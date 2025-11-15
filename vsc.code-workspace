@@ -1,0 +1,20 @@
+{
+    "folders": [
+        {
+            "path": "viiper"
+        },
+        {
+            "path": "doc"
+        },
+        {
+            "path": "scripts"
+        },
+        {
+            "path": "examples"
+        },
+        {
+            "name": "root",
+            "path": "."
+        }
+    ]
+}
