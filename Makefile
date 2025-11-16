@@ -98,16 +98,16 @@ run-server: ## Build and run VIIPER server with default settings
 	cd $(SRC_DIR) && go run $(MAIN_PKG) server
 
 .PHONY: docs-serve
-docs-serve: ## Serve MkDocs documentation locally
-	mkdocs serve
+docs-serve: ## Serve MkDocs documentation locally (latest dev version)
+	mike serve
 
 .PHONY: docs-build
 docs-build: ## Build MkDocs documentation
 	mkdocs build
 
-.PHONY: docs-deploy
-docs-deploy: ## Deploy documentation to GitHub Pages
-	mkdocs gh-deploy
+.PHONY: docs-deploy-dev
+docs-deploy-dev: ## Deploy dev documentation version to GitHub Pages
+	mike deploy --push --update-aliases dev latest
 
 .PHONY: version
 version: ## Show version information

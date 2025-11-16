@@ -31,75 +31,15 @@ jobs:
         id: generate_changelog
         shell: bash
         run: |
-          set -euo pipefail
-          echo "Generating changelog from commits..."
-
-          MODE="${{ inputs.mode }}"
-          if [[ "$MODE" == "release" ]]; then
-            PREVIOUS_TAG=$(git describe --tags --abbrev=0 --match "v*.*.*" HEAD^ 2>/dev/null || echo "")
-            CURRENT_TAG="${{ inputs.tag_name }}"
-            if [[ -z "$PREVIOUS_TAG" ]]; then
-              LOG_RANGE="$CURRENT_TAG"
-              CONTEXT_MSG="All changes in this release:"
-            else
-              LOG_RANGE="$PREVIOUS_TAG..$CURRENT_TAG"
-              CONTEXT_MSG="Changes since $PREVIOUS_TAG:"
-            fi
+          chmod +x .github/scripts/generate-changelog.sh
+          # Determine output file
+          OUTFILE=changelog_output.md
+          if [[ "${{ inputs.mode }}" == "release" ]]; then
+            .github/scripts/generate-changelog.sh "$OUTFILE" "${{ inputs.tag_name }}"
           else
-            LATEST_TAG=$(git describe --tags --abbrev=0 --match "v*.*.*" 2>/dev/null || echo "")
-            if [[ -z "$LATEST_TAG" ]]; then
-              LOG_RANGE=""
-              CONTEXT_MSG="All changes:"
-            else
-              LOG_RANGE="$LATEST_TAG..HEAD"
-              CONTEXT_MSG="since $LATEST_TAG:"
-            fi
+            .github/scripts/generate-changelog.sh "$OUTFILE"
           fi
-
-          mapfile -t COMMITS < <(git log --pretty=format:'%H' $LOG_RANGE)
-          CHANGELOG=""
-          for commit_hash in "${COMMITS[@]}"; do
-            commit_msg=$(git log -1 --pretty=format:'%s' "$commit_hash")
-            commit_body=$(git log -1 --pretty=format:'%b' "$commit_hash")
-            if echo "$commit_body" | grep -qiE "Changelog: (feature|fix|misc)"; then
-              changelog_type=$(echo "$commit_body" | grep -oiE "Changelog: (feature|fix|misc)" | head -n1 | cut -d ' ' -f 2 | tr '[:upper:]' '[:lower:]')
-              entry="- **$changelog_type**: $commit_msg"
-              body_content=$(echo "$commit_body" | grep -v -i "^Changelog: " | sed '/^$/d' || true)
-              if [[ -n "$body_content" ]]; then
-                entry="$entry\n  $(echo "$body_content" | sed 's/^/  /')"
-              fi
-              CHANGELOG="$CHANGELOG\n$entry"
-            fi
-          done
-
-          FEATURES=$(echo "$CHANGELOG" | grep "**feature**" || true)
-          FIXES=$(echo "$CHANGELOG" | grep "**fix**" || true)
-          MISC=$(echo "$CHANGELOG" | grep "**misc**" || true)
-
-          {
-            echo "changelog<<CHANGELOG_EOF"
-            if [[ -n "$CONTEXT_MSG" ]]; then
-              echo "$CONTEXT_MSG"
-              echo ""
-            fi
-            if [[ -n "$FEATURES" ]]; then
-              echo "### ✨ New Features"
-              echo ""
-              echo "$FEATURES" | sed 's/\\n/\n/g' | sed 's/**feature**: //g'
-              echo ""
-            fi
-            if [[ -n "$FIXES" ]]; then
-              echo "### 🐛 Fixes"
-              echo ""
-              echo "$FIXES" | sed 's/\\n/\n/g' | sed 's/**fix**: //g'
-              echo ""
-            fi
-            if [[ -n "$MISC" ]]; then
-              echo "### 🔧 Miscellaneous"
-              echo ""
-              echo "$MISC" | sed 's/\\n/\n/g' | sed 's/**misc**: //g'
-              echo ""
-            fi
-            echo "CHANGELOG_EOF"
-          } >> "$GITHUB_OUTPUT"
-          echo "Changelog generated."
+          # Set output for workflow
+          echo "changelog<<CHANGELOG_EOF" >> $GITHUB_OUTPUT
+          cat "$OUTFILE" >> $GITHUB_OUTPUT
+          echo "CHANGELOG_EOF" >> $GITHUB_OUTPUT

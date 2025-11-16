@@ -2,7 +2,7 @@ name: Dev Snapshot Build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 permissions:
   contents: write
@@ -25,7 +25,7 @@ jobs:
     name: Create Pre-Release
     needs: [build, generate-changelog]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/master')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

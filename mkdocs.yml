@@ -34,6 +34,11 @@ theme:
     - search.highlight
     - content.code.copy
 
+extra:
+  version:
+    provider: mike
+    default: stable
+
 extra_css:
   - stylesheets/extra.css
 
@@ -61,3 +66,4 @@ nav:
     - Configuration: cli/configuration.md
   - API Reference:
     - Overview: api/overview.md
+  - Changelog: changelog/
