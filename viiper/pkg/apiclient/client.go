@@ -1,6 +1,8 @@
 package apiclient
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,18 +18,24 @@ type Client struct{ transport *Transport }
 // The addr parameter specifies the TCP address (host:port) of the VIIPER API server.
 func New(addr string) *Client { return &Client{transport: NewTransport(addr)} }
 
+// NewWithConfig constructs a client with custom transport timeouts.
+func NewWithConfig(addr string, cfg *Config) *Client {
+	return &Client{transport: NewTransportWithConfig(addr, cfg)}
+}
+
 // WithTransport constructs a Client using a custom Transport implementation.
 // This is primarily useful for testing or when advanced transport configuration is needed.
 func WithTransport(t *Transport) *Client { return &Client{transport: t} }
 
-type errorEnvelope struct {
-	Error string `json:"error"`
-}
-
 // BusCreate creates a new virtual USB bus with the specified bus number.
 // Returns the created bus ID or an error if the bus number is already allocated.
 func (c *Client) BusCreate(busID uint32) (*apitypes.BusCreateResponse, error) {
-	line, err := c.transport.Do("bus/create", fmt.Sprintf("%d", busID), nil)
+	return c.BusCreateCtx(context.Background(), busID)
+}
+
+func (c *Client) BusCreateCtx(ctx context.Context, busID uint32) (*apitypes.BusCreateResponse, error) {
+	const path = "bus/create"
+	line, err := c.transport.DoCtx(ctx, path, fmt.Sprintf("%d", busID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +45,12 @@ func (c *Client) BusCreate(busID uint32) (*apitypes.BusCreateResponse, error) {
 // BusRemove removes an existing virtual USB bus and all devices attached to it.
 // Returns the removed bus ID or an error if the bus does not exist.
 func (c *Client) BusRemove(busID uint32) (*apitypes.BusRemoveResponse, error) {
-	line, err := c.transport.Do("bus/remove", fmt.Sprintf("%d", busID), nil)
+	return c.BusRemoveCtx(context.Background(), busID)
+}
+
+func (c *Client) BusRemoveCtx(ctx context.Context, busID uint32) (*apitypes.BusRemoveResponse, error) {
+	const path = "bus/remove"
+	line, err := c.transport.DoCtx(ctx, path, fmt.Sprintf("%d", busID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +59,12 @@ func (c *Client) BusRemove(busID uint32) (*apitypes.BusRemoveResponse, error) {
 
 // BusList retrieves a list of all active virtual USB bus numbers.
 func (c *Client) BusList() (*apitypes.BusListResponse, error) {
-	line, err := c.transport.Do("bus/list", nil, nil)
+	return c.BusListCtx(context.Background())
+}
+
+func (c *Client) BusListCtx(ctx context.Context) (*apitypes.BusListResponse, error) {
+	const path = "bus/list"
+	line, err := c.transport.DoCtx(ctx, path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -58,8 +76,13 @@ func (c *Client) BusList() (*apitypes.BusListResponse, error) {
 // Returns the assigned bus ID (e.g., "1-1") or an error if the bus does not exist
 // or the device type is unknown.
 func (c *Client) DeviceAdd(busID uint32, devType string) (*apitypes.DeviceAddResponse, error) {
+	return c.DeviceAddCtx(context.Background(), busID, devType)
+}
+
+func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string) (*apitypes.DeviceAddResponse, error) {
 	pathParams := map[string]string{"id": fmt.Sprintf("%d", busID)}
-	line, err := c.transport.Do("bus/{id}/add", devType, pathParams)
+	const path = "bus/{id}/add"
+	line, err := c.transport.DoCtx(ctx, path, devType, pathParams)
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +94,13 @@ func (c *Client) DeviceAdd(busID uint32, devType string) (*apitypes.DeviceAddRes
 // Active USB-IP connections to the device will be closed.
 // Returns the removed device's bus and device ID or an error if not found.
 func (c *Client) DeviceRemove(busID uint32, busid string) (*apitypes.DeviceRemoveResponse, error) {
+	return c.DeviceRemoveCtx(context.Background(), busID, busid)
+}
+
+func (c *Client) DeviceRemoveCtx(ctx context.Context, busID uint32, busid string) (*apitypes.DeviceRemoveResponse, error) {
 	pathParams := map[string]string{"id": fmt.Sprintf("%d", busID)}
-	line, err := c.transport.Do("bus/{id}/remove", busid, pathParams)
+	const path = "bus/{id}/remove"
+	line, err := c.transport.DoCtx(ctx, path, busid, pathParams)
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +110,15 @@ func (c *Client) DeviceRemove(busID uint32, busid string) (*apitypes.DeviceRemov
 // DevicesList retrieves a list of all devices attached to the specified bus.
 // Each device entry includes bus ID, device ID, VID, PID, and device type.
 func (c *Client) DevicesList(busID uint32) (*apitypes.DevicesListResponse, error) {
+	return c.DevicesListCtx(context.Background(), busID)
+}
+
+func (c *Client) DevicesListCtx(ctx context.Context, busID uint32) (*apitypes.DevicesListResponse, error) {
 	pathParams := map[string]string{"id": fmt.Sprintf("%d", busID)}
 	// Endpoint path corrected to match server registration ("bus/{id}/list").
 	// Previously used "bus/{id}/devices" which is not registered by the API server.
-	line, err := c.transport.Do("bus/{id}/list", nil, pathParams)
+	const path = "bus/{id}/list"
+	line, err := c.transport.DoCtx(ctx, path, nil, pathParams)
 	if err != nil {
 		return nil, err
 	}
@@ -96,12 +129,14 @@ func parse[T any](line string) (*T, error) {
 	if line == "" {
 		return nil, errors.New("empty response")
 	}
-	var ee errorEnvelope
-	if err := json.Unmarshal([]byte(line), &ee); err == nil && ee.Error != "" {
-		return nil, errors.New(ee.Error)
+	var ae apitypes.ApiError
+	if err := json.Unmarshal([]byte(line), &ae); err == nil && ae.Error != "" {
+		return nil, errors.New(ae.Error)
 	}
 	var out T
-	if err := json.Unmarshal([]byte(line), &out); err != nil {
+	dec := json.NewDecoder(bytes.NewReader([]byte(line)))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&out); err != nil {
 		return nil, fmt.Errorf("decode: %w", err)
 	}
 	return &out, nil

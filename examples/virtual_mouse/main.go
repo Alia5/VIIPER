@@ -1,12 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"io"
-	"net"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -23,9 +21,11 @@ func main() {
 	}
 
 	addr := os.Args[1]
+	ctx := context.Background()
 	api := apiclient.New(addr)
 
-	busesResp, err := api.BusList()
+	// Find or create a bus
+	busesResp, err := api.BusListCtx(ctx)
 	if err != nil {
 		fmt.Printf("BusList error: %v\n", err)
 		os.Exit(1)
@@ -35,7 +35,7 @@ func main() {
 	if len(busesResp.Buses) == 0 {
 		var createErr error
 		for try := uint32(1); try <= 100; try++ {
-			if r, err := api.BusCreate(try); err == nil {
+			if r, err := api.BusCreateCtx(ctx, try); err == nil {
 				busID = r.BusID
 				createdBus = true
 				break
@@ -57,57 +57,33 @@ func main() {
 		fmt.Printf("Using existing bus %d\n", busID)
 	}
 
-	addResp, err := api.DeviceAdd(busID, "mouse")
+	// Add device and connect to stream in one call
+	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, "mouse")
 	if err != nil {
-		fmt.Printf("DeviceAdd error: %v\n", err)
+		fmt.Printf("AddDeviceAndConnect error: %v\n", err)
 		if createdBus {
-			_, _ = api.BusRemove(busID)
+			_, _ = api.BusRemoveCtx(ctx, busID)
 		}
 		os.Exit(1)
 	}
-	deviceBusId := addResp.ID
-	devId := deviceBusId
-	if i := strings.Index(deviceBusId, "-"); i >= 0 && i+1 < len(deviceBusId) {
-		devId = deviceBusId[i+1:]
-	}
-	createdDevice := true
-	fmt.Printf("Created device %s on bus %d\n", devId, busID)
+	defer stream.Close()
 
+	deviceBusId := addResp.ID
+	fmt.Printf("Created and connected to device %s on bus %d\n", deviceBusId, busID)
+
+	// Cleanup on exit
 	defer func() {
-		if createdDevice {
-			if _, err := api.DeviceRemove(busID, devId); err != nil {
-				fmt.Printf("DeviceRemove error: %v\n", err)
-			} else {
-				fmt.Printf("Removed device %s\n", deviceBusId)
-			}
+		if _, err := api.DeviceRemoveCtx(ctx, stream.BusID, stream.DevID); err != nil {
+			fmt.Printf("DeviceRemove error: %v\n", err)
+		} else {
+			fmt.Printf("Removed device %s\n", deviceBusId)
 		}
 		if createdBus {
-			if _, err := api.BusRemove(busID); err != nil {
+			if _, err := api.BusRemoveCtx(ctx, busID); err != nil {
 				fmt.Printf("BusRemove error: %v\n", err)
 			} else {
 				fmt.Printf("Removed bus %d\n", busID)
 			}
-		}
-	}()
-
-	conn, err := net.Dial("tcp", addr)
-	if err != nil {
-		fmt.Printf("Stream dial error: %v\n", err)
-		return
-	}
-	defer conn.Close()
-	if _, err := fmt.Fprintf(conn, "bus/%d/%s\n", busID, devId); err != nil {
-		fmt.Printf("Stream activate error: %v\n", err)
-		return
-	}
-	fmt.Printf("Stream activated for %s\n", devId)
-
-	stop := make(chan struct{})
-	go func() {
-		// Mouse has no feedback channel, but we monitor for connection close
-		buf := make([]byte, 1)
-		if _, err := io.ReadFull(conn, buf); err != nil {
-			close(stop)
 		}
 	}()
 
@@ -132,66 +108,52 @@ func main() {
 			dir *= -1
 
 			// One-shot movement report (diagonal)
-			move := mouse.InputState{DX: dx, DY: dy}
-			pkt, _ := move.MarshalBinary()
-			if _, err := conn.Write(pkt); err != nil {
+			move := &mouse.InputState{DX: dx, DY: dy}
+			if err := stream.WriteBinary(move); err != nil {
 				fmt.Printf("Write error (move): %v\n", err)
-				close(stop)
 				return
 			}
 			fmt.Printf("→ Moved mouse dx=%d dy=%d\n", dx, dy)
 
 			// Zero state shortly after to keep movement one-shot (harmless safety)
 			time.Sleep(30 * time.Millisecond)
-			zero := mouse.InputState{}
-			zpkt, _ := zero.MarshalBinary()
-			if _, err := conn.Write(zpkt); err != nil {
+			zero := &mouse.InputState{}
+			if err := stream.WriteBinary(zero); err != nil {
 				fmt.Printf("Write error (zero after move): %v\n", err)
-				close(stop)
 				return
 			}
 
 			// Simulate a short left click: press then release
 			time.Sleep(50 * time.Millisecond)
-			press := mouse.InputState{Buttons: 0x01}
-			ppkt, _ := press.MarshalBinary()
-			if _, err := conn.Write(ppkt); err != nil {
+			press := &mouse.InputState{Buttons: 0x01}
+			if err := stream.WriteBinary(press); err != nil {
 				fmt.Printf("Write error (press): %v\n", err)
-				close(stop)
 				return
 			}
 			time.Sleep(60 * time.Millisecond)
-			rel := mouse.InputState{Buttons: 0x00}
-			rpkt, _ := rel.MarshalBinary()
-			if _, err := conn.Write(rpkt); err != nil {
+			rel := &mouse.InputState{Buttons: 0x00}
+			if err := stream.WriteBinary(rel); err != nil {
 				fmt.Printf("Write error (release): %v\n", err)
-				close(stop)
 				return
 			}
 			fmt.Printf("→ Clicked (left)\n")
 
 			// Simulate a short scroll: one notch upwards
 			time.Sleep(50 * time.Millisecond)
-			scr := mouse.InputState{Wheel: 1}
-			spkt, _ := scr.MarshalBinary()
-			if _, err := conn.Write(spkt); err != nil {
+			scr := &mouse.InputState{Wheel: 1}
+			if err := stream.WriteBinary(scr); err != nil {
 				fmt.Printf("Write error (scroll): %v\n", err)
-				close(stop)
 				return
 			}
 			time.Sleep(30 * time.Millisecond)
-			scr0 := mouse.InputState{}
-			spkt0, _ := scr0.MarshalBinary()
-			if _, err := conn.Write(spkt0); err != nil {
+			scr0 := &mouse.InputState{}
+			if err := stream.WriteBinary(scr0); err != nil {
 				fmt.Printf("Write error (zero after scroll): %v\n", err)
-				close(stop)
 				return
 			}
 			fmt.Printf("→ Scrolled (wheel=+1)\n")
 		case <-sigCh:
 			fmt.Println("Signal received, stopping…")
-			return
-		case <-stop:
 			return
 		}
 	}

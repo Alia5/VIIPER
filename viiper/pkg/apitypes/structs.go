@@ -2,6 +2,10 @@ package apitypes
 
 // Shared API response structs used by both handlers and clients.
 
+type ApiError struct {
+	Error string `json:"error"`
+}
+
 type BusListResponse struct {
 	Buses []uint32 `json:"buses"`
 }

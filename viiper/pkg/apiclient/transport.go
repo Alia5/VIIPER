@@ -2,27 +2,54 @@ package apiclient
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
 	"net/url"
 	"strings"
+	"time"
 )
+
+// Config controls low-level transport behavior such as timeouts.
+type Config struct {
+	DialTimeout  time.Duration
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+}
+
+func defaultConfig() Config {
+	return Config{
+		DialTimeout:  3 * time.Second,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
+	}
+}
 
 // Transport is the low-level VIIPER line protocol implementation used by higher-level API clients.
 // It builds the command line as: "<path> <payload>\n" with optional URL-escaped path params.
 type Transport struct {
 	addr string
 	mock func(path string, payload any, pathParams map[string]string) (string, error)
+	cfg  Config
 }
 
 // NewTransport creates a new low-level transport.
-func NewTransport(addr string) *Transport { return &Transport{addr: addr} }
+func NewTransport(addr string) *Transport { return NewTransportWithConfig(addr, nil) }
+
+// NewTransportWithConfig creates a new low-level transport with optional timeouts configuration.
+func NewTransportWithConfig(addr string, cfg *Config) *Transport {
+	c := defaultConfig()
+	if cfg != nil {
+		c = *cfg
+	}
+	return &Transport{addr: addr, cfg: c}
+}
 
 // NewMockTransport creates a transport that returns canned responses without real networking.
 // The responder function receives the path, payload and path params and returns the raw line.
 func NewMockTransport(responder func(path string, payload any, pathParams map[string]string) (string, error)) *Transport {
-	return &Transport{addr: "mock", mock: responder}
+	return &Transport{addr: "mock", mock: responder, cfg: defaultConfig()}
 }
 
 // Extend Transport with optional mock callback (kept private to avoid external misuse).
@@ -36,6 +63,11 @@ func NewMockTransport(responder func(path string, payload any, pathParams map[st
 //	struct/other -> JSON marshaled bytes
 //	nil -> no payload appended
 func (c *Transport) Do(path string, payload any, pathParams map[string]string) (string, error) {
+	return c.DoCtx(context.Background(), path, payload, pathParams)
+}
+
+// DoCtx is like Do but honors the provided context and configured timeouts.
+func (c *Transport) DoCtx(ctx context.Context, path string, payload any, pathParams map[string]string) (string, error) {
 	if c.mock != nil {
 		return c.mock(path, payload, pathParams)
 	}
@@ -46,15 +78,25 @@ func (c *Transport) Do(path string, payload any, pathParams map[string]string) (
 	} else {
 		lineBytes = []byte(fullPath)
 	}
-	conn, err := net.Dial("tcp", c.addr)
+	if err := ctx.Err(); err != nil {
+		return "", fmt.Errorf("dial: %w", err)
+	}
+	d := &net.Dialer{Timeout: c.cfg.DialTimeout}
+	conn, err := d.DialContext(ctx, "tcp", c.addr)
 	if err != nil {
 		return "", fmt.Errorf("dial: %w", err)
 	}
 	defer conn.Close()
+	if c.cfg.WriteTimeout > 0 {
+		_ = conn.SetWriteDeadline(time.Now().Add(c.cfg.WriteTimeout))
+	}
 	if _, err := conn.Write(append(lineBytes, '\n')); err != nil {
 		return "", fmt.Errorf("write: %w", err)
 	}
 	r := bufio.NewReader(conn)
+	if c.cfg.ReadTimeout > 0 {
+		_ = conn.SetReadDeadline(time.Now().Add(c.cfg.ReadTimeout))
+	}
 	resp, err := r.ReadString('\n')
 	if err != nil {
 		if len(resp) == 0 { // no data received

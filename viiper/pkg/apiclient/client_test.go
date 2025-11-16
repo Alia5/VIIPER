@@ -1,6 +1,7 @@
 package apiclient
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -66,7 +67,7 @@ func TestHighLevelClient(t *testing.T) {
 		{
 			name: "devices list",
 			setup: func(ms *mockState) {
-				ms.responses["bus/{id}/devices"] = `{"devices":[{"busId":1,"devId":"1","vid":"0x1234","pid":"0xabcd","type":"x"}]}`
+				ms.responses["bus/{id}/list"] = `{"devices":[{"busId":1,"devId":"1","vid":"0x1234","pid":"0xabcd","type":"x"}]}`
 			},
 			call: func(c *Client) (any, error) { return c.DevicesList(1) },
 			assertFunc: func(t *testing.T, got any) {
@@ -88,7 +89,7 @@ func TestHighLevelClient(t *testing.T) {
 		{
 			name: "devices list empty",
 			setup: func(ms *mockState) {
-				ms.responses["bus/{id}/devices"] = `{"devices":[]}`
+				ms.responses["bus/{id}/list"] = `{"devices":[]}`
 			},
 			call: func(c *Client) (any, error) { return c.DevicesList(1) },
 			assertFunc: func(t *testing.T, got any) {
@@ -108,7 +109,7 @@ func TestHighLevelClient(t *testing.T) {
 			got, err := tt.call(c)
 			if tt.wantErr != "" {
 				assert.Error(t, err)
-				assert.Equal(t, tt.wantErr, err.Error())
+				assert.Contains(t, err.Error(), tt.wantErr)
 				return
 			}
 			assert.NoError(t, err)
@@ -117,4 +118,22 @@ func TestHighLevelClient(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestContextCancellation(t *testing.T) {
+	// Use a real transport but cancel the context before dialing.
+	c := WithTransport(NewTransport("127.0.0.1:9")) // address irrelevant due to early cancel
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	_, err := c.BusListCtx(ctx)
+	assert.Error(t, err)
+}
+
+func TestStrictJSONDecode(t *testing.T) {
+	ms := &mockState{responses: map[string]string{}}
+	// extra field should cause decode error due to DisallowUnknownFields
+	ms.responses["bus/list"] = `{"buses":[1,2,3],"extra":true}`
+	c := WithTransport(newMockTransport(ms))
+	_, err := c.BusList()
+	assert.Error(t, err)
 }

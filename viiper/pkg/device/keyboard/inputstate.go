@@ -20,6 +20,21 @@ type LEDState struct {
 	Kana       bool
 }
 
+// UnmarshalBinary decodes a 1-byte LED bitmask into LEDState.
+// Bits are defined by LEDNumLock, LEDCapsLock, LEDScrollLock, LEDCompose, LEDKana.
+func (st *LEDState) UnmarshalBinary(data []byte) error {
+	if len(data) < 1 {
+		return io.ErrUnexpectedEOF
+	}
+	b := data[0]
+	st.NumLock = b&LEDNumLock != 0
+	st.CapsLock = b&LEDCapsLock != 0
+	st.ScrollLock = b&LEDScrollLock != 0
+	st.Compose = b&LEDCompose != 0
+	st.Kana = b&LEDKana != 0
+	return nil
+}
+
 // BuildReport encodes an InputState into the 34-byte HID keyboard report.
 //
 // Report layout (34 bytes):

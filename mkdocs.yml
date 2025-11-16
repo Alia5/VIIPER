@@ -64,8 +64,10 @@ nav:
     - Server Command: cli/server.md
     - Proxy Command: cli/proxy.md
     - Configuration: cli/configuration.md
-  - API Reference:
-    - Overview: api/overview.md
+  - API & Clients:
+    - API Overview: api/overview.md
+    - Go Client: clients/go.md
+    - Client Libraries Design: clients/design.md
   - Devices:
     - Xbox 360 Controller: devices/xbox360.md
     - Keyboard: devices/keyboard.md

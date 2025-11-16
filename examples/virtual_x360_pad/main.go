@@ -1,12 +1,13 @@
 package main
 
 import (
+	"bufio"
+	"context"
+	"encoding"
 	"fmt"
 	"io"
-	"net"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -23,9 +24,11 @@ func main() {
 	}
 
 	addr := os.Args[1]
+	ctx := context.Background()
 	api := apiclient.New(addr)
 
-	busesResp, err := api.BusList()
+	// Find or create a bus
+	busesResp, err := api.BusListCtx(ctx)
 	if err != nil {
 		fmt.Printf("BusList error: %v\n", err)
 		os.Exit(1)
@@ -35,7 +38,7 @@ func main() {
 	if len(busesResp.Buses) == 0 {
 		var createErr error
 		for try := uint32(1); try <= 100; try++ {
-			if r, err := api.BusCreate(try); err == nil {
+			if r, err := api.BusCreateCtx(ctx, try); err == nil {
 				busID = r.BusID
 				createdBus = true
 				break
@@ -57,32 +60,29 @@ func main() {
 		fmt.Printf("Using existing bus %d\n", busID)
 	}
 
-	addResp, err := api.DeviceAdd(busID, "xbox360")
+	// Add device and connect to stream in one call
+	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, "xbox360")
 	if err != nil {
-		fmt.Printf("DeviceAdd error: %v\n", err)
+		fmt.Printf("AddDeviceAndConnect error: %v\n", err)
 		if createdBus {
-			_, _ = api.BusRemove(busID)
+			_, _ = api.BusRemoveCtx(ctx, busID)
 		}
 		os.Exit(1)
 	}
-	deviceBusId := addResp.ID
-	devId := deviceBusId
-	if i := strings.Index(deviceBusId, "-"); i >= 0 && i+1 < len(deviceBusId) {
-		devId = deviceBusId[i+1:]
-	}
-	createdDevice := true
-	fmt.Printf("Created device %s on bus %d\n", devId, busID)
+	defer stream.Close()
 
+	deviceBusId := addResp.ID
+	fmt.Printf("Created and connected to device %s on bus %d\n", deviceBusId, busID)
+
+	// Cleanup on exit
 	defer func() {
-		if createdDevice {
-			if _, err := api.DeviceRemove(busID, devId); err != nil {
-				fmt.Printf("DeviceRemove error: %v\n", err)
-			} else {
-				fmt.Printf("Removed device %s\n", deviceBusId)
-			}
+		if _, err := api.DeviceRemoveCtx(ctx, stream.BusID, stream.DevID); err != nil {
+			fmt.Printf("DeviceRemove error: %v\n", err)
+		} else {
+			fmt.Printf("Removed device %s\n", deviceBusId)
 		}
 		if createdBus {
-			if _, err := api.BusRemove(busID); err != nil {
+			if _, err := api.BusRemoveCtx(ctx, busID); err != nil {
 				fmt.Printf("BusRemove error: %v\n", err)
 			} else {
 				fmt.Printf("Removed bus %d\n", busID)
@@ -90,29 +90,37 @@ func main() {
 		}
 	}()
 
-	conn, err := net.Dial("tcp", addr)
-	if err != nil {
-		fmt.Printf("Stream dial error: %v\n", err)
-		return
-	}
-	defer conn.Close()
-	if _, err := fmt.Fprintf(conn, "bus/%d/%s\n", busID, devId); err != nil {
-		fmt.Printf("Stream activate error: %v\n", err)
-		return
-	}
-	fmt.Printf("Stream activated for %s\n", devId)
+	// Start event-driven rumble reading
+	rumbleCh, errCh := stream.StartReading(ctx, 10, func(r *bufio.Reader) (encoding.BinaryUnmarshaler, error) {
+		var b [2]byte
+		if _, err := io.ReadFull(r, b[:]); err != nil {
+			return nil, err
+		}
+		msg := new(xbox360.XRumbleState)
+		if err := msg.UnmarshalBinary(b[:]); err != nil {
+			return nil, err
+		}
+		return msg, nil
+	})
 
-	stop := make(chan struct{})
 	go func() {
-		buf := make([]byte, 2)
 		for {
-			if _, err := io.ReadFull(conn, buf); err != nil {
+			select {
+			case msg := <-rumbleCh:
+				if msg != nil {
+					rumble := msg.(*xbox360.XRumbleState)
+					fmt.Printf("← Rumble: Left=%d, Right=%d\n", rumble.LeftMotor, rumble.RightMotor)
+				}
+			case err := <-errCh:
+				if err != nil {
+					fmt.Printf("Stream read error: %v\n", err)
+				}
 				return
 			}
-			fmt.Printf("← Rumble: Left=%d, Right=%d\n", buf[0], buf[1])
 		}
 	}()
 
+	// Send controller inputs
 	ticker := time.NewTicker(16 * time.Millisecond)
 	defer ticker.Stop()
 
@@ -135,7 +143,7 @@ func main() {
 			default:
 				buttons = 0x0008 // Y
 			}
-			state := xbox360.InputState{
+			state := &xbox360.InputState{
 				Buttons: buttons,
 				LT:      uint8((frame * 2) % 256),
 				RT:      uint8((frame * 3) % 256),
@@ -144,10 +152,8 @@ func main() {
 				RX:      0,
 				RY:      0,
 			}
-			pkt, _ := state.MarshalBinary()
-			if _, err := conn.Write(pkt); err != nil {
+			if err := stream.WriteBinary(state); err != nil {
 				fmt.Printf("Write error: %v\n", err)
-				close(stop)
 				return
 			}
 			if frame%60 == 0 {
@@ -155,8 +161,6 @@ func main() {
 			}
 		case <-sigCh:
 			fmt.Println("Signal received, stopping…")
-			return
-		case <-stop:
 			return
 		}
 	}
