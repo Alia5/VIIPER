@@ -16,6 +16,8 @@
         <link rel="prev" href="../../cli/configuration/">
       
       
+        <link rel="next" href="../../devices/xbox360/">
+      
       
         
       
@@ -297,6 +299,26 @@
   
   
   API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../devices/xbox360/" class="md-tabs__link">
+          
+  
+  
+  Devices
 
         </a>
       </li>
@@ -854,6 +876,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hid-keyboard-stream-device-type-keyboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HID keyboard stream (device type: keyboard)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hid-mouse-stream-device-type-mouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HID mouse stream (device type: mouse)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -929,6 +973,151 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Devices
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Devices
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/xbox360/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Xbox 360 Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/keyboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keyboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/mouse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mouse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1034,6 +1223,28 @@
     <span class="md-ellipsis">
       
         Xbox 360 controller stream (device type: xbox360)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hid-keyboard-stream-device-type-keyboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HID keyboard stream (device type: keyboard)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hid-mouse-stream-device-type-mouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HID mouse stream (device type: mouse)
       
     </span>
   </a>
@@ -1219,6 +1430,39 @@
 </li>
 </ul>
 <p>See <code>pkg/device/xbox360/protocol.go</code> for full details.</p>
+<h4 id="hid-keyboard-stream-device-type-keyboard">HID keyboard stream (device type: <code>keyboard</code>)</h4>
+<p>Direction: client ➜ server (keys pressed)</p>
+<ul>
+<li>Variable-length packets per frame:<ul>
+<li>Header: Modifiers uint8, KeyCount uint8</li>
+<li>Body: KeyCount bytes of HID Usage IDs for currently pressed (non-modifier) keys</li>
+</ul>
+</li>
+</ul>
+<p>Direction: server ➜ client (LED state)</p>
+<ul>
+<li>1-byte packets whenever host LED state changes:<ul>
+<li>Bit 0 NumLock, Bit 1 CapsLock, Bit 2 ScrollLock</li>
+</ul>
+</li>
+</ul>
+<p>Host-facing HID input report is 34 bytes: [Modifiers (1), Reserved (1), 256-bit key bitmap (32)].</p>
+<p>See <code>pkg/device/keyboard/</code> for helpers and constants.</p>
+<h4 id="hid-mouse-stream-device-type-mouse">HID mouse stream (device type: <code>mouse</code>)</h4>
+<p>Direction: client ➜ server (motion/buttons)</p>
+<ul>
+<li>Fixed 5-byte packets per frame:<ul>
+<li>Buttons uint8 (bits 0..4)</li>
+<li>dX int8, dY int8</li>
+<li>Wheel int8, Pan int8</li>
+</ul>
+</li>
+</ul>
+<p>Direction: server ➜ client</p>
+<ul>
+<li>None (mouse is input-only)</li>
+</ul>
+<p>Note: Motion and wheel deltas are consumed after each IN report so movement is relative.</p>
 <p>Note on protocol compatibility:</p>
 <ul>
 <li>The wire format is modeled after the XInput gamepad state (XINPUT_GAMEPAD) but is not byte‑for‑byte identical. Key differences:<ul>
