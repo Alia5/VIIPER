@@ -83,7 +83,9 @@ func (c *Client) DeviceRemove(busID uint32, busid string) (*apitypes.DeviceRemov
 // Each device entry includes bus ID, device ID, VID, PID, and device type.
 func (c *Client) DevicesList(busID uint32) (*apitypes.DevicesListResponse, error) {
 	pathParams := map[string]string{"id": fmt.Sprintf("%d", busID)}
-	line, err := c.transport.Do("bus/{id}/devices", nil, pathParams)
+	// Endpoint path corrected to match server registration ("bus/{id}/list").
+	// Previously used "bus/{id}/devices" which is not registered by the API server.
+	line, err := c.transport.Do("bus/{id}/list", nil, pathParams)
 	if err != nil {
 		return nil, err
 	}
