@@ -5,26 +5,50 @@ import (
 	"io"
 )
 
-// XInputState is the wire format for controller inputs sent from client to device.
-// Total size: 14 bytes (fixed).
-// Layout:
-//
-//	Buttons: 4 bytes (LE uint32)
-//	LT: 1 byte
-//	RT: 1 byte
-//	LX: 2 bytes (LE int16)
-//	LY: 2 bytes (LE int16)
-//	RX: 2 bytes (LE int16)
-//	RY: 2 bytes (LE int16)
-type XInputState struct {
+// InputState represents the controller state used to build a report.
+// Values are more or less XInput's C API
+type InputState struct {
+	// Button bitfield (lower 16 bits used typically), higher bits reserved
 	Buttons uint32
-	LT, RT  uint8
-	LX, LY  int16
-	RX, RY  int16
+	// Triggers: 0-255
+	LT, RT uint8
+	// Sticks: signed 16-bit little endian values
+	LX, LY int16
+	RX, RY int16
 }
 
-// MarshalBinary encodes XInputState to 12 bytes.
-func (x *XInputState) MarshalBinary() ([]byte, error) {
+// BuildReport encodes an InputState into the 20-byte Xbox 360 USB report
+// layout used by the wired controller.
+//
+// Bytes:
+//
+//	0: 0x00 (report id/message)
+//	1: 0x14 (payload size 20)
+//	2-7: buttons/reserved (we use first two bytes for button bitfield)
+//	8: LT (0-255)
+//	9: RT (0-255)
+//
+// 10-11: LX (LE int16)
+// 12-13: LY (LE int16)
+// 14-15: RX (LE int16)
+// 16-17: RY (LE int16)
+// 18-19: reserved 0x00
+func (st InputState) BuildReport() []byte {
+	b := make([]byte, 20)
+	b[0] = 0x00
+	b[1] = 0x14
+	binary.LittleEndian.PutUint16(b[2:4], uint16(st.Buttons&0xffff))
+	b[8] = st.LT
+	b[9] = st.RT
+	binary.LittleEndian.PutUint16(b[10:12], uint16(st.LX))
+	binary.LittleEndian.PutUint16(b[12:14], uint16(st.LY))
+	binary.LittleEndian.PutUint16(b[14:16], uint16(st.RX))
+	binary.LittleEndian.PutUint16(b[16:18], uint16(st.RY))
+	return b
+}
+
+// MarshalBinary encodes InputState to 14 bytes.
+func (x *InputState) MarshalBinary() ([]byte, error) {
 	b := make([]byte, 14)
 	binary.LittleEndian.PutUint32(b[0:4], x.Buttons)
 	b[4] = x.LT
@@ -36,8 +60,8 @@ func (x *XInputState) MarshalBinary() ([]byte, error) {
 	return b, nil
 }
 
-// UnmarshalBinary decodes 14 bytes into XInputState.
-func (x *XInputState) UnmarshalBinary(data []byte) error {
+// UnmarshalBinary decodes 14 bytes into InputState.
+func (x *InputState) UnmarshalBinary(data []byte) error {
 	if len(data) < 14 {
 		return io.ErrUnexpectedEOF
 	}
@@ -49,19 +73,6 @@ func (x *XInputState) UnmarshalBinary(data []byte) error {
 	x.RX = int16(binary.LittleEndian.Uint16(data[10:12]))
 	x.RY = int16(binary.LittleEndian.Uint16(data[12:14]))
 	return nil
-}
-
-// ToInputState converts XInputState to internal InputState for report building.
-func (x *XInputState) ToInputState() InputState {
-	return InputState{
-		Buttons: x.Buttons,
-		LT:      x.LT,
-		RT:      x.RT,
-		LX:      x.LX,
-		LY:      x.LY,
-		RX:      x.RX,
-		RY:      x.RY,
-	}
 }
 
 // XRumbleState is the wire format for rumble/motor commands sent from device to client.

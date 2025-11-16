@@ -48,11 +48,10 @@ func (r *handler) StreamHandler() api.StreamHandlerFunc {
 				return fmt.Errorf("read input state: %w", err)
 			}
 
-			var xstate XInputState
-			if err := xstate.UnmarshalBinary(buf); err != nil {
+			var state InputState
+			if err := state.UnmarshalBinary(buf); err != nil {
 				return fmt.Errorf("unmarshal input state: %w", err)
 			}
-			state := xstate.ToInputState()
 			xdev.UpdateInputState(state)
 		}
 	}

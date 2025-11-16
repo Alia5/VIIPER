@@ -1,3 +1,4 @@
+// Package device provides common interfaces and utilities for virtual USB devices.
 package device
 
 import (

@@ -49,7 +49,25 @@ type InterfaceConfig struct {
 type DeviceDescriptor struct {
 	Device     usb.DeviceDescriptor
 	Interfaces []InterfaceConfig
-	Strings    map[uint8][]byte
+	Strings    map[uint8]string
+}
+
+// EncodeStringDescriptor converts a UTF-8 string to a USB string descriptor byte array.
+// The resulting descriptor has the format:
+//
+//	Byte 0: bLength (total descriptor length)
+//	Byte 1: bDescriptorType (0x03 for string)
+//	Bytes 2+: UTF-16LE encoded string
+func EncodeStringDescriptor(s string) []byte {
+	runes := []rune(s)
+	buf := make([]byte, 2+len(runes)*2)
+	buf[0] = uint8(len(buf)) // bLength
+	buf[1] = 0x03            // bDescriptorType (STRING)
+	for i, r := range runes {
+		buf[2+i*2] = uint8(r)
+		buf[2+i*2+1] = uint8(r >> 8)
+	}
+	return buf
 }
 
 // DescriptorProvider is an optional device interface that exposes a static

@@ -549,7 +549,7 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 			data = buildConfigDescriptor(desc)
 		case usbDescTypeString:
 			if s, ok := desc.Strings[dindex]; ok {
-				data = s
+				data = virtualbus.EncodeStringDescriptor(s)
 			}
 		}
 		if len(data) == 0 {

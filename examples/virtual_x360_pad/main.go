@@ -135,7 +135,7 @@ func main() {
 			default:
 				buttons = 0x0008 // Y
 			}
-			state := xbox360.XInputState{
+			state := xbox360.InputState{
 				Buttons: buttons,
 				LT:      uint8((frame * 2) % 256),
 				RT:      uint8((frame * 3) % 256),
