@@ -13,8 +13,12 @@ type Log struct {
 
 // CLI is the root command structure for Kong CLI parsing.
 type CLI struct {
-	Log `embed:"" prefix:"log."`
+	// Global
+	ConfigPath string `help:"Path to configuration file (json|yaml|toml)" name:"config" env:"VIIPER_CONFIG"`
+	Log        `embed:"" prefix:"log."`
 
 	Server cmd.Server `cmd:"" help:"Start the VIIPER USB-IP server"`
 	Proxy  cmd.Proxy  `cmd:"" help:"Start the VIIPER USB-IP proxy"`
+
+	Config cmd.ConfigCommand `cmd:"" help:"Manage configuration files"`
 }

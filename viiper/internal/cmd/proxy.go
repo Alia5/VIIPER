@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -21,6 +22,10 @@ type Proxy struct {
 func (p *Proxy) Run(logger *slog.Logger, rawLogger log.RawLogger) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+
+	if p.UpstreamAddr == "" {
+		return errors.New("Upstream address is empty")
+	}
 
 	logger.Info("Starting VIIPER USB-IP proxy", "listen", p.ListenAddr, "upstream", p.UpstreamAddr)
 	proxySrv := proxy.New(p.ListenAddr, p.UpstreamAddr, p.ConnectionTimeout, logger, rawLogger)

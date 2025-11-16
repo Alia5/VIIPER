@@ -1,6 +1,10 @@
 # Configuration
 
-VIIPER can be configured via command-line flags or environment variables.
+VIIPER can be configured via:
+
+- Command-line flags
+- Environment variables
+- Configuration files (JSON/YAML/TOML)
 
 ## Environment Variables
 
@@ -30,6 +34,65 @@ All command-line flags have corresponding environment variables for easier deplo
 | `VIIPER_PROXY_ADDR` | `--listen-addr` | `:3241` | Proxy listen address |
 | `VIIPER_PROXY_UPSTREAM` | `--upstream` | (required) | Upstream USBIP server address |
 | `VIIPER_PROXY_TIMEOUT` | `--connection-timeout` | `30s` | Connection timeout |
+
+## Configuration Files
+
+VIIPER supports JSON, YAML, and TOML configuration files. Generate a starter file with:
+
+```bash
+viiper config init server --format=json   # or yaml|toml
+```
+
+If no output path is provided, the file is written to the current working directory (e.g., server.json, proxy.yaml).
+
+You can also specify a custom location:
+
+```bash
+viiper config init server --format=json --output ./server.json
+```
+
+To use a specific configuration file when starting VIIPER, pass the --config flag (or set VIIPER_CONFIG):
+
+```bash
+viiper --config ./server.json server
+```
+
+If --config is not provided, VIIPER will search for configuration in this order and first-found is used for each format:
+
+1. Working directory: server.(json|yaml|yml|toml), proxy.(json|yaml|yml|toml), viiper.(json|yaml|yml|toml), config.(json|yaml|yml|toml)
+2. Platform config directory (see above): server.(json|yaml|yml|toml), proxy.(json|yaml|yml|toml), config.(json|yaml|yml|toml)
+3. Linux system-wide: /etc/viiper/server.(json|yaml|yml|toml), /etc/viiper/proxy.(json|yaml|yml|toml), /etc/viiper/config.(json|yaml|yml|toml)
+
+Example JSON configurations:
+
+Server:
+
+```json
+{
+  "api": {
+    "addr": ":3242",
+    "device-handler-connect-timeout": "5s"
+  },
+  "usb": {
+    "addr": ":3241"
+  },
+  "connection-timeout": "30s"
+}
+```
+
+Proxy:
+
+```json
+{
+  "listen-addr": ":3241",
+  "upstream-addr": "127.0.0.1:3242",
+  "connection-timeout": "30s"
+}
+```
+
+Notes:
+
+- The configuration file never contains secrets; environment variables or external secret stores are recommended for sensitive values.
 
 ## Configuration Examples
 
@@ -81,7 +144,8 @@ When both CLI flags and environment variables are set, CLI flags take precedence
 
 1. **CLI flags** (highest priority)
 2. **Environment variables**
-3. **Default values** (lowest priority)
+3. **Configuration file values**
+4. **Default values** (lowest priority)
 
 ## See Also
 

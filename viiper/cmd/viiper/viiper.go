@@ -2,20 +2,48 @@ package main
 
 import (
 	"os"
+	"strings"
 	"viiper/internal/config"
+	"viiper/internal/configpaths"
 	"viiper/internal/log"
 
 	_ "viiper/internal/registry" // Register all device handlers
 
 	"github.com/alecthomas/kong"
+	kongtoml "github.com/alecthomas/kong-toml"
+	kongyaml "github.com/alecthomas/kong-yaml"
 )
 
 func main() {
+
+	findUserConfig := func(args []string) string {
+		for i := 0; i < len(args); i++ {
+			a := args[i]
+			if strings.HasPrefix(a, "--config=") {
+				return a[len("--config="):]
+			}
+			if a == "--config" && i+1 < len(args) {
+				return args[i+1]
+			}
+		}
+		if v := os.Getenv("VIIPER_CONFIG"); v != "" {
+			return v
+		}
+		return ""
+	}
+
+	userCfg := findUserConfig(os.Args[1:])
+	jsonPaths, yamlPaths, tomlPaths := configpaths.ConfigCandidatePaths(userCfg)
+
 	var cli config.CLI
 	ctx := kong.Parse(&cli,
 		kong.Name("viiper"),
 		kong.Description("Virtual Input over IP EmulatoR"),
 		kong.UsageOnError(),
+		// Load configuration from JSON/YAML/TOML in priority order; flags/env override config values.
+		kong.Configuration(kong.JSON, jsonPaths...),
+		kong.Configuration(kongyaml.Loader, yamlPaths...),
+		kong.Configuration(kongtoml.Loader, tomlPaths...),
 	)
 
 	logger, closeFiles, err := log.SetupLogger(cli.Log.Level, cli.Log.File)
