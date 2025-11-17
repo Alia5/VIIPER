@@ -63,11 +63,13 @@ nav:
     - Overview: cli/overview.md
     - Server Command: cli/server.md
     - Proxy Command: cli/proxy.md
+    - Code Generation: cli/codegen.md
     - Configuration: cli/configuration.md
   - API & Clients:
     - API Overview: api/overview.md
     - Go Client: clients/go.md
-    - Client Libraries Design: clients/design.md
+    - Generator Documentation: clients/generator.md
+    - C SDK: clients/c.md
   - Devices:
     - Xbox 360 Controller: devices/xbox360.md
     - Keyboard: devices/keyboard.md

@@ -7,6 +7,7 @@ import (
 
 // InputState represents the controller state used to build a report.
 // Values are more or less XInput's C API
+// viiper:wire xbox360 c2s buttons:u32 lt:u8 rt:u8 lx:i16 ly:i16 rx:i16 ry:i16
 type InputState struct {
 	// Button bitfield (lower 16 bits used typically), higher bits reserved
 	Buttons uint32
@@ -81,6 +82,8 @@ func (x *InputState) UnmarshalBinary(data []byte) error {
 //
 //	LeftMotor: 1 byte (0-255)
 //	RightMotor: 1 byte (0-255)
+//
+// viiper:wire xbox360 s2c left:u8 right:u8
 type XRumbleState struct {
 	LeftMotor  uint8
 	RightMotor uint8

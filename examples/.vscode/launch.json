@@ -9,13 +9,13 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceFolder}/virtual_x360_pad",
+            "program": "${workspaceFolder}/gp/virtual_x360_pad",
             "args": [
                 "localhost:3242",
             ],
             "showLog": true,
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}/go"
         },
     ],
 }

@@ -5,6 +5,7 @@ import (
 )
 
 // InputState represents the mouse state used to build a report.
+// viiper:wire mouse c2s buttons:u8 dx:i8 dy:i8 wheel:i8 pan:i8
 type InputState struct {
 	// Button bitfield: bit 0=Left, 1=Right, 2=Middle, 3=Back, 4=Forward
 	Buttons uint8

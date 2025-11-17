@@ -6,12 +6,14 @@ import (
 
 // InputState represents the keyboard state used to build a report.
 // Internally uses a 256-bit bitmap for N-key rollover support.
+// viiper:wire keyboard c2s modifiers:u8 count:u8 keys:u8*count
 type InputState struct {
 	Modifiers uint8     // bit 0-7: LCtrl, LShift, LAlt, LGui, RCtrl, RShift, RAlt, RGui
 	KeyBitmap [32]uint8 // 256 bits for HID usage codes 0x00-0xFF
 }
 
 // LEDState represents the state of keyboard LEDs controlled by the host.
+// viiper:wire keyboard s2c leds:u8
 type LEDState struct {
 	NumLock    bool
 	CapsLock   bool

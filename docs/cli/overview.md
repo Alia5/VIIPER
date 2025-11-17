@@ -6,6 +6,7 @@ VIIPER provides a command-line interface for running the USBIP server and proxy.
 
 - [`server`](server.md) - Start the VIIPER USBIP server
 - [`proxy`](proxy.md) - Start the VIIPER USBIP proxy
+- [`codegen`](codegen.md) - Generate client SDKs from source code annotations
 
 ## Global Options
 

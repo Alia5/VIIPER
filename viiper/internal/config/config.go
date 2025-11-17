@@ -20,5 +20,6 @@ type CLI struct {
 	Server cmd.Server `cmd:"" help:"Start the VIIPER USB-IP server"`
 	Proxy  cmd.Proxy  `cmd:"" help:"Start the VIIPER USB-IP proxy"`
 
-	Config cmd.ConfigCommand `cmd:"" help:"Manage configuration files"`
+	Config  cmd.ConfigCommand `cmd:"" help:"Manage configuration files"`
+	Codegen cmd.Codegen       `cmd:"" help:"Generate client SDKs from server code"`
 }
