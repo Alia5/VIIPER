@@ -23,7 +23,7 @@ All command-line flags have corresponding environment variables for easier deplo
 | Environment Variable | CLI Flag | Default | Description |
 |---------------------|----------|---------|-------------|
 | `VIIPER_USB_ADDR` | `--usb.addr` | `:3241` | USBIP server listen address |
-| `VIIPER_API_ADDR` | `--api.addr` | `:3242` | API server listen address (empty = disabled) |
+| `VIIPER_API_ADDR` | `--api.addr` | `:3242` | API server listen address |
 | `VIIPER_API_DEVICE_HANDLER_TIMEOUT` | `--api.device-handler-timeout` | `5s` | Device handler auto-cleanup timeout |
 | `VIIPER_CONNECTION_TIMEOUT` | `--connection-timeout` | `30s` | Connection operation timeout |
 
@@ -89,10 +89,6 @@ Proxy:
   "connection-timeout": "30s"
 }
 ```
-
-Notes:
-
-- The configuration file never contains secrets; environment variables or external secret stores are recommended for sensitive values.
 
 ## Configuration Examples
 

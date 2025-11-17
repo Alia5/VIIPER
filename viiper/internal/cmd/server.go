@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -41,22 +42,23 @@ func (s *Server) Run(logger *slog.Logger, rawLogger log.RawLogger) error {
 	case <-usbSrv.Ready():
 	}
 
-	var apiSrv *api.Server
-	if s.ApiServerConfig.Addr != "" {
-		apiSrv = api.New(usbSrv, s.ApiServerConfig.Addr, s.ApiServerConfig, logger)
+	if s.ApiServerConfig.Addr == "" {
+		logger.Error("API server address must be set (default :3242).")
+		return fmt.Errorf("API server address must be set (default :3242).")
+	}
 
-		r := apiSrv.Router()
-		r.Register("bus/list", handler.BusList(usbSrv))
-		r.Register("bus/create", handler.BusCreate(usbSrv))
-		r.Register("bus/remove", handler.BusRemove(usbSrv))
-		r.Register("bus/{id}/list", handler.BusDevicesList(usbSrv))
-		r.Register("bus/{id}/add", handler.BusDeviceAdd(usbSrv, apiSrv))
-		r.Register("bus/{id}/remove", handler.BusDeviceRemove(usbSrv))
-		r.RegisterStream("bus/{busId}/{deviceid}", api.DeviceStreamHandler(usbSrv))
-		if err := apiSrv.Start(); err != nil {
-			logger.Error("failed to start API server", "error", err)
-			return err
-		}
+	apiSrv := api.New(usbSrv, s.ApiServerConfig.Addr, s.ApiServerConfig, logger)
+	r := apiSrv.Router()
+	r.Register("bus/list", handler.BusList(usbSrv))
+	r.Register("bus/create", handler.BusCreate(usbSrv))
+	r.Register("bus/remove", handler.BusRemove(usbSrv))
+	r.Register("bus/{id}/list", handler.BusDevicesList(usbSrv))
+	r.Register("bus/{id}/add", handler.BusDeviceAdd(usbSrv, apiSrv))
+	r.Register("bus/{id}/remove", handler.BusDeviceRemove(usbSrv))
+	r.RegisterStream("bus/{busId}/{deviceid}", api.DeviceStreamHandler(usbSrv))
+	if err := apiSrv.Start(); err != nil {
+		logger.Error("failed to start API server", "error", err)
+		return err
 	}
 
 	select {

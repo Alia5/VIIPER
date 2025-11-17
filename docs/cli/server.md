@@ -15,7 +15,7 @@ The `server` command starts the VIIPER USBIP server, which allows you to create 
 The server exposes two interfaces:
 
 1. **USBIP Server** - Standard USBIP protocol for device attachment
-2. **API Server** (optional) - Management API for device/bus control
+2. **API Server** - Management API for device/bus control
 
 ## Options
 
@@ -34,7 +34,7 @@ viiper server --usb.addr=0.0.0.0:3241
 
 ### `--api.addr`
 
-API server listen address. If empty, the API server is disabled.
+API server listen address.
 
 **Default:** `:3242`  
 **Environment Variable:** `VIIPER_API_ADDR`
@@ -44,9 +44,6 @@ API server listen address. If empty, the API server is disabled.
 ```bash
 # Enable API on custom port
 viiper server --api.addr=:8080
-
-# Disable API server
-viiper server --api.addr=
 ```
 
 ### `--api.device-handler-timeout`
@@ -85,14 +82,6 @@ Start server with default settings (USBIP on :3241, API on :3242):
 viiper server
 ```
 
-### Server Without API
-
-Start only the USBIP server (no API):
-
-```bash
-viiper server --api.addr=
-```
-
 ### Custom Addresses
 
 Start server on custom ports:
@@ -122,6 +111,7 @@ viiper server --log.raw-file=/var/log/viiper-raw.log
 After the server is running and a virtual device has been added to a bus (via the API), attach it from a client using USBIP.
 
 Notes:
+
 - VIIPER's USBIP server listens on `:3241` by default (configurable via `--usb.addr`).
 - The BUSID-DEVICEID you need (e.g. `1-1`) is returned by the API on device add and also visible via `usbip list`.
 
