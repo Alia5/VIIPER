@@ -16,7 +16,7 @@
         <link rel="prev" href="../../api/overview/">
       
       
-        <link rel="next" href="../../devices/xbox360/">
+        <link rel="next" href="../generator/">
       
       
         
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#go-client-usage-timeouts-and-error-handling" class="md-skip">
+        <a href="#go-client-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -679,6 +679,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../cli/codegen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../cli/configuration/" class="md-nav__link">
         
   
@@ -859,10 +887,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#constructing-the-client" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Constructing the client
+        Overview
       
     </span>
   </a>
@@ -870,10 +898,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#context-aware-calls" class="md-nav__link">
+  <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Context-aware calls
+        Quick Start
       
     </span>
   </a>
@@ -881,44 +909,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
+  <a href="#device-stream-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error handling
+        Device Stream API
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#strict-json-decoding" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Strict JSON decoding
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#device-streams" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Device streams
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Device streams">
+    <nav class="md-nav" aria-label="Device Stream API">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#connecting-to-an-existing-device" class="md-nav__link">
+  <a href="#creating-and-connecting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Connecting to an existing device
+        Creating and Connecting
       
     </span>
   </a>
@@ -926,10 +932,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#mouse-button-constants" class="md-nav__link">
+  <a href="#sending-input" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Mouse button constants
+        Sending Input
       
     </span>
   </a>
@@ -937,10 +943,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#receiving-device-feedback-event-driven" class="md-nav__link">
+  <a href="#receiving-output-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Receiving device feedback (event-driven)
+        Receiving Output (Callbacks)
       
     </span>
   </a>
@@ -948,10 +954,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#creating-and-connecting-in-one-step" class="md-nav__link">
+  <a href="#closing-a-stream" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Creating and connecting in one step
+        Closing a Stream
       
     </span>
   </a>
@@ -960,6 +966,89 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-specific-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device-Specific Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-and-advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration and Advanced Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration and Advanced Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-timeouts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Timeouts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#context-aware-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context-Aware Calls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
   
 </li>
       
@@ -979,14 +1068,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../design.md" class="md-nav__link">
+      <a href="../generator/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Client Libraries Design
+    Generator Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../c/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C SDK
   
 
     
@@ -1206,10 +1323,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#constructing-the-client" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Constructing the client
+        Overview
       
     </span>
   </a>
@@ -1217,10 +1334,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#context-aware-calls" class="md-nav__link">
+  <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Context-aware calls
+        Quick Start
       
     </span>
   </a>
@@ -1228,44 +1345,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
+  <a href="#device-stream-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error handling
+        Device Stream API
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#strict-json-decoding" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Strict JSON decoding
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#device-streams" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Device streams
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Device streams">
+    <nav class="md-nav" aria-label="Device Stream API">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#connecting-to-an-existing-device" class="md-nav__link">
+  <a href="#creating-and-connecting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Connecting to an existing device
+        Creating and Connecting
       
     </span>
   </a>
@@ -1273,10 +1368,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#mouse-button-constants" class="md-nav__link">
+  <a href="#sending-input" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Mouse button constants
+        Sending Input
       
     </span>
   </a>
@@ -1284,10 +1379,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#receiving-device-feedback-event-driven" class="md-nav__link">
+  <a href="#receiving-output-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Receiving device feedback (event-driven)
+        Receiving Output (Callbacks)
       
     </span>
   </a>
@@ -1295,10 +1390,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#creating-and-connecting-in-one-step" class="md-nav__link">
+  <a href="#closing-a-stream" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Creating and connecting in one step
+        Closing a Stream
       
     </span>
   </a>
@@ -1307,6 +1402,89 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-specific-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device-Specific Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-and-advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration and Advanced Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration and Advanced Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-timeouts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Timeouts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#context-aware-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context-Aware Calls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1330,117 +1508,180 @@
   
 
 
-<h1 id="go-client-usage-timeouts-and-error-handling">Go client usage (timeouts and error handling)</h1>
-<p>This page summarizes how to configure timeouts and work with errors in the Go client.</p>
-<h2 id="constructing-the-client">Constructing the client</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s">&quot;time&quot;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nx">apiclient</span><span class="w"> </span><span class="s">&quot;viiper/pkg/apiclient&quot;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1">// Defaults are sensible (Dial 3s, Read/Write 5s)</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nx">c</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">apiclient</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;127.0.0.1:3242&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1">// Custom timeouts</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nx">cfg</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">apiclient</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span><span class="nx">DialTimeout</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span><span class="w"> </span><span class="nx">ReadTimeout</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span><span class="w"> </span><span class="nx">WriteTimeout</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">}</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nx">cc</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">apiclient</span><span class="p">.</span><span class="nx">NewWithConfig</span><span class="p">(</span><span class="s">&quot;127.0.0.1:3242&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">cfg</span><span class="p">)</span>
+<h1 id="go-client-documentation">Go Client Documentation</h1>
+<p>The Go client is the reference implementation for interacting with VIIPER servers. It's included in the repository under <code>pkg/apiclient</code> and <code>pkg/device</code>.</p>
+<h2 id="overview">Overview</h2>
+<p>The Go client features:</p>
+<ul>
+<li><strong>Type-safe API</strong>: Structured request/response types with context support</li>
+<li><strong>Device streams</strong>: Bidirectional communication using <code>encoding.BinaryMarshaler</code>/<code>BinaryUnmarshaler</code></li>
+<li><strong>Built-in</strong>: No code generation needed; part of the main repository</li>
+<li><strong>Flexible timeouts</strong>: Configurable connection and I/O timeouts</li>
+</ul>
+<h2 id="quick-start">Quick Start</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">package</span><span class="w"> </span><span class="nx">main</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="s">&quot;context&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="s">&quot;log&quot;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="s">&quot;time&quot;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nx">apiclient</span><span class="w"> </span><span class="s">&quot;viiper/pkg/apiclient&quot;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="s">&quot;viiper/pkg/device/keyboard&quot;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="c1">// Connect to management API</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="nx">client</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">apiclient</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;127.0.0.1:3242&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="nx">ctx</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">()</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="c1">// Create or find a bus</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="nx">buses</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">BusList</span><span class="p">()</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">busID</span><span class="w"> </span><span class="kt">uint32</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">buses</span><span class="p">)</span><span class="w"> </span><span class="p">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">    </span><span class="nx">busID</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">buses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">    </span><span class="nx">resp</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">BusCreate</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">      </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">    </span><span class="nx">busID</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">resp</span><span class="p">.</span><span class="nx">BusID</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="w">  </span><span class="c1">// Add device and connect</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="w">  </span><span class="nx">stream</span><span class="p">,</span><span class="w"> </span><span class="nx">resp</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">AddDeviceAndConnect</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">busID</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;keyboard&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="w">    </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">  </span><span class="k">defer</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Connected to device %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">resp</span><span class="p">.</span><span class="nx">ID</span><span class="p">)</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="w">  </span><span class="c1">// Send keyboard input</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a><span class="w">  </span><span class="nx">input</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">keyboard</span><span class="p">.</span><span class="nx">InputState</span><span class="p">{</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="w">    </span><span class="nx">Modifiers</span><span class="p">:</span><span class="w"> </span><span class="nx">keyboard</span><span class="p">.</span><span class="nx">ModLeftShift</span><span class="p">,</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a><span class="w">  </span><span class="nx">input</span><span class="p">.</span><span class="nx">SetKey</span><span class="p">(</span><span class="nx">keyboard</span><span class="p">.</span><span class="nx">KeyH</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>
+<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">WriteBinary</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a><span class="w">    </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>
+<a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a><span class="w">  </span><span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>
+<a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a><span class="w">  </span><span class="c1">// Release</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a><span class="w">  </span><span class="nx">input</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">keyboard</span><span class="p">.</span><span class="nx">InputState</span><span class="p">{}</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a><span class="w">  </span><span class="nx">stream</span><span class="p">.</span><span class="nx">WriteBinary</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="context-aware-calls">Context-aware calls</h2>
-<p>All methods have context-aware variants ending with <code>Ctx</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">cancel</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">defer</span><span class="w"> </span><span class="nx">cancel</span><span class="p">()</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nx">buses</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">cc</span><span class="p">.</span><span class="nx">BusListCtx</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+<h2 id="device-stream-api">Device Stream API</h2>
+<h3 id="creating-and-connecting">Creating and Connecting</h3>
+<p>The simplest way to add a device and open its stream:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">stream</span><span class="p">,</span><span class="w"> </span><span class="nx">resp</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">AddDeviceAndConnect</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">busID</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;xbox360&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">}</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">defer</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Connected to device %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">resp</span><span class="p">.</span><span class="nx">ID</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="error-handling">Error handling</h2>
-<p>The server uses a uniform error envelope <code>{ "error": "message" }</code> and the client simply returns a Go <code>error</code> with that message.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="c1">// err contains the server-provided message or a transport error</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;request failed: %v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
+<p>Or connect to an existing device:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nx">stream</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">OpenStream</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">busID</span><span class="p">,</span><span class="w"> </span><span class="nx">deviceID</span><span class="p">)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">}</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">defer</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
 </code></pre></div>
-<h2 id="strict-json-decoding">Strict JSON decoding</h2>
-<p>Responses are decoded with <code>DisallowUnknownFields</code> to fail fast if the server sends unexpected fields. This helps detect drift early.</p>
-<h2 id="device-streams">Device streams</h2>
-<p>Device streams provide bidirectional communication with virtual devices. The client includes native support for device types using <code>encoding.BinaryMarshaler</code>/<code>BinaryUnmarshaler</code>.</p>
-<h3 id="connecting-to-an-existing-device">Connecting to an existing device</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="s">&quot;viiper/pkg/device/xbox360&quot;</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">)</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nx">stream</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">OpenStream</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">busID</span><span class="p">,</span><span class="w"> </span><span class="nx">deviceID</span><span class="p">)</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">}</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">defer</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1">// Send input using device structs (client → device)</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="nx">input</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">InputState</span><span class="p">{</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="nx">Buttons</span><span class="p">:</span><span class="w"> </span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">ButtonA</span><span class="p">,</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">  </span><span class="nx">LX</span><span class="p">:</span><span class="w">      </span><span class="o">-</span><span class="mi">32768</span><span class="p">,</span><span class="w"> </span><span class="c1">// Left stick left</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">  </span><span class="nx">LY</span><span class="p">:</span><span class="w">      </span><span class="mi">32767</span><span class="p">,</span><span class="w">  </span><span class="c1">// Left stick up</span>
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">}</span>
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">WriteBinary</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="p">}</span>
+<h3 id="sending-input">Sending Input</h3>
+<p>Device input is sent using structs that implement <code>encoding.BinaryMarshaler</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="s">&quot;viiper/pkg/device/xbox360&quot;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nx">input</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">InputState</span><span class="p">{</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nx">Buttons</span><span class="p">:</span><span class="w"> </span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">ButtonA</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nx">LX</span><span class="p">:</span><span class="w">      </span><span class="o">-</span><span class="mi">32768</span><span class="p">,</span><span class="w"> </span><span class="c1">// Left stick left</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nx">LY</span><span class="p">:</span><span class="w">      </span><span class="mi">32767</span><span class="p">,</span><span class="w">  </span><span class="c1">// Left stick up</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">}</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">WriteBinary</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="mouse-button-constants">Mouse button constants</h3>
-<p>For the virtual mouse, use exported bitmask constants from <code>viiper/pkg/device/mouse</code>:</p>
+<h3 id="receiving-output-callbacks">Receiving Output (Callbacks)</h3>
+<p>For devices that send feedback (rumble, LEDs), use <code>StartReading</code> with a decode function:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s">&quot;viiper/pkg/device/mouse&quot;</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">)</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1">// Left click (press then release)</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="nx">press</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mouse</span><span class="p">.</span><span class="nx">InputState</span><span class="p">{</span><span class="nx">Buttons</span><span class="p">:</span><span class="w"> </span><span class="nx">mouse</span><span class="p">.</span><span class="nx">Btn_Left</span><span class="p">}</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="nx">_</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">WriteBinary</span><span class="p">(</span><span class="nx">press</span><span class="p">)</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="nx">release</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mouse</span><span class="p">.</span><span class="nx">InputState</span><span class="p">{</span><span class="nx">Buttons</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="nx">_</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">WriteBinary</span><span class="p">(</span><span class="nx">release</span><span class="p">)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s">&quot;bufio&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="s">&quot;encoding&quot;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="s">&quot;io&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="s">&quot;viiper/pkg/device/xbox360&quot;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1">// Start async reading for rumble commands</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="nx">rumbleCh</span><span class="p">,</span><span class="w"> </span><span class="nx">errCh</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">StartReading</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">bufio</span><span class="p">.</span><span class="nx">Reader</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">encoding</span><span class="p">.</span><span class="nx">BinaryUnmarshaler</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="kt">byte</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">ReadFull</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">[:]);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="nx">msg</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">new</span><span class="p">(</span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">XRumbleState</span><span class="p">)</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">msg</span><span class="p">.</span><span class="nx">UnmarshalBinary</span><span class="p">(</span><span class="nx">b</span><span class="p">[:]);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">msg</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">})</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nx">msg</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&lt;-</span><span class="nx">rumbleCh</span><span class="p">:</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">      </span><span class="nx">rumble</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">msg</span><span class="p">.(</span><span class="o">*</span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">XRumbleState</span><span class="p">)</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">      </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Rumble: Left=%d Right=%d\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">rumble</span><span class="p">.</span><span class="nx">LeftMotor</span><span class="p">,</span><span class="w"> </span><span class="nx">rumble</span><span class="p">.</span><span class="nx">RightMotor</span><span class="p">)</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&lt;-</span><span class="nx">errCh</span><span class="p">:</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Stream error: %v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">      </span><span class="k">return</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="p">}()</span>
 </code></pre></div>
-<h3 id="receiving-device-feedback-event-driven">Receiving device feedback (event-driven)</h3>
-<p>For devices that send feedback (rumble, LEDs), you can use <code>StartReading</code> with a decode function to avoid polling. The decode function must read exactly one message from a <code>*bufio.Reader</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="s">&quot;bufio&quot;</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="s">&quot;encoding&quot;</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="s">&quot;io&quot;</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="s">&quot;viiper/pkg/device/xbox360&quot;</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">)</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1">// Start async reading for rumble commands</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="nx">rumbleCh</span><span class="p">,</span><span class="w"> </span><span class="nx">errCh</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">StartReading</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">bufio</span><span class="p">.</span><span class="nx">Reader</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">encoding</span><span class="p">.</span><span class="nx">BinaryUnmarshaler</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="kt">byte</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">ReadFull</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">[:]);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span><span class="nx">msg</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">new</span><span class="p">(</span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">XRumbleState</span><span class="p">)</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">msg</span><span class="p">.</span><span class="nx">UnmarshalBinary</span><span class="p">(</span><span class="nx">b</span><span class="p">[:]);</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">msg</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="p">})</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nx">msg</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&lt;-</span><span class="nx">rumbleCh</span><span class="p">:</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">      </span><span class="nx">rumble</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">msg</span><span class="p">.(</span><span class="o">*</span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">XRumbleState</span><span class="p">)</span>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">      </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Rumble: Left=%d Right=%d\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">rumble</span><span class="p">.</span><span class="nx">LeftMotor</span><span class="p">,</span><span class="w"> </span><span class="nx">rumble</span><span class="p">.</span><span class="nx">RightMotor</span><span class="p">)</span>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&lt;-</span><span class="nx">errCh</span><span class="p">:</span>
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Stream error: %v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">      </span><span class="k">return</span>
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="p">}()</span>
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>
-<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="nx">state</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">InputState</span><span class="p">{</span><span class="nx">Buttons</span><span class="p">:</span><span class="w"> </span><span class="nx">xbox360</span><span class="p">.</span><span class="nx">ButtonA</span><span class="p">}</span>
-<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">WriteBinary</span><span class="p">(</span><span class="nx">state</span><span class="p">)</span>
-<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="o">...</span>
+<h3 id="closing-a-stream">Closing a Stream</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nx">stream</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
 </code></pre></div>
-<h3 id="creating-and-connecting-in-one-step">Creating and connecting in one step</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nx">stream</span><span class="p">,</span><span class="w"> </span><span class="nx">resp</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">AddDeviceAndConnect</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">busID</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;xbox360&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">}</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">defer</span><span class="w"> </span><span class="nx">stream</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Connected to device %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">resp</span><span class="p">.</span><span class="nx">ID</span><span class="p">)</span>
+<h2 id="device-specific-notes">Device-Specific Notes</h2>
+<p>Each device type has specific wire formats and helper methods. For wire format details and usage patterns, see the <a href="../devices/">Devices</a> section of the documentation.</p>
+<p>The Go client provides device packages under <code>pkg/device/</code> with type-safe structs and constants (e.g., <code>keyboard.InputState</code>, <code>keyboard.KeyA</code>, <code>mouse.Btn_Left</code>).</p>
+<h2 id="configuration-and-advanced-usage">Configuration and Advanced Usage</h2>
+<h3 id="custom-timeouts">Custom Timeouts</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nx">cfg</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">apiclient</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nx">DialTimeout</span><span class="p">:</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nx">ReadTimeout</span><span class="p">:</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nx">WriteTimeout</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="nx">client</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">apiclient</span><span class="p">.</span><span class="nx">NewWithConfig</span><span class="p">(</span><span class="s">&quot;127.0.0.1:3242&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">cfg</span><span class="p">)</span>
 </code></pre></div>
+<p>Default timeouts are: Dial 3s, Read/Write 5s.</p>
+<h3 id="context-aware-calls">Context-Aware Calls</h3>
+<p>All methods have context-aware variants ending with <code>Ctx</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">cancel</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">defer</span><span class="w"> </span><span class="nx">cancel</span><span class="p">()</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nx">buses</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">BusListCtx</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="error-handling">Error Handling</h3>
+<p>The server returns errors as <code>{ "error": "message" }</code> JSON. The client wraps these as Go errors:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;request failed: %v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="examples">Examples</h2>
+<p>Full working examples are available in the repository:</p>
+<ul>
+<li><strong>Virtual Mouse</strong>: <code>examples/virtual_mouse/main.go</code></li>
+<li><strong>Virtual Keyboard</strong>: <code>examples/virtual_keyboard/main.go</code></li>
+<li><strong>Virtual Xbox360 Controller</strong>: <code>examples/virtual_x360_pad/main.go</code></li>
+</ul>
+<h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="../generator/">Generator Documentation</a>: How generated SDKs work</li>
+<li><a href="../c/">C SDK Documentation</a>: Generated C SDK usage</li>
+<li><a href="../../api/overview/">API Overview</a>: Management API reference</li>
+</ul>
 
 
 

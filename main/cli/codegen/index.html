@@ -13,6 +13,10 @@
       
       
       
+        <link rel="prev" href="../proxy/">
+      
+      
+        <link rel="next" href="../configuration/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>Changelog for Development Version - VIIPER Documentation</title>
+        <title>Code Generation - VIIPER Documentation</title>
       
     
     
@@ -76,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#changelog-for-development-version" class="md-skip">
+        <a href="#code-generation-command" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Changelog for Development Version
+              Code Generation
             
           </span>
         </div>
@@ -264,11 +268,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../cli/overview/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
           
   
   
@@ -326,7 +332,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../" class="md-tabs__link">
+      <a href="../../changelog/" class="md-tabs__link">
         
   
   
@@ -532,28 +538,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -571,7 +580,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -589,7 +598,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/overview/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -617,7 +626,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/server/" class="md-nav__link">
+      <a href="../server/" class="md-nav__link">
         
   
   
@@ -645,7 +654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/proxy/" class="md-nav__link">
+      <a href="../proxy/" class="md-nav__link">
         
   
   
@@ -670,10 +679,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../cli/codegen/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Generation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -689,6 +725,170 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Description
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flags
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flags">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-lang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --lang
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generate-all-sdks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generate All SDKs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generate-c-sdk-and-rebuild-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generate C SDK and Rebuild Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cicd-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI/CD Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-regenerate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Regenerate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -701,7 +901,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -1054,7 +1254,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../changelog/" class="md-nav__link">
         
   
   
@@ -1101,10 +1301,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#fixes" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🐛 Fixes
+        Usage
       
     </span>
   </a>
@@ -1112,10 +1312,132 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#miscellaneous" class="md-nav__link">
+  <a href="#description" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔧 Miscellaneous
+        Description
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flags
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flags">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-lang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --lang
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generate-all-sdks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generate All SDKs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generate-c-sdk-and-rebuild-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generate C SDK and Rebuild Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cicd-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI/CD Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-regenerate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Regenerate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
       
     </span>
   </a>
@@ -1142,17 +1464,100 @@
   
 
 
-<h1 id="changelog-for-development-version">Changelog for Development Version</h1>
-<p>This page shows unreleased changes in the development version.</p>
-<p>Changes since v0.0.2:</p>
-<h2 id="fixes">🐛 Fixes</h2>
+<h1 id="code-generation-command">Code Generation Command</h1>
+<p>The <code>codegen</code> command generates type-safe client SDKs from Go source code annotations.</p>
+<h2 id="usage">Usage</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
+</code></pre></div>
+<h2 id="description">Description</h2>
+<p>Scans the VIIPER server codebase to extract:
+- API routes and response DTOs
+- Device wire formats from <code>viiper:wire</code> comment tags
+- Device constants (keycodes, modifiers, button masks)</p>
+<p>Then generates client SDKs for C, C#, and TypeScript with:
+- Management API clients
+- Device-agnostic stream wrappers
+- Per-device encode/decode functions
+- Typed constants and enums</p>
+<h2 id="flags">Flags</h2>
+<h3 id="-output"><code>--output</code></h3>
+<p>Output directory for generated SDKs (relative to repository root).</p>
+<p><strong>Default:</strong> <code>../clients</code><br />
+<strong>Environment Variable:</strong> <code>VIIPER_CODEGEN_OUTPUT</code></p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--output<span class="o">=</span>../sdk-output
+</code></pre></div>
+<h3 id="-lang"><code>--lang</code></h3>
+<p>Target language to generate.</p>
+<p><strong>Values:</strong> <code>c</code>, <code>csharp</code>, <code>typescript</code>, <code>all</code><br />
+<strong>Default:</strong> <code>all</code><br />
+<strong>Environment Variable:</strong> <code>VIIPER_CODEGEN_LANG</code></p>
+<p><strong>Examples:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Generate all SDKs</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Generate C SDK only</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Generate C# SDK only</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># Generate TypeScript SDK only</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript
+</code></pre></div>
+<h2 id="output-structure">Output Structure</h2>
+<p>Generated files are organized by language:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>clients/
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>├── c/
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>│   ├── include/viiper/
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│   │   ├── viiper.h
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│   │   ├── viiper_keyboard.h
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│   │   ├── viiper_mouse.h
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>│   │   └── viiper_xbox360.h
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>│   ├── src/
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>│   │   ├── viiper.c
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>│   │   ├── viiper_keyboard.c
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>│   │   ├── viiper_mouse.c
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>│   │   └── viiper_xbox360.c
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>│   └── CMakeLists.txt
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>├── csharp/
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>│   └── Viiper.Client/
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>│       └── (generated C# files)
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>└── ts/
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    └── viiperclient/
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>        └── (generated TypeScript files)
+</code></pre></div>
+<h2 id="examples">Examples</h2>
+<h3 id="generate-all-sdks">Generate All SDKs</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>viiper
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen
+</code></pre></div>
+<h3 id="generate-c-sdk-and-rebuild-examples">Generate C SDK and Rebuild Examples</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">cd</span><span class="w"> </span>viiper
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nb">cd</span><span class="w"> </span>../examples/c
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--config<span class="w"> </span>Release
+</code></pre></div>
+<h3 id="cicd-integration">CI/CD Integration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate Client SDKs</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="no">cd viiper</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="no">go run ./cmd/viiper codegen --lang=all</span>
+</code></pre></div>
+<h2 id="when-to-regenerate">When to Regenerate</h2>
+<p>Run codegen when any of these change:</p>
 <ul>
-<li>Fix client using incorrect path</li>
+<li><code>pkg/apitypes/*.go</code>: API response structures</li>
+<li><code>pkg/device/*/inputstate.go</code>: Wire format annotations</li>
+<li><code>pkg/device/*/const.go</code>: Exported constants</li>
+<li><code>internal/server/api/*.go</code>: Route registrations</li>
+<li>Generator templates in <code>internal/codegen/generator/</code></li>
 </ul>
-<h2 id="miscellaneous">🔧 Miscellaneous</h2>
+<h2 id="see-also">See Also</h2>
 <ul>
-<li>Improve go api-client.</li>
-<li>Support file based configs</li>
+<li><a href="../../clients/generator/">Generator Documentation</a>: Detailed explanation of tagging system and code generation flow</li>
+<li><a href="../../clients/c/">C SDK Documentation</a>: C-specific usage and build instructions</li>
+<li><a href="../configuration/">Configuration</a>: Global configuration options</li>
 </ul>
 
 

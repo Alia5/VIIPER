@@ -13,6 +13,10 @@
       
       
       
+        <link rel="prev" href="../go/">
+      
+      
+        <link rel="next" href="../c/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>Changelog for Development Version - VIIPER Documentation</title>
+        <title>Generator Documentation - VIIPER Documentation</title>
       
     
     
@@ -76,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#changelog-for-development-version" class="md-skip">
+        <a href="#viiper-client-generator-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Changelog for Development Version
+              Generator Documentation
             
           </span>
         </div>
@@ -284,10 +288,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../api/overview/" class="md-tabs__link">
           
   
@@ -326,7 +332,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../" class="md-tabs__link">
+      <a href="../../changelog/" class="md-tabs__link">
         
   
   
@@ -733,28 +739,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -772,7 +781,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -818,7 +827,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../clients/go/" class="md-nav__link">
+      <a href="../go/" class="md-nav__link">
         
   
   
@@ -843,10 +852,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../clients/generator/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generator Documentation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -862,6 +898,214 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-generator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the Generator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comment-tag-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comment Tag System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Comment Tag System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#viiperwire-device-stream-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        viiper:wire: Device Stream Formats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#constant-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constant Export
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-generation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Generation Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wire-format-mapping-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wire Format Mapping Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wire Format Mapping Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed-size-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed-Size Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-length-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable-Length Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#struct-packing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Struct Packing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-keyboard-input-variable-length" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Keyboard Input (Variable-Length)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-constant-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Constant Export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#regeneration-triggers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regeneration Triggers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#language-specific-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Language-Specific Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sdk-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SDK Status
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -874,7 +1118,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../clients/c/" class="md-nav__link">
+      <a href="../c/" class="md-nav__link">
         
   
   
@@ -1054,7 +1298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../changelog/" class="md-nav__link">
         
   
   
@@ -1101,10 +1345,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#fixes" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🐛 Fixes
+        Overview
       
     </span>
   </a>
@@ -1112,10 +1356,176 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#miscellaneous" class="md-nav__link">
+  <a href="#running-the-generator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔧 Miscellaneous
+        Running the Generator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comment-tag-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comment Tag System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Comment Tag System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#viiperwire-device-stream-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        viiper:wire: Device Stream Formats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#constant-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constant Export
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-generation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Generation Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wire-format-mapping-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wire Format Mapping Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wire Format Mapping Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed-size-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed-Size Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-length-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable-Length Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#struct-packing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Struct Packing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-keyboard-input-variable-length" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Keyboard Input (Variable-Length)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-constant-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Constant Export
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#regeneration-triggers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regeneration Triggers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#language-specific-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Language-Specific Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sdk-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SDK Status
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
       
     </span>
   </a>
@@ -1142,18 +1552,149 @@
   
 
 
-<h1 id="changelog-for-development-version">Changelog for Development Version</h1>
-<p>This page shows unreleased changes in the development version.</p>
-<p>Changes since v0.0.2:</p>
-<h2 id="fixes">🐛 Fixes</h2>
+<h1 id="viiper-client-generator-documentation">VIIPER Client Generator Documentation</h1>
+<h2 id="overview">Overview</h2>
+<p>The VIIPER client generator scans Go source code to extract API routes, device wire formats, and constants; then emits type-safe client SDKs for multiple languages.</p>
+<p><strong>What it extracts:</strong></p>
 <ul>
-<li>Fix client using incorrect path</li>
+<li>API routes and DTOs from management API handlers  </li>
+<li>Device wire formats from <code>viiper:wire</code> comment tags  </li>
+<li>All exported constants from device packages (automatic)</li>
 </ul>
-<h2 id="miscellaneous">🔧 Miscellaneous</h2>
+<p><strong>Output:</strong> Type-safe client SDKs for multiple target languages</p>
+<div class="admonition note">
+<p class="admonition-title">License</p>
+<p>All generated client SDKs are licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects. The core VIIPER server remains under its original license.</p>
+</div>
+<h2 id="running-the-generator">Running the Generator</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>viiper
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all<span class="w">     </span><span class="c1"># Generate all SDKs</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c<span class="w">       </span><span class="c1"># Generate C SDK only</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp<span class="w">  </span><span class="c1"># Generate C# SDK only</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript<span class="w"> </span><span class="c1"># Generate TypeScript SDK only</span>
+</code></pre></div>
+<p><strong>Output directory</strong>: <code>clients/</code> (relative to repository root)</p>
+<h2 id="comment-tag-system">Comment Tag System</h2>
+<p>The generator uses lightweight comment tags placed next to device types and constants.</p>
+<h3 id="viiperwire-device-stream-formats"><code>viiper:wire</code>: Device Stream Formats</h3>
+<p><strong>Syntax:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// viiper:wire &lt;device&gt; &lt;direction&gt; &lt;field1:type&gt; &lt;field2:type&gt; ...</span>
+</code></pre></div>
+<p><strong>Directions:</strong>  </p>
 <ul>
-<li>Improve go api-client.</li>
-<li>Support file based configs</li>
+<li><code>c2s</code>: Client to server (input)  </li>
+<li><code>s2c</code>: Server to client (output, e.g., rumble, LEDs)</li>
 </ul>
+<p><strong>Field types:</strong>  </p>
+<ul>
+<li>Fixed: <code>u8</code>, <code>i8</code>, <code>u16</code>, <code>i16</code>, <code>u32</code>, <code>i32</code>  </li>
+<li>Variable: <code>u8*countField</code> (pointer to count field)</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// viiper:wire keyboard c2s modifiers:u8 count:u8 keys:u8*count</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">type</span><span class="w"> </span><span class="nx">InputState</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<h3 id="constant-export">Constant Export</h3>
+<p>The generator automatically exports all constants from <code>pkg/device/*/const.go</code> for each device type.<br />
+No special tags are required. Exported Go constants are emitted with language-appropriate representations and prefixes.</p>
+<h2 id="code-generation-flow">Code Generation Flow</h2>
+<p><strong>Scan Phase:</strong>  </p>
+<ol>
+<li>Parse API routes from <code>internal/server/api/*.go</code>  </li>
+<li>Reflect response DTOs from <code>pkg/apitypes/*.go</code>  </li>
+<li>Find device types via <code>RegisterDevice()</code> calls  </li>
+<li>Parse <code>viiper:wire</code> comments for packet layouts  </li>
+<li>Extract all exported constants from <code>pkg/device/*/const.go</code> (automatic)</li>
+</ol>
+<p><strong>Emit Phase:</strong><br />
+For each language, generate management client, DTO types, device streams, constants, and build configs.</p>
+<p><strong>Post-Process:</strong><br />
+Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, or <code>prettier</code>.</p>
+<h2 id="wire-format-mapping-rules">Wire Format Mapping Rules</h2>
+<h3 id="fixed-size-fields">Fixed-Size Fields</h3>
+<p>Fixed-size fields are mapped to native integer types in each target language:</p>
+<ul>
+<li><code>u8</code> / <code>i8</code>: 8-bit unsigned/signed integers</li>
+<li><code>u16</code> / <code>i16</code>: 16-bit unsigned/signed integers</li>
+<li><code>u32</code> / <code>i32</code>: 32-bit unsigned/signed integers</li>
+</ul>
+<h3 id="variable-length-fields">Variable-Length Fields</h3>
+<p>Variable-length arrays use a <strong>pointer + count</strong> pattern. The field syntax <code>u8*count</code> references a count field that determines the array length.</p>
+<p><strong>Wire tag example:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// viiper:wire keyboard c2s modifiers:u8 count:u8 keys:u8*count</span>
+</code></pre></div>
+<p>Each target language emits appropriate types for dynamic arrays (pointers with counts, managed arrays, or typed arrays depending on the language).</p>
+<h2 id="struct-packing">Struct Packing</h2>
+<p>For wire compatibility, all device I/O structs are tightly packed (no padding).</p>
+<ul>
+<li><strong>C:</strong> <code>#pragma pack(push, 1)</code> / <code>#pragma pack(pop)</code></li>
+<li><strong>C#:</strong> <code>[StructLayout(LayoutKind.Sequential, Pack = 1)]</code></li>
+<li><strong>TypeScript:</strong> Manual byte-level encoding/decoding</li>
+</ul>
+<h2 id="example-keyboard-input-variable-length">Example: Keyboard Input (Variable-Length)</h2>
+<p><strong>Go source with wire tag:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// viiper:wire keyboard c2s modifiers:u8 count:u8 keys:u8*count</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">type</span><span class="w"> </span><span class="nx">InputState</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nx">Modifiers</span><span class="w"> </span><span class="kt">uint8</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nx">KeyBitmap</span><span class="w"> </span><span class="p">[</span><span class="mi">32</span><span class="p">]</span><span class="kt">uint8</span><span class="w">  </span><span class="c1">// Internal: 256-bit NKR bitmap</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Emitted C struct:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">#pragma pack(push, 1)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">modifiers</span><span class="p">;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">keys</span><span class="p">;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">keys_count</span><span class="p">;</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span><span class="w"> </span><span class="n">viiper_keyboard_input_t</span><span class="p">;</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="cp">#pragma pack(pop)</span>
+</code></pre></div>
+<h2 id="example-constant-export">Example: Constant Export</h2>
+<p><strong>Go source (<code>pkg/device/keyboard/const.go</code>):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nx">ModLeftCtrl</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="mh">0x01</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nx">ModLeftShift</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x02</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nx">KeyA</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x04</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nx">KeyB</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x05</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong>Emitted C header (<code>viiper_keyboard.h</code>):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cp">#define VIIPER_KEYBOARD_MODLEFTCTRL 0x1</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="cp">#define VIIPER_KEYBOARD_MODLEFTSHIFT 0x2</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="cp">#define VIIPER_KEYBOARD_KEYA 0x4</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="cp">#define VIIPER_KEYBOARD_KEYB 0x5</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="c1">// ...</span>
+</code></pre></div>
+<h2 id="regeneration-triggers">Regeneration Triggers</h2>
+<p>Run codegen when any of these change:</p>
+<ul>
+<li><code>pkg/apitypes/*.go</code>: API response structures</li>
+<li><code>pkg/device/*/inputstate.go</code>: Wire tag annotations</li>
+<li><code>pkg/device/*/const.go</code>: Exported constants</li>
+<li><code>internal/server/api/*.go</code>: Route registrations</li>
+<li><code>internal/codegen/generator/**/*.go</code>: Generator templates</li>
+</ul>
+<h2 id="language-specific-notes">Language-Specific Notes</h2>
+<ul>
+<li><strong>C</strong>: manual memory management for variable-length fields; builds with CMake.  </li>
+<li><strong>C#</strong>: <code>ViiperDevice</code> class with <code>OnOutput</code> event; async/await for management API; struct packing via attributes.  </li>
+<li><strong>TypeScript</strong>: manual byte encoding; ESM/CJS compatible.  </li>
+</ul>
+<h2 id="current-sdk-status">Current SDK Status</h2>
+<ul>
+<li><strong>C</strong>: ✅ Complete</li>
+<li><strong>C#</strong>: 🚧 Planned</li>
+<li><strong>TypeScript</strong>: 🚧 Planned</li>
+</ul>
+<h2 id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="../design.md">Design Document</a>: Architectural rationale and detailed generation strategy</li>
+<li><a href="../c/">C SDK Documentation</a>: C-specific usage, build, and examples</li>
+<li><a href="../go/">Go Client Documentation</a>: Go reference client usage</li>
+</ul>
+<hr />
+<p>For questions or contributions, see the main VIIPER repository.</p>
 
 
 

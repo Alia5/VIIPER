@@ -679,6 +679,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../cli/codegen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../cli/configuration/" class="md-nav__link">
         
   
@@ -1013,14 +1041,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../clients/design.md" class="md-nav__link">
+      <a href="../../clients/generator/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Client Libraries Design
+    Generator Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clients/c/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C SDK
   
 
     
@@ -1399,7 +1455,17 @@
 
 
 <h1 id="api-reference">API Reference</h1>
-<p>VIIPER ships a lightweight TCP API for managing virtual buses/devices and for device-specific streaming. It’s designed to be trivial to drive from any language that can open a TCP socket and send newline-terminated commands.</p>
+<p>VIIPER ships a lightweight TCP API for managing virtual buses/devices and for device-specific streaming. It's designed to be trivial to drive from any language that can open a TCP socket and send newline-terminated commands.</p>
+<div class="admonition tip">
+<p class="admonition-title">Client SDKs Available</p>
+<p>Generated client libraries are available that abstract away the protocol details described below. For most use cases, you should use one of the provided SDKs rather than implementing the raw protocol yourself:</p>
+<ul>
+<li><a href="../../clients/c/">C SDK</a>: Generated C library with type-safe device streams</li>
+<li><a href="../../clients/go/">Go Client</a>: Reference implementation included in the repository</li>
+<li><a href="../../clients/generator/">Generator Documentation</a>: Information about code generation for additional languages</li>
+</ul>
+<p>The documentation below is provided for reference and for implementing clients in languages not yet supported by the generator.</p>
+</div>
 <h2 id="protocol-overview">Protocol overview</h2>
 <ul>
 <li>Transport: TCP</li>
