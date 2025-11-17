@@ -1081,17 +1081,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#current-sdk-status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Current SDK Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1154,6 +1143,34 @@
     
   
     C# SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../typescript/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TypeScript SDK
   
 
     
@@ -1539,17 +1556,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#current-sdk-status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Current SDK Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1752,20 +1758,15 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <ul>
 <li><strong>C</strong>: <code>#define</code> macros for constants; switch-based lookup functions for maps; manual memory management for variable-length fields; builds with CMake.  </li>
 <li><strong>C#</strong>: Enums for constant groups; <code>Dictionary&lt;K,V&gt;</code> with static helper methods for maps; <code>ViiperDevice</code> class with <code>OnOutput</code> event; async/await for management API; struct packing via attributes.  </li>
-<li><strong>TypeScript</strong>: Enums for constant groups; <code>Map&lt;K,V&gt;</code> or plain objects for maps; manual byte encoding; ESM/CJS compatible.  </li>
-</ul>
-<h2 id="current-sdk-status">Current SDK Status</h2>
-<ul>
-<li><strong>C</strong>: ✅ Complete</li>
-<li><strong>C#</strong>: ✅ Complete</li>
-<li><strong>TypeScript</strong>: 🚧 Planned</li>
+<li><strong>TypeScript</strong>: Enums for constant groups; <code>Record&lt;K, V&gt;</code> objects with <code>Get</code>/<code>Has</code> helper functions for maps; manual byte encoding via <code>BinaryWriter</code>/<code>BinaryReader</code>; <code>ViiperDevice</code> class with EventEmitter for output; <code>addDeviceAndConnect</code> convenience method; builds with <code>tsc</code>.  </li>
 </ul>
 <h2 id="further-reading">Further Reading</h2>
 <ul>
 <li><a href="../design.md">Design Document</a>: Architectural rationale and detailed generation strategy</li>
+<li><a href="../go/">Go Client Documentation</a>: Go reference client usage</li>
 <li><a href="../c/">C SDK Documentation</a>: C-specific usage, build, and examples</li>
 <li><a href="../csharp/">C# SDK Documentation</a>: C#-specific usage, async patterns, and map helpers</li>
-<li><a href="../go/">Go Client Documentation</a>: Go reference client usage</li>
+<li><a href="../typescript/">TypeScript SDK Documentation</a>: TypeScript-specific usage, EventEmitter patterns, and examples</li>
 </ul>
 <hr />
 <p>For questions or contributions, see the main VIIPER repository.</p>
