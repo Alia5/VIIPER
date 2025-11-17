@@ -960,10 +960,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#constant-export" class="md-nav__link">
+  <a href="#constant-and-map-export" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Constant Export
+        Constant and Map Export
       
     </span>
   </a>
@@ -1048,10 +1048,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-constant-export" class="md-nav__link">
+  <a href="#example-constant-and-map-export" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Constant Export
+        Example: Constant and Map Export
       
     </span>
   </a>
@@ -1126,6 +1126,34 @@
     
   
     C SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../csharp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C# SDK
   
 
     
@@ -1390,10 +1418,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#constant-export" class="md-nav__link">
+  <a href="#constant-and-map-export" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Constant Export
+        Constant and Map Export
       
     </span>
   </a>
@@ -1478,10 +1506,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-constant-export" class="md-nav__link">
+  <a href="#example-constant-and-map-export" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Constant Export
+        Example: Constant and Map Export
       
     </span>
   </a>
@@ -1594,9 +1622,13 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// viiper:wire keyboard c2s modifiers:u8 count:u8 keys:u8*count</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">type</span><span class="w"> </span><span class="nx">InputState</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
-<h3 id="constant-export">Constant Export</h3>
-<p>The generator automatically exports all constants from <code>pkg/device/*/const.go</code> for each device type.<br />
-No special tags are required. Exported Go constants are emitted with language-appropriate representations and prefixes.</p>
+<h3 id="constant-and-map-export">Constant and Map Export</h3>
+<p>The generator automatically exports all constants and map literals from <code>pkg/device/*/const.go</code> for each device type.<br />
+No special tags are required. Exported Go constants and maps are emitted with language-appropriate representations:</p>
+<ul>
+<li><strong>Constants</strong>: Grouped into enums (C#/TS) or <code>#define</code> macros (C) based on common prefixes</li>
+<li><strong>Maps</strong>: Converted to Dictionary/Map/lookup functions with helper methods</li>
+</ul>
 <h2 id="code-generation-flow">Code Generation Flow</h2>
 <p><strong>Scan Phase:</strong>  </p>
 <ol>
@@ -1604,7 +1636,7 @@ No special tags are required. Exported Go constants are emitted with language-ap
 <li>Reflect response DTOs from <code>pkg/apitypes/*.go</code>  </li>
 <li>Find device types via <code>RegisterDevice()</code> calls  </li>
 <li>Parse <code>viiper:wire</code> comments for packet layouts  </li>
-<li>Extract all exported constants from <code>pkg/device/*/const.go</code> (automatic)</li>
+<li>Extract all exported constants and map literals from <code>pkg/device/*/const.go</code> (automatic)</li>
 </ol>
 <p><strong>Emit Phase:</strong><br />
 For each language, generate management client, DTO types, device streams, constants, and build configs.</p>
@@ -1649,7 +1681,7 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span><span class="w"> </span><span class="n">viiper_keyboard_input_t</span><span class="p">;</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="cp">#pragma pack(pop)</span>
 </code></pre></div>
-<h2 id="example-constant-export">Example: Constant Export</h2>
+<h2 id="example-constant-and-map-export">Example: Constant and Map Export</h2>
 <p><strong>Go source (<code>pkg/device/keyboard/const.go</code>):</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nx">ModLeftCtrl</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="mh">0x01</span>
@@ -1658,39 +1690,81 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nx">KeyB</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x05</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="c1">// ...</span>
 <a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">)</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="kd">var</span><span class="w"> </span><span class="nx">CharToKey</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">byte</span><span class="p">]</span><span class="kt">byte</span><span class="p">{</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="sc">&#39;a&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyA</span><span class="p">,</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="sc">&#39;b&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyB</span><span class="p">,</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="sc">&#39;\n&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyEnter</span><span class="p">,</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Emitted C header (<code>viiper_keyboard.h</code>):</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cp">#define VIIPER_KEYBOARD_MODLEFTCTRL 0x1</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="cp">#define VIIPER_KEYBOARD_MODLEFTSHIFT 0x2</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="cp">#define VIIPER_KEYBOARD_KEYA 0x4</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="cp">#define VIIPER_KEYBOARD_KEYB 0x5</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="c1">// ...</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1">// Map lookup function</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">viiper_keyboard_char_to_key_lookup</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out_value</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Emitted C# (<code>KeyboardConstants.cs</code>):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">public</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">Mod</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kt">uint</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="p">{</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">LeftCtrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="n">LeftShift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x02</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">}</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="k">public</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">Key</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kt">uint</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="p">{</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x04</span><span class="p">,</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="n">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x05</span><span class="p">,</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="p">}</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="k">public</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">CharToKey</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="p">{</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="k">private</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="n">Dictionary</span><span class="o">&lt;</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="o">&gt;</span><span class="w"> </span><span class="n">_map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">()</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">A</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">B</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">Enter</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">        </span><span class="c1">// ...</span>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">    </span><span class="p">};</span>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">TryGetValue</span><span class="p">(</span><span class="kt">byte</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">Key</span><span class="w"> </span><span class="k">value</span><span class="p">)</span>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">_map</span><span class="p">.</span><span class="n">TryGetValue</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="k">value</span><span class="p">);</span>
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="regeneration-triggers">Regeneration Triggers</h2>
 <p>Run codegen when any of these change:</p>
 <ul>
 <li><code>pkg/apitypes/*.go</code>: API response structures</li>
 <li><code>pkg/device/*/inputstate.go</code>: Wire tag annotations</li>
-<li><code>pkg/device/*/const.go</code>: Exported constants</li>
+<li><code>pkg/device/*/const.go</code>: Exported constants and map literals</li>
 <li><code>internal/server/api/*.go</code>: Route registrations</li>
 <li><code>internal/codegen/generator/**/*.go</code>: Generator templates</li>
+<li><code>internal/codegen/scanner/**/*.go</code>: Scanner logic (constants, maps, wire tags)</li>
 </ul>
 <h2 id="language-specific-notes">Language-Specific Notes</h2>
 <ul>
-<li><strong>C</strong>: manual memory management for variable-length fields; builds with CMake.  </li>
-<li><strong>C#</strong>: <code>ViiperDevice</code> class with <code>OnOutput</code> event; async/await for management API; struct packing via attributes.  </li>
-<li><strong>TypeScript</strong>: manual byte encoding; ESM/CJS compatible.  </li>
+<li><strong>C</strong>: <code>#define</code> macros for constants; switch-based lookup functions for maps; manual memory management for variable-length fields; builds with CMake.  </li>
+<li><strong>C#</strong>: Enums for constant groups; <code>Dictionary&lt;K,V&gt;</code> with static helper methods for maps; <code>ViiperDevice</code> class with <code>OnOutput</code> event; async/await for management API; struct packing via attributes.  </li>
+<li><strong>TypeScript</strong>: Enums for constant groups; <code>Map&lt;K,V&gt;</code> or plain objects for maps; manual byte encoding; ESM/CJS compatible.  </li>
 </ul>
 <h2 id="current-sdk-status">Current SDK Status</h2>
 <ul>
 <li><strong>C</strong>: ✅ Complete</li>
-<li><strong>C#</strong>: 🚧 Planned</li>
+<li><strong>C#</strong>: ✅ Complete</li>
 <li><strong>TypeScript</strong>: 🚧 Planned</li>
 </ul>
 <h2 id="further-reading">Further Reading</h2>
 <ul>
 <li><a href="../design.md">Design Document</a>: Architectural rationale and detailed generation strategy</li>
 <li><a href="../c/">C SDK Documentation</a>: C-specific usage, build, and examples</li>
+<li><a href="../csharp/">C# SDK Documentation</a>: C#-specific usage, async patterns, and map helpers</li>
 <li><a href="../go/">Go Client Documentation</a>: Go reference client usage</li>
 </ul>
 <hr />

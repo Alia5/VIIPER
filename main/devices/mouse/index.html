@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hid-mouse-virtual" class="md-skip">
+        <a href="#hid-mouse" class="md-skip">
           Skip to content
         </a>
       
@@ -899,6 +899,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clients/csharp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C# SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1086,6 +1114,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#client-sdk-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client SDK Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#hid-report-format-host-facing" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1199,6 +1238,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#client-sdk-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client SDK Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#hid-report-format-host-facing" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1262,13 +1312,17 @@
   
 
 
-<h1 id="hid-mouse-virtual">HID Mouse (virtual)</h1>
+<h1 id="hid-mouse">HID Mouse</h1>
 <p>A standard 5-button mouse with vertical and horizontal scroll wheels. Reports relative motion deltas and supports up to five buttons.</p>
 <ul>
 <li>USB IDs: VID 0x2E8A (Raspberry Pi), PID 0x0011</li>
 <li>Interface/Endpoint: IN 0x81 (mouse input report)</li>
 <li>Device type id (for API add): <code>mouse</code></li>
 </ul>
+<h2 id="client-sdk-support">Client SDK Support</h2>
+<p>The wire protocol is abstracted by client SDKs. The <strong>Go client</strong> includes built-in types (<code>pkg/device/mouse</code>), and <strong>generated SDKs</strong> provide equivalent structures with proper packing.<br />
+You don't need to manually construct packets, just use the provided types and send them via the device stream.</p>
+<p>See: <a href="../../clients/go/">Go Client</a>, <a href="../../clients/generator/">Generated SDKs</a></p>
 <h2 id="hid-report-format-host-facing">HID report format (host-facing)</h2>
 <p>Input (device → host): 5 bytes</p>
 <ul>

@@ -1156,6 +1156,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clients/csharp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C# SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1601,53 +1629,53 @@ VIIPER intercepts and logs all USB traffic passing through, without handling the
 <p><strong>Default:</strong> <code>:3241</code><br />
 <strong>Environment Variable:</strong> <code>VIIPER_PROXY_ADDR</code></p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--listen-addr<span class="o">=</span>:9000<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3241
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--listen-addr<span class="o">=</span>:9000<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3240
 </code></pre></div>
 <h3 id="-upstream"><code>--upstream</code></h3>
 <p><strong>Required.</strong> Upstream USBIP server address (where real devices are).</p>
 <p><strong>Environment Variable:</strong> <code>VIIPER_PROXY_UPSTREAM</code></p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3241
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3240
 </code></pre></div>
 <h3 id="-connection-timeout"><code>--connection-timeout</code></h3>
 <p>Connection timeout for proxy operations.</p>
 <p><strong>Default:</strong> <code>30s</code><br />
 <strong>Environment Variable:</strong> <code>VIIPER_PROXY_TIMEOUT</code></p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3241<span class="w"> </span>--connection-timeout<span class="o">=</span>60s
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3240<span class="w"> </span>--connection-timeout<span class="o">=</span>60s
 </code></pre></div>
 <h2 id="examples">Examples</h2>
 <h3 id="basic-proxy">Basic Proxy</h3>
 <p>Start proxy between local clients and remote USBIP server:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3241
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3240
 </code></pre></div>
-<p>Clients connect to <code>localhost:3241</code>, traffic is proxied to <code>192.168.1.100:3241</code>.</p>
+<p>Clients connect to <code>localhost:3241</code>, traffic is proxied to <code>192.168.1.100:3240</code>.</p>
 <h3 id="custom-listen-address">Custom Listen Address</h3>
 <p>Start proxy on a different port:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--listen-addr<span class="o">=</span>:9000<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3241
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--listen-addr<span class="o">=</span>:9000<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3240
 </code></pre></div>
-<p>Clients connect to <code>localhost:9000</code>, traffic is proxied to <code>192.168.1.100:3241</code>.</p>
+<p>Clients connect to <code>localhost:9000</code>, traffic is proxied to <code>192.168.1.100:3240</code>.</p>
 <h3 id="with-raw-packet-logging">With Raw Packet Logging</h3>
 <p>Capture all USB traffic for reverse engineering:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3241<span class="w"> </span>--log.raw-file<span class="o">=</span>usb-capture.log
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3240<span class="w"> </span>--log.raw-file<span class="o">=</span>usb-capture.log
 </code></pre></div>
 <p>All USB packets will be logged to <code>usb-capture.log</code>.</p>
 <h3 id="with-debug-logging">With Debug Logging</h3>
 <p>Enable debug logging to see proxy operations:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3241<span class="w"> </span>--log.level<span class="o">=</span>debug
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span><span class="m">192</span>.168.1.100:3240<span class="w"> </span>--log.level<span class="o">=</span>debug
 </code></pre></div>
 <h2 id="use-cases">Use Cases</h2>
 <h3 id="reverse-engineering">Reverse Engineering</h3>
 <p>Intercept USB traffic between a client and server to understand device protocols:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span>real-server:3241<span class="w"> </span>--log.raw-file<span class="o">=</span>device-capture.log
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span>real-server:3240<span class="w"> </span>--log.raw-file<span class="o">=</span>device-capture.log
 </code></pre></div>
 <h3 id="traffic-analysis">Traffic Analysis</h3>
 <p>Monitor USB communication for debugging:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span>real-server:3241<span class="w"> </span>--log.level<span class="o">=</span>trace
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span>real-server:3240<span class="w"> </span>--log.level<span class="o">=</span>trace
 </code></pre></div>
 <h3 id="network-inspection">Network Inspection</h3>
 <p>Route USB traffic through VIIPER to inspect and log all operations:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span>real-server:3241<span class="w"> </span>--log.level<span class="o">=</span>debug<span class="w"> </span>--log.raw-file<span class="o">=</span>traffic.log
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>viiper<span class="w"> </span>proxy<span class="w"> </span>--upstream<span class="o">=</span>real-server:3240<span class="w"> </span>--log.level<span class="o">=</span>debug<span class="w"> </span>--log.raw-file<span class="o">=</span>traffic.log
 </code></pre></div>
 <h2 id="proxy-architecture">Proxy Architecture</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>USBIP Client  →  VIIPER Proxy  →  USBIP Server (real devices)

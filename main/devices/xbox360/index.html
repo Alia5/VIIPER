@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../../clients/c/">
+        <link rel="prev" href="../../clients/csharp/">
       
       
         <link rel="next" href="../keyboard/">
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#xbox-360-controller-virtual" class="md-skip">
+        <a href="#xbox-360-controller" class="md-skip">
           Skip to content
         </a>
       
@@ -901,6 +901,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clients/csharp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C# SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1030,6 +1058,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#client-sdk-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client SDK Support
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#adding-the-device" class="md-nav__link">
@@ -1190,6 +1229,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#client-sdk-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client SDK Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#adding-the-device" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1242,13 +1292,17 @@
   
 
 
-<h1 id="xbox-360-controller-virtual">Xbox 360 Controller (virtual)</h1>
+<h1 id="xbox-360-controller">Xbox 360 Controller</h1>
 <p>The Xbox 360 virtual gamepad emulates an XInput-compatible controller that most operating systems and games understand out of the box.</p>
 <ul>
 <li>USB IDs: VID 0x045E (Microsoft), PID 0x028E (Xbox 360 Controller)</li>
 <li>Interfaces/Endpoints: single HID interface with one IN interrupt endpoint and one OUT interrupt endpoint for rumble</li>
 <li>Device type id (for API add): <code>xbox360</code></li>
 </ul>
+<h2 id="client-sdk-support">Client SDK Support</h2>
+<p>The wire protocol is abstracted by client SDKs. The <strong>Go client</strong> includes built-in types (<code>pkg/device/xbox360</code>), and <strong>generated SDKs</strong> provide equivalent structures with proper packing.<br />
+You don't need to manually construct packets, just use the provided types and send them via the device stream.</p>
+<p>See: <a href="../../clients/go/">Go Client</a>, <a href="../../clients/generator/">Generated SDKs</a></p>
 <h2 id="adding-the-device">Adding the device</h2>
 <p>Use the API to create a bus and add an Xbox 360 controller:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bus/create
