@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	cgen "viiper/internal/codegen/generator/c"
 	"viiper/internal/codegen/generator/csharp"
+	"viiper/internal/codegen/generator/typescript"
 	"viiper/internal/codegen/meta"
 	"viiper/internal/codegen/scanner"
 )
@@ -21,8 +22,9 @@ type Generator struct {
 type LanguageGenerator func(logger *slog.Logger, outputDir string, md *meta.Metadata) error
 
 var generators = map[string]LanguageGenerator{
-	"c":      cgen.Generate,
-	"csharp": csharp.Generate,
+	"c":          cgen.Generate,
+	"csharp":     csharp.Generate,
+	"typescript": typescript.Generate,
 }
 
 func New(outputDir string, logger *slog.Logger) *Generator {

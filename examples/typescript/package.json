@@ -1,0 +1,21 @@
+{
+  "name": "viiper-examples-typescript",
+  "private": true,
+  "version": "0.0.0",
+  "description": "VIIPER TypeScript examples mirroring C# and C",
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p .",
+    "vk": "node dist/virtual_keyboard.js",
+    "vm": "node dist/virtual_mouse.js",
+    "vx": "node dist/virtual_x360_pad.js"
+  },
+  "dependencies": {
+    "viiperclient": "file:../../clients/typescript"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -62,32 +62,6 @@ viiper codegen --lang=csharp
 viiper codegen --lang=typescript
 ```
 
-## Output Structure
-
-Generated files are organized by language:
-
-```
-clients/
-├── c/
-│   ├── include/viiper/
-│   │   ├── viiper.h
-│   │   ├── viiper_keyboard.h
-│   │   ├── viiper_mouse.h
-│   │   └── viiper_xbox360.h
-│   ├── src/
-│   │   ├── viiper.c
-│   │   ├── viiper_keyboard.c
-│   │   ├── viiper_mouse.c
-│   │   └── viiper_xbox360.c
-│   └── CMakeLists.txt
-├── csharp/
-│   └── Viiper.Client/
-│       └── (generated C# files)
-└── ts/
-    └── viiperclient/
-        └── (generated TypeScript files)
-```
-
 ## Examples
 
 ### Generate All SDKs

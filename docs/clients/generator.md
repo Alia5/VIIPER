@@ -217,20 +217,16 @@ Run codegen when any of these change:
 
 - **C**: `#define` macros for constants; switch-based lookup functions for maps; manual memory management for variable-length fields; builds with CMake.  
 - **C#**: Enums for constant groups; `Dictionary<K,V>` with static helper methods for maps; `ViiperDevice` class with `OnOutput` event; async/await for management API; struct packing via attributes.  
-- **TypeScript**: Enums for constant groups; `Map<K,V>` or plain objects for maps; manual byte encoding; ESM/CJS compatible.  
+- **TypeScript**: Enums for constant groups; `Record<K, V>` objects with `Get`/`Has` helper functions for maps; manual byte encoding via `BinaryWriter`/`BinaryReader`; `ViiperDevice` class with EventEmitter for output; `addDeviceAndConnect` convenience method; builds with `tsc`.  
 
-## Current SDK Status
-
-- **C**: ✅ Complete
-- **C#**: ✅ Complete
-- **TypeScript**: 🚧 Planned
 
 ## Further Reading
 
 - [Design Document](../design.md): Architectural rationale and detailed generation strategy
+- [Go Client Documentation](go.md): Go reference client usage
 - [C SDK Documentation](c.md): C-specific usage, build, and examples
 - [C# SDK Documentation](csharp.md): C#-specific usage, async patterns, and map helpers
-- [Go Client Documentation](go.md): Go reference client usage
+- [TypeScript SDK Documentation](typescript.md): TypeScript-specific usage, EventEmitter patterns, and examples
 
 ---
 

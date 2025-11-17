@@ -5,9 +5,12 @@ VIIPER ships a lightweight TCP API for managing virtual buses/devices and for de
 !!! tip "Client SDKs Available"
     Generated client libraries are available that abstract away the protocol details described below. For most use cases, you should use one of the provided SDKs rather than implementing the raw protocol yourself:
     
-    - [C SDK](../clients/c.md): Generated C library with type-safe device streams
     - [Go Client](../clients/go.md): Reference implementation included in the repository
-    - [Generator Documentation](../clients/generator.md): Information about code generation for additional languages
+    - [Generator Documentation](../clients/generator.md): Information about code generation
+    - [C SDK](../clients/c.md): Generated C library with type-safe device streams
+    - [C# SDK](../clients/csharp.md): Generated .NET library with async/await support
+    - [TypeScript SDK](../clients/typescript.md): Generated Node.js library with EventEmitter streams
+
     
     The documentation below is provided for reference and for implementing clients in languages not yet supported by the generator.
 
