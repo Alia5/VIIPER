@@ -18,36 +18,57 @@ The C# SDK features:
 
 ## Installation
 
-### Building from Source
+### 1. Using the Published NuGet Package (Recommended)
 
-The C# SDK is generated from the VIIPER server codebase:
+Install the stable package:
+
+```bash
+dotnet add package Viiper.Client
+```
+
+Package page: [Viiper.Client on NuGet](https://www.nuget.org/packages/Viiper.Client/)
+
+> Pre-release / snapshot builds are **not** published to NuGet. They are only available as GitHub Release artifacts (e.g. `dev-latest`) or by building from source.
+
+To use a snapshot `.nupkg` from a GitHub Release:
+
+```bash
+# 1. Download viiper-csharp-sdk-nupkg-Release.nupkg (or Snapshot) to ./packages
+mkdir -p packages
+cp /path/to/downloaded/viiper-csharp-sdk-nupkg.nupkg packages/
+
+# 2. Add a temporary local source and install
+dotnet nuget add source ./packages --name viiper-local || true
+dotnet add package Viiper.Client --source viiper-local
+```
+
+Or add directly in your `.csproj` (stable only):
+
+```xml
+<ItemGroup>
+    <PackageReference Include="Viiper.Client" Version="*" />
+</ItemGroup>
+```
+
+### 2. Project Reference (For Local Development Against Source)
+
+Use this when modifying the generator or contributing new device types:
+
+```xml
+<ItemGroup>
+    <ProjectReference Include="..\..\clients\csharp\Viiper.Client\Viiper.Client.csproj" />
+</ItemGroup>
+```
+
+### 3. Generating from Source (Advanced / Contributors)
+
+Only required when enhancing VIIPER itself:
 
 ```bash
 cd viiper
 go run ./cmd/viiper codegen --lang=csharp
-```
-
-Build the SDK:
-
-```bash
 cd ../clients/csharp
 dotnet build -c Release Viiper.Client
-```
-
-### Adding to Your Project
-
-**Project Reference (recommended for local development):**
-
-```xml
-<ItemGroup>
-  <ProjectReference Include="path\to\clients\csharp\Viiper.Client\Viiper.Client.csproj" />
-</ItemGroup>
-```
-
-**NuGet Package (when available):**
-
-```bash
-dotnet add package Viiper.Client
 ```
 
 ## Quick Start

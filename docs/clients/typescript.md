@@ -18,26 +18,40 @@ The TypeScript SDK features:
 
 ## Installation
 
-### Building from Source
+### 1. Using the Published NPM Package (Recommended)
 
-The TypeScript SDK is generated from the VIIPER server codebase:
-
-```bash
-cd viiper
-go run ./cmd/viiper codegen --lang=typescript
-```
-
-Build the SDK:
+Install the SDK from the public npm registry:
 
 ```bash
-cd ../clients/typescript
-npm install
-npm run build
+npm install viiperclient
 ```
 
-### Adding to Your Project
+Or with pnpm / yarn:
 
-**Project Reference (recommended for local development):**
+```bash
+pnpm add viiperclient
+# or
+yarn add viiperclient
+```
+
+The latest stable version is tagged as `latest`.
+
+> Pre-release / snapshot builds are **not** published to npm. They are only available as GitHub Release artifacts (e.g. `dev-latest`) or by building from source.
+
+To use a snapshot artifact from GitHub:
+
+1. Download `viiperclient-typescript-sdk-Snapshot.tgz` (or a versioned tarball) from the appropriate Release.
+2. Install it directly:
+
+```bash
+npm install ./viiperclient-typescript-sdk-Snapshot.tgz
+```
+
+Package page: [npm: viiperclient](https://www.npmjs.com/package/viiperclient)
+
+### 2. Local Project Reference (For Development Against Source)
+
+If you are actively modifying VIIPER or the code generator, link directly:
 
 ```json
 {
@@ -47,10 +61,24 @@ npm run build
 }
 ```
 
-**NPM Package (when available):**
+Then build locally after regeneration:
 
 ```bash
-npm install viiperclient
+cd clients/typescript
+npm install
+npm run build
+```
+
+### 3. Generating from Source (Advanced / Contributors)
+
+This is only required if you are contributing to VIIPER or adding device types. Normal users should use the npm package.
+
+```bash
+cd viiper
+go run ./cmd/viiper codegen --lang=typescript
+cd ../clients/typescript
+npm install
+npm run build
 ```
 
 ## Quick Start
