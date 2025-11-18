@@ -159,3 +159,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ```
+
+## Credits / Inspiration
+
+[REDACTED-Bus aka ViGEmBus](https://github.com/nefarius/ViGEmBus) - (Retired) Windows kernel-mode driver emulating well-known USB game controllers.
