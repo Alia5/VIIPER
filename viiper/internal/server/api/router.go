@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"log/slog"
 	"net"
 	"strings"
@@ -9,6 +10,7 @@ import (
 
 // Request contains route parameters and additional args from the command.
 type Request struct {
+	Ctx    context.Context
 	Params map[string]string
 	Args   []string
 }

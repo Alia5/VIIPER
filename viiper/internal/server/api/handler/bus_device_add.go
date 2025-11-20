@@ -68,6 +68,18 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 			}
 		}()
 
+		if apiSrv.Config().AutoAttachLocalClient {
+			err := api.AttachLocalhostClient(
+				req.Ctx,
+				exportMeta,
+				s.GetListenPort(),
+				logger,
+			)
+			if err != nil {
+				logger.Error("failed to auto-attach localhost client", "error", err)
+			}
+		}
+
 		payload, err := json.Marshal(apitypes.DeviceAddResponse{
 			ID: fmt.Sprintf("%d-%d", busID, exportMeta.DevId),
 		})

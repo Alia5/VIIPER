@@ -59,6 +59,21 @@ Time before auto-cleanup occurs when a device handler has no active connection.
 viiper server --api.device-handler-timeout=10s
 ```
 
+### `--api.auto-attach-local-client`
+
+Automatically attach newly added devices to a local USBIP client on the same host (localhost only). This is a convenience feature; attachment failures (tool not found, error exit) are logged but do not abort device creation.
+
+VIIPER expects the USBIP command-line tool to be in the PATH (should be by default) (`usbip` on Linux, `usbip.exe` on Windows). If it is missing, auto-attach will simply log an error.
+
+**Default:** `true`  
+**Environment Variable:** `VIIPER_API_AUTO_ATTACH_LOCAL_CLIENT`
+
+Disable example:
+
+```bash
+viiper server --api.auto-attach-local-client=false
+```
+
 ### `--connection-timeout`
 
 Connection operation timeout for both USBIP and API servers.

@@ -8,6 +8,7 @@ import (
 	"io"
 	"log/slog"
 	"net"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -203,6 +204,19 @@ func (s *Server) Close() error {
 		return s.ln.Close()
 	}
 	return nil
+}
+
+// GetListenPort extracts and returns the port number from the server's listen address.
+func (s *Server) GetListenPort() uint16 {
+	_, portStr, err := net.SplitHostPort(s.config.Addr)
+	if err != nil {
+		return 0
+	}
+	port, err := strconv.ParseUint(portStr, 10, 16)
+	if err != nil {
+		return 0
+	}
+	return uint16(port)
 }
 
 // --

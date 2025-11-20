@@ -98,6 +98,10 @@ func (a *Server) writeOK(w io.Writer, rest string) {
 
 func (a *Server) handleConn(conn net.Conn) {
 	defer conn.Close()
+
+	connCtx, connCancel := context.WithCancel(context.Background())
+	defer connCancel()
+
 	connLogger := a.logger.With("remote", conn.RemoteAddr().String())
 	r := bufio.NewReader(conn)
 	w := conn
@@ -124,7 +128,7 @@ func (a *Server) handleConn(conn net.Conn) {
 		args := fields[1:]
 
 		if h, params := a.router.Match(path); h != nil {
-			req := &Request{Params: params, Args: args}
+			req := &Request{Ctx: connCtx, Params: params, Args: args}
 			res := &Response{}
 			if err := h(req, res, connLogger); err != nil {
 				connLogger.Error("api handler error", "path", path, "error", err)

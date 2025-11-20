@@ -25,6 +25,7 @@ All command-line flags have corresponding environment variables for easier deplo
 | `VIIPER_USB_ADDR` | `--usb.addr` | `:3241` | USBIP server listen address |
 | `VIIPER_API_ADDR` | `--api.addr` | `:3242` | API server listen address |
 | `VIIPER_API_DEVICE_HANDLER_TIMEOUT` | `--api.device-handler-timeout` | `5s` | Device handler auto-cleanup timeout |
+| `VIIPER_API_AUTO_ATTACH_LOCAL_CLIENT` | `--api.auto-attach-local-client` | `true` | Auto-attach exported devices to local usbip client |
 | `VIIPER_CONNECTION_TIMEOUT` | `--connection-timeout` | `30s` | Connection operation timeout |
 
 ### Proxy Configuration
@@ -71,7 +72,8 @@ Server:
 {
   "api": {
     "addr": ":3242",
-    "device-handler-connect-timeout": "5s"
+    "device-handler-connect-timeout": "5s",
+    "auto-attach-local-client": true
   },
   "usb": {
     "addr": ":3241"
