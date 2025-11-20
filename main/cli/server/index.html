@@ -753,6 +753,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-apiauto-attach-local-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --api.auto-attach-local-client
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-connection-timeout" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1474,6 +1485,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-apiauto-attach-local-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --api.auto-attach-local-client
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-connection-timeout" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1655,29 +1677,37 @@
 <p><strong>Example:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--api.device-handler-timeout<span class="o">=</span>10s
 </code></pre></div>
+<h3 id="-apiauto-attach-local-client"><code>--api.auto-attach-local-client</code></h3>
+<p>Automatically attach newly added devices to a local USBIP client on the same host (localhost only). This is a convenience feature; attachment failures (tool not found, error exit) are logged but do not abort device creation.</p>
+<p>VIIPER expects the USBIP command-line tool to be in the PATH (should be by default) (<code>usbip</code> on Linux, <code>usbip.exe</code> on Windows). If it is missing, auto-attach will simply log an error.</p>
+<p><strong>Default:</strong> <code>true</code><br />
+<strong>Environment Variable:</strong> <code>VIIPER_API_AUTO_ATTACH_LOCAL_CLIENT</code></p>
+<p>Disable example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--api.auto-attach-local-client<span class="o">=</span><span class="nb">false</span>
+</code></pre></div>
 <h3 id="-connection-timeout"><code>--connection-timeout</code></h3>
 <p>Connection operation timeout for both USBIP and API servers.</p>
 <p><strong>Default:</strong> <code>30s</code><br />
 <strong>Environment Variable:</strong> <code>VIIPER_CONNECTION_TIMEOUT</code></p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--connection-timeout<span class="o">=</span>60s
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--connection-timeout<span class="o">=</span>60s
 </code></pre></div>
 <h2 id="examples">Examples</h2>
 <h3 id="basic-server">Basic Server</h3>
 <p>Start server with default settings (USBIP on :3241, API on :3242):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>viiper<span class="w"> </span>server
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>viiper<span class="w"> </span>server
 </code></pre></div>
 <h3 id="custom-addresses">Custom Addresses</h3>
 <p>Start server on custom ports:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--usb.addr<span class="o">=</span>:9000<span class="w"> </span>--api.addr<span class="o">=</span>:9001
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--usb.addr<span class="o">=</span>:9000<span class="w"> </span>--api.addr<span class="o">=</span>:9001
 </code></pre></div>
 <h3 id="with-logging">With Logging</h3>
 <p>Start server with debug logging to file:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--log.level<span class="o">=</span>debug<span class="w"> </span>--log.file<span class="o">=</span>/var/log/viiper.log
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--log.level<span class="o">=</span>debug<span class="w"> </span>--log.file<span class="o">=</span>/var/log/viiper.log
 </code></pre></div>
 <h3 id="with-raw-packet-logging">With Raw Packet Logging</h3>
 <p>Start server with raw USB packet logging (useful for reverse engineering):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--log.raw-file<span class="o">=</span>/var/log/viiper-raw.log
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>viiper<span class="w"> </span>server<span class="w"> </span>--log.raw-file<span class="o">=</span>/var/log/viiper-raw.log
 </code></pre></div>
 <h2 id="connect-from-a-client-usbip">Connect from a client (USBIP)</h2>
 <p>After the server is running and a virtual device has been added to a bus (via the API), attach it from a client using USBIP.</p>
@@ -1687,17 +1717,17 @@
 <li>The BUSID-DEVICEID you need (e.g. <code>1-1</code>) is returned by the API on device add and also visible via <code>usbip list</code>.</li>
 </ul>
 <h3 id="linux">Linux</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Load the virtual host controller (only needed once per boot)</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>sudo<span class="w"> </span>modprobe<span class="w"> </span>vhci-hcd
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># List exportable devices on the VIIPER host</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>usbip<span class="w"> </span>list<span class="w"> </span>--remote<span class="o">=</span>VIIPER_HOST<span class="w"> </span>--tcp-port<span class="o">=</span><span class="m">3241</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Attach a device by busid (long flags)</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>sudo<span class="w"> </span>usbip<span class="w"> </span>attach<span class="w"> </span>--remote<span class="o">=</span>VIIPER_HOST<span class="w"> </span>--tcp-port<span class="o">=</span><span class="m">3241</span><span class="w"> </span>--busid<span class="o">=</span>BUSID-DEVICEID
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># Equivalent short-form flags</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>sudo<span class="w"> </span>usbip<span class="w"> </span>--tcp-port<span class="w"> </span><span class="m">3241</span><span class="w"> </span>-r<span class="w"> </span>VIIPER_HOST<span class="w"> </span>-b<span class="w"> </span>BUSID-DEVICEID
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Load the virtual host controller (only needed once per boot)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>sudo<span class="w"> </span>modprobe<span class="w"> </span>vhci-hcd
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># List exportable devices on the VIIPER host</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>usbip<span class="w"> </span>list<span class="w"> </span>--remote<span class="o">=</span>VIIPER_HOST<span class="w"> </span>--tcp-port<span class="o">=</span><span class="m">3241</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Attach a device by busid (long flags)</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>sudo<span class="w"> </span>usbip<span class="w"> </span>attach<span class="w"> </span>--remote<span class="o">=</span>VIIPER_HOST<span class="w"> </span>--tcp-port<span class="o">=</span><span class="m">3241</span><span class="w"> </span>--busid<span class="o">=</span>BUSID-DEVICEID
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># Equivalent short-form flags</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>sudo<span class="w"> </span>usbip<span class="w"> </span>--tcp-port<span class="w"> </span><span class="m">3241</span><span class="w"> </span>-r<span class="w"> </span>VIIPER_HOST<span class="w"> </span>-b<span class="w"> </span>BUSID-DEVICEID
 </code></pre></div>
 <p>Replace <code>VIIPER_HOST</code> with the server's hostname/IP. If you changed the USBIP port, use that port instead of <code>3241</code>.</p>
 <h3 id="windows">Windows</h3>
@@ -1706,8 +1736,8 @@
 <li>GUI: use the client to add a remote host and attach by busid.</li>
 <li>CLI (similar flags):</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">usbip</span><span class="p">.</span><span class="n">exe</span> <span class="n">list</span> <span class="p">-</span><span class="n">-remote</span> <span class="n">VIIPER_HOST</span> <span class="p">-</span><span class="n">-tcp-port</span> <span class="n">3241</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">usbip</span><span class="p">.</span><span class="n">exe</span> <span class="n">attach</span> <span class="p">-</span><span class="n">-remote</span> <span class="n">VIIPER_HOST</span> <span class="p">-</span><span class="n">-tcp-port</span> <span class="n">3241</span> <span class="p">-</span><span class="n">-busid</span> <span class="n">BUSID-DEVICEID</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">usbip</span><span class="p">.</span><span class="n">exe</span> <span class="n">list</span> <span class="p">-</span><span class="n">-remote</span> <span class="n">VIIPER_HOST</span> <span class="p">-</span><span class="n">-tcp-port</span> <span class="n">3241</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">usbip</span><span class="p">.</span><span class="n">exe</span> <span class="n">attach</span> <span class="p">-</span><span class="n">-remote</span> <span class="n">VIIPER_HOST</span> <span class="p">-</span><span class="n">-tcp-port</span> <span class="n">3241</span> <span class="p">-</span><span class="n">-busid</span> <span class="n">BUSID-DEVICEID</span>
 </code></pre></div>
 <p>Once attached, the device will appear to the OS/applications as a local USB device.</p>
 <h2 id="see-also">See Also</h2>

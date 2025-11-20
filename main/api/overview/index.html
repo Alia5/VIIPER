@@ -1575,6 +1575,8 @@
 <li>Add a device to a bus. <code>deviceType</code> is a registered device name (e.g., <code>xbox360</code>).</li>
 <li>Response: <code>{ "id": "&lt;busId&gt;-&lt;devId&gt;" }</code> where the id is the USBIP busid string you will attach to.</li>
 <li>Important: After add, the server starts a connect timer (default <code>5s</code>). You must open a device stream (see below) before the timeout expires, otherwise the device is auto-removed.</li>
+<li>If <a href="../../cli/server/#api.auto-attach-local-client">auto-attach</a> is enabled (default) the server automatically attaches the new device to a local USBIP client on the same host (localhost only).<br />
+Failures (missing tool, non-zero exit) are logged but do not affect the API response.</li>
 </ul>
 </li>
 <li>
@@ -1701,7 +1703,8 @@
 <p>For a higher-level experience, see the Go client in <code>pkg/apiclient/</code>.</p>
 <h2 id="how-this-relates-to-usbip">How this relates to USBIP</h2>
 <p>The API controls which virtual devices exist and exposes a device stream for live input/feedback. Separately, the USBIP server (default <code>:3241</code>) makes these devices attachable from clients. Typical flow:</p>
-<p>1) Create a bus ➜ 2) Add a device ➜ 3) Connect the device stream ➜ 4) From a client, attach using USBIP by <code>busid</code> (see the Server command page for exact <code>usbip</code> syntax).</p>
+<p>1) Create a bus ➜ 2) Add a device ➜ 3) Connect the device stream ➜ 4) Attach using USBIP by <code>busid</code> (see the Server command page for syntax).</p>
+<p>If auto-attach is enabled step 4 is attempted automatically for the local host; you still must perform step 3 to keep the device alive.</p>
 
 
 
