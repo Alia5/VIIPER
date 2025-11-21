@@ -8,7 +8,7 @@ function Invoke-ViiperApi {
         Sends a command to the VIIPER API server and returns the response.
     
     .PARAMETER Command
-        The API command to send (e.g., "bus.list", "bus.create MyBus")
+        The API command to send (e.g., "bus/list", "bus/create MyBus")
     
     .PARAMETER Port
         The TCP port where the API server is listening. Default: 3242
@@ -17,13 +17,13 @@ function Invoke-ViiperApi {
         The hostname or IP address of the API server. Default: localhost
     
     .EXAMPLE
-        Invoke-ViiperApi "bus.list"
+        Invoke-ViiperApi "bus/list"
     
     .EXAMPLE
-        Invoke-ViiperApi "bus.create MyBus" -Port 3242
+        Invoke-ViiperApi "bus/create MyBus" -Port 3242
     
     .EXAMPLE
-        Invoke-ViiperApi "device.add MyBus xbox360" -Hostname "192.168.1.100"
+        Invoke-ViiperApi "bus/1/add {\"type\":\"xbox360\"}" -Hostname "192.168.1.100"
     #>
     param(
         [Parameter(Mandatory=$true, Position=0)]
