@@ -1511,7 +1511,7 @@
 
 
 <h1 id="api-reference">API Reference</h1>
-<p>VIIPER ships a lightweight TCP API for managing virtual buses/devices and for device-specific streaming. It's designed to be trivial to drive from any language that can open a TCP socket and send newline-terminated commands.</p>
+<p>VIIPER ships a lightweight TCP API for managing virtual buses/devices and for device-specific streaming. It's designed to be trivial to drive from any language that can open a TCP socket and send null-byte-terminated commands.</p>
 <div class="admonition tip">
 <p class="admonition-title">Client SDKs Available</p>
 <p>Generated client libraries are available that abstract away the protocol details described below. For most use cases, you should use one of the provided SDKs rather than implementing the raw protocol yourself:</p>
@@ -1528,9 +1528,9 @@
 <ul>
 <li>Transport: TCP</li>
 <li>Default listen address: <code>:3242</code> (configurable via <code>--api.addr</code>)</li>
-<li>Request format: a single ASCII/UTF‑8 line terminated by <code>\n\n</code> (double newline)</li>
-<li>Routing: path followed by optional payload separated by whitespace (e.g., <code>bus/list\n\n</code> or <code>bus/create 5\n\n</code>)</li>
-<li>Payload: optional string that can be a JSON object, numeric value, or plain string depending on the endpoint</li>
+<li>Request format: a single ASCII/UTF‑8 line terminated by <code>\0</code> (null byte)</li>
+<li>Routing: path followed by optional payload separated by whitespace (e.g., <code>bus/list\0</code> or <code>bus/create 5\0</code>)</li>
+<li>Payload: optional string that can be a JSON object, numeric value, or plain string depending on the endpoint. The payload may contain newlines (e.g., pretty-printed JSON) as only the null byte terminates the request.</li>
 <li>Success response: a single line containing a JSON payload (or an empty line for commands that have no payload), followed by <code>\n</code>, then connection close</li>
 <li>Error response: a single line JSON object following RFC 7807 Problem Details format with a <code>status</code> field (HTTP-style status code) and other error details, followed by <code>\n</code>, then connection close</li>
 </ul>
@@ -1596,7 +1596,7 @@ Failures (missing tool, non-zero exit) are logged but do not affect the API resp
 <h3 id="streaming-endpoint">Streaming endpoint</h3>
 <ul>
 <li>Path: <code>bus/{busId}/{deviceid}</code></li>
-<li>Handshake: Send the path followed by <code>\n\n</code> (e.g., <code>bus/1/1\n\n</code>)</li>
+<li>Handshake: Send the path followed by <code>\0</code> (null byte) (e.g., <code>bus/1/1\0</code>)</li>
 <li>Type: long-lived TCP connection</li>
 <li>Purpose: device-specific, bidirectional stream. The API server hands the socket to the device's registered stream handler.</li>
 <li>Timeout behavior: When a stream ends, a reconnect timer is started (same <code>DeviceHandlerConnectTimeout</code>).<br />
@@ -1665,24 +1665,24 @@ Failures (missing tool, non-zero exit) are logged but do not affect the API resp
 <h2 id="example-sessions">Example sessions</h2>
 <h3 id="using-netcat-linuxmacos">Using netcat (Linux/macOS)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># List buses</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/list\n\n&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/list\0&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Create a bus</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/create\n\n&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/create\0&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># → {&quot;busId&quot;:1}</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Create a bus with specific ID</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/create 5\n\n&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/create 5\0&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># → {&quot;busId&quot;:5}</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Add a virtual Xbox 360 controller to bus 1</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;bus/1/add {&quot;type&quot;:&quot;xbox360&quot;}\n\n&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;bus/1/add {&quot;type&quot;:&quot;xbox360&quot;}\0&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># → {&quot;busId&quot;:1,&quot;devId&quot;:&quot;1&quot;,&quot;vid&quot;:&quot;0x045e&quot;,&quot;pid&quot;:&quot;0x028e&quot;,&quot;type&quot;:&quot;xbox360&quot;}</span>
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1"># List devices on bus 1</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/1/list\n\n&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/1/list\0&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
 </code></pre></div>
-<p>Then, open a second TCP connection for streaming to <code>bus/1/1</code> (the API port, not the USBIP port). First send the handshake <code>bus/1/1\n\n</code>, then you'll write 14‑byte input packets and read 2‑byte rumble packets. Any language with raw TCP support works.</p>
+<p>Then, open a second TCP connection for streaming to <code>bus/1/1</code> (the API port, not the USBIP port). First send the handshake <code>bus/1/1\0</code>, then you'll write 14‑byte input packets and read 2‑byte rumble packets. Any language with raw TCP support works.</p>
 <h3 id="windows-powershell">WIndows (PowerShell)</h3>
 <p>VIIPER includes convenience scripts for quick testing and automation:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c"># Source the script to load helper functions</span>
@@ -1707,8 +1707,8 @@ Failures (missing tool, non-zero exit) are logged but do not affect the API resp
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="nx">conn</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">net</span><span class="p">.</span><span class="nx">Dial</span><span class="p">(</span><span class="s">&quot;tcp&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;localhost:3242&quot;</span><span class="p">)</span>
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="nx">conn</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="c1">// Send request with double newline terminator</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprint</span><span class="p">(</span><span class="nx">conn</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bus/create\n\n&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="c1">// Send request with null terminator</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprint</span><span class="p">(</span><span class="nx">conn</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bus/create\x00&quot;</span><span class="p">)</span>
 <a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
 <a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="c1">// Read entire response until connection closes</span>
 <a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="nx">resp</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">ReadAll</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>

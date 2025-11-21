@@ -602,6 +602,56 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#linux-kernel-module-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux Kernel Module Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Linux Kernel Module Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#one-time-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        One-Time Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -620,10 +670,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pre-built-binaries" class="md-nav__link">
+  <a href="#pre-built-binaries-recommended" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pre-built Binaries
+        Pre-built Binaries (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#portable-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Portable Deployment
       
     </span>
   </a>
@@ -1408,6 +1469,56 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#linux-kernel-module-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux Kernel Module Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Linux Kernel Module Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#one-time-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        One-Time Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1426,10 +1537,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pre-built-binaries" class="md-nav__link">
+  <a href="#pre-built-binaries-recommended" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pre-built Binaries
+        Pre-built Binaries (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#portable-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Portable Deployment
       
     </span>
   </a>
@@ -1514,10 +1636,54 @@
 <p><a href="https://wiki.archlinux.org/title/USB/IP">Arch Wiki: USBIP</a></p>
 <h3 id="windows">Windows</h3>
 <p><a href="https://github.com/vadimgrn/usbip-win2">usbip-win2</a> is by far the most complete implementation of USBIP for Windows (comes with a <strong>SIGNED</strong> kernel mode driver).</p>
+<h3 id="linux-kernel-module-setup">Linux Kernel Module Setup</h3>
+<div class="admonition info">
+<p class="admonition-title">USBIP Client Requirement</p>
+<p>USBIP requires the <code>vhci-hcd</code> (Virtual Host Controller Interface) kernel module on Linux for client operations. This includes VIIPER's auto-attach feature and manual device attachment.</p>
+</div>
+<p>Most Linux distributions include this module but don't load it automatically.</p>
+<h4 id="one-time-setup">One-Time Setup</h4>
+<p>To load the module automatically on boot:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;vhci-hcd&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/modules-load.d/vhci-hcd.conf
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>modprobe<span class="w"> </span>vhci-hcd
+</code></pre></div>
+<h4 id="manual-loading">Manual Loading</h4>
+<p>To load the module for the current session only:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>modprobe<span class="w"> </span>vhci-hcd
+</code></pre></div>
+<h4 id="verification">Verification</h4>
+<p>Check if the module is loaded:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>lsmod<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>vhci_hcd
+</code></pre></div>
+<p>If you don't plan to use the auto-attach feature, you can skip this setup and disable it with <code>--api.auto-attach-local-client=false</code>.</p>
 <h2 id="installing-viiper">Installing VIIPER</h2>
-<h3 id="pre-built-binaries">Pre-built Binaries</h3>
-<p>Download the latest release from the <a href="https://github.com/Alia5/VIIPER/releases">GitHub Releases</a> page.</p>
+<h3 id="pre-built-binaries-recommended">Pre-built Binaries (Recommended)</h3>
+<p>Download the latest release from the <a href="https://github.com/Alia5/VIIPER/releases">GitHub Releases</a> page. Pre-built binaries are available for:</p>
+<ul>
+<li>Windows (x64, ARM64)</li>
+<li>Linux (x64, ARM64)</li>
+</ul>
+<h3 id="portable-deployment">Portable Deployment</h3>
+<p>VIIPER does not require system-wide installation.<br />
+The <code>viiper</code> executable is completely self-contained (and statically linked) and can be:</p>
+<ul>
+<li>Placed in any directory</li>
+<li>Shipped alongside your application</li>
+<li>Run directly without installation</li>
+<li>Bundled with your application's distribution</li>
+</ul>
+<p>This makes VIIPER ideal for embedding in applications or distributing as part of a software package.</p>
+<div class="admonition warning">
+<p class="admonition-title">Daemon/Service Conflicts</p>
+<p>If VIIPER is already running as a system service or daemon on the target machine, be aware of potential port conflicts. Applications should either:</p>
+<ul>
+<li>Connect to the existing VIIPER instance (if accessible)</li>
+<li>Use a custom port via <code>--api.addr</code> flag to run a separate instance</li>
+<li>Check if VIIPER is already running before starting their own instance</li>
+</ul>
+</div>
 <h3 id="building-from-source">Building from Source</h3>
+<p>Building from source is only necessary if you need to modify VIIPER or target an unsupported platform.</p>
 <h4 id="prerequisites">Prerequisites</h4>
 <ul>
 <li><a href="https://go.dev/">Go</a> 1.25 or newer</li>
@@ -1529,14 +1695,14 @@
 </li>
 </ul>
 <h4 id="build-steps">Build Steps</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Alia5/VIIPER.git
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>VIIPER
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>make<span class="w"> </span>build
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Alia5/VIIPER.git
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>VIIPER
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>make<span class="w"> </span>build
 </code></pre></div>
 <p>The compiled binary will be in <code>dist/viiper</code> (or <code>dist/viiper.exe</code> on Windows).</p>
 <p><strong>Additional build targets:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span><span class="nb">help</span><span class="w">          </span><span class="c1"># Show all available make targets</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>make<span class="w"> </span><span class="nb">test</span><span class="w">          </span><span class="c1"># Run tests</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>make<span class="w"> </span><span class="nb">help</span><span class="w">          </span><span class="c1"># Show all available make targets</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>make<span class="w"> </span><span class="nb">test</span><span class="w">          </span><span class="c1"># Run tests</span>
 </code></pre></div>
 
 

@@ -836,17 +836,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#cicd-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CI/CD Integration
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1440,17 +1429,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#cicd-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CI/CD Integration
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1517,7 +1495,10 @@
 <li>Per-device encode/decode functions</li>
 <li>Typed constants and enums</li>
 </ul>
-<p><strong>Note:</strong> The codegen command requires access to VIIPER source code. It must be executed from the <code>viiper/</code> module directory within the repository.</p>
+<div class="admonition note">
+<p class="admonition-title">Sourcecode access is required</p>
+<p>The codegen command requires access to VIIPER source code. It must be executed from the <code>viiper/</code> module directory within the repository.</p>
+</div>
 <h2 id="flags">Flags</h2>
 <h3 id="-output"><code>--output</code></h3>
 <p>Output directory for generated SDKs (relative to repository root).</p>
@@ -1554,12 +1535,6 @@
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">cd</span><span class="w"> </span>../examples/c
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--config<span class="w"> </span>Release
-</code></pre></div>
-<h3 id="cicd-integration">CI/CD Integration</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate Client SDKs</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="no">cd viiper</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="no">go run ./cmd/viiper codegen --lang=all</span>
 </code></pre></div>
 <h2 id="when-to-regenerate">When to Regenerate</h2>
 <p>Run codegen when any of these change:</p>
