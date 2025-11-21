@@ -13,21 +13,13 @@ import (
 	"viiper/internal/server/api"
 	"viiper/internal/server/api/handler"
 	"viiper/internal/server/usb"
-	handlerTest "viiper/internal/testing"
+	th "viiper/internal/testing"
 	"viiper/pkg/apiclient"
+	"viiper/pkg/device"
 	"viiper/pkg/device/xbox360"
 	pusb "viiper/pkg/usb"
 	"viiper/pkg/virtualbus"
 )
-
-// testRegistration implements api.DeviceRegistration for tests
-type testRegistration struct {
-	creator func() pusb.Device
-	handler api.StreamHandlerFunc
-}
-
-func (t *testRegistration) CreateDevice() pusb.Device            { return t.creator() }
-func (t *testRegistration) StreamHandler() api.StreamHandlerFunc { return t.handler }
 
 func TestBusDeviceAdd(t *testing.T) {
 	tests := []struct {
@@ -49,22 +41,52 @@ func TestBusDeviceAdd(t *testing.T) {
 				}
 			},
 			pathParams:       map[string]string{"id": "80001"},
-			payload:          "xbox360",
-			expectedResponse: `{"id":"80001-1"}`,
+			payload:          `{"type": "xbox360"}`,
+			expectedResponse: `{"busId":80001, "devId": "1", "vid":"0x045e", "pid":"0x028e", "type":"xbox360"}`,
 		},
 		{
 			name:             "add device to non-existing bus",
 			setup:            nil,
 			pathParams:       map[string]string{"id": "99999"},
-			payload:          "xbox360",
-			expectedResponse: `{"error":"unknown bus"}`,
+			payload:          `{"type": "xbox360"}`,
+			expectedResponse: `{"status":404,"title":"Not Found","detail":"bus 99999 not found"}`,
 		},
 		{
 			name:             "invalid bus number",
 			setup:            nil,
 			pathParams:       map[string]string{"id": "baz"},
-			payload:          "xbox360",
-			expectedResponse: `{"error":"strconv.ParseUint: parsing \"baz\": invalid syntax"}`,
+			payload:          `{"type": "xbox360"}`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid busId: strconv.ParseUint: parsing \"baz\": invalid syntax"}`,
+		},
+		{
+			name: "invalid json",
+			setup: func(t *testing.T, s *usb.Server) {
+				b, err := virtualbus.NewWithBusId(2)
+				if err != nil {
+					t.Fatalf("create bus failed: %v", err)
+				}
+				if err := s.AddBus(b); err != nil {
+					t.Fatalf("add bus failed: %v", err)
+				}
+			},
+			pathParams:       map[string]string{"id": "2"},
+			payload:          `xbox360`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid JSON payload: invalid character 'x' looking for beginning of value"}`,
+		},
+		{
+			name: "invalid payload",
+			setup: func(t *testing.T, s *usb.Server) {
+				b, err := virtualbus.NewWithBusId(3)
+				if err != nil {
+					t.Fatalf("create bus failed: %v", err)
+				}
+				if err := s.AddBus(b); err != nil {
+					t.Fatalf("add bus failed: %v", err)
+				}
+			},
+			pathParams:       map[string]string{"id": "3"},
+			payload:          `{"tpe": "xbox360"}`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"missing device type"}`,
 		},
 		{
 			name: "correct device id after add/remove",
@@ -76,7 +98,7 @@ func TestBusDeviceAdd(t *testing.T) {
 				if err := s.AddBus(b); err != nil {
 					t.Fatalf("add bus failed: %v", err)
 				}
-				if _, err := b.Add(xbox360.New()); err != nil {
+				if _, err := b.Add(xbox360.New(nil)); err != nil {
 					t.Fatalf("add device failed: %v", err)
 				}
 				if err := b.RemoveDeviceByID("1"); err != nil {
@@ -84,14 +106,14 @@ func TestBusDeviceAdd(t *testing.T) {
 				}
 			},
 			pathParams:       map[string]string{"id": "80005"},
-			payload:          "xbox360",
-			expectedResponse: `{"id":"80005-1"}`,
+			payload:          `{"type": "xbox360"}`,
+			expectedResponse: `{"busId":80005, "devId": "1", "vid":"0x045e", "pid":"0x028e", "type":"xbox360"}`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			addr, srv, done := handlerTest.StartAPIServer(t, func(r *api.Router, s *usb.Server, apiSrv *api.Server) {
+			addr, srv, done := th.StartAPIServer(t, func(r *api.Router, s *usb.Server, apiSrv *api.Server) {
 				r.Register("bus/create", handler.BusCreate(s))
 				r.Register("bus/{id}/add", handler.BusDeviceAdd(s, apiSrv))
 			})
@@ -103,7 +125,7 @@ func TestBusDeviceAdd(t *testing.T) {
 			}
 			line, err := c.Do("bus/{id}/add", tt.payload, tt.pathParams)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.expectedResponse, line)
+			assert.JSONEq(t, tt.expectedResponse, line)
 		})
 	}
 }
@@ -113,7 +135,6 @@ func TestBusDeviceAdd_NoConnection_TimeoutCleanup(t *testing.T) {
 	// We need to control API DeviceHandlerConnectTimeout, so set up API server manually (not via StartAPIServer).
 	usbSrv := usb.New(usb.ServerConfig{Addr: "127.0.0.1:0"}, slog.Default(), log.NewRaw(nil))
 
-	// Create a bus directly on the USB server.
 	b, err := virtualbus.NewWithBusId(80100)
 	require.NoError(t, err)
 	require.NoError(t, usbSrv.AddBus(b))
@@ -133,15 +154,15 @@ func TestBusDeviceAdd_NoConnection_TimeoutCleanup(t *testing.T) {
 	require.NoError(t, apiSrv.Start())
 	defer apiSrv.Close()
 
-	// Register a minimal device registration for xbox360 that creates a real device
-	api.RegisterDevice("xbox360", &testRegistration{
-		creator: func() pusb.Device { return xbox360.New() },
-		handler: func(conn net.Conn, dev *pusb.Device, logger *slog.Logger) error { return nil },
-	})
+	testReg := th.CreateMockRegistration(t, "xbox360",
+		func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+		func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error { return nil },
+	)
 
-	// Use API client to add device, then wait beyond timeout and verify removal
+	api.RegisterDevice("xbox360", testReg)
+
 	c := apiclient.New(addr)
-	_, err = c.DeviceAdd(80100, "xbox360")
+	_, err = c.DeviceAdd(80100, "xbox360", nil)
 	require.NoError(t, err)
 
 	// Immediately after add, the device should be present (server now registers bus/{id}/list)

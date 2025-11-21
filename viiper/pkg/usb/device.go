@@ -7,4 +7,5 @@ type Device interface {
 	// ep is the endpoint number (without direction). dir is protocol.DirIn or protocol.DirOut.
 	// For IN transfers, return the payload to send; for OUT, consume 'out' and return nil.
 	HandleTransfer(ep uint32, dir uint32, out []byte) []byte
+	GetDescriptor() *Descriptor
 }

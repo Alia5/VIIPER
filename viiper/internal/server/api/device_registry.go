@@ -2,21 +2,16 @@ package api
 
 import (
 	"sync"
+	"viiper/pkg/device"
 	"viiper/pkg/usb"
 )
-
-// NOTE: Stream handlers now share the unified StreamHandler type (see router.go).
-// They return an error to signal terminal failures; successful completion should
-// generally return nil. Handlers still own the connection lifecycle.
 
 // DeviceRegistration describes a device type, providing both device creation
 // and stream handler registration.
 type DeviceRegistration interface {
 	// CreateDevice returns a new device instance of this type.
-	CreateDevice() usb.Device
+	CreateDevice(o *device.CreateOptions) usb.Device
 	// StreamHandler returns the handler function for long-lived connections.
-	// The provided device (if non-nil) can be used to bind handler behavior, but handlers
-	// should not rely on it being set at registration time.
 	StreamHandler() StreamHandlerFunc
 }
 
@@ -53,7 +48,6 @@ func GetStreamHandler(name string) StreamHandlerFunc {
 }
 
 func toLower(s string) string {
-	// Simple ASCII lowercase for device type names
 	b := []byte(s)
 	for i := range b {
 		if b[i] >= 'A' && b[i] <= 'Z' {

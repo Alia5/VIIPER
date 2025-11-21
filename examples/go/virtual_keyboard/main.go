@@ -61,7 +61,7 @@ func main() {
 	}
 
 	// Add device and connect to stream in one call
-	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, "keyboard")
+	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, "keyboard", nil)
 	if err != nil {
 		fmt.Printf("AddDeviceAndConnect error: %v\n", err)
 		if createdBus {
@@ -71,15 +71,14 @@ func main() {
 	}
 	defer stream.Close()
 
-	deviceBusId := addResp.ID
-	fmt.Printf("Created and connected to device %s on bus %d\n", deviceBusId, busID)
+	fmt.Printf("Created and connected to device %s on bus %d\n", addResp.DevId, addResp.BusID)
 
 	// Cleanup on exit
 	defer func() {
 		if _, err := api.DeviceRemoveCtx(ctx, stream.BusID, stream.DevID); err != nil {
 			fmt.Printf("DeviceRemove error: %v\n", err)
 		} else {
-			fmt.Printf("Removed device %s\n", deviceBusId)
+			fmt.Printf("Removed device %d-%s\n", addResp.BusID, addResp.DevId)
 		}
 		if createdBus {
 			if _, err := api.BusRemoveCtx(ctx, busID); err != nil {

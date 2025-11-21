@@ -14,6 +14,7 @@ import (
 	"viiper/internal/server/api"
 	srvusb "viiper/internal/server/usb"
 	htesting "viiper/internal/testing"
+	th "viiper/internal/testing"
 	"viiper/pkg/device"
 	"viiper/pkg/device/xbox360"
 	pusb "viiper/pkg/usb"
@@ -28,7 +29,7 @@ func TestDeviceStreamHandler_Dispatch(t *testing.T) {
 	bus, err := virtualbus.NewWithBusId(90001)
 	require.NoError(t, err)
 	require.NoError(t, srv.AddBus(bus))
-	dev := xbox360.New()
+	dev := xbox360.New(nil)
 	devCtx, err := bus.Add(dev)
 	require.NoError(t, err)
 
@@ -53,13 +54,14 @@ func TestDeviceStreamHandler_Dispatch(t *testing.T) {
 	require.NotNil(t, dv)
 
 	handlerCalled := make(chan bool, 1)
-	testReg := &mockRegistration{
-		deviceName: "xbox360",
-		handlerFunc: func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error {
+	testReg := th.CreateMockRegistration(t, "xbox360",
+		func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+		func(conn net.Conn, d *pusb.Device, l *slog.Logger) error {
 			handlerCalled <- true
 			return nil
 		},
-	}
+	)
+
 	api.RegisterDevice("xbox360", testReg)
 
 	clientConn, serverConn := net.Pipe()
@@ -89,7 +91,7 @@ func TestAPIServer_StreamRoute_DispatchE2E(t *testing.T) {
 	bus, err := virtualbus.NewWithBusId(70001)
 	require.NoError(t, err)
 	require.NoError(t, srv.AddBus(bus))
-	dev := xbox360.New()
+	dev := xbox360.New(nil)
 	devCtx, err := bus.Add(dev)
 	require.NoError(t, err)
 	meta := device.GetDeviceMeta(devCtx)
@@ -107,20 +109,20 @@ func TestAPIServer_StreamRoute_DispatchE2E(t *testing.T) {
 	require.NotEmpty(t, deviceID)
 
 	handlerCalled := make(chan struct{}, 1)
-	testReg := &mockRegistration{
-		deviceName: "xbox360",
-		handlerFunc: func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error {
+	testReg := th.CreateMockRegistration(t, "xbox360",
+		func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+		func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error {
 			handlerCalled <- struct{}{}
 			return nil
 		},
-	}
+	)
 	api.RegisterDevice("xbox360", testReg)
 
 	c, err := net.Dial("tcp", addr)
 	require.NoError(t, err)
 	defer c.Close()
 
-	_, err = fmt.Fprintf(c, "bus/%d/%s\n", bus.BusID(), deviceID)
+	_, err = fmt.Fprintf(c, "bus/%d/%s\n\n", bus.BusID(), deviceID)
 	require.NoError(t, err)
 
 	select {

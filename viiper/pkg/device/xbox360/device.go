@@ -5,9 +5,9 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"viiper/pkg/device"
 	"viiper/pkg/usb"
 	"viiper/pkg/usbip"
-	"viiper/pkg/virtualbus"
 )
 
 // Xbox360 implements only the minimal Device interface.
@@ -16,11 +16,23 @@ type Xbox360 struct {
 	inputState *InputState
 	stateMu    sync.Mutex
 	rumbleFunc func(XRumbleState) // called when rumble commands arrive
+	descriptor usb.Descriptor
 }
 
 // New returns a new Xbox360 device.
-func New() *Xbox360 {
-	return &Xbox360{}
+func New(o *device.CreateOptions) *Xbox360 {
+	d := &Xbox360{
+		descriptor: defaultDescriptor,
+	}
+	if o != nil {
+		if o.IdProduct != nil {
+			d.descriptor.Device.IDProduct = *o.IdProduct
+		}
+		if o.IdProduct != nil {
+			d.descriptor.Device.IDProduct = *o.IdProduct
+		}
+	}
+	return d
 }
 
 // SetRumbleCallback sets a callback that will be invoked when rumble commands arrive.
@@ -68,7 +80,7 @@ func (x *Xbox360) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
 }
 
 // Static descriptor/config for Xbox360, for registration with the bus.
-var Descriptor = virtualbus.DeviceDescriptor{
+var defaultDescriptor = usb.Descriptor{
 	Device: usb.DeviceDescriptor{
 		BcdUSB:             0x0200,
 		BDeviceClass:       0xff,
@@ -84,7 +96,7 @@ var Descriptor = virtualbus.DeviceDescriptor{
 		BNumConfigurations: 0x01,
 		Speed:              2, // Full speed
 	},
-	Interfaces: []virtualbus.InterfaceConfig{
+	Interfaces: []usb.InterfaceConfig{
 		// Interface 0: ff/5d/01 with 2 interrupt endpoints
 		{
 			Descriptor: usb.InterfaceDescriptor{
@@ -159,6 +171,6 @@ var Descriptor = virtualbus.DeviceDescriptor{
 	},
 }
 
-func (x *Xbox360) GetDeviceDescriptor() virtualbus.DeviceDescriptor {
-	return Descriptor
+func (x *Xbox360) GetDescriptor() *usb.Descriptor {
+	return &x.descriptor
 }

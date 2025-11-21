@@ -107,37 +107,18 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    /* First create device via management API */
-    viiper_device_add_response_t addResp;
-    memset(&addResp, 0, sizeof addResp);
-    char busIdStr[16];
-    snprintf(busIdStr, sizeof busIdStr, "%u", (unsigned)busId);
-    viiper_error_t rc = viiper_bus_device_add(client, busIdStr, "xbox360", &addResp);
-    if (rc != VIIPER_OK){
-        fprintf(stderr, "device_add failed: %s\n", viiper_get_error(client));
-        viiper_client_free(client);
-        return 1;
-    }
-    /* Parse id like "busId-devId" */
-    const char* hyphen = strchr(addResp.ID ? addResp.ID : "", '-');
-    if (!hyphen || !*(hyphen+1)) {
-        fprintf(stderr, "Malformed device ID: %s\n", addResp.ID ? addResp.ID : "(null)");
-        viiper_free_device_add_response(&addResp);
-        viiper_client_free(client);
-        return 1;
-    }
-    const char* devId = hyphen + 1;
-    printf("Created device %s on bus %u\n", devId, (unsigned)busId);
-
-    /* Open device stream (generic API) */
+    viiper_device_info_t addResp; memset(&addResp, 0, sizeof addResp);
     viiper_device_t* dev = NULL;
-    rc = viiper_device_create(client, busId, devId, &dev);
-    viiper_free_device_add_response(&addResp);
+    const char* deviceType = "xbox360";
+    viiper_device_create_request_t createReq = { .Type = &deviceType, .IdVendor = NULL, .IdProduct = NULL };
+    viiper_error_t rc = viiper_add_device_and_connect(client, busId, &createReq, &addResp, &dev);
     if (rc != VIIPER_OK){
-        fprintf(stderr, "device_create failed: %s\n", viiper_get_error(client));
+        fprintf(stderr, "add_device_and_connect failed: %s\n", viiper_get_error(client));
         viiper_client_free(client);
         return 1;
     }
+    const char* devId = addResp.DevId ? addResp.DevId : "(none)";
+    printf("Created and connected device %s on bus %u (type: %s)\n", devId, (unsigned)busId, addResp.Type ? addResp.Type : "unknown");
 
     /* Register async backchannel callback */
     viiper_device_on_output(dev, on_rumble, NULL);
@@ -182,11 +163,9 @@ int main(int argc, char** argv)
 
     viiper_device_close(dev);
     // Optional: remove bus (will fail if devices are still present)
-    char idbuf[16];
-    snprintf(idbuf, sizeof idbuf, "%u", (unsigned)busId);
     viiper_bus_remove_response_t br;
     memset(&br, 0, sizeof br);
-    if (viiper_bus_remove(client, idbuf, &br) != VIIPER_OK){
+    if (viiper_bus_remove(client, busId, &br) != VIIPER_OK){
         fprintf(stderr, "BusRemove failed (continuing): %s\n", viiper_get_error(client));
     }
     viiper_client_free(client);

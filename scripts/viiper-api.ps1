@@ -42,27 +42,13 @@ function Invoke-ViiperApi {
         $writer = New-Object System.IO.StreamWriter($stream)
         $reader = New-Object System.IO.StreamReader($stream)
         
-        $writer.WriteLine($Command)
+        # Send command with double newline delimiter
+        $writer.Write($Command)
+        $writer.Write("`n`n")
         $writer.Flush()
         
-        # Read response line by line until we get everything available
-        $response = ""
-        $timeout = 1000 # 1 second timeout
-        $start = Get-Date
-        while ($true) {
-            if ($stream.DataAvailable) {
-                $response += $reader.ReadLine() + "`n"
-            }
-            elseif ($response.Length -gt 0) {
-                # Got some data and no more available, we're done
-                break
-            }
-            elseif (((Get-Date) - $start).TotalMilliseconds -gt $timeout) {
-                # Timeout waiting for response
-                break
-            }
-            Start-Sleep -Milliseconds 10
-        }
+        # Read single line response
+        $response = $reader.ReadLine()
         
         $client.Close()
         

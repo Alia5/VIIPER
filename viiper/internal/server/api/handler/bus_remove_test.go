@@ -53,7 +53,7 @@ func TestBusRemove(t *testing.T) {
 			name:             "remove non-existing bus",
 			setup:            nil,
 			payload:          "99999",
-			expectedResponse: `{"error":"bus 99999 not found"}`,
+			expectedResponse: `{"status":404,"title":"Not Found","detail":"bus 99999 not found"}`,
 		},
 		{
 			name: "remove bus with devices attached",
@@ -65,10 +65,10 @@ func TestBusRemove(t *testing.T) {
 				if err := s.AddBus(b); err != nil {
 					t.Fatalf("add bus failed: %v", err)
 				}
-				if _, err := b.Add(xbox360.New()); err != nil {
+				if _, err := b.Add(xbox360.New(nil)); err != nil {
 					t.Fatalf("add device 1 failed: %v", err)
 				}
-				if _, err := b.Add(xbox360.New()); err != nil {
+				if _, err := b.Add(xbox360.New(nil)); err != nil {
 					t.Fatalf("add device 2 failed: %v", err)
 				}
 			},
@@ -79,7 +79,7 @@ func TestBusRemove(t *testing.T) {
 			name:             "invalid bus number",
 			setup:            nil,
 			payload:          "bar",
-			expectedResponse: `{"error":"strconv.ParseUint: parsing \"bar\": invalid syntax"}`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid busId: strconv.ParseUint: parsing \"bar\": invalid syntax"}`,
 		},
 	}
 
@@ -97,7 +97,11 @@ func TestBusRemove(t *testing.T) {
 			}
 			line, err := c.Do("bus/remove", tt.payload, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.expectedResponse, line)
+			if tt.expectedResponse[0] == '{' {
+				assert.JSONEq(t, tt.expectedResponse, line)
+			} else {
+				assert.Equal(t, tt.expectedResponse, line)
+			}
 
 			if tt.name == "remove bus and reuse bus number" {
 				b, err := virtualbus.NewWithBusId(70002)

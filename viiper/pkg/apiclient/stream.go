@@ -11,6 +11,7 @@ import (
 	"time"
 
 	apitypes "viiper/pkg/apitypes"
+	"viiper/pkg/device"
 )
 
 // DeviceStream represents a bidirectional connection to a device stream.
@@ -38,7 +39,7 @@ func (c *Client) OpenStream(ctx context.Context, busID uint32, devID string) (*D
 		return nil, fmt.Errorf("dial: %w", err)
 	}
 
-	streamPath := fmt.Sprintf("bus/%d/%s\n", busID, devID)
+	streamPath := fmt.Sprintf("bus/%d/%s\n\n", busID, devID)
 	if _, err := conn.Write([]byte(streamPath)); err != nil {
 		conn.Close()
 		return nil, fmt.Errorf("write stream path: %w", err)
@@ -54,19 +55,13 @@ func (c *Client) OpenStream(ctx context.Context, busID uint32, devID string) (*D
 
 // AddDeviceAndConnect creates a device on the specified bus and immediately connects to its stream.
 // This is a convenience wrapper that combines DeviceAdd + OpenStream in one call.
-func (c *Client) AddDeviceAndConnect(ctx context.Context, busID uint32, deviceType string) (*DeviceStream, *apitypes.DeviceAddResponse, error) {
-	resp, err := c.DeviceAddCtx(ctx, busID, deviceType)
+func (c *Client) AddDeviceAndConnect(ctx context.Context, busID uint32, deviceType string, o *device.CreateOptions) (*DeviceStream, *apitypes.Device, error) {
+	resp, err := c.DeviceAddCtx(ctx, busID, deviceType, o)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var devID string
-	_, err = fmt.Sscanf(resp.ID, "%d-%s", &busID, &devID)
-	if err != nil {
-		return nil, resp, fmt.Errorf("parse device ID: %w", err)
-	}
-
-	stream, err := c.OpenStream(ctx, busID, devID)
+	stream, err := c.OpenStream(ctx, busID, resp.DevId)
 	if err != nil {
 		return nil, resp, err
 	}

@@ -265,7 +265,7 @@ func (s *Server) handleDevList(conn net.Conn) error {
 	dlh := usbip.DevListReplyHeader{NDevices: n}
 	_ = dlh.Write(&buf)
 	for _, m := range metas {
-		desc := m.Desc
+		desc := m.Dev.GetDescriptor()
 		meta := m.Meta
 
 		exp := usbip.ExportedDevice{
@@ -306,7 +306,7 @@ func (s *Server) handleImport(conn net.Conn, first8 []byte) (usb.Device, error) 
 	s.logger.Info("Import request", "busid", reqBus)
 	var chosen usb.Device
 	var chosenMeta *usbip.ExportMeta
-	var chosenDesc *virtualbus.DeviceDescriptor
+	var chosenDesc *usb.Descriptor
 	for _, m := range s.getAllDeviceMetas() {
 		meta := m.Meta
 		end := bytes.IndexByte(meta.USBBusId[:], 0)
@@ -314,7 +314,7 @@ func (s *Server) handleImport(conn net.Conn, first8 []byte) (usb.Device, error) 
 		if bid == reqBus {
 			chosen = m.Dev
 			chosenMeta = &meta
-			chosenDesc = &m.Desc
+			chosenDesc = m.Dev.GetDescriptor()
 			break
 		}
 	}
@@ -362,18 +362,6 @@ func (s *Server) getAllDeviceMetas() []virtualbus.DeviceMeta {
 	return out
 }
 
-// getDeviceDescriptor locates the descriptor for a device across all buses.
-func (s *Server) getDeviceDescriptor(dev usb.Device) *virtualbus.DeviceDescriptor {
-	s.busesMu.Lock()
-	defer s.busesMu.Unlock()
-	for _, b := range s.busses {
-		if desc := b.GetDeviceDescriptor(dev); desc != nil {
-			return desc
-		}
-	}
-	return nil
-}
-
 type readBufferConn struct {
 	net.Conn
 	buf []byte
@@ -412,19 +400,24 @@ func (lc *logConn) Write(p []byte) (int, error) {
 func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 	_ = conn.SetDeadline(time.Time{})
 
-	var ownerBus *virtualbus.VirtualBus
-	for _, bnum := range s.ListBuses() {
-		bus := s.GetBus(bnum)
-		if bus != nil && bus.GetDeviceDescriptor(dev) != nil {
-			ownerBus = bus
+	var owningBus *virtualbus.VirtualBus
+	for _, b := range s.busses {
+		devices := b.Devices()
+		for _, d := range devices {
+			if d == dev {
+				owningBus = b
+				break
+			}
+		}
+		if owningBus != nil {
 			break
 		}
 	}
-	if ownerBus == nil {
-		return fmt.Errorf("device not found on any bus")
+	if owningBus == nil {
+		return fmt.Errorf("device does not belong to any bus")
 	}
 
-	ctx := ownerBus.GetDeviceContext(dev)
+	ctx := owningBus.GetDeviceContext(dev)
 	if ctx == nil {
 		return fmt.Errorf("no device context available from bus")
 	}
@@ -547,10 +540,7 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 		return []byte{0x01}
 	}
 
-	desc := s.getDeviceDescriptor(dev)
-	if desc == nil {
-		return nil
-	}
+	desc := dev.GetDescriptor()
 
 	if breq == usbReqGetDescriptor && bm == usbReqTypeStandardFromDevice {
 		dtype := uint8(wValue >> 8)
@@ -558,12 +548,12 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 		var data []byte
 		switch dtype {
 		case usbDescTypeDevice:
-			data = desc.Device.Bytes()
+			data = desc.Bytes()
 		case usbDescTypeConfiguration:
 			data = buildConfigDescriptor(desc)
 		case usbDescTypeString:
 			if s, ok := desc.Strings[dindex]; ok {
-				data = virtualbus.EncodeStringDescriptor(s)
+				data = usb.EncodeStringDescriptor(s)
 			}
 		}
 		if len(data) == 0 {
@@ -601,7 +591,7 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 }
 
 // buildConfigDescriptor builds a configuration descriptor for the device.
-func buildConfigDescriptor(desc *virtualbus.DeviceDescriptor) []byte {
+func buildConfigDescriptor(desc *usb.Descriptor) []byte {
 	var b bytes.Buffer
 	h := usb.ConfigHeader{
 		WTotalLength:        0, // to be patched

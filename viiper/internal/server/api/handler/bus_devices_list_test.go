@@ -45,7 +45,7 @@ func TestBusDevicesList(t *testing.T) {
 				if err := s.AddBus(b); err != nil {
 					t.Fatalf("add bus failed: %v", err)
 				}
-				if _, err := b.Add(xbox360.New()); err != nil {
+				if _, err := b.Add(xbox360.New(nil)); err != nil {
 					t.Fatalf("add device failed: %v", err)
 				}
 			},
@@ -62,10 +62,10 @@ func TestBusDevicesList(t *testing.T) {
 				if err := s.AddBus(b); err != nil {
 					t.Fatalf("add bus failed: %v", err)
 				}
-				if _, err := b.Add(xbox360.New()); err != nil {
+				if _, err := b.Add(xbox360.New(nil)); err != nil {
 					t.Fatalf("add device 1 failed: %v", err)
 				}
-				if _, err := b.Add(xbox360.New()); err != nil {
+				if _, err := b.Add(xbox360.New(nil)); err != nil {
 					t.Fatalf("add device 2 failed: %v", err)
 				}
 			},
@@ -76,13 +76,13 @@ func TestBusDevicesList(t *testing.T) {
 			name:             "list devices on non-existing bus",
 			setup:            nil,
 			pathParams:       map[string]string{"id": "99999"},
-			expectedResponse: `{"error":"unknown bus"}`,
+			expectedResponse: `{"status":404,"title":"Not Found","detail":"bus 99999 not found"}`,
 		},
 		{
 			name:             "invalid bus number",
 			setup:            nil,
 			pathParams:       map[string]string{"id": "abc"},
-			expectedResponse: `{"error":"strconv.ParseUint: parsing \"abc\": invalid syntax"}`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid busId: strconv.ParseUint: parsing \"abc\": invalid syntax"}`,
 		},
 	}
 
@@ -99,7 +99,11 @@ func TestBusDevicesList(t *testing.T) {
 			}
 			line, err := c.Do("bus/{id}/list", nil, tt.pathParams)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.expectedResponse, line)
+			if tt.expectedResponse[0] == '{' {
+				assert.JSONEq(t, tt.expectedResponse, line)
+			} else {
+				assert.Equal(t, tt.expectedResponse, line)
+			}
 		})
 	}
 }

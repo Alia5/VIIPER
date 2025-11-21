@@ -5,9 +5,9 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"viiper/pkg/device"
 	"viiper/pkg/usb"
 	"viiper/pkg/usbip"
-	"viiper/pkg/virtualbus"
 )
 
 // Mouse implements the minimal Device interface for a 5-button HID mouse
@@ -16,11 +16,23 @@ type Mouse struct {
 	tick       uint64
 	inputState *InputState
 	stateMu    sync.Mutex
+	descriptor usb.Descriptor
 }
 
 // New returns a new Mouse device.
-func New() *Mouse {
-	return &Mouse{}
+func New(o *device.CreateOptions) *Mouse {
+	d := &Mouse{
+		descriptor: defaultDescriptor,
+	}
+	if o != nil {
+		if o.IdProduct != nil {
+			d.descriptor.Device.IDProduct = *o.IdProduct
+		}
+		if o.IdProduct != nil {
+			d.descriptor.Device.IDProduct = *o.IdProduct
+		}
+	}
+	return d
 }
 
 // UpdateInputState updates the device's current input state (thread-safe).
@@ -98,7 +110,7 @@ var hidReportDescriptor = []byte{
 }
 
 // Descriptor defines the static USB descriptor for the mouse.
-var Descriptor = virtualbus.DeviceDescriptor{
+var defaultDescriptor = usb.Descriptor{
 	Device: usb.DeviceDescriptor{
 		BcdUSB:             0x0200,
 		BDeviceClass:       0x00,
@@ -114,7 +126,7 @@ var Descriptor = virtualbus.DeviceDescriptor{
 		BNumConfigurations: 0x01,
 		Speed:              2, // Full speed
 	},
-	Interfaces: []virtualbus.InterfaceConfig{
+	Interfaces: []usb.InterfaceConfig{
 		{
 			Descriptor: usb.InterfaceDescriptor{
 				BInterfaceNumber:   0x00,
@@ -153,6 +165,6 @@ var Descriptor = virtualbus.DeviceDescriptor{
 	},
 }
 
-func (m *Mouse) GetDeviceDescriptor() virtualbus.DeviceDescriptor {
-	return Descriptor
+func (m *Mouse) GetDescriptor() *usb.Descriptor {
+	return &m.descriptor
 }

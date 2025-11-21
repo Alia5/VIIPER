@@ -15,14 +15,19 @@ See: [Go Client](../clients/go.md), [Generated SDKs](../clients/generator.md)
 
 ## Adding the device
 
-Use the API to create a bus and add an Xbox 360 controller:
+Use the API to create a bus and add an Xbox 360 controller. Using the raw API (see [API Reference](../api/overview.md) for details):
 
-```text
-bus/create
-bus/1/add xbox360
+```bash
+# Create a bus
+printf "bus/create\n\n" | nc localhost 3242
+
+# Add xbox360 device with JSON payload
+printf 'bus/1/add {"type":"xbox360"}\n\n' | nc localhost 3242
 ```
 
-The API returns a `busid` like `1-1`. Attach it from a USB/IP client, then open a stream to drive input and receive rumble.
+The API returns a Device object with `busId`, `devId`, and other details. Attach it from a USB/IP client, then open a stream to drive input and receive rumble.
+
+Or use one of the [client SDKs](../clients/generator.md) which handle the protocol automatically.
 
 ## Streaming protocol
 

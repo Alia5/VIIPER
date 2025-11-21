@@ -1,4 +1,4 @@
-import { ViiperClient, ViiperDevice, Xbox360 } from "viiperclient";
+import { ViiperClient, ViiperDevice, Xbox360, Types } from "viiperclient";
 
 const { Xbox360Input, Button } = Xbox360;
 
@@ -27,7 +27,7 @@ async function main() {
     busID = 0;
     for (let tryBus = 1; tryBus <= 100; tryBus++) {
       try {
-        const r = await client.buscreate(String(tryBus));
+        const r = await client.buscreate(tryBus);
         busID = r.busId;
         createdBus = true;
         break;
@@ -47,16 +47,17 @@ async function main() {
 
   // Add device and connect to stream in one call
   let dev: ViiperDevice;
-  let deviceBusId: string;
+  let deviceDevId: string;
   try {
-    const { device, response: addResp } = await client.addDeviceAndConnect(busID, "xbox360");
+    const req: Types.DeviceCreateRequest = { type: "xbox360" };
+    const { device, response: addResp } = await client.addDeviceAndConnect(busID, req);
     dev = device;
-    deviceBusId = addResp.id;
-    console.log(`Created and connected to device ${deviceBusId} on bus ${busID}`);
+    deviceDevId = addResp.devId;
+    console.log(`Created and connected to device ${deviceDevId} on bus ${busID}`);
   } catch (err) {
     console.error(`AddDeviceAndConnect error: ${err}`);
     if (createdBus) {
-      await client.busremove(String(busID)).catch(() => {});
+      await client.busremove(busID).catch(() => {});
     }
     process.exit(1);
   }
@@ -65,14 +66,14 @@ async function main() {
   const cleanup = async () => {
     try {
       dev.close();
-      await client.busdeviceremove(busID, deviceBusId);
-      console.log(`Removed device ${deviceBusId}`);
+      await client.busdeviceremove(busID, deviceDevId);
+      console.log(`Removed device ${deviceDevId}`);
     } catch (err) {
       console.error(`DeviceRemove error: ${err}`);
     }
     if (createdBus) {
       try {
-        await client.busremove(String(busID));
+        await client.busremove(busID);
         console.log(`Removed bus ${busID}`);
       } catch (err) {
         console.error(`BusRemove error: ${err}`);

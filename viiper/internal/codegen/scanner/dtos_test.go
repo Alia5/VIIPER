@@ -26,7 +26,6 @@ func TestScanDTOs(t *testing.T) {
 		"BusRemoveResponse":    true,
 		"Device":               true,
 		"DevicesListResponse":  true,
-		"DeviceAddResponse":    true,
 		"DeviceRemoveResponse": true,
 	}
 

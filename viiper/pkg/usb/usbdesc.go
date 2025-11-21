@@ -25,6 +25,40 @@ const (
 	HIDDescLen       = 9
 )
 
+// Descriptor holds all static descriptor/config data for a device.
+type Descriptor struct {
+	Device     DeviceDescriptor
+	Interfaces []InterfaceConfig
+	Strings    map[uint8]string
+}
+
+// InterfaceConfig holds all descriptors for a single interface for bus management.
+type InterfaceConfig struct {
+	Descriptor    InterfaceDescriptor
+	Endpoints     []EndpointDescriptor
+	HIDDescriptor []byte // optional HID class descriptor (0x21)
+	HIDReport     []byte // optional HID report descriptor (0x22)
+	VendorData    []byte // optional vendor-specific bytes
+}
+
+// EncodeStringDescriptor converts a UTF-8 string to a USB string descriptor byte array.
+// The resulting descriptor has the format:
+//
+//	Byte 0: bLength (total descriptor length)
+//	Byte 1: bDescriptorType (0x03 for string)
+//	Bytes 2+: UTF-16LE encoded string
+func EncodeStringDescriptor(s string) []byte {
+	runes := []rune(s)
+	buf := make([]byte, 2+len(runes)*2)
+	buf[0] = uint8(len(buf)) // bLength
+	buf[1] = 0x03            // bDescriptorType (STRING)
+	for i, r := range runes {
+		buf[2+i*2] = uint8(r)
+		buf[2+i*2+1] = uint8(r >> 8)
+	}
+	return buf
+}
+
 // DeviceDescriptor represents the standard USB device descriptor.
 // BLength is computed dynamically; BDescriptorType is implied DeviceDescType.
 type DeviceDescriptor struct {
@@ -33,8 +67,8 @@ type DeviceDescriptor struct {
 	BDeviceSubClass    uint8
 	BDeviceProtocol    uint8
 	BMaxPacketSize0    uint8
-	IDVendor           uint16 // LE
-	IDProduct          uint16 // LE
+	IDVendor           uint16 // LE; may get overridden
+	IDProduct          uint16 // LE; may get overridden
 	BcdDevice          uint16 // LE
 	IManufacturer      uint8
 	IProduct           uint8
@@ -44,22 +78,22 @@ type DeviceDescriptor struct {
 }
 
 // Bytes returns the binary representation of the DeviceDescriptor with BLength auto-filled.
-func (d DeviceDescriptor) Bytes() []byte {
+func (d Descriptor) Bytes() []byte {
 	var b bytes.Buffer
 	b.WriteByte(DeviceDescLen)
 	b.WriteByte(DeviceDescType)
-	_ = binary.Write(&b, binary.LittleEndian, d.BcdUSB)
-	b.WriteByte(d.BDeviceClass)
-	b.WriteByte(d.BDeviceSubClass)
-	b.WriteByte(d.BDeviceProtocol)
-	b.WriteByte(d.BMaxPacketSize0)
-	_ = binary.Write(&b, binary.LittleEndian, d.IDVendor)
-	_ = binary.Write(&b, binary.LittleEndian, d.IDProduct)
-	_ = binary.Write(&b, binary.LittleEndian, d.BcdDevice)
-	b.WriteByte(d.IManufacturer)
-	b.WriteByte(d.IProduct)
-	b.WriteByte(d.ISerialNumber)
-	b.WriteByte(d.BNumConfigurations)
+	_ = binary.Write(&b, binary.LittleEndian, d.Device.BcdUSB)
+	b.WriteByte(d.Device.BDeviceClass)
+	b.WriteByte(d.Device.BDeviceSubClass)
+	b.WriteByte(d.Device.BDeviceProtocol)
+	b.WriteByte(d.Device.BMaxPacketSize0)
+	_ = binary.Write(&b, binary.LittleEndian, d.Device.IDVendor)
+	_ = binary.Write(&b, binary.LittleEndian, d.Device.IDProduct)
+	_ = binary.Write(&b, binary.LittleEndian, d.Device.BcdDevice)
+	b.WriteByte(d.Device.IManufacturer)
+	b.WriteByte(d.Device.IProduct)
+	b.WriteByte(d.Device.ISerialNumber)
+	b.WriteByte(d.Device.BNumConfigurations)
 	return b.Bytes()
 }
 

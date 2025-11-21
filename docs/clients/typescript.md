@@ -95,17 +95,18 @@ const client = new ViiperClient("localhost", 3242);
 const busesResp = await client.buslist();
 let busID: number;
 if (busesResp.buses.length === 0) {
-  const resp = await client.buscreate("my-bus");
+  const resp = await client.buscreate(); // Auto-assign ID
+  // Or specify ID: await client.buscreate(5);
   busID = resp.busId;
 } else {
   busID = busesResp.buses[0];
 }
 
 // Add device and connect
-const { device, response } = await client.addDeviceAndConnect(busID, "keyboard");
-const deviceId = response.id.split('-')[1]; // Extract device ID from "busId-devId"
+const deviceReq = { type: "keyboard" };
+const { device, response } = await client.addDeviceAndConnect(busID, deviceReq);
 
-console.log(`Connected to device ${response.id}`);
+console.log(`Connected to device ${response.busId}-${response.devId}`);
 
 // Send keyboard input
 const input = new KeyboardInput({
@@ -116,7 +117,7 @@ const input = new KeyboardInput({
 await device.send(input);
 
 // Cleanup
-await client.busdeviceremove(busID, deviceId);
+await client.busdeviceremove(busID, response.devId);
 ```
 
 ## Device Stream API
@@ -126,8 +127,26 @@ await client.busdeviceremove(busID, deviceId);
 The simplest way to add a device and connect:
 
 ```typescript
-const { device, response } = await client.addDeviceAndConnect(busID, "xbox360");
-const deviceId = response.id.split('-')[1];
+const deviceReq = { type: "xbox360" };
+const { device, response } = await client.addDeviceAndConnect(busID, deviceReq);
+```
+
+With custom VID/PID:
+
+```typescript
+const deviceReq = { 
+  type: "keyboard", 
+  idVendor: 0x1234, 
+  idProduct: 0x5678 
+};
+const { device, response } = await client.addDeviceAndConnect(busID, deviceReq);
+```
+
+Or manually add and connect:
+
+```typescript
+const deviceResp = await client.busdeviceadd(busId, { type: "keyboard" });
+const device = await client.connectDevice(busId, deviceResp.devId);
 ```
 
 Or connect to an existing device:

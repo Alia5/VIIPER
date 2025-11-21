@@ -8,6 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"viiper/internal/server/api"
+	th "viiper/internal/testing"
+	"viiper/pkg/device"
 	"viiper/pkg/usb"
 )
 
@@ -18,21 +20,14 @@ type mockDevice struct {
 func (m *mockDevice) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
 	return nil
 }
-
-type mockRegistration struct {
-	deviceName  string
-	handlerFunc api.StreamHandlerFunc
-}
-
-func (m *mockRegistration) CreateDevice() usb.Device {
-	return &mockDevice{name: m.deviceName}
-}
-
-func (m *mockRegistration) StreamHandler() api.StreamHandlerFunc {
-	return m.handlerFunc
+func (m *mockDevice) GetDescriptor() *usb.Descriptor {
+	return &usb.Descriptor{}
 }
 
 func TestDeviceRegistry(t *testing.T) {
+
+	// TODO: test with OPTS
+
 	tests := []struct {
 		name           string
 		registerName   string
@@ -79,10 +74,12 @@ func TestDeviceRegistry(t *testing.T) {
 				return nil
 			}
 
-			reg := &mockRegistration{
-				deviceName:  tt.expectedDevice,
-				handlerFunc: mockHandler,
-			}
+			reg := th.CreateMockRegistration(
+				t,
+				tt.expectedDevice,
+				func(o *device.CreateOptions) usb.Device { return &mockDevice{name: tt.expectedDevice} },
+				mockHandler,
+			)
 
 			api.RegisterDevice(testRegName, reg)
 
@@ -92,7 +89,7 @@ func TestDeviceRegistry(t *testing.T) {
 			if tt.shouldFind {
 				assert.NotNil(t, retrieved, "expected to find registered device")
 				if retrieved != nil {
-					dev := retrieved.CreateDevice()
+					dev := retrieved.CreateDevice(nil)
 					mockDev, ok := dev.(*mockDevice)
 					assert.True(t, ok, "expected mockDevice type")
 					if ok {
@@ -115,6 +112,9 @@ func TestDeviceRegistry(t *testing.T) {
 }
 
 func TestGetStreamHandler(t *testing.T) {
+
+	// TODO: test with OPTS
+
 	tests := []struct {
 		name         string
 		registerName string
@@ -149,10 +149,12 @@ func TestGetStreamHandler(t *testing.T) {
 				return nil
 			}
 
-			reg := &mockRegistration{
-				deviceName:  tt.registerName,
-				handlerFunc: mockHandler,
-			}
+			reg := th.CreateMockRegistration(
+				t,
+				tt.registerName,
+				func(o *device.CreateOptions) usb.Device { return &mockDevice{name: tt.registerName} },
+				mockHandler,
+			)
 
 			testRegName := tt.name + "_" + tt.registerName
 			api.RegisterDevice(testRegName, reg)

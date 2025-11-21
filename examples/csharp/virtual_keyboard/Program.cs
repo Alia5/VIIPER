@@ -29,7 +29,7 @@ bool createdBus = false;
         {
             try
             {
-                var resp = await client.BusCreateAsync(i.ToString());
+                var resp = await client.BusCreateAsync(i);
                 busId = resp.BusID;
                 createdBus = true;
                 break;
@@ -53,25 +53,20 @@ bool createdBus = false;
     }
 }
 
-string fullDevId;
-string devId;
+Device deviceInfo;
 ViiperDevice device;
 try
 {
     // 2) Add device and connect
-    var add = await client.BusDeviceAddAsync(busId, "keyboard");
-    fullDevId = add.ID; // e.g., "1-1"
-    // Parse "busId-devId" format to extract just the device part
-    var parts = fullDevId.Split('-');
-    devId = parts.Length > 1 ? parts[1] : fullDevId;
-    device = await client.ConnectDeviceAsync(busId, devId);
-    Console.WriteLine($"Created and connected to device {fullDevId} on bus {busId}");
+    deviceInfo = await client.BusDeviceAddAsync(busId, new DeviceCreateRequest { Type = "keyboard" });
+    device = await client.ConnectDeviceAsync(deviceInfo.BusID, deviceInfo.DevId);
+    Console.WriteLine($"Created and connected to device {deviceInfo.DevId} on bus {deviceInfo.BusID}");
 }
 catch (Exception ex)
 {
     if (createdBus)
     {
-        try { await client.BusRemoveAsync(busId.ToString()); } catch { }
+        try { await client.BusRemoveAsync(busId); } catch { }
     }
     Console.WriteLine($"AddDevice/connect error: {ex}");
     return;
@@ -83,10 +78,10 @@ Console.CancelKeyPress += async (_, e) => { e.Cancel = true; await Cleanup(); En
 
 async Task Cleanup()
 {
-    try { await client.BusDeviceRemoveAsync(busId, devId); Console.WriteLine($"Removed device {fullDevId}"); } catch { }
+    try { await client.BusDeviceRemoveAsync(deviceInfo.BusID, deviceInfo.DevId); Console.WriteLine($"Removed device {deviceInfo.DevId}"); } catch { }
     if (createdBus)
     {
-        try { await client.BusRemoveAsync(busId.ToString()); Console.WriteLine($"Removed bus {busId}"); } catch { }
+        try { await client.BusRemoveAsync(busId); Console.WriteLine($"Removed bus {busId}"); } catch { }
     }
 }
 

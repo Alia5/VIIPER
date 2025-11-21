@@ -1,5 +1,6 @@
 using Viiper.Client;
 using Viiper.Client.Devices.Mouse;
+using Viiper.Client.Types;
 
 if (args.Length < 1)
 {
@@ -22,7 +23,7 @@ bool createdBus = false;
         busId = 0;
         for (uint i = 1; i <= 100; i++)
         {
-            try { var r = await client.BusCreateAsync(i.ToString()); busId = r.BusID; createdBus = true; break; }
+            try { var r = await client.BusCreateAsync(i); busId = r.BusID; createdBus = true; break; }
             catch (Exception ex) { lastErr = ex; }
         }
         if (busId == 0) { Console.WriteLine($"BusCreate failed: {lastErr}"); return; }
@@ -32,19 +33,16 @@ bool createdBus = false;
 }
 
 // Add device and connect
-string fullDevId; string devId; ViiperDevice device;
+Device resp; ViiperDevice device;
 try
 {
-    var add = await client.BusDeviceAddAsync(busId, "mouse");
-    fullDevId = add.ID; // e.g., "1-1"
-    var parts = fullDevId.Split('-');
-    devId = parts.Length > 1 ? parts[1] : fullDevId;
-    device = await client.ConnectDeviceAsync(busId, devId);
-    Console.WriteLine($"Created and connected to device {fullDevId} on bus {busId}");
+    resp = await client.BusDeviceAddAsync(busId, new Viiper.Client.Types.DeviceCreateRequest { Type = "mouse" });
+    device = await client.ConnectDeviceAsync(resp.BusID, resp.DevId);
+    Console.WriteLine($"Created and connected to device {resp.DevId} on bus {resp.BusID}");
 }
 catch (Exception ex)
 {
-    if (createdBus) { try { await client.BusRemoveAsync(busId.ToString()); } catch { } }
+    if (createdBus) { try { await client.BusRemoveAsync(busId); } catch { } }
     Console.WriteLine($"AddDevice/connect error: {ex}");
     return;
 }
@@ -54,8 +52,8 @@ Console.CancelKeyPress += async (_, e) => { e.Cancel = true; await Cleanup(); En
 
 async Task Cleanup()
 {
-    try { await client.BusDeviceRemoveAsync(busId, devId); Console.WriteLine($"Removed device {fullDevId}"); } catch { }
-    if (createdBus) { try { await client.BusRemoveAsync(busId.ToString()); Console.WriteLine($"Removed bus {busId}"); } catch { } }
+    try { await client.BusDeviceRemoveAsync(resp.BusID, resp.DevId); Console.WriteLine($"Removed device {resp.DevId}"); } catch { }
+    if (createdBus) { try { await client.BusRemoveAsync(busId); Console.WriteLine($"Removed bus {busId}"); } catch { } }
 }
 
 // Send movement/click/scroll every 3s

@@ -38,7 +38,7 @@ func TestBusCreate(t *testing.T) {
 				}
 			},
 			payload:          "60002",
-			expectedResponse: `{"error":"bus number 60002 already allocated"}`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid busId: bus number 60002 already allocated"}`,
 		},
 		{
 			name: "create after remove allows reuse",
@@ -61,13 +61,13 @@ func TestBusCreate(t *testing.T) {
 			name:             "invalid bus number",
 			setup:            nil,
 			payload:          "foo",
-			expectedResponse: `{"error":"strconv.ParseUint: parsing \"foo\": invalid syntax"}`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid busId: strconv.ParseUint: parsing \"foo\": invalid syntax"}`,
 		},
 		{
 			name:             "negative bus number",
 			setup:            nil,
 			payload:          "-1",
-			expectedResponse: `{"error":"strconv.ParseUint: parsing \"-1\": invalid syntax"}`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid busId: strconv.ParseUint: parsing \"-1\": invalid syntax"}`,
 		},
 	}
 
@@ -83,7 +83,11 @@ func TestBusCreate(t *testing.T) {
 			}
 			line, err := c.Do("bus/create", tt.payload, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.expectedResponse, line)
+			if tt.expectedResponse[0] == '{' {
+				assert.JSONEq(t, tt.expectedResponse, line)
+			} else {
+				assert.Equal(t, tt.expectedResponse, line)
+			}
 		})
 	}
 }

@@ -88,6 +88,7 @@ func (g *Generator) ScanAll() (*meta.Metadata, error) {
 
 	md := &meta.Metadata{
 		DevicePackages: make(map[string]*scanner.DeviceConstants),
+		CTypeNames:     make(map[string]string),
 	}
 
 	g.logger.Debug("Scanning API routes")
@@ -105,6 +106,14 @@ func (g *Generator) ScanAll() (*meta.Metadata, error) {
 	}
 	md.DTOs = dtos
 	g.logger.Info("Found DTOs", "count", len(dtos))
+
+	// Build C type name mappings for types that would conflict
+	for _, dto := range dtos {
+		// Device conflicts with viiper_device_t (streaming handle), so rename to device_info
+		if dto.Name == "Device" {
+			md.CTypeNames["Device"] = "device_info"
+		}
+	}
 
 	g.logger.Debug("Discovering device packages")
 	deviceBaseDir := "pkg/device"

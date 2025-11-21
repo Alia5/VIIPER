@@ -18,35 +18,49 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 	return func(req *api.Request, res *api.Response, logger *slog.Logger) error {
 		idStr, ok := req.Params["id"]
 		if !ok {
-			return fmt.Errorf("missing id")
+			return api.ErrBadRequest("missing id parameter")
 		}
 		busID, err := strconv.ParseUint(idStr, 10, 32)
 		if err != nil {
-			return err
+			return api.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
 		}
 		b := s.GetBus(uint32(busID))
 		if b == nil {
-			return fmt.Errorf("unknown bus")
+			return api.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
 		}
-		if len(req.Args) < 1 {
-			return fmt.Errorf("missing device type")
+		if req.Payload == "" {
+			return api.ErrBadRequest("missing payload")
 		}
-		name := strings.ToLower(req.Args[0])
+		var deviceCreateReq apitypes.DeviceCreateRequest
+		err = json.Unmarshal([]byte(req.Payload), &deviceCreateReq)
+		if err != nil {
+			return api.ErrBadRequest(fmt.Sprintf("invalid JSON payload: %v", err))
+		}
+		if deviceCreateReq.Type == nil {
+			return api.ErrBadRequest("missing device type")
+		}
+
+		name := strings.ToLower(*deviceCreateReq.Type)
 
 		reg := api.GetRegistration(name)
 		if reg == nil {
-			return fmt.Errorf("unknown device type: %s", name)
+			return api.ErrBadRequest(fmt.Sprintf("unknown device type: %s", name))
 		}
 
-		dev := reg.CreateDevice()
+		opts := device.CreateOptions{
+			IdVendor:  deviceCreateReq.IdVendor,
+			IdProduct: deviceCreateReq.IdProduct,
+		}
+
+		dev := reg.CreateDevice(&opts)
 		devCtx, err := b.Add(dev)
 		if err != nil {
-			return err
+			return api.ErrInternal(fmt.Sprintf("failed to add device to bus: %v", err))
 		}
 
 		exportMeta := device.GetDeviceMeta(devCtx)
 		if exportMeta == nil {
-			return fmt.Errorf("failed to get device metadata from context")
+			return api.ErrInternal("failed to get device metadata from context")
 		}
 
 		connTimer := device.GetConnTimer(devCtx)
@@ -80,11 +94,15 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 			}
 		}
 
-		payload, err := json.Marshal(apitypes.DeviceAddResponse{
-			ID: fmt.Sprintf("%d-%d", busID, exportMeta.DevId),
+		payload, err := json.Marshal(apitypes.Device{
+			BusID: uint32(busID),
+			DevId: fmt.Sprintf("%d", exportMeta.DevId),
+			Vid:   fmt.Sprintf("0x%04x", dev.GetDescriptor().Device.IDVendor),
+			Pid:   fmt.Sprintf("0x%04x", dev.GetDescriptor().Device.IDProduct),
+			Type:  name,
 		})
 		if err != nil {
-			return err
+			return api.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))
 		}
 
 		res.JSON = string(payload)

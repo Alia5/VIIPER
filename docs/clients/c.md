@@ -78,23 +78,27 @@ int main(void) {
     }
 
     // Create or find a bus
-    viiper_bus_list_t buses = {0};
+    viiper_bus_list_response_t buses = {0};
     err = viiper_bus_list(client, &buses);
-    uint32_t bus_id = (buses.count > 0) ? buses.buses[0] : 0;
+    uint32_t bus_id = (buses.BusesCount > 0) ? buses.Buses[0] : 0;
     
     if (bus_id == 0) {
         viiper_bus_create_response_t resp = {0};
-        err = viiper_bus_create(client, 1, &resp);
-        bus_id = resp.bus_id;
+        uint32_t desired_id = 1;
+        err = viiper_bus_create(client, &desired_id, &resp); // NULL for auto-assign
+        bus_id = resp.BusID;
     }
 
-    // Add device
-    viiper_device_add_response_t dev_resp = {0};
-    err = viiper_device_add(client, bus_id, "keyboard", &dev_resp);
-
-    // Open device stream
+    // Add device and connect (convenience function)
+    const char* device_type = "keyboard";
+    viiper_device_create_request_t req = {
+        .Type = &device_type,
+        .IdVendor = NULL,
+        .IdProduct = NULL
+    };
+    viiper_device_info_t dev_info = {0};
     viiper_device_t* device = NULL;
-    err = viiper_device_create(client, bus_id, dev_resp.id, &device);
+    err = viiper_add_device_and_connect(client, bus_id, &req, &dev_info, &device);
 
     // Send keyboard input
     viiper_keyboard_input_t input = {
@@ -109,8 +113,13 @@ int main(void) {
 
     // Cleanup
     viiper_device_close(device);
-    viiper_device_remove(client, bus_id, dev_resp.id);
-    viiper_client_destroy(client);
+    
+    char bus_id_str[32];
+    snprintf(bus_id_str, sizeof(bus_id_str), "%u", bus_id);
+    viiper_device_remove_response_t remove_resp = {0};
+    viiper_bus_device_remove(client, bus_id_str, dev_info.DevId, &remove_resp);
+    
+    viiper_client_free(client);
     return 0;
 }
 ```
@@ -119,11 +128,49 @@ int main(void) {
 
 ### Creating a Device Stream
 
+Manual approach (add device, then connect):
+
 ```c
+// Add device first
+const char* device_type = "keyboard";
+viiper_device_create_request_t req = {
+    .Type = &device_type,
+    .IdVendor = NULL,  // Optional: set to specify custom VID
+    .IdProduct = NULL  // Optional: set to specify custom PID
+};
+
+char bus_id_str[32];
+snprintf(bus_id_str, sizeof(bus_id_str), "%u", bus_id);
+
+viiper_device_info_t dev_info = {0};
+viiper_error_t err = viiper_bus_device_add(client, bus_id_str, &req, &dev_info);
+if (err != VIIPER_OK) {
+    fprintf(stderr, "Failed to add device: %s\n", viiper_get_error(client));
+}
+
+// Then connect to its stream
 viiper_device_t* device = NULL;
-int err = viiper_device_create(client, bus_id, device_id, &device);
-if (err != 0) {
-    fprintf(stderr, "Failed to open device stream: %s\n", viiper_strerror(err));
+err = viiper_open_stream(client, bus_id, dev_info.DevId, &device);
+if (err != VIIPER_OK) {
+    fprintf(stderr, "Failed to open device stream: %s\n", viiper_get_error(client));
+}
+```
+
+Convenience approach (add and connect in one call):
+
+```c
+const char* device_type = "xbox360";
+viiper_device_create_request_t req = {
+    .Type = &device_type,
+    .IdVendor = NULL,
+    .IdProduct = NULL
+};
+
+viiper_device_info_t dev_info = {0};
+viiper_device_t* device = NULL;
+viiper_error_t err = viiper_add_device_and_connect(client, bus_id, &req, &dev_info, &device);
+if (err != VIIPER_OK) {
+    fprintf(stderr, "Failed to add and connect device: %s\n", viiper_get_error(client));
 }
 ```
 

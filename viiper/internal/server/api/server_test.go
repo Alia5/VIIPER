@@ -12,18 +12,12 @@ import (
 	"viiper/internal/log"
 	"viiper/internal/server/api"
 	srvusb "viiper/internal/server/usb"
+	th "viiper/internal/testing"
+	"viiper/pkg/device"
 	"viiper/pkg/device/xbox360"
 	pusb "viiper/pkg/usb"
 	"viiper/pkg/virtualbus"
 )
-
-type testRegistration2 struct {
-	creator func() pusb.Device
-	handler api.StreamHandlerFunc
-}
-
-func (t *testRegistration2) CreateDevice() pusb.Device            { return t.creator() }
-func (t *testRegistration2) StreamHandler() api.StreamHandlerFunc { return t.handler }
 
 func TestAPIServer_StreamHandlerError_ClosesConn(t *testing.T) {
 	cfg := srvusb.ServerConfig{Addr: "127.0.0.1:0"}
@@ -43,7 +37,7 @@ func TestAPIServer_StreamHandlerError_ClosesConn(t *testing.T) {
 	bus, err := virtualbus.NewWithBusId(70002)
 	require.NoError(t, err)
 	require.NoError(t, usbSrv.AddBus(bus))
-	dev := xbox360.New()
+	dev := xbox360.New(nil)
 	_, err = bus.Add(dev)
 	require.NoError(t, err)
 
@@ -56,11 +50,12 @@ func TestAPIServer_StreamHandlerError_ClosesConn(t *testing.T) {
 	require.NotEmpty(t, devID)
 
 	sentinel := fmt.Errorf("boom")
-	api.RegisterDevice("xbox360", &testRegistration2{
-		creator: func() pusb.Device { return xbox360.New() },
-		handler: func(conn net.Conn, d *pusb.Device, l *slog.Logger) error { return sentinel },
-	})
+	mr := th.CreateMockRegistration(t, "xbox360",
+		func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+		func(conn net.Conn, d *pusb.Device, l *slog.Logger) error { return sentinel },
+	)
 
+	api.RegisterDevice("xbox360", mr)
 	c, err := net.Dial("tcp", addr)
 	require.NoError(t, err)
 	_, err = fmt.Fprintf(c, "bus/%d/%s\n", bus.BusID(), devID)

@@ -186,7 +186,7 @@ VIIPER_API const char* viiper_get_error(viiper_client_t* client) {
 }
 
 /* ========================================================================
- * Internal networking helpers (line protocol)
+ * Internal networking helpers
  * ======================================================================== */
 
 static int viiper_connect(const char* host, uint16_t port) {
@@ -229,12 +229,12 @@ static int viiper_send_line(int fd, const char* line) {
 #if defined(_WIN32) || defined(_WIN64)
     int wr = send(fd, line, (int)n, 0);
     if (wr < 0) return -1;
-    wr = send(fd, "\n", 1, 0);
+    wr = send(fd, "\n\n", 2, 0);
     if (wr < 0) return -1;
 #else
     ssize_t wr = send(fd, line, n, 0);
     if (wr < 0) return -1;
-    wr = send(fd, "\n", 1, 0);
+    wr = send(fd, "\n\n", 2, 0);
     if (wr < 0) return -1;
 #endif
     return 0;
@@ -312,21 +312,15 @@ static int viiper_do(viiper_client_t* client, const char* path, const char* payl
  * ======================================================================== */
 
 /* Free helpers */
-VIIPER_API void viiper_free_bus_list_response(viiper_bus_list_response_t* v){ if (!v) return; if (v->Buses) free(v->Buses); }
-VIIPER_API void viiper_free_bus_create_response(viiper_bus_create_response_t* v){ (void)v; }
-VIIPER_API void viiper_free_bus_remove_response(viiper_bus_remove_response_t* v){ (void)v; }
-VIIPER_API void viiper_free_devices_list_response(viiper_devices_list_response_t* v){ if (!v) return; if (v->Devices){ for (size_t i=0;i<v->devices_count;i++){ if (v->Devices[i].DevId) free((void*)v->Devices[i].DevId); if (v->Devices[i].Vid) free((void*)v->Devices[i].Vid); if (v->Devices[i].Pid) free((void*)v->Devices[i].Pid); if (v->Devices[i].Type) free((void*)v->Devices[i].Type); } free(v->Devices);} }
-VIIPER_API void viiper_free_device_add_response(viiper_device_add_response_t* v){ if (!v) return; if (v->ID) free((void*)v->ID); }
-VIIPER_API void viiper_free_device_remove_response(viiper_device_remove_response_t* v){ if (!v) return; if (v->DevId) free((void*)v->DevId); }
-VIIPER_API void viiper_free_api_error(viiper_api_error_t* v){ if (!v) return; if (v->Error) free((void*)v->Error); }
+{{range .DTOs}}{{if ne .Name "Device"}}
+{{genFreeFunc .}}
+{{end}}{{end}}
 
 /* Parsers */
-static int viiper_parse_bus_list_response(const char* json, viiper_bus_list_response_t* out){ return json_parse_array_uint32(json, "buses", &out->Buses, &out->buses_count) == 0 ? 0 : -1; }
-static int viiper_parse_bus_create_response(const char* json, viiper_bus_create_response_t* out){ return json_parse_uint32(json, "busId", &out->BusID)==0?0:-1; }
-static int viiper_parse_bus_remove_response(const char* json, viiper_bus_remove_response_t* out){ return json_parse_uint32(json, "busId", &out->BusID)==0?0:-1; }
-static int viiper_parse_devices_list_response(const char* json, viiper_devices_list_response_t* out){ return json_parse_array_device_info(json, "devices", &out->Devices, &out->devices_count)==0?0:-1; }
-static int viiper_parse_device_add_response(const char* json, viiper_device_add_response_t* out){ return json_parse_string_alloc(json, "id", (char**)&out->ID)==0?0:-1; }
-static int viiper_parse_device_remove_response(const char* json, viiper_device_remove_response_t* out){ if (json_parse_uint32(json, "busId", &out->BusID)!=0) return -1; return json_parse_string_alloc(json, "devId", (char**)&out->DevId)==0?0:-1; }
+static int viiper_parse_device_info_obj(const char* json, viiper_device_info_t* out){ if (json_parse_uint32(json, "busId", &out->BusID)!=0) return -1; if (json_parse_string_alloc(json, "devId", (char**)&out->DevId)!=0) return -1; json_parse_string_alloc(json, "vid", (char**)&out->Vid); json_parse_string_alloc(json, "pid", (char**)&out->Pid); json_parse_string_alloc(json, "type", (char**)&out->Type); return 0; }
+{{range .DTOs}}{{if ne .Name "Device"}}
+{{genParser .}}
+{{end}}{{end}}
 
 /* ========================================================================
  * Management API - Implementations
@@ -334,9 +328,9 @@ static int viiper_parse_device_remove_response(const char* json, viiper_device_r
 {{range .Routes}}
 VIIPER_API viiper_error_t viiper_{{snakecase .Handler}}(
     viiper_client_t* client{{ $params := pathParams .Path }}{{range $params}},
-    const char* {{.}}{{end}}{{range .Arguments}},
-    {{ctype .Type ""}} {{.Name}}{{end}}{{if .ResponseDTO}},
-    viiper_{{snakecase .ResponseDTO}}_t* out{{end}}
+    const char* {{.}}{{end}}{{$payloadType := payloadCType .Payload}}{{if ne $payloadType ""}},
+    {{$payloadType}} {{if eq .Payload.Kind "json"}}request{{else if eq .Payload.Kind "numeric"}}payload_value{{else}}payload_str{{end}}{{end}}{{if .ResponseDTO}},
+    {{responseCType .ResponseDTO}}* out{{end}}
 ) {
     if (!client) return VIIPER_ERROR_INVALID_PARAM;
     /* Build path by substituting params in order */
@@ -356,20 +350,20 @@ VIIPER_API viiper_error_t viiper_{{snakecase .Handler}}(
         }
     }
     {{end}}
-    /* Build payload from args (space-separated) */
-    char payload[256]; payload[0]='\0';
-    {{if gt (len .Arguments) 0}}
-    {
-        char buf[256]; buf[0]='\0';
-        {{range $i, $a := .Arguments}}
-        {{/* naive formatting: strings as-is, numbers as unsigned */}}
-        {{- if eq (ctype $a.Type "") "const char*" -}}
-        snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (strlen(buf)>0?" ":""), {{$a.Name}} ? {{$a.Name}} : "");
-        {{- else -}}
-        snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%u", (strlen(buf)>0?" ":""), (unsigned){{$a.Name}});
-        {{- end}}
-        {{end}}
-        snprintf(payload, sizeof payload, "%s", buf);
+    /* Build payload based on PayloadKind */
+    char payload[512]; payload[0]='\0';
+    {{if eq .Payload.Kind "json"}}
+    {{marshalPayload .Payload}}
+    {{else if eq .Payload.Kind "numeric"}}{{if .Payload.Required}}
+    snprintf(payload, sizeof payload, "%u", (unsigned)payload_value);
+    {{else}}
+    if (payload_value) {
+        snprintf(payload, sizeof payload, "%u", (unsigned)*payload_value);
+    }
+    {{end}}
+    {{else if eq .Payload.Kind "string"}}
+    if (payload_str && payload_str[0]) {
+        snprintf(payload, sizeof payload, "%s", payload_str);
     }
     {{end}}
     char* line = NULL;
@@ -377,8 +371,8 @@ VIIPER_API viiper_error_t viiper_{{snakecase .Handler}}(
         snprintf(client->error_msg, sizeof client->error_msg, "io error");
         return VIIPER_ERROR_IO;
     }
-    /* rudimentary error detection: {"error":...} */
-    if (line && strncmp(line, "{\"error\":", 9) == 0) {
+    /* rudimentary error detection: {"status":4xx/5xx} (RFC 7807) */
+    if (line && strncmp(line, "{\"status\":", 11) == 0) {
         snprintf(client->error_msg, sizeof client->error_msg, "%s", line);
         free(line);
         return VIIPER_ERROR_PROTOCOL;
@@ -386,13 +380,7 @@ VIIPER_API viiper_error_t viiper_{{snakecase .Handler}}(
     {{if .ResponseDTO}}
     if (out) {
         int prc = 0;
-        {{if eq .ResponseDTO "BusListResponse"}} prc = viiper_parse_bus_list_response(line, out);
-        {{else if eq .ResponseDTO "BusCreateResponse"}} prc = viiper_parse_bus_create_response(line, out);
-        {{else if eq .ResponseDTO "BusRemoveResponse"}} prc = viiper_parse_bus_remove_response(line, out);
-        {{else if eq .ResponseDTO "DevicesListResponse"}} prc = viiper_parse_devices_list_response(line, out);
-        {{else if eq .ResponseDTO "DeviceAddResponse"}} prc = viiper_parse_device_add_response(line, out);
-        {{else if eq .ResponseDTO "DeviceRemoveResponse"}} prc = viiper_parse_device_remove_response(line, out);
-        {{else}} prc = 0; {{end}}
+        {{if eq .ResponseDTO "Device"}}prc = viiper_parse_device_info_obj(line, out);{{else}}prc = viiper_parse_{{snakecase .ResponseDTO}}(line, out);{{end}}
         if (prc != 0) { snprintf(client->error_msg, sizeof client->error_msg, "parse error"); free(line); return VIIPER_ERROR_PROTOCOL; }
     }
     free(line);
@@ -452,15 +440,17 @@ VIIPER_API viiper_error_t viiper_device_create(
     if (!client || !dev_id || !out_device) return VIIPER_ERROR_INVALID_PARAM;
     int fd = viiper_connect(client->host, client->port);
     if (fd < 0) return VIIPER_ERROR_CONNECT;
-    /* Send stream path: bus/<busId>/<devId>\n */
+    /* Send stream path with double newline terminator for framing */
     char pathbuf[256];
-    snprintf(pathbuf, sizeof pathbuf, "bus/%u/%s\n", (unsigned)bus_id, dev_id);
-    size_t n = strlen(pathbuf);
+    snprintf(pathbuf, sizeof pathbuf, "bus/%u/%s", (unsigned)bus_id, dev_id);
+    if (viiper_send_line(fd, pathbuf) != 0) {
 #if defined(_WIN32) || defined(_WIN64)
-    if (send(fd, pathbuf, (int)n, 0) < 0) { closesocket(fd); return VIIPER_ERROR_IO; }
+        closesocket(fd);
 #else
-    if (send(fd, pathbuf, n, 0) < 0) { close(fd); return VIIPER_ERROR_IO; }
+        close(fd);
 #endif
+        return VIIPER_ERROR_IO;
+    }
     viiper_device_t* dev = (viiper_device_t*)calloc(1, sizeof(viiper_device_t));
     if (!dev) {
 #if defined(_WIN32) || defined(_WIN64)
@@ -548,6 +538,82 @@ VIIPER_API void viiper_device_close(viiper_device_t* device) {
 #endif
     if (device->dev_id) free(device->dev_id);
     free(device);
+}
+
+/* OpenStream: connect to an existing device's stream channel (device must already exist on bus) */
+VIIPER_API viiper_error_t viiper_open_stream(
+    viiper_client_t* client,
+    uint32_t bus_id,
+    const char* dev_id,
+    viiper_device_t** out_device
+) {
+    if (!client || !dev_id || !out_device) return VIIPER_ERROR_INVALID_PARAM;
+    int fd = viiper_connect(client->host, client->port);
+    if (fd < 0) return VIIPER_ERROR_CONNECT;
+    char pathbuf[256];
+    snprintf(pathbuf, sizeof pathbuf, "bus/%u/%s", (unsigned)bus_id, dev_id);
+    if (viiper_send_line(fd, pathbuf) != 0) {
+#if defined(_WIN32) || defined(_WIN64)
+        closesocket(fd);
+#else
+        close(fd);
+#endif
+        return VIIPER_ERROR_IO;
+    }
+    viiper_device_t* dev = (viiper_device_t*)calloc(1, sizeof(viiper_device_t));
+    if (!dev) {
+#if defined(_WIN32) || defined(_WIN64)
+        closesocket(fd);
+#else
+        close(fd);
+#endif
+        return VIIPER_ERROR_MEMORY;
+    }
+    dev->socket_fd = fd;
+    dev->client = client;
+    dev->bus_id = bus_id;
+    size_t idlen = strlen(dev_id);
+    dev->dev_id = (char*)malloc(idlen+1);
+    if (!dev->dev_id) {
+#if defined(_WIN32) || defined(_WIN64)
+        closesocket(fd);
+#else
+        close(fd);
+#endif
+        free(dev);
+        return VIIPER_ERROR_MEMORY;
+    }
+    memcpy(dev->dev_id, dev_id, idlen+1);
+    dev->running = 1;
+#if defined(_WIN32) || defined(_WIN64)
+    dev->recv_thread = CreateThread(NULL, 0, viiper_device_receiver_thread, dev, 0, NULL);
+    if (!dev->recv_thread) {
+        closesocket(fd); free(dev->dev_id); free(dev); return VIIPER_ERROR_IO;
+    }
+#else
+    if (pthread_create(&dev->recv_thread, NULL, viiper_device_receiver_thread, dev) != 0) {
+        close(fd); free(dev->dev_id); free(dev); return VIIPER_ERROR_IO;
+    }
+#endif
+    *out_device = dev;
+    return VIIPER_OK;
+}
+
+/* Convenience wrapper: AddDeviceAndConnect (create device on bus then open stream) */
+VIIPER_API viiper_error_t viiper_add_device_and_connect(
+    viiper_client_t* client,
+    uint32_t bus_id,
+    const viiper_device_create_request_t* request,
+    viiper_device_info_t* out_info,
+    viiper_device_t** out_device
+) {
+    if (!client || !out_info || !out_device) return VIIPER_ERROR_INVALID_PARAM;
+    char busIdStr[32]; snprintf(busIdStr, sizeof busIdStr, "%u", (unsigned)bus_id);
+    viiper_error_t rc = viiper_bus_device_add(client, busIdStr, request, out_info);
+    if (rc != VIIPER_OK) return rc;
+    const char* devId = out_info->DevId ? out_info->DevId : NULL;
+    if (!devId) return VIIPER_ERROR_PROTOCOL; /* missing devId */
+    return viiper_open_stream(client, bus_id, devId, out_device);
 }
 `
 

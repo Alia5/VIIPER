@@ -7,6 +7,7 @@ import (
 	"net"
 
 	"viiper/internal/server/api"
+	"viiper/pkg/device"
 	"viiper/pkg/usb"
 )
 
@@ -16,7 +17,7 @@ func init() {
 
 type handler struct{}
 
-func (h *handler) CreateDevice() usb.Device { return New() }
+func (h *handler) CreateDevice(o *device.CreateOptions) usb.Device { return New(o) }
 
 func (h *handler) StreamHandler() api.StreamHandlerFunc {
 	return func(conn net.Conn, devPtr *usb.Device, logger *slog.Logger) error {

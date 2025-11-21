@@ -108,9 +108,9 @@ VIIPER_API const char* viiper_get_error(viiper_client_t* client);
 /* {{.Method}}: {{.Path}} */
 VIIPER_API viiper_error_t viiper_{{snakecase .Handler}}(
   viiper_client_t* client{{ $params := pathParams .Path }}{{range $params}},
-  const char* {{.}}{{end}}{{range .Arguments}},
-  {{ctype .Type ""}} {{.Name}}{{end}}{{if .ResponseDTO}},
-  viiper_{{snakecase .ResponseDTO}}_t* out{{end}}
+  const char* {{.}}{{end}}{{$payloadType := payloadCType .Payload}}{{if ne $payloadType ""}},
+  {{$payloadType}} {{if eq .Payload.Kind "json"}}request{{else if eq .Payload.Kind "numeric"}}payload_value{{else}}payload_str{{end}}{{end}}{{if .ResponseDTO}},
+  {{responseCType .ResponseDTO}}* out{{end}}
 );
 {{end}}
 
@@ -145,6 +145,23 @@ VIIPER_API void viiper_device_on_output(
 
 /* Close device stream and free resources */
 VIIPER_API void viiper_device_close(viiper_device_t* device);
+
+/* OpenStream: connect to an existing device's stream channel (device must already exist) */
+VIIPER_API viiper_error_t viiper_open_stream(
+  viiper_client_t* client,
+  uint32_t bus_id,
+  const char* dev_id,
+  viiper_device_t** out_device
+);
+
+/* Convenience: AddDeviceAndConnect (create device then connect its stream) */
+VIIPER_API viiper_error_t viiper_add_device_and_connect(
+  viiper_client_t* client,
+  uint32_t bus_id,
+  const viiper_device_create_request_t* request,
+  viiper_device_info_t* out_info,
+  viiper_device_t** out_device
+);
 
 #ifdef __cplusplus
 }

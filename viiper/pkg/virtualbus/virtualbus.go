@@ -32,50 +32,7 @@ type VirtualBus struct {
 // DeviceMeta exposes a registered device and its metadata for external queries.
 type DeviceMeta struct {
 	Dev  usb.Device
-	Desc DeviceDescriptor
 	Meta usbip.ExportMeta
-}
-
-// InterfaceConfig holds all descriptors for a single interface for bus management.
-type InterfaceConfig struct {
-	Descriptor    usb.InterfaceDescriptor
-	Endpoints     []usb.EndpointDescriptor
-	HIDDescriptor []byte // optional HID class descriptor (0x21)
-	HIDReport     []byte // optional HID report descriptor (0x22)
-	VendorData    []byte // optional vendor-specific bytes
-}
-
-// DeviceDescriptor holds all static descriptor/config data for a device.
-type DeviceDescriptor struct {
-	Device     usb.DeviceDescriptor
-	Interfaces []InterfaceConfig
-	Strings    map[uint8]string
-}
-
-// EncodeStringDescriptor converts a UTF-8 string to a USB string descriptor byte array.
-// The resulting descriptor has the format:
-//
-//	Byte 0: bLength (total descriptor length)
-//	Byte 1: bDescriptorType (0x03 for string)
-//	Bytes 2+: UTF-16LE encoded string
-func EncodeStringDescriptor(s string) []byte {
-	runes := []rune(s)
-	buf := make([]byte, 2+len(runes)*2)
-	buf[0] = uint8(len(buf)) // bLength
-	buf[1] = 0x03            // bDescriptorType (STRING)
-	for i, r := range runes {
-		buf[2+i*2] = uint8(r)
-		buf[2+i*2+1] = uint8(r >> 8)
-	}
-	return buf
-}
-
-// DescriptorProvider is an optional device interface that exposes a static
-// descriptor/config used when registering a device with a VirtualBus via
-// `Add(dev)`. Devices that expose this will have their descriptors
-// automatically consulted at registration time.
-type DescriptorProvider interface {
-	GetDeviceDescriptor() DeviceDescriptor
 }
 
 // New creates a new VirtualBus instance with a unique auto-assigned bus number.
@@ -124,44 +81,40 @@ func NewWithBusId(busId uint32) (*VirtualBus, error) {
 // which returns a static descriptor that will be used for bus registration.
 // Returns a context containing the device's lifecycle and metadata (use GetDeviceMeta to extract).
 func (vb *VirtualBus) Add(dev usb.Device) (context.Context, error) {
-	if p, ok := dev.(DescriptorProvider); ok {
-		desc := p.GetDeviceDescriptor()
-		vb.mutex.Lock()
-		defer vb.mutex.Unlock()
+	vb.mutex.Lock()
+	defer vb.mutex.Unlock()
 
-		for _, d := range vb.devices {
-			if d.dev == dev {
-				return nil, fmt.Errorf("device already registered on this bus")
-			}
+	for _, d := range vb.devices {
+		if d.dev == dev {
+			return nil, fmt.Errorf("device already registered on this bus")
 		}
-		busID := vb.busId
-		var devID uint32
-		for i := uint32(1); ; i++ {
-			if !vb.allocatedDevIDs[i] {
-				devID = i
-				vb.allocatedDevIDs[i] = true
-				break
-			}
-		}
-
-		busDevID := fmt.Sprintf("%d-%d", busID, devID)
-		path := fmt.Sprintf("%s%d/%s", basepath, busID, busDevID)
-
-		var meta usbip.ExportMeta
-		copy(meta.Path[:], path)
-		copy(meta.USBBusId[:], busDevID)
-		meta.BusId = busID
-		meta.DevId = devID
-		connTimer := time.NewTimer(0)
-
-		ctx, cancel := context.WithCancel(context.Background())
-		ctx = context.WithValue(ctx, device.ExportMetaKey, &meta)
-		ctx = context.WithValue(ctx, device.ConnTimerKey, connTimer)
-
-		vb.devices = append(vb.devices, busDevice{dev: dev, desc: desc, meta: meta, ctx: ctx, cancel: cancel})
-		return ctx, nil
 	}
-	return nil, fmt.Errorf("device does not implement GetDeviceDescriptor")
+	busID := vb.busId
+	var devID uint32
+	for i := uint32(1); ; i++ {
+		if !vb.allocatedDevIDs[i] {
+			devID = i
+			vb.allocatedDevIDs[i] = true
+			break
+		}
+	}
+
+	busDevID := fmt.Sprintf("%d-%d", busID, devID)
+	path := fmt.Sprintf("%s%d/%s", basepath, busID, busDevID)
+
+	var meta usbip.ExportMeta
+	copy(meta.Path[:], path)
+	copy(meta.USBBusId[:], busDevID)
+	meta.BusId = busID
+	meta.DevId = devID
+	connTimer := time.NewTimer(0)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ctx = context.WithValue(ctx, device.ExportMetaKey, &meta)
+	ctx = context.WithValue(ctx, device.ConnTimerKey, connTimer)
+
+	vb.devices = append(vb.devices, busDevice{dev: dev, meta: meta, ctx: ctx, cancel: cancel})
+	return ctx, nil
 }
 
 // GetAllDeviceMetas returns a copy of all registered devices with their descriptors and export metadata.
@@ -170,7 +123,7 @@ func (vb *VirtualBus) GetAllDeviceMetas() []DeviceMeta {
 	defer vb.mutex.Unlock()
 	out := make([]DeviceMeta, 0, len(vb.devices))
 	for _, d := range vb.devices {
-		out = append(out, DeviceMeta{Dev: d.dev, Desc: d.desc, Meta: d.meta})
+		out = append(out, DeviceMeta{Dev: d.dev, Meta: d.meta})
 	}
 	return out
 }
@@ -180,19 +133,6 @@ func (vb *VirtualBus) BusID() uint32 {
 	vb.mutex.Lock()
 	defer vb.mutex.Unlock()
 	return vb.busId
-}
-
-// GetDeviceDescriptor looks up a device's descriptor/config by device reference.
-// Returns nil if the device is not found.
-func (vb *VirtualBus) GetDeviceDescriptor(dev usb.Device) *DeviceDescriptor {
-	vb.mutex.Lock()
-	defer vb.mutex.Unlock()
-	for i := range vb.devices {
-		if vb.devices[i].dev == dev {
-			return &vb.devices[i].desc
-		}
-	}
-	return nil
 }
 
 // Devices returns all devices currently attached to this bus.
@@ -283,7 +223,6 @@ func (vb *VirtualBus) GetDeviceContext(dev usb.Device) context.Context {
 
 type busDevice struct {
 	dev    usb.Device
-	desc   DeviceDescriptor
 	meta   usbip.ExportMeta
 	ctx    context.Context
 	cancel context.CancelFunc

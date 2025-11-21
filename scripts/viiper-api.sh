@@ -60,7 +60,8 @@ if nc -h 2>&1 | grep -q -- "-q "; then
 fi
 
 
-if ! OUTPUT=$(printf '%s\n' "$CMD" | nc $NC_QUIT -w "$TIMEOUT" "$HOST" "$PORT"); then
+# Send command with double newline delimiter
+if ! OUTPUT=$(printf '%s\n\n' "$CMD" | nc $NC_QUIT -w "$TIMEOUT" "$HOST" "$PORT"); then
   echo "Error: failed to connect to ${HOST}:${PORT} (is the VIIPER API running?)" >&2
   exit 1
 fi

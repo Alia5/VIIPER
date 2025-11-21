@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -48,11 +49,9 @@ func StartAPIServer(t *testing.T, register func(r *api.Router, s *usb.Server, ap
 	return addr, srv, done
 }
 
-// ExecCmd dials the API server, sends cmd (newline not required) and returns
-// the full preliminary response line (OK/ERR plus payload). The caller should
-// inspect the response. Client errors call t.Fatalf.
-// ExecCmd executes a raw command against a running API server and returns the full
-// response line (including JSON payload if present) without the trailing newline.
+// ExecCmd dials the API server, sends cmd and reads the full response.
+// The command should not include a trailing newline. Returns the response
+// without the trailing newline.
 func ExecCmd(t *testing.T, addr string, cmd string) string {
 	t.Helper()
 	c, err := net.Dial("tcp", addr)
@@ -60,47 +59,61 @@ func ExecCmd(t *testing.T, addr string, cmd string) string {
 		t.Fatalf("dial failed: %v", err)
 	}
 	defer c.Close()
+
+	// Send command with double newline delimiter
+	_, _ = fmt.Fprintf(c, "%s\n\n", cmd)
+
+	// Read response
 	r := bufio.NewReader(c)
-	_, _ = fmt.Fprintf(c, "%s\n", cmd)
 	line, err := r.ReadString('\n')
-	if err != nil {
-		if err != io.EOF {
-			t.Fatalf("read failed: %v", err)
-		}
+	if err != nil && err != io.EOF {
+		t.Fatalf("read failed: %v", err)
 	}
-	if len(line) == 0 {
-		return ""
-	}
-	return line[:len(line)-1] // strip newline; may be empty string
+
+	result := strings.TrimSuffix(line, "\n")
+	result = strings.TrimSuffix(result, "\r")
+	return result
 }
 
-// RunAPICmd executes a command through the ApiServer's connection handler using in-memory pipes.
-// It exercises routing and handler invocation without a network listener.
-// ExecuteLine routes a single command string (one full line without trailing newline)
-// through the provided router, emulating ApiServer.handleConn logic but without network IO.
-// Returns the full response line (without trailing newline) as produced by the API contract.
-func ExecuteLine(t *testing.T, r *api.Router, line string) string {
+// ExecuteLine routes a command string through the provided router,
+// emulating ApiServer.handleConn logic but without network IO.
+// The data parameter is the full request data (path + optional payload).
+// Returns the full response as produced by the API contract.
+func ExecuteLine(t *testing.T, r *api.Router, data string) string {
 	t.Helper()
-	line = strings.TrimSpace(line)
-	if line == "" {
+	if data == "" {
 		return jsonError("empty")
 	}
-	fields := strings.Fields(line)
-	if len(fields) == 0 {
-		return jsonError("empty")
+
+	// Split on first whitespace character using regex \s
+	wsRegex := regexp.MustCompile(`\s`)
+	loc := wsRegex.FindStringIndex(data)
+
+	var path, payload string
+	if loc != nil {
+		path = data[:loc[0]]
+		payload = data[loc[1]:]
+	} else {
+		path = data
+		payload = ""
 	}
-	path := strings.ToLower(fields[0])
-	args := fields[1:]
+
+	if path == "" {
+		return jsonError("empty path")
+	}
+
+	path = strings.ToLower(path)
+
 	if h, params := r.Match(path); h != nil {
-		req := &api.Request{Params: params, Args: args}
+		req := &api.Request{Params: params, Payload: payload}
 		res := &api.Response{}
 		if err := h(req, res, slog.Default()); err != nil {
 			return jsonError(err.Error())
 		}
 		if res.JSON == "" {
-			return "OK"
+			return ""
 		}
-		return "OK " + res.JSON
+		return res.JSON
 	}
 	return jsonError("unknown path")
 }

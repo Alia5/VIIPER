@@ -9,6 +9,7 @@ import (
 	"io"
 	"log/slog"
 	"net"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -82,9 +83,9 @@ func (a *Server) serve() {
 	}
 }
 
-func (a *Server) writeError(w io.Writer, msg string) {
-	problem := map[string]string{"error": msg}
-	problemJSON, _ := json.Marshal(problem)
+func (a *Server) writeError(w io.Writer, err error) {
+	apiErr := WrapError(err)
+	problemJSON, _ := json.Marshal(apiErr)
 	fmt.Fprintf(w, "%s\n", string(problemJSON))
 }
 
@@ -105,115 +106,147 @@ func (a *Server) handleConn(conn net.Conn) {
 	connLogger := a.logger.With("remote", conn.RemoteAddr().String())
 	r := bufio.NewReader(conn)
 	w := conn
+
+	// Read until double newline delimiter
+	var data strings.Builder
+	newlineCount := 0
 	for {
-		line, err := r.ReadString('\n')
+		b, err := r.ReadByte()
 		if err != nil {
-			if err != io.EOF {
-				connLogger.Error("read api line", "error", err)
+			if err == io.EOF {
+				break
 			}
+			connLogger.Error("read api data", "error", err)
 			return
 		}
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
+		if b == '\n' {
+			newlineCount++
+			if newlineCount >= 2 {
+				break
+			}
+		} else {
+			newlineCount = 0
 		}
-		connLogger.Info("api cmd", "cmd", line)
-		fields := strings.Fields(line)
-		if len(fields) == 0 {
-			connLogger.Error("api empty command")
-			a.writeError(w, "empty")
-			continue
+		data.WriteByte(b)
+	}
+
+	reqData := data.String()
+	// Remove trailing newline if present
+	reqData = strings.TrimSuffix(reqData, "\n")
+
+	if reqData == "" {
+		connLogger.Error("api empty command")
+		a.writeError(w, ErrBadRequest("empty request"))
+		return
+	}
+
+	// Split on first whitespace character using regex \s
+	wsRegex := regexp.MustCompile(`\s`)
+	loc := wsRegex.FindStringIndex(reqData)
+
+	var path, payload string
+	if loc != nil {
+		path = reqData[:loc[0]]
+		payload = reqData[loc[1]:]
+	} else {
+		path = reqData
+		payload = ""
+	}
+
+	if path == "" {
+		connLogger.Error("api empty path")
+		a.writeError(w, ErrBadRequest("empty path"))
+		return
+	}
+
+	path = strings.ToLower(path)
+	connLogger.Info("api cmd", "path", path)
+
+	if h, params := a.router.Match(path); h != nil {
+		req := &Request{Ctx: connCtx, Params: params, Payload: payload}
+		res := &Response{}
+		if err := h(req, res, connLogger); err != nil {
+			connLogger.Error("api handler error", "path", path, "error", err)
+			a.writeError(w, err)
+			return
 		}
-		path := strings.ToLower(fields[0])
-		args := fields[1:]
+		connLogger.Debug("api handler success", "path", path)
+		a.writeOK(w, res.JSON)
+		return
+	} else if sh, params := a.router.MatchStream(path); sh != nil {
+		connLogger.Info("api stream begin", "path", path)
+		busIDStr, ok := params["busId"]
+		if !ok {
+			a.writeError(w, ErrBadRequest("missing busId parameter"))
+			return
+		}
+		devIDStr, ok := params["deviceid"]
+		if !ok {
+			a.writeError(w, ErrBadRequest("missing deviceid parameter"))
+			return
+		}
 
-		if h, params := a.router.Match(path); h != nil {
-			req := &Request{Ctx: connCtx, Params: params, Args: args}
-			res := &Response{}
-			if err := h(req, res, connLogger); err != nil {
-				connLogger.Error("api handler error", "path", path, "error", err)
-				a.writeError(w, err.Error())
-				continue
+		busID, err := strconv.ParseUint(busIDStr, 10, 32)
+		if err != nil {
+			a.writeError(w, ErrBadRequest(fmt.Sprintf("invalid busId: %v", err)))
+			return
+		}
+		bus := a.usbs.GetBus(uint32(busID))
+		if bus == nil {
+			a.writeError(w, ErrNotFound(fmt.Sprintf("bus %d not found", busID)))
+			return
+		}
+		var dev pusb.Device
+		var devCtx context.Context
+		metas := bus.GetAllDeviceMetas()
+		for _, meta := range metas {
+			if fmt.Sprintf("%d", meta.Meta.DevId) == devIDStr {
+				dev = meta.Dev
+				devCtx = bus.GetDeviceContext(dev)
+				break
 			}
-			connLogger.Debug("api handler success", "path", path)
-			a.writeOK(w, res.JSON)
-			continue
-		} else if sh, params := a.router.MatchStream(path); sh != nil {
-			connLogger.Info("api stream begin", "path", path)
-			busIdStr, ok := params["busId"]
-			if !ok {
-				a.writeError(w, "missing busId parameter")
-				return
-			}
-			devIdStr, ok := params["deviceid"]
-			if !ok {
-				a.writeError(w, "missing deviceid parameter")
-				return
-			}
+		}
+		if dev == nil || devCtx == nil {
+			a.writeError(w, ErrNotFound(fmt.Sprintf("device %s not found on bus %d", devIDStr, busID)))
+			return
+		}
 
-			busID, err := strconv.ParseUint(busIdStr, 10, 32)
-			if err != nil {
-				a.writeError(w, fmt.Sprintf("invalid busId: %v", err))
-				return
-			}
-			bus := a.usbs.GetBus(uint32(busID))
-			if bus == nil {
-				a.writeError(w, "bus not found")
-				return
-			}
-			var dev pusb.Device
-			var devCtx context.Context
-			metas := bus.GetAllDeviceMetas()
-			for _, meta := range metas {
-				if fmt.Sprintf("%d", meta.Meta.DevId) == devIdStr {
-					dev = meta.Dev
-					devCtx = bus.GetDeviceContext(dev)
-					break
-				}
-			}
-			if dev == nil || devCtx == nil {
-				a.writeError(w, "device not found")
-				return
-			}
+		connTimer := device.GetConnTimer(devCtx)
+		if connTimer != nil {
+			connTimer.Stop()
+		}
 
-			connTimer := device.GetConnTimer(devCtx)
-			if connTimer != nil {
-				connTimer.Stop()
-			}
+		// Stream handler takes ownership of connection
+		if err := sh(conn, &dev, connLogger); err != nil {
+			connLogger.Error("api stream handler error", "path", path, "error", err)
+		}
+		connLogger.Info("api stream end", "path", path)
 
-			// Stream handler takes ownership of connection
-			if err := sh(conn, &dev, connLogger); err != nil {
-				connLogger.Error("api stream handler error", "path", path, "error", err)
-			}
-			connLogger.Info("api stream end", "path", path)
-
-			connTimer = device.GetConnTimer(devCtx)
-			if connTimer != nil {
-				connTimer.Reset(a.config.DeviceHandlerConnectTimeout)
-				go func() {
-					select {
-					case <-devCtx.Done():
-						connTimer.Stop()
-						return
-					case <-connTimer.C:
-						exportMeta := device.GetDeviceMeta(devCtx)
-						if exportMeta != nil {
-							deviceIDStr := fmt.Sprintf("%d", exportMeta.DevId)
-							if err := bus.RemoveDeviceByID(deviceIDStr); err != nil {
-								connLogger.Error("disconnect timeout: failed to remove device", "busID", busID, "deviceID", deviceIDStr, "error", err)
-							} else {
-								connLogger.Info("disconnect timeout: removed device (no reconnection)", "busID", busID, "deviceID", deviceIDStr)
-							}
+		connTimer = device.GetConnTimer(devCtx)
+		if connTimer != nil {
+			connTimer.Reset(a.config.DeviceHandlerConnectTimeout)
+			go func() {
+				select {
+				case <-devCtx.Done():
+					connTimer.Stop()
+					return
+				case <-connTimer.C:
+					exportMeta := device.GetDeviceMeta(devCtx)
+					if exportMeta != nil {
+						deviceIDStr := fmt.Sprintf("%d", exportMeta.DevId)
+						if err := bus.RemoveDeviceByID(deviceIDStr); err != nil {
+							connLogger.Error("disconnect timeout: failed to remove device", "busID", busID, "deviceID", deviceIDStr, "error", err)
+						} else {
+							connLogger.Info("disconnect timeout: removed device (no reconnection)", "busID", busID, "deviceID", deviceIDStr)
 						}
 					}
-				}()
-			}
-
-			return
-		} else {
-			connLogger.Error("api unknown path", "path", path)
-			a.writeError(w, "unknown path")
+				}
+			}()
 		}
 
+		return
 	}
+	connLogger.Error("api unknown path", "path", path)
+	a.writeError(w, ErrNotFound(fmt.Sprintf("unknown path: %s", path)))
+	return
 }

@@ -32,7 +32,7 @@ func TestBusDeviceRemove(t *testing.T) {
 				if err := s.AddBus(b); err != nil {
 					t.Fatalf("add bus failed: %v", err)
 				}
-				if _, err := b.Add(xbox360.New()); err != nil {
+				if _, err := b.Add(xbox360.New(nil)); err != nil {
 					t.Fatalf("add device failed: %v", err)
 				}
 			},
@@ -45,7 +45,7 @@ func TestBusDeviceRemove(t *testing.T) {
 			setup:            nil,
 			pathParams:       map[string]string{"id": "90001"},
 			payload:          "1",
-			expectedResponse: `{"error":"bus 90001 not found"}`,
+			expectedResponse: `{"status":404,"title":"Not Found","detail":"bus 90001 not found"}`,
 		},
 		{
 			name: "remove non-existing device",
@@ -60,14 +60,14 @@ func TestBusDeviceRemove(t *testing.T) {
 			},
 			pathParams:       map[string]string{"id": "90002"},
 			payload:          "1",
-			expectedResponse: `{"error":"device with id 1 not found on bus 90002"}`,
+			expectedResponse: `{"status":404,"title":"Not Found","detail":"device 1 not found on bus 90002"}`,
 		},
 		{
 			name:             "invalid bus number",
 			setup:            nil,
 			pathParams:       map[string]string{"id": "abc"},
 			payload:          "1",
-			expectedResponse: `{"error":"strconv.ParseUint: parsing \"abc\": invalid syntax"}`,
+			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid busId: strconv.ParseUint: parsing \"abc\": invalid syntax"}`,
 		},
 	}
 
@@ -84,7 +84,11 @@ func TestBusDeviceRemove(t *testing.T) {
 			}
 			line, err := c.Do("bus/{id}/remove", tt.payload, tt.pathParams)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.expectedResponse, line)
+			if tt.expectedResponse[0] == '{' {
+				assert.JSONEq(t, tt.expectedResponse, line)
+			} else {
+				assert.Equal(t, tt.expectedResponse, line)
+			}
 		})
 	}
 }

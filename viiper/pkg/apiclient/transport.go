@@ -1,10 +1,10 @@
 package apiclient
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/url"
 	"strings"
@@ -26,8 +26,12 @@ func defaultConfig() Config {
 	}
 }
 
-// Transport is the low-level VIIPER line protocol implementation used by higher-level API clients.
-// It builds the command line as: "<path> <payload>\n" with optional URL-escaped path params.
+// Transport is the low-level VIIPER management protocol implementation used by higher-level API clients.
+// Request framing: `<path>[ SP <payload>] \n\n` (double newline terminator). The payload may itself
+// contain newlines (e.g. pretty JSON) because only a *double* newline ends the request.
+// Response framing: server writes a single JSON (or empty success) line terminated by `\n` and then
+// closes the connection. We therefore read until EOF (connection close) and trim a single trailing
+// newline if present. Embedded newlines in the response (future multi-line responses) are preserved.
 type Transport struct {
 	addr string
 	mock func(path string, payload any, pathParams map[string]string) (string, error)
@@ -90,24 +94,21 @@ func (c *Transport) DoCtx(ctx context.Context, path string, payload any, pathPar
 	if c.cfg.WriteTimeout > 0 {
 		_ = conn.SetWriteDeadline(time.Now().Add(c.cfg.WriteTimeout))
 	}
-	if _, err := conn.Write(append(lineBytes, '\n')); err != nil {
+	// Send request with double newline delimiter
+	if _, err := conn.Write(append(lineBytes, '\n', '\n')); err != nil {
 		return "", fmt.Errorf("write: %w", err)
 	}
-	r := bufio.NewReader(conn)
 	if c.cfg.ReadTimeout > 0 {
 		_ = conn.SetReadDeadline(time.Now().Add(c.cfg.ReadTimeout))
 	}
-	resp, err := r.ReadString('\n')
-	if err != nil {
-		if len(resp) == 0 { // no data received
-			return "", fmt.Errorf("read: %w", err)
-		}
+	respBytes, err := io.ReadAll(conn)
+	if err != nil && len(respBytes) == 0 {
+		return "", fmt.Errorf("read: %w", err)
 	}
-	if len(resp) == 0 {
-		return "", nil
-	}
-	if resp[len(resp)-1] == '\n' {
-		resp = resp[:len(resp)-1]
+	resp := string(respBytes)
+	// Trim exactly one trailing newline if present.
+	if strings.HasSuffix(resp, "\n") {
+		resp = strings.TrimSuffix(resp, "\n")
 	}
 	return resp, nil
 }

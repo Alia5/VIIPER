@@ -40,13 +40,13 @@ public class ViiperClient : IDisposable
 {{range .Routes}}{{if eq .Method "Register"}}
     /// <summary>
     /// {{.Handler}}: {{.Path}}
-    /// </summary>{{range .Arguments}}
-    /// <param name="{{toCamelCase .Name}}">{{.Type}}</param>{{end}}{{if .ResponseDTO}}
+    /// </summary>{{if .ResponseDTO}}
     /// <returns>{{.ResponseDTO}}</returns>{{end}}
     public async Task<{{if .ResponseDTO}}{{.ResponseDTO}}{{else}}bool{{end}}> {{.Handler}}Async({{generateMethodParams .}}CancellationToken cancellationToken = default)
     {
         var path = "{{.Path}}"{{range $key, $value := .PathParams}}.Replace("{{lb}}{{$key}}{{rb}}", {{toCamelCase $key}}.ToString()){{end}};
-        {{if .Arguments}}string? payload = {{range $i, $arg := .Arguments}}{{if $i}} + " " + {{end}}{{toCamelCase $arg.Name}}{{if ne $arg.Type "string"}}?.ToString(){{end}}{{end}};{{else}}string? payload = null;{{end}}
+        {{/* Build payload based on classification */}}
+		{{if eq .Payload.Kind "none"}}string? payload = null;{{else if eq .Payload.Kind "json"}}string? payload = JsonSerializer.Serialize({{payloadParamNameCS .}});{{else if eq .Payload.Kind "numeric"}}{{if .Payload.Required}}string? payload = {{payloadParamNameCS .}}.ToString();{{else}}string? payload = {{payloadParamNameCS .}}?.ToString();{{end}}{{else if eq .Payload.Kind "string"}}string? payload = {{payloadParamNameCS .}};{{end}}
         {{if .ResponseDTO}}return await SendRequestAsync<{{.ResponseDTO}}>(path, payload, cancellationToken);{{else}}await SendRequestAsync<object>(path, payload, cancellationToken);
         return true;{{end}}
     }
@@ -58,13 +58,13 @@ public class ViiperClient : IDisposable
         
         using var stream = client.GetStream();
         
-        // Build command line: "path arg1 arg2 ...\n" (matches Go transport protocol)
+		// Build command line: "path[ optional-payload]\n\n" (management protocol uses double newline terminator)
         string commandLine = path.ToLowerInvariant();
         if (!string.IsNullOrEmpty(payload))
         {
             commandLine += " " + payload;
         }
-        commandLine += "\n";
+		commandLine += "\n\n";
         
         var requestBytes = Encoding.UTF8.GetBytes(commandLine);
         await stream.WriteAsync(requestBytes, cancellationToken);
@@ -80,9 +80,14 @@ public class ViiperClient : IDisposable
                 break;
         }
         
-        var responseJson = responseBuilder.ToString().TrimEnd('\n');
-        var response = JsonSerializer.Deserialize<T>(responseJson) 
-            ?? throw new InvalidOperationException("Failed to deserialize response");
+		var responseJson = responseBuilder.ToString().TrimEnd('\n');
+		// Typed error detection (RFC 7807 style): check for status field prefix
+		if (responseJson.StartsWith("{\"status\":"))
+		{
+			throw new InvalidOperationException($"VIIPER error response: {responseJson}");
+		}
+		var response = JsonSerializer.Deserialize<T>(responseJson)
+			?? throw new InvalidOperationException("Failed to deserialize response");
         
         return response;
     }
@@ -94,18 +99,18 @@ public class ViiperClient : IDisposable
     /// <param name="devId">Device ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>ViiperDevice stream wrapper</returns>
-    public async Task<ViiperDevice> ConnectDeviceAsync(uint busId, string devId, CancellationToken cancellationToken = default)
-    {
-        var client = new TcpClient();
-        await client.ConnectAsync(_host, _port, cancellationToken);
-        
-        var stream = client.GetStream();
-        var streamPath = $"bus/{{lb}}busId{{rb}}/{{lb}}devId{{rb}}\n";
-        var handshake = Encoding.UTF8.GetBytes(streamPath);
-        await stream.WriteAsync(handshake, cancellationToken);
-        
-        return new ViiperDevice(client, stream);
-    }
+	public async Task<ViiperDevice> ConnectDeviceAsync(uint busId, string devId, CancellationToken cancellationToken = default)
+	{
+		var client = new TcpClient();
+		await client.ConnectAsync(_host, _port, cancellationToken);
+		var stream = client.GetStream();
+		// Streaming handshake uses double newline delimiter (same framing as management).
+		// Server api/server.go reads until two consecutive '\n'; a single '\n' leaves it waiting.
+		var streamPath = $"bus/{{lb}}busId{{rb}}/{{lb}}devId{{rb}}\n\n";
+		var handshake = Encoding.UTF8.GetBytes(streamPath);
+		await stream.WriteAsync(handshake, cancellationToken);
+		return new ViiperDevice(client, stream);
+	}
 
     public void Dispose()
     {
@@ -126,6 +131,7 @@ func generateClient(logger *slog.Logger, projectDir string, md *meta.Metadata) e
 		"toCamelCase":          toCamelCase,
 		"writeFileHeader":      writeFileHeader,
 		"generateMethodParams": generateMethodParams,
+		"payloadParamNameCS":   payloadParamNameCS,
 		"lb":                   func() string { return "{" },
 		"rb":                   func() string { return "}" },
 	}
@@ -157,22 +163,66 @@ func generateClient(logger *slog.Logger, projectDir string, md *meta.Metadata) e
 
 func generateMethodParams(route scanner.RouteInfo) string {
 	var params []string
-
 	for key := range route.PathParams {
 		params = append(params, fmt.Sprintf("uint %s", toCamelCase(key)))
 	}
-
-	for _, arg := range route.Arguments {
-		csharpType := goTypeToCSharp(arg.Type)
-		if arg.Optional {
-			csharpType += "?"
+	// Add payload parameter if needed
+	switch route.Payload.Kind {
+	case scanner.PayloadJSON:
+		name := payloadParamNameCS(route)
+		typeName := route.Payload.RawType
+		if typeName == "" {
+			typeName = "object"
 		}
-		params = append(params, fmt.Sprintf("%s %s", csharpType, toCamelCase(arg.Name)))
+		params = append(params, fmt.Sprintf("%s %s", typeName, name))
+	case scanner.PayloadNumeric:
+		name := payloadParamNameCS(route)
+		typeName := "uint"
+		// crude width mapping
+		if strings.HasPrefix(route.Payload.RawType, "int") && !strings.HasPrefix(route.Payload.RawType, "uint") {
+			typeName = "int"
+		} else if strings.HasPrefix(route.Payload.RawType, "uint") {
+			typeName = "uint"
+		}
+		if !route.Payload.Required {
+			typeName += "?"
+		}
+		params = append(params, fmt.Sprintf("%s %s", typeName, name))
+	case scanner.PayloadString:
+		name := payloadParamNameCS(route)
+		typeName := "string"
+		if !route.Payload.Required {
+			typeName += "?"
+		}
+		params = append(params, fmt.Sprintf("%s %s", typeName, name))
 	}
-
 	if len(params) == 0 {
 		return ""
 	}
-
 	return strings.Join(params, ", ") + ", "
+}
+
+func payloadParamNameCS(route scanner.RouteInfo) string {
+	if route.Payload.Kind == scanner.PayloadNone {
+		return ""
+	}
+	hint := route.Payload.ParserHint
+	if hint == "" {
+		return "payload"
+	}
+	switch route.Payload.Kind {
+	case scanner.PayloadNumeric:
+		if strings.Contains(strings.ToLower(hint), "id") || strings.HasPrefix(hint, "uint") || strings.HasPrefix(hint, "int") {
+			return "id"
+		}
+		return "value"
+	case scanner.PayloadJSON:
+		if route.Payload.RawType != "" {
+			return toCamelCase(route.Payload.RawType)
+		}
+		return "request"
+	case scanner.PayloadString:
+		return "value"
+	}
+	return "payload"
 }

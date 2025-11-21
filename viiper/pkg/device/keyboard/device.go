@@ -5,9 +5,9 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"viiper/pkg/device"
 	"viiper/pkg/usb"
 	"viiper/pkg/usbip"
-	"viiper/pkg/virtualbus"
 )
 
 // Keyboard implements the Device interface for a full HID keyboard with LED support.
@@ -17,11 +17,23 @@ type Keyboard struct {
 	stateMu     sync.Mutex
 	ledState    uint8
 	ledCallback func(LEDState)
+	descriptor  usb.Descriptor
 }
 
 // New returns a new Keyboard device.
-func New() *Keyboard {
-	return &Keyboard{}
+func New(o *device.CreateOptions) *Keyboard {
+	d := &Keyboard{
+		descriptor: defaultDescriptor,
+	}
+	if o != nil {
+		if o.IdProduct != nil {
+			d.descriptor.Device.IDProduct = *o.IdProduct
+		}
+		if o.IdProduct != nil {
+			d.descriptor.Device.IDProduct = *o.IdProduct
+		}
+	}
+	return d
 }
 
 // SetLEDCallback sets a callback that will be invoked when LED state changes.
@@ -136,7 +148,7 @@ var hidReportDescriptor = []byte{
 }
 
 // Descriptor defines the static USB descriptor for the keyboard.
-var Descriptor = virtualbus.DeviceDescriptor{
+var defaultDescriptor = usb.Descriptor{
 	Device: usb.DeviceDescriptor{
 		BcdUSB:             0x0200,
 		BDeviceClass:       0x00,
@@ -152,7 +164,7 @@ var Descriptor = virtualbus.DeviceDescriptor{
 		BNumConfigurations: 0x01,
 		Speed:              2, // Full speed
 	},
-	Interfaces: []virtualbus.InterfaceConfig{
+	Interfaces: []usb.InterfaceConfig{
 		{
 			Descriptor: usb.InterfaceDescriptor{
 				BInterfaceNumber:   0x00,
@@ -197,6 +209,6 @@ var Descriptor = virtualbus.DeviceDescriptor{
 	},
 }
 
-func (k *Keyboard) GetDeviceDescriptor() virtualbus.DeviceDescriptor {
-	return Descriptor
+func (k *Keyboard) GetDescriptor() *usb.Descriptor {
+	return &k.descriptor
 }

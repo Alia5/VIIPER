@@ -85,7 +85,8 @@ var buses = await client.BusListAsync();
 uint busId;
 if (buses.Buses.Length == 0)
 {
-    var resp = await client.BusCreateAsync("my-bus");
+    var resp = await client.BusCreateAsync(null); // null = auto-assign ID
+    // Or specify ID: await client.BusCreateAsync(5);
     busId = resp.BusID;
 }
 else
@@ -94,11 +95,11 @@ else
 }
 
 // Add device and connect
-var addResp = await client.BusDeviceAddAsync(busId, "keyboard");
-var deviceId = addResp.ID.Split('-')[1]; // Extract device ID from "busId-devId"
-var device = await client.ConnectDeviceAsync(busId, deviceId);
+var deviceReq = new DeviceCreateRequest { Type = "keyboard" };
+var deviceResp = await client.BusDeviceAddAsync(busId, deviceReq);
+var device = await client.ConnectDeviceAsync(busId, deviceResp.DevId);
 
-Console.WriteLine($"Connected to device {addResp.ID}");
+Console.WriteLine($"Connected to device {deviceResp.BusID}-{deviceResp.DevId}");
 
 // Send keyboard input
 var input = new KeyboardInput
@@ -110,7 +111,7 @@ var input = new KeyboardInput
 await device.SendAsync(input);
 
 // Cleanup
-await client.BusDeviceRemoveAsync(busId, deviceId);
+await client.BusDeviceRemoveAsync(busId, deviceResp.DevId);
 ```
 
 ## Device Stream API
@@ -120,9 +121,21 @@ await client.BusDeviceRemoveAsync(busId, deviceId);
 The simplest way to add a device and connect:
 
 ```csharp
-var addResp = await client.BusDeviceAddAsync(busId, "xbox360");
-var deviceId = addResp.ID.Split('-')[1];
-var device = await client.ConnectDeviceAsync(busId, deviceId);
+var deviceReq = new DeviceCreateRequest { Type = "xbox360" };
+var deviceResp = await client.BusDeviceAddAsync(busId, deviceReq);
+var device = await client.ConnectDeviceAsync(busId, deviceResp.DevId);
+```
+
+With custom VID/PID:
+
+```csharp
+var deviceReq = new DeviceCreateRequest { 
+    Type = "keyboard", 
+    IdVendor = 0x1234, 
+    IdProduct = 0x5678 
+};
+var deviceResp = await client.BusDeviceAddAsync(busId, deviceReq);
+var device = await client.ConnectDeviceAsync(busId, deviceResp.DevId);
 ```
 
 Or connect to an existing device:

@@ -18,15 +18,15 @@ func BusDevicesList(s *usb.Server) api.HandlerFunc {
 	return func(req *api.Request, res *api.Response, logger *slog.Logger) error {
 		idStr, ok := req.Params["id"]
 		if !ok {
-			return fmt.Errorf("missing id")
+			return api.ErrBadRequest("missing id parameter")
 		}
 		busID, err := strconv.ParseUint(idStr, 10, 32)
 		if err != nil {
-			return err
+			return api.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
 		}
 		b := s.GetBus(uint32(busID))
 		if b == nil {
-			return fmt.Errorf("unknown bus")
+			return api.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
 		}
 		metas := b.GetAllDeviceMetas()
 		out := make([]apitypes.Device, 0, len(metas))
@@ -35,14 +35,14 @@ func BusDevicesList(s *usb.Server) api.HandlerFunc {
 			out = append(out, apitypes.Device{
 				BusID: m.Meta.BusId,
 				DevId: fmt.Sprintf("%d", m.Meta.DevId),
-				Vid:   fmt.Sprintf("0x%04x", m.Desc.Device.IDVendor),
-				Pid:   fmt.Sprintf("0x%04x", m.Desc.Device.IDProduct),
+				Vid:   fmt.Sprintf("0x%04x", m.Dev.GetDescriptor().Device.IDVendor),
+				Pid:   fmt.Sprintf("0x%04x", m.Dev.GetDescriptor().Device.IDProduct),
 				Type:  dtype,
 			})
 		}
 		payload, err := json.Marshal(apitypes.DevicesListResponse{Devices: out})
 		if err != nil {
-			return err
+			return api.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))
 		}
 		res.JSON = string(payload)
 		return nil
