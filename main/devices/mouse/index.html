@@ -1369,9 +1369,14 @@ You don't need to manually construct packets, just use the provided types and se
 </ul>
 <p>Buttons persist until changed; motion/wheel deltas are applied once and reset.</p>
 <h2 id="adding-the-device">Adding the device</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bus/create
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>bus/1/add mouse
+<p>Using the raw API (see <a href="../../api/overview/">API Reference</a> for details):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Create a bus</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/create\n\n&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Add mouse device with JSON payload</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;bus/1/add {&quot;type&quot;:&quot;mouse&quot;}\n\n&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
 </code></pre></div>
+<p>Or use one of the <a href="../../clients/generator/">client SDKs</a> which handle the protocol automatically.</p>
 <h2 id="examples">Examples</h2>
 <p>A runnable example that periodically moves the mouse a short distance, clicks, and scrolls is provided in <code>examples/virtual_mouse/</code>.</p>
 
