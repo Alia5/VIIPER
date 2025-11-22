@@ -16,22 +16,6 @@ import (
 
 func main() {
 
-	findUserConfig := func(args []string) string {
-		for i := 0; i < len(args); i++ {
-			a := args[i]
-			if strings.HasPrefix(a, "--config=") {
-				return a[len("--config="):]
-			}
-			if a == "--config" && i+1 < len(args) {
-				return args[i+1]
-			}
-		}
-		if v := os.Getenv("VIIPER_CONFIG"); v != "" {
-			return v
-		}
-		return ""
-	}
-
 	userCfg := findUserConfig(os.Args[1:])
 	jsonPaths, yamlPaths, tomlPaths := configpaths.ConfigCandidatePaths(userCfg)
 
@@ -78,4 +62,20 @@ func main() {
 
 	err = ctx.Run()
 	ctx.FatalIfErrorf(err)
+}
+
+func findUserConfig(args []string) string {
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		if strings.HasPrefix(a, "--config=") {
+			return a[len("--config="):]
+		}
+		if a == "--config" && i+1 < len(args) {
+			return args[i+1]
+		}
+	}
+	if v := os.Getenv("VIIPER_CONFIG"); v != "" {
+		return v
+	}
+	return ""
 }
