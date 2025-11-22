@@ -140,6 +140,11 @@ Proxy mode sits between a USBIP client and a USBIP server (like a Linux machine 
 VIIPER intercepts and logs all USB traffic passing through, without handling the devices directly.  
 Useful for reverse engineering USB protocols and understanding how devices communicate.
 
+### What about TCP overhead or input latency performance?
+
+End-to-end input latency for virtual devices created with VIIPER is typically well below 1 millisecond on a modern desktop (e.g. Windows / Ryzen 3900X test machine).  
+Detailed methodology and sample runs can be found in [E2E Latency Benchmarks](docs/testing/e2e_latency.md).
+
 ## 📄 License
 
 ```license

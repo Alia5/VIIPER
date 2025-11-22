@@ -24,7 +24,10 @@ type Server struct {
 func (s *Server) Run(logger *slog.Logger, rawLogger log.RawLogger) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+	return s.StartServer(ctx, logger, rawLogger)
+}
 
+func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger log.RawLogger) error {
 	s.UsbServerConfig.ConnectionTimeout = s.ConnectionTimeout
 	s.ApiServerConfig.ConnectionTimeout = s.ConnectionTimeout
 

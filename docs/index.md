@@ -43,3 +43,9 @@ All devices _**can and must be**_ controlled programmatically via an API.
 - ✅ API server for device/bus management and controlling virtual devices programmatically
 - ✅ Multiple client SDKs for easy integration; see [Client SDKs](api/overview.md)  
   MIT Licensed
+
+---
+
+### Additional Resources / Misc
+
+- [E2E Latency Benchmarks](testing/e2e_latency.md)

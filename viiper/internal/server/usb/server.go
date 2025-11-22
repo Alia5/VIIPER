@@ -383,7 +383,7 @@ type logConn struct {
 
 func (lc *logConn) Read(p []byte) (int, error) {
 	n, err := lc.Conn.Read(p)
-	if n > 0 {
+	if n > 0 && lc.s.rawLogger != nil {
 		lc.s.rawLogger.Log(true, p[:n])
 	}
 	return n, err
@@ -391,7 +391,7 @@ func (lc *logConn) Read(p []byte) (int, error) {
 
 func (lc *logConn) Write(p []byte) (int, error) {
 	n, err := lc.Conn.Write(p)
-	if n > 0 {
+	if n > 0 && lc.s.rawLogger != nil {
 		lc.s.rawLogger.Log(false, p[:n])
 	}
 	return n, err
