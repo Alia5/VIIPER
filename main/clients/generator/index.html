@@ -1601,11 +1601,10 @@
 <p>All generated client SDKs are licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects. The core VIIPER server remains under its original license.</p>
 </div>
 <h2 id="running-the-generator">Running the Generator</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>viiper
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all<span class="w">     </span><span class="c1"># Generate all SDKs</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c<span class="w">       </span><span class="c1"># Generate C SDK only</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp<span class="w">  </span><span class="c1"># Generate C# SDK only</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript<span class="w"> </span><span class="c1"># Generate TypeScript SDK only</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all<span class="w">        </span><span class="c1"># Generate all SDKs</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c<span class="w">          </span><span class="c1"># Generate C SDK only</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp<span class="w">     </span><span class="c1"># Generate C# SDK only</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript<span class="w"> </span><span class="c1"># Generate TypeScript SDK only</span>
 </code></pre></div>
 <p><strong>Output directory</strong>: <code>clients/</code> (relative to repository root)</p>
 <h2 id="comment-tag-system">Comment Tag System</h2>
@@ -1629,7 +1628,7 @@
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">type</span><span class="w"> </span><span class="nx">InputState</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <h3 id="constant-and-map-export">Constant and Map Export</h3>
-<p>The generator automatically exports all constants and map literals from <code>pkg/device/*/const.go</code> for each device type.<br />
+<p>The generator automatically exports all constants and map literals from <code>/device/*/const.go</code> for each device type.<br />
 No special tags are required. Exported Go constants and maps are emitted with language-appropriate representations:</p>
 <ul>
 <li><strong>Constants</strong>: Grouped into enums (C#/TS) or <code>#define</code> macros (C) based on common prefixes</li>
@@ -1639,10 +1638,10 @@ No special tags are required. Exported Go constants and maps are emitted with la
 <p><strong>Scan Phase:</strong>  </p>
 <ol>
 <li>Parse API routes from <code>internal/server/api/*.go</code>  </li>
-<li>Reflect response DTOs from <code>pkg/apitypes/*.go</code>  </li>
+<li>Reflect response DTOs from <code>/apitypes/*.go</code>  </li>
 <li>Find device types via <code>RegisterDevice()</code> calls  </li>
 <li>Parse <code>viiper:wire</code> comments for packet layouts  </li>
-<li>Extract all exported constants and map literals from <code>pkg/device/*/const.go</code> (automatic)</li>
+<li>Extract all exported constants and map literals from <code>/device/*/const.go</code> (automatic)</li>
 </ol>
 <p><strong>Emit Phase:</strong><br />
 For each language, generate management client, DTO types, device streams, constants, and build configs.</p>
@@ -1688,7 +1687,7 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="cp">#pragma pack(pop)</span>
 </code></pre></div>
 <h2 id="example-constant-and-map-export">Example: Constant and Map Export</h2>
-<p><strong>Go source (<code>pkg/device/keyboard/const.go</code>):</strong></p>
+<p><strong>Go source (<code>/device/keyboard/const.go</code>):</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nx">ModLeftCtrl</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="mh">0x01</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nx">ModLeftShift</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x02</span>
@@ -1747,9 +1746,9 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <h2 id="regeneration-triggers">Regeneration Triggers</h2>
 <p>Run codegen when any of these change:</p>
 <ul>
-<li><code>pkg/apitypes/*.go</code>: API response structures</li>
-<li><code>pkg/device/*/inputstate.go</code>: Wire tag annotations</li>
-<li><code>pkg/device/*/const.go</code>: Exported constants and map literals</li>
+<li><code>/apitypes/*.go</code>: API response structures</li>
+<li><code>/device/*/inputstate.go</code>: Wire tag annotations</li>
+<li><code>/device/*/const.go</code>: Exported constants and map literals</li>
 <li><code>internal/server/api/*.go</code>: Route registrations</li>
 <li><code>internal/codegen/generator/**/*.go</code>: Generator templates</li>
 <li><code>internal/codegen/scanner/**/*.go</code>: Scanner logic (constants, maps, wire tags)</li>

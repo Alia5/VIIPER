@@ -1497,12 +1497,12 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Sourcecode access is required</p>
-<p>The codegen command requires access to VIIPER source code. It must be executed from the <code>viiper/</code> module directory within the repository.</p>
+<p>The codegen command requires access to VIIPER source code. Run it from the repository root.</p>
 </div>
 <h2 id="flags">Flags</h2>
 <h3 id="-output"><code>--output</code></h3>
 <p>Output directory for generated SDKs (relative to repository root).</p>
-<p><strong>Default:</strong> <code>../clients</code><br />
+<p><strong>Default:</strong> <code>clients</code><br />
 <strong>Environment Variable:</strong> <code>VIIPER_CODEGEN_OUTPUT</code></p>
 <p><strong>Example:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--output<span class="o">=</span>../sdk-output
@@ -1527,21 +1527,19 @@
 </code></pre></div>
 <h2 id="examples">Examples</h2>
 <h3 id="generate-all-sdks">Generate All SDKs</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>viiper
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen
 </code></pre></div>
 <h3 id="generate-c-sdk-and-rebuild-examples">Generate C SDK and Rebuild Examples</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>viiper
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">cd</span><span class="w"> </span>../examples/c
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--config<span class="w"> </span>Release
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>examples/c
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--config<span class="w"> </span>Release
 </code></pre></div>
 <h2 id="when-to-regenerate">When to Regenerate</h2>
 <p>Run codegen when any of these change:</p>
 <ul>
-<li><code>pkg/apitypes/*.go</code>: API response structures</li>
-<li><code>pkg/device/*/inputstate.go</code>: Wire format annotations</li>
-<li><code>pkg/device/*/const.go</code>: Exported constants</li>
+<li><code>/apitypes/*.go</code>: API response structures</li>
+<li><code>/device/*/inputstate.go</code>: Wire format annotations</li>
+<li><code>/device/*/const.go</code>: Exported constants</li>
 <li><code>internal/server/api/*.go</code>: Route registrations</li>
 <li>Generator templates in <code>internal/codegen/generator/</code></li>
 </ul>

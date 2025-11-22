@@ -1619,7 +1619,7 @@ Failures (missing tool, non-zero exit) are logged but do not affect the API resp
 </ul>
 </li>
 </ul>
-<p>See <code>pkg/device/xbox360/protocol.go</code> for full details.</p>
+<p>See <code>/device/xbox360/protocol.go</code> for full details.</p>
 <h4 id="hid-keyboard-stream-device-type-keyboard">HID keyboard stream (device type: <code>keyboard</code>)</h4>
 <p>Direction: client ➜ server (keys pressed)</p>
 <ul>
@@ -1637,7 +1637,7 @@ Failures (missing tool, non-zero exit) are logged but do not affect the API resp
 </li>
 </ul>
 <p>Host-facing HID input report is 34 bytes: [Modifiers (1), Reserved (1), 256-bit key bitmap (32)].</p>
-<p>See <code>pkg/device/keyboard/</code> for helpers and constants.</p>
+<p>See <code>/device/keyboard/</code> for helpers and constants.</p>
 <h4 id="hid-mouse-stream-device-type-mouse">HID mouse stream (device type: <code>mouse</code>)</h4>
 <p>Direction: client ➜ server (motion/buttons)</p>
 <ul>
@@ -1715,7 +1715,7 @@ Failures (missing tool, non-zero exit) are logged but do not affect the API resp
 <a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nb">string</span><span class="p">(</span><span class="nx">resp</span><span class="p">))</span><span class="w"> </span><span class="c1">// {&quot;busId&quot;:1}\n</span>
 <a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="p">}</span>
 </code></pre></div>
-<p>For a higher-level experience, see the Go client in <code>pkg/apiclient/</code>.</p>
+<p>For a higher-level experience, see the Go client in <code>/apiclient/</code>.</p>
 <h2 id="how-this-relates-to-usbip">How this relates to USBIP</h2>
 <p>The API controls which virtual devices exist and exposes a device stream for live input/feedback. Separately, the USBIP server (default <code>:3241</code>) makes these devices attachable from clients. Typical flow:</p>
 <p>1) Create a bus ➜ 2) Add a device ➜ 3) Connect the device stream ➜ 4) Attach using USBIP by <code>busid</code> (see the Server command page for syntax).</p>

@@ -2033,10 +2033,9 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <h3 id="3-generating-from-source-advanced-contributors">3. Generating from Source (Advanced / Contributors)</h3>
 <p>Only required when enhancing VIIPER itself:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>viiper
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">cd</span><span class="w"> </span>../clients/csharp
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>dotnet<span class="w"> </span>build<span class="w"> </span>-c<span class="w"> </span>Release<span class="w"> </span>Viiper.Client
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>clients/csharp
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>dotnet<span class="w"> </span>build<span class="w"> </span>-c<span class="w"> </span>Release<span class="w"> </span>Viiper.Client
 </code></pre></div>
 <h2 id="quick-start">Quick Start</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">using</span><span class="w"> </span><span class="nn">Viiper.Client</span><span class="p">;</span>
@@ -2341,26 +2340,26 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>│   ├── BusCreateResponse.cs
 <a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>│   └── ...
 <a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>└── Devices/
-<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>    ├── Keyboard/
-<a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a>    │   ├── KeyboardInput.cs     # Wire format struct
-<a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a>    │   └── KeyboardConstants.cs # Enums + maps
-<a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a>    ├── Mouse/
-<a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a>    │   ├── MouseInput.cs
-<a id="__codelineno-31-14" name="__codelineno-31-14" href="#__codelineno-31-14"></a>    │   └── MouseConstants.cs
-<a id="__codelineno-31-15" name="__codelineno-31-15" href="#__codelineno-31-15"></a>    └── Xbox360/
-<a id="__codelineno-31-16" name="__codelineno-31-16" href="#__codelineno-31-16"></a>        ├── Xbox360Input.cs
-<a id="__codelineno-31-17" name="__codelineno-31-17" href="#__codelineno-31-17"></a>        ├── Xbox360Output.cs
-<a id="__codelineno-31-18" name="__codelineno-31-18" href="#__codelineno-31-18"></a>        └── Xbox360Constants.cs
+<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>        ├── Keyboard/
+<a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a>        │   ├── KeyboardInput.cs     # Wire format struct
+<a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a>        │   └── KeyboardConstants.cs # Enums + maps
+<a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a>        ├── Mouse/
+<a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a>        │   ├── MouseInput.cs
+<a id="__codelineno-31-14" name="__codelineno-31-14" href="#__codelineno-31-14"></a>        │   └── MouseConstants.cs
+<a id="__codelineno-31-15" name="__codelineno-31-15" href="#__codelineno-31-15"></a>        └── Xbox360/
+<a id="__codelineno-31-16" name="__codelineno-31-16" href="#__codelineno-31-16"></a>                ├── Xbox360Input.cs
+<a id="__codelineno-31-17" name="__codelineno-31-17" href="#__codelineno-31-17"></a>                ├── Xbox360Output.cs
+<a id="__codelineno-31-18" name="__codelineno-31-18" href="#__codelineno-31-18"></a>                └── Xbox360Constants.cs
 </code></pre></div>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <p><strong>Build Errors:</strong></p>
-<p>Ensure you have .NET 8.0 SDK installed:
+<p>Ensure you have .NET 8.0 SDK installed:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>dotnet<span class="w"> </span>--version<span class="w">  </span><span class="c1"># Should be 8.0 or higher</span>
 </code></pre></div>
-<strong>Nullable Reference Warnings:</strong></p>
+<p><strong>Nullable Reference Warnings:</strong></p>
 <p>The generated code uses nullable annotations. You may see warnings like CS8601/CS8625. These are safe to ignore or suppress in your project file:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nt">&lt;PropertyGroup&gt;</span>
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span><span class="nt">&lt;NoWarn&gt;</span>$(NoWarn);CS8601;CS8625<span class="nt">&lt;/NoWarn&gt;</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">    </span><span class="nt">&lt;NoWarn&gt;</span>$(NoWarn);CS8601;CS8625<span class="nt">&lt;/NoWarn&gt;</span>
 <a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="nt">&lt;/PropertyGroup&gt;</span>
 </code></pre></div>
 <h2 id="see-also">See Also</h2>

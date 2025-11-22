@@ -1328,7 +1328,7 @@
 <li>Device type id (for API add): <code>xbox360</code></li>
 </ul>
 <h2 id="client-sdk-support">Client SDK Support</h2>
-<p>The wire protocol is abstracted by client SDKs. The <strong>Go client</strong> includes built-in types (<code>pkg/device/xbox360</code>), and <strong>generated SDKs</strong> provide equivalent structures with proper packing.<br />
+<p>The wire protocol is abstracted by client SDKs. The <strong>Go client</strong> includes built-in types (<code>/device/xbox360</code>), and <strong>generated SDKs</strong> provide equivalent structures with proper packing.<br />
 You don't need to manually construct packets, just use the provided types and send them via the device stream.</p>
 <p>See: <a href="../../clients/go/">Go Client</a>, <a href="../../clients/generator/">Generated SDKs</a></p>
 <h2 id="adding-the-device">Adding the device</h2>
@@ -1355,7 +1355,7 @@ You don't need to manually construct packets, just use the provided types and se
 <li>2-byte packets:</li>
 <li>LeftMotor: uint8, RightMotor: uint8</li>
 </ul>
-<p>See <code>pkg/device/xbox360/inputstate.go</code> for details.</p>
+<p>See <code>/device/xbox360/inputstate.go</code> for details.</p>
 <h2 id="example">Example</h2>
 <p>A minimal example program that sends input and reads rumble is provided in <code>examples/</code>.</p>
 
