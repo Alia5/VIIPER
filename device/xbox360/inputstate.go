@@ -18,33 +18,32 @@ type InputState struct {
 	RX, RY int16
 }
 
-// BuildReport encodes an InputState into the 20-byte Xbox 360 USB report
-// layout used by the wired controller.
+// BuildReport encodes an InputState into the 20-byte Xbox 360 wired USB input report.
+// Layout (indices in the returned slice):
 //
-// Bytes:
-//
-//	0: 0x00 (report id/message)
-//	1: 0x14 (payload size 20)
-//	2-7: buttons/reserved (we use first two bytes for button bitfield)
-//	8: LT (0-255)
-//	9: RT (0-255)
-//
-// 10-11: LX (LE int16)
-// 12-13: LY (LE int16)
-// 14-15: RX (LE int16)
-// 16-17: RY (LE int16)
-// 18-19: reserved 0x00
+//	 0: 0x00              - Report ID
+//	 1: 0x14              - Payload size (20 bytes)
+//	 2: Buttons (low byte)
+//	 3: Buttons (high byte)
+//	 4: LT (0-255)
+//	 5: RT (0-255)
+//	 6-7: LX (little-endian int16)
+//	 8-9: LY (little-endian int16)
+//	10-11: RX (little-endian int16)
+//	12-13: RY (little-endian int16)
+//	14-19: Reserved / zero
 func (st InputState) BuildReport() []byte {
 	b := make([]byte, 20)
 	b[0] = 0x00
 	b[1] = 0x14
 	binary.LittleEndian.PutUint16(b[2:4], uint16(st.Buttons&0xffff))
-	b[8] = st.LT
-	b[9] = st.RT
-	binary.LittleEndian.PutUint16(b[10:12], uint16(st.LX))
-	binary.LittleEndian.PutUint16(b[12:14], uint16(st.LY))
-	binary.LittleEndian.PutUint16(b[14:16], uint16(st.RX))
-	binary.LittleEndian.PutUint16(b[16:18], uint16(st.RY))
+	b[4] = st.LT
+	b[5] = st.RT
+	binary.LittleEndian.PutUint16(b[6:8], uint16(st.LX))
+	binary.LittleEndian.PutUint16(b[8:10], uint16(st.LY))
+	binary.LittleEndian.PutUint16(b[10:12], uint16(st.RX))
+	binary.LittleEndian.PutUint16(b[12:14], uint16(st.RY))
+	// Remaining bytes (14-19) are left zeroed
 	return b
 }
 

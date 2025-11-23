@@ -10,12 +10,11 @@ import (
 	"github.com/Alia5/VIIPER/usbip"
 )
 
-// Xbox360 implements only the minimal Device interface.
 type Xbox360 struct {
 	tick       uint64
 	inputState *InputState
 	stateMu    sync.Mutex
-	rumbleFunc func(XRumbleState) // called when rumble commands arrive
+	rumbleFunc func(XRumbleState)
 	descriptor usb.Descriptor
 }
 
@@ -66,10 +65,15 @@ func (x *Xbox360) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
 		}
 	}
 	if dir == usbip.DirOut && ep == 1 {
-		if len(out) >= 8 {
+		// Host->Device output reports used by the wired Xbox 360 controller include
+		// an 8-byte rumble packet: [0]=ReportID(0x00), [1]=Len(0x08), [2]=Reserved/Status(0x00),
+		// [3]=Left (low-frequency/large) motor 0-255, [4]=Right (high-frequency/small) motor 0-255,
+		// [5..7]=Reserved (often 0x00).
+		// Some other outbound reports (e.g. LED control) use different IDs/lengths; we ignore those here.
+		if len(out) >= 8 && out[0] == 0x00 && out[1] == 0x08 {
 			rumble := XRumbleState{
-				LeftMotor:  out[3],
-				RightMotor: out[4],
+				LeftMotor:  out[3], // big / low-frequency motor
+				RightMotor: out[4], // small / high-frequency motor
 			}
 			if x.rumbleFunc != nil {
 				x.rumbleFunc(rumble)
