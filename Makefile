@@ -39,7 +39,7 @@ COMMIT := $(shell git rev-parse --short HEAD 2>$(NULL_DEVICE) || echo unknown)
 BUILD_TIME := $(shell $(DATE_CMD))
 
 # Go build flags
-LDFLAGS := -s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.buildTime=$(BUILD_TIME) -X github.com/Alia5/VIIPER/internal/codegen/common.Version=$(VERSION)
+LDFLAGS := -s -w -X main.Version=$(VERSION) -X main.Commit=$(COMMIT) -X main.Date=$(BUILD_TIME) -X github.com/Alia5/VIIPER/internal/codegen/common.Version=$(VERSION)
 BUILD_FLAGS := -trimpath -ldflags "$(LDFLAGS)"
 
 # Windows resource embedding
