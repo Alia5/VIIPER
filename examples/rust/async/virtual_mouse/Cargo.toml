@@ -1,0 +1,8 @@
+[package]
+name = "async_virtual_mouse"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+viiper-client = { workspace = true, features = ["async"] }
+tokio = { workspace = true }

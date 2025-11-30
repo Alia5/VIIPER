@@ -1,0 +1,7 @@
+[package]
+name = "virtual_x360_pad"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+viiper-client = { workspace = true }

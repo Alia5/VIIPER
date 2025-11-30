@@ -1,0 +1,15 @@
+[workspace]
+members = [
+    "sync/virtual_keyboard",
+    "sync/virtual_mouse",
+    "sync/virtual_x360_pad",
+    "async/virtual_keyboard",
+    "async/virtual_mouse",
+    "async/virtual_x360_pad",
+]
+
+resolver = "2"
+
+[workspace.dependencies]
+viiper-client = { path = "../../clients/rust" }
+tokio = { version = "1.0", features = ["full"] }

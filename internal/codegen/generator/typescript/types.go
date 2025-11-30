@@ -17,7 +17,7 @@ const dtoTemplateTS = `{{writeFileHeaderTS}}
 // Management API DTO interfaces
 
 {{range .DTOs}}
-// {{.Name}} DTO for management API
+// {{.Name}} DTO
 export interface {{.Name}} {
 {{- range .Fields}}
   {{.JSONName}}{{if .Optional}}?{{end}}: {{fieldTypeToTS .}};

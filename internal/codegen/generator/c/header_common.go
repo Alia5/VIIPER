@@ -89,7 +89,7 @@ VIIPER_API void viiper_free_{{snakecase .Name}}(viiper_{{snakecase .Name}}_t* v)
  * Client API
  * ======================================================================== */
 
-/* Create a VIIPER client handle (no persistent connection for management API) */
+/* Create a VIIPER client handle */
 VIIPER_API viiper_error_t viiper_client_create(
     const char* host,
     uint16_t port,

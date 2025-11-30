@@ -151,6 +151,41 @@ jobs:
           echo "Publishing NuGet package: $NUPKG"
           dotnet nuget push "$NUPKG" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
+      - name: Set up Rust (for crates.io publish)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish Rust SDK to crates.io
+        working-directory: release_files
+        shell: bash
+        run: |
+          set -euo pipefail
+          CRATE="viiper-rust-sdk.crate"
+          if [ ! -f "$CRATE" ]; then
+            echo "ERROR: Missing Rust SDK crate: $CRATE" >&2
+            ls -la
+            exit 1
+          fi
+          echo "Extracting crate to publish..."
+          mkdir -p ../rust-publish
+          tar -xzf "$CRATE" -C ../rust-publish
+          CRATE_DIR=$(ls -d ../rust-publish/viiper-client-*)
+          cd "$CRATE_DIR"
+          CRATE_VERSION=$(grep '^version' Cargo.toml | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+          CRATE_NAME="viiper-client"
+          if [ -z "$CRATE_VERSION" ]; then
+            echo "ERROR: Failed to extract version from Cargo.toml" >&2
+            exit 1
+          fi
+          echo "Crate version: $CRATE_VERSION"
+          echo "Crate name: $CRATE_NAME"
+          echo "Checking if $CRATE_NAME@$CRATE_VERSION already exists on crates.io..."
+          if cargo search "$CRATE_NAME" 2>/dev/null | grep -q "^$CRATE_NAME = \"$CRATE_VERSION\""; then
+            echo "Crate $CRATE_NAME@$CRATE_VERSION already exists. Skipping cargo publish (idempotent re-run)."
+            exit 0
+          fi
+          echo "Publishing crate with OIDC trusted publishing..."
+          cargo publish --allow-dirty
+
       - name: Extract build info
         id: build_info
         shell: bash

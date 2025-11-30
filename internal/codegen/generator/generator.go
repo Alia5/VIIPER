@@ -8,6 +8,7 @@ import (
 
 	cgen "github.com/Alia5/VIIPER/internal/codegen/generator/c"
 	"github.com/Alia5/VIIPER/internal/codegen/generator/csharp"
+	"github.com/Alia5/VIIPER/internal/codegen/generator/rust"
 	"github.com/Alia5/VIIPER/internal/codegen/generator/typescript"
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 	"github.com/Alia5/VIIPER/internal/codegen/scanner"
@@ -25,6 +26,7 @@ type LanguageGenerator func(logger *slog.Logger, outputDir string, md *meta.Meta
 var generators = map[string]LanguageGenerator{
 	"c":          cgen.Generate,
 	"csharp":     csharp.Generate,
+	"rust":       rust.Generate,
 	"typescript": typescript.Generate,
 }
 

@@ -504,6 +504,7 @@ The generated code uses nullable annotations. You may see warnings like CS8601/C
 
 - [Generator Documentation](generator.md): How generated SDKs work
 - [Go SDK Documentation](go.md): Reference implementation patterns
+- [Rust SDK Documentation](rust.md): Rust SDK with sync/async support
 - [TypeScript SDK Documentation](typescript.md): Node.js SDK
 - [C SDK Documentation](c.md): Alternative SDK for native integration
 - [API Overview](../api/overview.md): Management API reference

@@ -102,6 +102,26 @@ jobs:
         run: |
           cmake -S examples/c -B examples/c/build
           cmake --build examples/c/build --config Release --parallel
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Rust SDK (smoke)
+        working-directory: clients/rust
+        run: |
+          cargo build --release
+          cargo build --release --features async
+
+      - name: Package Rust SDK
+        working-directory: clients/rust
+        run: |
+          cargo package --allow-dirty --no-verify
+
+      - name: Build Rust examples (smoke)
+        working-directory: examples/rust
+        run: |
+          cargo build --release
+
       - name: Rename TypeScript SDK tarball
         if: ${{ inputs.upload_artifacts }}
         working-directory: clients/typescript
@@ -138,4 +158,22 @@ jobs:
         with:
           name: c-sdk-source${{ inputs.artifact_suffix }}
           path: c-sdk-source${{ inputs.artifact_suffix }}.tar.gz
+          if-no-files-found: error
+
+      - name: Rename Rust SDK crate
+        if: ${{ inputs.upload_artifacts }}
+        working-directory: clients/rust/target/package
+        run: |
+          for file in viiper-client-*.crate; do
+            if [ -f "$file" ]; then
+              mv "$file" "viiper-client-rust-sdk${{ inputs.artifact_suffix }}.crate"
+            fi
+          done
+
+      - name: Upload Rust SDK crate
+        if: ${{ inputs.upload_artifacts }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-sdk${{ inputs.artifact_suffix }}
+          path: clients/rust/target/package/viiper-client-rust-sdk${{ inputs.artifact_suffix }}.crate
           if-no-files-found: error

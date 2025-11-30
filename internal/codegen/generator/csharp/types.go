@@ -18,7 +18,7 @@ namespace Viiper.Client.Types;
 
 {{range .DTOs}}
 /// <summary>
-/// {{.Name}} DTO for management API
+/// {{.Name}} DTO
 /// </summary>
 public class {{.Name}}
 {

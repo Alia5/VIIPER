@@ -232,5 +232,6 @@ Full working examples are available in the repository:
 - [Generator Documentation](generator.md): How generated SDKs work
 - [C SDK Documentation](c.md): Generated C SDK usage
 - [C# SDK Documentation](csharp.md): .NET SDK
+- [Rust SDK Documentation](rust.md): Rust SDK
 - [TypeScript SDK Documentation](typescript.md): Node.js SDK
 - [API Overview](../api/overview.md): Management API reference
