@@ -15,7 +15,6 @@ import (
 	"github.com/Alia5/VIIPER/device/keyboard"
 )
 
-// Minimal example: create a keyboard device, type "Hello!" + Enter every 5 seconds, monitor LEDs.
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: virtual_keyboard <api_addr>")
@@ -36,19 +35,13 @@ func main() {
 	var busID uint32
 	createdBus := false
 	if len(busesResp.Buses) == 0 {
-		var createErr error
-		for try := uint32(1); try <= 100; try++ {
-			if r, err := api.BusCreateCtx(ctx, try); err == nil {
-				busID = r.BusID
-				createdBus = true
-				break
-			}
-			createErr = err
-		}
-		if busID == 0 {
-			fmt.Printf("BusCreate failed: %v\n", createErr)
+		r, err := api.BusCreateCtx(ctx, 0)
+		if err != nil {
+			fmt.Printf("BusCreate failed: %v\n", err)
 			os.Exit(1)
 		}
+		busID = r.BusID
+		createdBus = true
 		fmt.Printf("Created bus %d\n", busID)
 	} else {
 		busID = busesResp.Buses[0]

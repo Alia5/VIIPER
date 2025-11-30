@@ -4,7 +4,6 @@ const { Xbox360Input, Button } = Xbox360;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// Minimal example: ensure a bus, create an xbox360 device, stream inputs, read rumble, clean up on exit.
 async function main() {
   if (process.argv.length < 3) {
     console.log("Usage: node virtual_x360_pad.js <api_addr>");
@@ -23,23 +22,15 @@ async function main() {
   let createdBus = false;
   
   if (busesResp.buses.length === 0) {
-    let createErr: any;
-    busID = 0;
-    for (let tryBus = 1; tryBus <= 100; tryBus++) {
-      try {
-        const r = await client.buscreate(tryBus);
-        busID = r.busId;
-        createdBus = true;
-        break;
-      } catch (err) {
-        createErr = err;
-      }
-    }
-    if (busID === 0) {
-      console.error(`BusCreate failed: ${createErr}`);
+    try {
+      const r = await client.buscreate();
+      busID = r.busId;
+      createdBus = true;
+      console.log(`Created bus ${busID}`);
+    } catch (err) {
+      console.error(`BusCreate failed: ${err}`);
       process.exit(1);
     }
-    console.log(`Created bus ${busID}`);
   } else {
     busID = Math.min(...busesResp.buses);
     console.log(`Using existing bus ${busID}`);

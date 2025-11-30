@@ -19,15 +19,18 @@ bool createdBus = false;
     var list = await client.BusListAsync();
     if (list.Buses.Length == 0)
     {
-        Exception? lastErr = null;
-        busId = 0;
-        for (uint i = 1; i <= 100; i++)
+        try
         {
-            try { var r = await client.BusCreateAsync(i); busId = r.BusID; createdBus = true; break; }
-            catch (Exception ex) { lastErr = ex; }
+            var r = await client.BusCreateAsync(null);
+            busId = r.BusID;
+            createdBus = true;
+            Console.WriteLine($"Created bus {busId}");
         }
-        if (busId == 0) { Console.WriteLine($"BusCreate failed: {lastErr}"); return; }
-        Console.WriteLine($"Created bus {busId}");
+        catch (Exception ex)
+        {
+            Console.WriteLine($"BusCreate failed: {ex}");
+            return;
+        }
     }
     else { busId = list.Buses.Min(); Console.WriteLine($"Using existing bus {busId}"); }
 }
