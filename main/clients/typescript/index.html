@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../csharp/">
+        <link rel="prev" href="../rust/">
       
       
         <link rel="next" href="../../devices/xbox360/">
@@ -919,6 +919,34 @@
     
   
     C# SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rust/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rust SDK
   
 
     
@@ -2027,7 +2055,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">KeyboardInput</span><span class="p">,</span><span class="w"> </span><span class="nx">Key</span><span class="p">,</span><span class="w"> </span><span class="nx">Mod</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Keyboard</span><span class="p">;</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1">// Connect to management API</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1">// Create new Viiper client</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ViiperClient</span><span class="p">(</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">3242</span><span class="p">);</span>
 <a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="c1">// Find or create a bus</span>
@@ -2182,12 +2210,8 @@ The core VIIPER server remains under its original license.</p>
 <p><strong>LED Flags:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Keyboard</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;viiperclient&quot;</span><span class="p">;</span>
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">LED</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Keyboard</span><span class="p">;</span>
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">LED</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Keyboard</span><span class="p">;</span>
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>
-<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">numLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">leds</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nx">LED</span><span class="p">.</span><span class="nx">NumLock</span><span class="p">)</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
-<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="kd">const</span><span class="w"> </span><span class="nx">capsLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">leds</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nx">LED</span><span class="p">.</span><span class="nx">CapsLock</span><span class="p">)</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">numLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">leds</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nx">LED</span><span class="p">.</span><span class="nx">NumLock</span><span class="p">)</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">capsLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">leds</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nx">LED</span><span class="p">.</span><span class="nx">CapsLock</span><span class="p">)</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="helper-maps">Helper Maps</h3>
 <p>The SDK generates useful lookup maps for working with keyboard input:</p>
@@ -2355,7 +2379,6 @@ The core VIIPER server remains under its original license.</p>
 <li>Connection refused / timeout: Verify VIIPER server is running and listening on the expected API port (default 3242). Ensure firewall/ACLs allow TCP connections.</li>
 <li>Unexpected response or parse errors: The VIIPER API uses null-byte (\x00) terminated requests. Use the provided SDK helper methods or ensure raw sockets append a null terminator when calling the server.</li>
 <li>Stream closed unexpectedly: Confirm the device stream was opened (device added and connected) and that the device handler did not time out (default 5s reconnect window). Check server logs for reasons.</li>
-<li>Device not appearing to OS: Remember you must attach the virtual device via USBIP (USB-IP server default port :3241) AFTER you create the device via the API (or enable auto-attach on local host).</li>
 <li>Use examples: See the repository examples in <code>examples/typescript/</code> for working end-to-end samples that demonstrate bus creation, device streams, and cleanup.</li>
 </ul>
 <h2 id="see-also">See Also</h2>
@@ -2363,6 +2386,7 @@ The core VIIPER server remains under its original license.</p>
 <li><a href="../generator/">Generator Documentation</a>: How generated SDKs work</li>
 <li><a href="../go/">Go SDK Documentation</a>: Reference implementation patterns</li>
 <li><a href="../csharp/">C# SDK Documentation</a>: Alternative managed language SDK</li>
+<li><a href="../rust/">Rust SDK Documentation</a>: Rust SDK with sync/async support</li>
 <li><a href="../c/">C SDK Documentation</a>: Alternative SDK for native integration</li>
 <li><a href="../../api/overview/">API Overview</a>: Management API reference</li>
 <li><a href="../devices/">Device Documentation</a>: Wire formats and device-specific details</li>
