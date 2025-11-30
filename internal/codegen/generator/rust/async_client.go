@@ -15,6 +15,7 @@ import (
 const asyncClientTemplate = `{{.Header}}
 use crate::error::{ProblemJson, ViiperError};
 use crate::types::*;
+use std::net::SocketAddr;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
@@ -22,16 +23,14 @@ use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 /// VIIPER management API client (asynchronous).
 #[cfg(feature = "async")]
 pub struct AsyncViiperClient {
-    addr: String,
+    addr: SocketAddr,
 }
 
 #[cfg(feature = "async")]
 impl AsyncViiperClient {
-    /// Create a new async VIIPER client connecting to the specified host and port.
-    pub fn new(host: impl Into<String>, port: u16) -> Self {
-        Self {
-            addr: format!("{}:{}", host.into(), port),
-        }
+    /// Create a new async VIIPER client connecting to the specified address.
+    pub fn new(addr: SocketAddr) -> Self {
+        Self { addr }
     }
 
     async fn do_request<T: for<'de> serde::Deserialize<'de>>(
@@ -39,7 +38,7 @@ impl AsyncViiperClient {
         path: &str,
         payload: Option<&str>,
     ) -> Result<T, ViiperError> {
-        let mut stream = TcpStream::connect(&self.addr).await?;
+        let mut stream = TcpStream::connect(self.addr).await?;
 
         stream.write_all(path.as_bytes()).await?;
         if let Some(p) = payload {
@@ -74,7 +73,7 @@ impl AsyncViiperClient {
 {{end}}{{end}}
     /// Connect to a device stream for sending input and receiving output.
     pub async fn connect_device(&self, bus_id: u32, dev_id: &str) -> Result<AsyncDeviceStream, ViiperError> {
-        AsyncDeviceStream::connect(&self.addr, bus_id, dev_id).await
+        AsyncDeviceStream::connect(self.addr, bus_id, dev_id).await
     }
 }
 
@@ -89,7 +88,7 @@ pub struct AsyncDeviceStream {
 
 #[cfg(feature = "async")]
 impl AsyncDeviceStream {
-    pub async fn connect(addr: &str, bus_id: u32, dev_id: &str) -> Result<Self, ViiperError> {
+    pub async fn connect(addr: SocketAddr, bus_id: u32, dev_id: &str) -> Result<Self, ViiperError> {
         let mut stream = TcpStream::connect(addr).await?;
         let handshake = format!("bus/{}/{}\0", bus_id, dev_id);
         stream.write_all(handshake.as_bytes()).await?;

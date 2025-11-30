@@ -127,7 +127,7 @@ func generateMethodParamsRust(route scanner.RouteInfo) string {
 func generatePathRust(route scanner.RouteInfo) string {
 	path := route.Path
 	if len(route.PathParams) == 0 {
-		return fmt.Sprintf(`"%s"`, path)
+		return fmt.Sprintf(`"%s".to_string()`, path)
 	}
 
 	var formatStr string
@@ -143,7 +143,7 @@ func generatePathRust(route scanner.RouteInfo) string {
 	if len(args) > 0 {
 		return fmt.Sprintf(`format!("%s", %s)`, formatStr, strings.Join(args, ", "))
 	}
-	return fmt.Sprintf(`"%s"`, path)
+	return fmt.Sprintf(`"%s".to_string()`, path)
 }
 
 func generatePayloadRust(route scanner.RouteInfo) string {

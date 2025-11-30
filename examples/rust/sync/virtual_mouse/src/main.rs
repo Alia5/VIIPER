@@ -10,16 +10,12 @@ fn main() {
         std::process::exit(1);
     }
 
-    let addr = &args[1];
-    let parts: Vec<&str> = addr.split(':').collect();
-    let host = parts[0];
-    let port = if parts.len() > 1 {
-        parts[1].parse().unwrap_or(3242)
-    } else {
-        3242
-    };
+    let addr: std::net::SocketAddr = args[1].parse().unwrap_or_else(|e| {
+        eprintln!("Invalid address '{}': {}", args[1], e);
+        std::process::exit(1);
+    });
 
-    let client = ViiperClient::new(host, port);
+    let client = ViiperClient::new(addr);
 
     // Find or create a bus
     let (bus_id, created_bus) = match client.bus_list() {

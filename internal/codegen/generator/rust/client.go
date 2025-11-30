@@ -16,19 +16,17 @@ const clientTemplate = `{{.Header}}
 use crate::error::{ProblemJson, ViiperError};
 use crate::types::*;
 use std::io::{Read, Write};
-use std::net::TcpStream;
+use std::net::{SocketAddr, TcpStream};
 
 /// VIIPER management API client (synchronous).
 pub struct ViiperClient {
-    addr: String,
+    addr: SocketAddr,
 }
 
 impl ViiperClient {
-    /// Create a new VIIPER client connecting to the specified host and port.
-    pub fn new(host: impl Into<String>, port: u16) -> Self {
-        Self {
-            addr: format!("{}:{}", host.into(), port),
-        }
+    /// Create a new VIIPER client connecting to the specified address.
+    pub fn new(addr: SocketAddr) -> Self {
+        Self { addr }
     }
 
     fn do_request<T: for<'de> serde::Deserialize<'de>>(
@@ -36,7 +34,7 @@ impl ViiperClient {
         path: &str,
         payload: Option<&str>,
     ) -> Result<T, ViiperError> {
-        let mut stream = TcpStream::connect(&self.addr)?;
+        let mut stream = TcpStream::connect(self.addr)?;
 
         stream.write_all(path.as_bytes())?;
         if let Some(p) = payload {
@@ -71,7 +69,7 @@ impl ViiperClient {
 {{end}}{{end}}
     /// Connect to a device stream for sending input and receiving output.
     pub fn connect_device(&self, bus_id: u32, dev_id: &str) -> Result<DeviceStream, ViiperError> {
-        DeviceStream::connect(&self.addr, bus_id, dev_id)
+        DeviceStream::connect(self.addr, bus_id, dev_id)
     }
 }
 
@@ -82,7 +80,7 @@ pub struct DeviceStream {
 }
 
 impl DeviceStream {
-    pub fn connect(addr: &str, bus_id: u32, dev_id: &str) -> Result<Self, ViiperError> {
+    pub fn connect(addr: SocketAddr, bus_id: u32, dev_id: &str) -> Result<Self, ViiperError> {
         let mut stream = TcpStream::connect(addr)?;
         let handshake = format!("bus/{}/{}\0", bus_id, dev_id);
         stream.write_all(handshake.as_bytes())?;
@@ -114,12 +112,7 @@ impl DeviceStream {
         let stream = self.stream.try_clone()?;
         let handle = std::thread::spawn(move || {
             let mut reader = std::io::BufReader::new(stream);
-            loop {
-                match callback(&mut reader) {
-                    Ok(()) => continue,
-                    Err(_) => break,
-                }
-            }
+            while callback(&mut reader).is_ok() {}
         });
         self.output_thread = Some(handle);
         Ok(())
