@@ -56,7 +56,6 @@ func generateTypes(logger *slog.Logger, srcDir string, md *meta.Metadata) error 
 
 		for _, field := range dto.Fields {
 			rustName := common.ToSnakeCase(field.Name)
-			// Escape Rust keywords
 			if isRustKeyword(rustName) {
 				rustName = "r#" + rustName
 			}

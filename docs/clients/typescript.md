@@ -517,6 +517,7 @@ Some quick troubleshooting tips for the TypeScript SDK and device streams:
 - [C# SDK Documentation](csharp.md): Alternative managed language SDK
 - [Rust SDK Documentation](rust.md): Rust SDK with sync/async support
 - [C SDK Documentation](c.md): Alternative SDK for native integration
+- [C++ SDK Documentation](cpp.md): Header-only C++ SDK
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
 

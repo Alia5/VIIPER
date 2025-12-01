@@ -146,7 +146,6 @@ func generateMethodParamsTS(route scanner.RouteInfo) string {
 	for key := range route.PathParams {
 		params = append(params, fmt.Sprintf("%s: number", common.ToCamelCase(key)))
 	}
-	// Add payload parameter based on classification
 	switch route.Payload.Kind {
 	case scanner.PayloadJSON:
 		name := payloadParamNameTS(route)
@@ -173,26 +172,21 @@ func generateMethodParamsTS(route scanner.RouteInfo) string {
 	return strings.Join(params, ", ")
 }
 
-// payloadParamNameTS chooses a descriptive parameter name for the payload.
 func payloadParamNameTS(route scanner.RouteInfo) string {
 	if route.Payload.Kind == scanner.PayloadNone {
 		return ""
 	}
-	// Use ParserHint to derive parameter name (e.g., uint32 -> "busId", DeviceCreateRequest -> "request")
 	hint := route.Payload.ParserHint
 	if hint == "" {
 		return "payload"
 	}
-	// Heuristic: numeric hints map to "id", JSON DTOs map to "request"
 	switch route.Payload.Kind {
 	case scanner.PayloadNumeric:
-		// uint32 / uint64 / int likely represent IDs
 		if strings.Contains(strings.ToLower(hint), "id") || strings.HasPrefix(hint, "uint") || strings.HasPrefix(hint, "int") {
 			return "id"
 		}
 		return "value"
 	case scanner.PayloadJSON:
-		// Use raw type name (e.g., DeviceCreateRequest -> request)
 		if route.Payload.RawType != "" {
 			return common.ToCamelCase(route.Payload.RawType)
 		}

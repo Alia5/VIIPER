@@ -189,6 +189,44 @@ jobs:
           path: c-sdk-source${{ inputs.artifact_suffix }}.tar.gz
           if-no-files-found: error
 
+  cpp-sdk:
+    name: C++ SDK
+    needs: codegen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download generated clients
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-clients
+          path: clients/
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.26.x'
+
+      - name: Build C++ examples (smoke)
+        run: |
+          cmake -S examples/cpp -B examples/cpp/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build examples/cpp/build --config Release --parallel
+
+      - name: Archive C++ SDK headers
+        if: ${{ inputs.upload_artifacts }}
+        run: |
+          cd clients/cpp
+          zip -r ../../cpp-sdk-headers${{ inputs.artifact_suffix }}.zip include/
+
+      - name: Upload C++ SDK headers
+        if: ${{ inputs.upload_artifacts }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpp-sdk-headers${{ inputs.artifact_suffix }}
+          path: cpp-sdk-headers${{ inputs.artifact_suffix }}.zip
+          if-no-files-found: error
+
   rust:
     name: Rust SDK
     needs: codegen

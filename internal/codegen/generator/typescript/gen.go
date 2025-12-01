@@ -10,14 +10,6 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 )
 
-// Generate produces the TypeScript SDK layout under outputDir.
-// It creates a Node package with the following structure:
-// - package.json, tsconfig.json
-// - src/index.ts
-// - src/ViiperClient.ts (management API)
-// - src/ViiperDevice.ts (device stream wrapper)
-// - src/types/ManagementDtos.ts (DTOs)
-// - src/devices/<Device>/{<Device>Input.ts,<Device>Output.ts,<Device>Constants.ts}
 func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 	projectDir := outputDir
 	srcDir := filepath.Join(projectDir, "src")

@@ -70,6 +70,7 @@ nav:
     - Go Client: clients/go.md
     - Generator Documentation: clients/generator.md
     - C SDK: clients/c.md
+    - C++ SDK: clients/cpp.md
     - C# SDK: clients/csharp.md
     - Rust SDK: clients/rust.md
     - TypeScript SDK: clients/typescript.md

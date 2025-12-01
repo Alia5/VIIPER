@@ -8,6 +8,7 @@ VIIPER ships a lightweight TCP API for managing virtual buses/devices and for de
     - [Go Client](../clients/go.md): Reference implementation included in the repository
     - [Generator Documentation](../clients/generator.md): Information about code generation
     - [C SDK](../clients/c.md): Generated C library with type-safe device streams
+    - [C++ SDK](../clients/cpp.md): Header-only C++20 library (requires external JSON parser)
     - [C# SDK](../clients/csharp.md): Generated .NET library with async/await support
     - [TypeScript SDK](../clients/typescript.md): Generated Node.js library with EventEmitter streams
     - [Rust SDK](../clients/rust.md): Generated Rust library with sync/async support

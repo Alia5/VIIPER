@@ -289,6 +289,7 @@ cmake --build build --config Release
 
 - [Generator Documentation](generator.md): How the C SDK is generated
 - [Go Client Documentation](go.md): Reference implementation
+- [C++ SDK Documentation](cpp.md): Header-only C++ SDK
 - [C# SDK Documentation](csharp.md): .NET SDK
 - [Rust SDK Documentation](rust.md): Rust SDK
 - [TypeScript SDK Documentation](typescript.md): Node.js SDK

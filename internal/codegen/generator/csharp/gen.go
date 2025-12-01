@@ -10,13 +10,6 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 )
 
-// Generate produces the C# SDK layout under outputDir.
-// It creates:
-// - Viiper.Client/Viiper.Client.csproj
-// - Viiper.Client/ViiperClient.cs (management API)
-// - Viiper.Client/ViiperDevice.cs (device stream wrapper)
-// - Viiper.Client/Types/*.cs (DTOs)
-// - Viiper.Client/Devices/*/*.cs (per-device types and constants)
 func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 	projectDir := filepath.Join(outputDir, "Viiper.Client")
 	typesDir := filepath.Join(projectDir, "Types")

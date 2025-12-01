@@ -95,7 +95,6 @@ func generateConstants(logger *slog.Logger, deviceDir string, deviceName string,
 		})
 	}
 
-	// Generate maps
 	var maps []rustMapInfo
 	for _, m := range devicePkg.Maps {
 		mapInfo := rustMapInfo{
@@ -118,7 +117,6 @@ func generateConstants(logger *slog.Logger, deviceDir string, deviceName string,
 		}
 	}
 
-	// Determine which collections to import
 	hasHashMap := false
 	hasHashSet := false
 	for _, m := range maps {
@@ -176,7 +174,6 @@ func formatConstValue(val interface{}, goType string) string {
 func formatMapKeyRust(key string, goType string) string {
 	switch goType {
 	case "byte", "uint8":
-		// Handle escape sequences
 		if len(key) == 2 && key[0] == '\\' {
 			switch key[1] {
 			case 'n':
@@ -191,7 +188,6 @@ func formatMapKeyRust(key string, goType string) string {
 				return "0x27"
 			}
 		}
-		// Single character
 		if len(key) >= 1 {
 			return fmt.Sprintf("%d", key[0])
 		}
@@ -206,9 +202,7 @@ func formatMapKeyRust(key string, goType string) string {
 func formatMapValueRust(value interface{}, goType string) string {
 	switch goType {
 	case "byte", "uint8":
-		// Check if it's a constant reference
 		if str, ok := value.(string); ok {
-			// Use the constant directly
 			return toScreamingSnakeCase(str)
 		}
 		return fmt.Sprintf("%v", value)

@@ -15,11 +15,11 @@ func tplFuncs(md *meta.Metadata) template.FuncMap {
 		"ctype":          cType,
 		"snakecase":      common.ToSnakeCase,
 		"upper":          strings.ToUpper,
-		"hasWireTag":     func(device, direction string) bool { return hasWireTag(md, device, direction) },
-		"wireFields":     func(device, direction string) string { return wireFields(md, device, direction) },
+		"hasWireTag":     func(device, direction string) bool { return common.HasWireTag(md, device, direction) },
+		"wireFields":     func(device, direction string) string { return wireFieldsString(md, device, direction) },
 		"indent":         indent,
 		"fieldDecl":      func(f scanner.FieldInfo) string { return fieldDecl(md, f) },
-		"pathParams":     orderedPathParams,
+		"pathParams":     common.ExtractPathParams,
 		"join":           strings.Join,
 		"mapFuncDecl":    mapFuncDecl,
 		"mapFuncImpl":    mapFuncImpl,
@@ -57,25 +57,20 @@ func responseCType(md *meta.Metadata, dtoName string) string {
 	return fmt.Sprintf("viiper_%s_t", dtoToCTypeName(md, dtoName))
 }
 
-// dtoToCTypeName converts a DTO name to its C typedef name using metadata mappings
 func dtoToCTypeName(md *meta.Metadata, dtoName string) string {
-	// Check if there's an explicit mapping for this DTO
 	if md.CTypeNames != nil {
 		if mapped, ok := md.CTypeNames[dtoName]; ok {
 			return mapped
 		}
 	}
-	// Default: just convert to snake_case
 	return common.ToSnakeCase(dtoName)
 }
 
-// marshalPayload generates C code to marshal a struct to JSON string
 func marshalPayload(md *meta.Metadata, pi scanner.PayloadInfo) string {
 	if pi.Kind != scanner.PayloadJSON || pi.RawType == "" {
 		return ""
 	}
 
-	// Find the DTO in metadata
 	var dto *scanner.DTOSchema
 	for i := range md.DTOs {
 		if md.DTOs[i].Name == pi.RawType {
@@ -92,7 +87,6 @@ func marshalPayload(md *meta.Metadata, pi scanner.PayloadInfo) string {
 		fmt.Sprintf("if (%s) {", varName),
 	}
 
-	// Start JSON object
 	firstField := true
 	for _, f := range dto.Fields {
 		isPointer := strings.HasPrefix(f.Type, "*")
@@ -104,7 +98,6 @@ func marshalPayload(md *meta.Metadata, pi scanner.PayloadInfo) string {
 		} else if isPointer {
 			condition = fmt.Sprintf("if (%s->%s) ", varName, f.Name)
 		} else {
-			// Non-pointer optional fields shouldn't exist for JSON payloads
 			condition = ""
 		}
 
@@ -127,7 +120,6 @@ func marshalPayload(md *meta.Metadata, pi scanner.PayloadInfo) string {
 					condition, f.JSONName, varName, f.Name)
 			}
 		default:
-			// Unsupported type, skip
 			continue
 		}
 
@@ -184,19 +176,8 @@ func cType(goType, kind string) string {
 	}
 }
 
-func hasWireTag(md *meta.Metadata, device, direction string) bool {
-	if md.WireTags == nil {
-		return false
-	}
-	return md.WireTags.HasDirection(device, direction)
-}
-
-func wireFields(md *meta.Metadata, device, direction string) string {
-	if md.WireTags == nil {
-		return "/* no wire tags found */"
-	}
-
-	tag := md.WireTags.GetTag(device, direction)
+func wireFieldsString(md *meta.Metadata, device, direction string) string {
+	tag := common.GetWireTag(md, device, direction)
 	if tag == nil {
 		return "/* no wire tag for this device/direction */"
 	}
@@ -256,20 +237,6 @@ func indent(spaces int, s string) string {
 	return strings.Join(parts, "\n")
 }
 
-func orderedPathParams(path string) []string {
-	if path == "" {
-		return nil
-	}
-	parts := strings.Split(path, "/")
-	var params []string
-	for _, p := range parts {
-		if strings.HasPrefix(p, "{") && strings.HasSuffix(p, "}") {
-			params = append(params, p[1:len(p)-1])
-		}
-	}
-	return params
-}
-
 func fieldDecl(md *meta.Metadata, f scanner.FieldInfo) string {
 	if f.TypeKind == "slice" || strings.HasPrefix(f.Type, "[]") {
 		elem := strings.TrimPrefix(f.Type, "[]")
@@ -286,9 +253,7 @@ func fieldDecl(md *meta.Metadata, f scanner.FieldInfo) string {
 	return fmt.Sprintf("%s %s;%s", fieldTypeToCType(md, f.Type), f.Name, optComment(f))
 }
 
-// fieldTypeToCType converts a field type to C type, using metadata for struct type name mapping
 func fieldTypeToCType(md *meta.Metadata, goType string) string {
-	// Check if it's a primitive type first
 	switch goType {
 	case "string":
 		return "const char*"
@@ -316,14 +281,12 @@ func fieldTypeToCType(md *meta.Metadata, goType string) string {
 		return "double"
 	}
 
-	// For struct types, check if it's a DTO and use the type name mapping
 	for _, dto := range md.DTOs {
 		if dto.Name == goType {
 			return fmt.Sprintf("viiper_%s_t", dtoToCTypeName(md, goType))
 		}
 	}
 
-	// Default: assume it's a struct and use snake_case
 	return fmt.Sprintf("viiper_%s_t", common.ToSnakeCase(goType))
 }
 
@@ -398,7 +361,6 @@ func formatCMapKey(key string, goType string, device string) string {
 	switch goType {
 	case "byte", "uint8":
 		if len(key) == 1 {
-			// Escape special characters
 			switch key[0] {
 			case '\n':
 				return "'\\n'"
@@ -480,7 +442,6 @@ func formatCMapValue(value interface{}, goType string, device string) string {
 	}
 }
 
-// generateFreeFunction creates a free function for a DTO
 func generateFreeFunction(md *meta.Metadata, dto scanner.DTOSchema) string {
 	snakeName := dtoToCTypeName(md, dto.Name)
 	lines := []string{
@@ -507,11 +468,8 @@ func generateFreeFunction(md *meta.Metadata, dto scanner.DTOSchema) string {
 		baseType = strings.TrimPrefix(baseType, "[]")
 
 		if strings.HasPrefix(f.Type, "[]") {
-			// Array type - need to free elements and array itself
 			if baseType != "string" && baseType != "uint8" && baseType != "uint16" && baseType != "uint32" && baseType != "uint64" {
-				// Complex type array - need to find the DTO and free each field
 				lines = append(lines, fmt.Sprintf(" if (v->%s){ for (size_t i=0;i<v->%s_count;i++){ ", f.Name, common.ToSnakeCase(f.JSONName)))
-				// Look up the DTO to find string fields that need freeing
 				for _, dtoSchema := range md.DTOs {
 					if dtoSchema.Name == baseType {
 						for _, field := range dtoSchema.Fields {
@@ -527,11 +485,9 @@ func generateFreeFunction(md *meta.Metadata, dto scanner.DTOSchema) string {
 			} else if baseType == "string" {
 				lines = append(lines, fmt.Sprintf(" if (v->%s){ for (size_t i=0;i<v->%s_count;i++){ if (v->%s[i]) free((void*)v->%s[i]); } free(v->%s);}", f.Name, common.ToSnakeCase(f.JSONName), f.Name, f.Name, f.Name))
 			} else {
-				// Primitive array - just free the array
 				lines = append(lines, fmt.Sprintf(" if (v->%s) free(v->%s);", f.Name, f.Name))
 			}
 		} else if strings.HasPrefix(f.Type, "*") && baseType == "string" {
-			// Pointer to string
 			lines = append(lines, fmt.Sprintf(" if (v->%s) free((void*)v->%s);", f.Name, f.Name))
 		}
 	}
@@ -540,11 +496,8 @@ func generateFreeFunction(md *meta.Metadata, dto scanner.DTOSchema) string {
 	return strings.Join(lines, "")
 }
 
-// generateParser creates a parser function for a DTO
 func generateParser(md *meta.Metadata, dto scanner.DTOSchema) string {
 	snakeName := dtoToCTypeName(md, dto.Name)
-
-	// For parsing object responses, use _obj suffix
 	parserName := fmt.Sprintf("viiper_parse_%s", snakeName)
 	if strings.HasSuffix(snakeName, "_info") {
 		parserName = fmt.Sprintf("viiper_parse_%s_obj", snakeName)
@@ -565,7 +518,6 @@ func generateParser(md *meta.Metadata, dto scanner.DTOSchema) string {
 			if baseType == "uint32" {
 				parserCalls = append(parserCalls, fmt.Sprintf("json_parse_array_uint32(json, \"%s\", &out->%s, &out->%s_count)", f.JSONName, f.Name, common.ToSnakeCase(f.JSONName)))
 			} else {
-				// Complex type - use appropriate parser based on type name mapping
 				parserFuncName := fmt.Sprintf("json_parse_array_%s", dtoToCTypeName(md, baseType))
 				parserCalls = append(parserCalls, fmt.Sprintf("%s(json, \"%s\", &out->%s, &out->%s_count)", parserFuncName, f.JSONName, f.Name, common.ToSnakeCase(f.JSONName)))
 			}
@@ -573,7 +525,6 @@ func generateParser(md *meta.Metadata, dto scanner.DTOSchema) string {
 			if required {
 				parserCalls = append(parserCalls, fmt.Sprintf("json_parse_string_alloc(json, \"%s\", (char**)&out->%s)", f.JSONName, f.Name))
 			} else {
-				// Optional string - don't fail if missing
 				lines = append(lines, fmt.Sprintf(" json_parse_string_alloc(json, \"%s\", (char**)&out->%s);", f.JSONName, f.Name))
 			}
 		} else if baseType == "uint32" {

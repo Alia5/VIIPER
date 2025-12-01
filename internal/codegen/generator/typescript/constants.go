@@ -144,7 +144,6 @@ func mapGoConstTypeToTS(goType string) string {
 func formatMapKeyTS(key string, goType string) string {
 	switch goType {
 	case "byte", "uint8":
-		// Prefer enum symbolic key if provided (e.g., Key.A)
 		if len(key) > 0 && (key[0] >= 'A' && key[0] <= 'Z') {
 			if pfx := common.ExtractPrefix(key); pfx != "" {
 				_, member := common.TrimPrefixAndSanitize(key)
@@ -153,7 +152,6 @@ func formatMapKeyTS(key string, goType string) string {
 				}
 			}
 		}
-		// Otherwise, emit numeric key code for literal chars/escapes
 		if len(key) == 2 && key[0] == '\\' {
 			switch key[1] {
 			case 'n':

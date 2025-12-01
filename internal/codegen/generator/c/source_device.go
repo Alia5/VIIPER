@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/Alia5/VIIPER/internal/codegen/common"
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 	"github.com/Alia5/VIIPER/internal/codegen/scanner"
 )
@@ -35,7 +36,7 @@ func generateDeviceSource(logger *slog.Logger, srcDir, device string, md *meta.M
 	pkg := md.DevicePackages[device]
 	data := deviceSourceData{
 		Device: device,
-		HasS2C: hasWireTag(md, device, "s2c"),
+		HasS2C: common.HasWireTag(md, device, "s2c"),
 		Pkg:    pkg,
 	}
 	out := filepath.Join(srcDir, fmt.Sprintf("viiper_%s.c", device))

@@ -4,7 +4,6 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/common"
 )
 
-// goTypeToTS maps Go types to TypeScript types
 func goTypeToTS(goType string) string {
 	base, _, _ := common.NormalizeGoType(goType)
 	switch base {

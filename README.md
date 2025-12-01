@@ -16,6 +16,7 @@
 [![crates.io version](https://img.shields.io/crates/v/viiper-client?logo=rust)](https://crates.io/crates/viiper-client)
 [![crates.io downloads](https://img.shields.io/crates/d/viiper-client?logo=rust&label=downloads)](https://crates.io/crates/viiper-client)
 [![C SDK](https://img.shields.io/badge/C_SDK-artifact-blueviolet)](https://github.com/Alia5/VIIPER/releases)
+[![C++ SDK](https://img.shields.io/badge/C++_Header_Only-blue)](https://github.com/Alia5/VIIPER/releases)
 
 
 

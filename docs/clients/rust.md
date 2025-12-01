@@ -60,10 +60,16 @@ cargo build --release
 
 ```rust
 use viiper_client::{ViiperClient, devices::keyboard::*};
+use std::net::ToSocketAddrs;
 
 fn main() {
     // Create new Viiper client
-    let client = ViiperClient::new("localhost", 3242);
+    let addr = "localhost:3242"
+        .to_socket_addrs()
+        .expect("Invalid address")
+        .next()
+        .expect("No address resolved");
+    let client = ViiperClient::new(addr);
 
     // Find or create a bus
     let bus_id = match client.bus_list() {
@@ -109,11 +115,17 @@ fn main() {
 ```rust
 use tokio::time::{sleep, Duration};
 use viiper_client::{AsyncViiperClient, devices::keyboard::*};
+use std::net::ToSocketAddrs;
 
 #[tokio::main]
 async fn main() {
     // Create new Viiper client
-    let client = AsyncViiperClient::new("localhost", 3242);
+    let addr = "localhost:3242"
+        .to_socket_addrs()
+        .expect("Invalid address")
+        .next()
+        .expect("No address resolved");
+    let client = AsyncViiperClient::new(addr);
 
     // Find or create a bus
     let bus_id = match client.bus_list().await {
@@ -161,8 +173,14 @@ async fn main() {
 
 ```rust
 use viiper_client::{ViiperClient, types::DeviceCreateRequest};
+use std::net::ToSocketAddrs;
 
-let client = ViiperClient::new("localhost", 3242);
+let addr = "localhost:3242"
+    .to_socket_addrs()
+    .expect("Invalid address")
+    .next()
+    .expect("No address resolved");
+let client = ViiperClient::new(addr);
 
 // Add device first
 let device_info = client.bus_device_add(
@@ -554,7 +572,9 @@ clients/rust/
 Verify VIIPER server is running and listening on the expected API port (default 3242).
 
 ```rust
-let client = ViiperClient::new("127.0.0.1", 3242);
+use std::net::SocketAddr;
+let addr: SocketAddr = "127.0.0.1:3242".parse().expect("Invalid address");
+let client = ViiperClient::new(addr);
 ```
 
 **Feature not found errors:**
@@ -572,6 +592,7 @@ viiper-client = { version = "0.1", features = ["async"] }
 - [C# SDK Documentation](csharp.md): Alternative managed language SDK
 - [TypeScript SDK Documentation](typescript.md): Node.js SDK
 - [C SDK Documentation](c.md): Native C SDK
+- [C++ SDK Documentation](cpp.md): Header-only C++ SDK
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
 

@@ -8,7 +8,7 @@ import (
 
 type Codegen struct {
 	Output string `help:"Output directory for generated SDKs (repo-root relative). Default resolves to <repo>/clients" default:"./clients" env:"VIIPER_CODEGEN_OUTPUT"`
-	Lang   string `help:"Target language: c, csharp, rust, typescript, or 'all'" default:"all" enum:"c,csharp,rust,typescript,all" env:"VIIPER_CODEGEN_LANG"`
+	Lang   string `help:"Target language: c, cpp, csharp, rust, typescript, or 'all'" default:"all" enum:"c,cpp,csharp,rust,typescript,all" env:"VIIPER_CODEGEN_LANG"`
 }
 
 // Run is called by Kong when the codegen command is executed.

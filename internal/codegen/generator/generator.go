@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	cgen "github.com/Alia5/VIIPER/internal/codegen/generator/c"
+	"github.com/Alia5/VIIPER/internal/codegen/generator/cpp"
 	"github.com/Alia5/VIIPER/internal/codegen/generator/csharp"
 	"github.com/Alia5/VIIPER/internal/codegen/generator/rust"
 	"github.com/Alia5/VIIPER/internal/codegen/generator/typescript"
@@ -14,17 +15,16 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/scanner"
 )
 
-// Generator orchestrates SDK generation for all target languages
 type Generator struct {
 	outputDir string
 	logger    *slog.Logger
 }
 
-// LanguageGenerator defines a function that generates an SDK for a language into outputDir.
 type LanguageGenerator func(logger *slog.Logger, outputDir string, md *meta.Metadata) error
 
 var generators = map[string]LanguageGenerator{
 	"c":          cgen.Generate,
+	"cpp":        cpp.Generate,
 	"csharp":     csharp.Generate,
 	"rust":       rust.Generate,
 	"typescript": typescript.Generate,
@@ -46,8 +46,6 @@ func (g *Generator) GenAll() error {
 	return nil
 }
 
-// GenerateLang runs the SDK generator for the provided language key.
-// It scans metadata once per invocation and passes it to the language-specific generator.
 func (g *Generator) GenerateLang(lang string) error {
 	gen, ok := generators[lang]
 	if !ok {
@@ -78,7 +76,6 @@ func (g *Generator) GenerateLang(lang string) error {
 	return nil
 }
 
-// ScanAll runs all scanners to collect metadata
 func (g *Generator) ScanAll() (*meta.Metadata, error) {
 	requiredPaths := []string{"internal/cmd", "apitypes", "device"}
 	for _, path := range requiredPaths {
@@ -110,9 +107,8 @@ func (g *Generator) ScanAll() (*meta.Metadata, error) {
 	md.DTOs = dtos
 	g.logger.Info("Found DTOs", "count", len(dtos))
 
-	// Build C type name mappings for types that would conflict
+	md.CTypeNames = make(map[string]string)
 	for _, dto := range dtos {
-		// Device conflicts with viiper_device_t (streaming handle), so rename to device_info
 		if dto.Name == "Device" {
 			md.CTypeNames["Device"] = "device_info"
 		}

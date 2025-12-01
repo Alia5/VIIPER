@@ -119,7 +119,6 @@ public class ViiperClient : IDisposable
 }
 `
 
-// generateClient creates the ViiperClient management API class
 func generateClient(logger *slog.Logger, projectDir string, md *meta.Metadata) error {
 	logger.Debug("Generating ViiperClient management API")
 
@@ -164,7 +163,6 @@ func generateMethodParams(route scanner.RouteInfo) string {
 	for key := range route.PathParams {
 		params = append(params, fmt.Sprintf("uint %s", toCamelCase(key)))
 	}
-	// Add payload parameter if needed
 	switch route.Payload.Kind {
 	case scanner.PayloadJSON:
 		name := payloadParamNameCS(route)
@@ -176,7 +174,6 @@ func generateMethodParams(route scanner.RouteInfo) string {
 	case scanner.PayloadNumeric:
 		name := payloadParamNameCS(route)
 		typeName := "uint"
-		// crude width mapping
 		if strings.HasPrefix(route.Payload.RawType, "int") && !strings.HasPrefix(route.Payload.RawType, "uint") {
 			typeName = "int"
 		} else if strings.HasPrefix(route.Payload.RawType, "uint") {

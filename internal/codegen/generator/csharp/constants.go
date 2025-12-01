@@ -215,8 +215,6 @@ func mapGoConstTypeToCSharp(goType string) string {
 	}
 }
 
-// inferValueTypeFromEntries scans map values to detect if they're enum constants
-// Returns the inferred C# type name (e.g., "Key") or empty string if not detected
 func inferValueTypeFromEntries(entries map[string]interface{}) string {
 	if len(entries) == 0 {
 		return ""

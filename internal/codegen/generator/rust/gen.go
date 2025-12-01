@@ -1,4 +1,3 @@
-// Package rust provides code generation for the Rust SDK.
 package rust
 
 import (
@@ -11,15 +10,6 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 )
 
-// Generate produces the Rust SDK layout under outputDir.
-// It creates a Cargo workspace with the following structure:
-// - Cargo.toml
-// - src/lib.rs (public exports)
-// - src/error.rs
-// - src/types.rs (management API DTOs)
-// - src/client.rs (sync API)
-// - src/async_client.rs (async API, feature-gated)
-// - src/devices/<device>/{mod.rs, input.rs, output.rs, constants.rs}
 func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 	projectDir := outputDir
 	srcDir := filepath.Join(projectDir, "src")
@@ -64,7 +54,6 @@ func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 		return err
 	}
 
-	// Generate device modules
 	for deviceName := range md.DevicePackages {
 		deviceDir := filepath.Join(devicesDir, deviceName)
 		if err := os.MkdirAll(deviceDir, 0o755); err != nil {
@@ -84,12 +73,10 @@ func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 		}
 	}
 
-	// Generate devices/mod.rs
 	if err := generateDevicesModFile(logger, devicesDir, md); err != nil {
 		return err
 	}
 
-	// Generate lib.rs
 	if err := generateLibFile(logger, srcDir, md); err != nil {
 		return err
 	}
@@ -161,7 +148,6 @@ func generateDeviceModFile(logger *slog.Logger, deviceDir string, deviceName str
 
 	content := writeFileHeaderRust()
 
-	// Check what files exist
 	hasInput := md.WireTags != nil && md.WireTags.GetTag(deviceName, "c2s") != nil
 	hasOutput := md.WireTags != nil && md.WireTags.GetTag(deviceName, "s2c") != nil
 	hasConstants := md.DevicePackages[deviceName] != nil &&

@@ -10,13 +10,6 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 )
 
-// Generate produces the C SDK layout under outputDir.
-// It creates:
-// - include/viiper/viiper.h (common types and management API)
-// - include/viiper/viiper_<device>.h (per-device constants and API)
-// - src/viiper.c (common implementations)
-// - src/viiper_<device>.c (per-device)
-// - CMakeLists.txt
 func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 	version, err := common.GetVersion()
 	if err != nil {
