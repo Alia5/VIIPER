@@ -1,5 +1,6 @@
 use std::thread;
 use std::time::Duration;
+use std::net::ToSocketAddrs;
 use viiper_client::{devices::xbox360::*, ViiperClient};
 
 fn main() {
@@ -10,10 +11,20 @@ fn main() {
         std::process::exit(1);
     }
 
-    let addr: std::net::SocketAddr = args[1].parse().unwrap_or_else(|e| {
-        eprintln!("Invalid address '{}': {}", args[1], e);
-        std::process::exit(1);
-    });
+    let addr_str = &args[1];
+    let addr: std::net::SocketAddr = match addr_str.to_socket_addrs() {
+        Ok(mut iter) => match iter.next() {
+            Some(a) => a,
+            None => {
+                eprintln!("Invalid address '{}': no resolvable addresses", addr_str);
+                std::process::exit(1);
+            }
+        },
+        Err(e) => {
+            eprintln!("Invalid address '{}': {}", addr_str, e);
+            std::process::exit(1);
+        }
+    };
 
     let client = ViiperClient::new(addr);
 
