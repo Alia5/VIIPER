@@ -74,7 +74,7 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 				return
 			case <-connTimer.C:
 				deviceIDStr := fmt.Sprintf("%d", exportMeta.DevId)
-				if err := b.RemoveDeviceByID(deviceIDStr); err != nil {
+				if err := s.RemoveDeviceByID(uint32(busID), deviceIDStr); err != nil {
 					logger.Error("timeout: failed to remove device", "busID", busID, "deviceID", deviceIDStr, "error", err)
 				} else {
 					logger.Info("timeout: removed device (no connection)", "busID", busID, "deviceID", deviceIDStr)

@@ -225,7 +225,9 @@ func (a *Server) handleConn(conn net.Conn) {
 						} else {
 							connLogger.Info("disconnect timeout: removed device (no reconnection)", "busID", busID, "deviceID", deviceIDStr)
 						}
+						return
 					}
+					connLogger.Warn("disconnect timeout: device context closed but metadata missing")
 				}
 			}()
 		}

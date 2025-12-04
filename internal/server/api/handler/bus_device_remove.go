@@ -31,7 +31,7 @@ func BusDeviceRemove(s *usb.Server) api.HandlerFunc {
 		if b == nil {
 			return api.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
 		}
-		if err := b.RemoveDeviceByID(deviceID); err != nil {
+		if err := s.RemoveDeviceByID(uint32(busID), deviceID); err != nil {
 			return api.ErrNotFound(fmt.Sprintf("device %s not found on bus %d", deviceID, busID))
 		}
 

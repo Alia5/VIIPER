@@ -27,6 +27,8 @@ type VirtualBus struct {
 	nextDevID       uint32
 	allocatedDevIDs map[uint32]bool
 	devices         []busDevice
+	emptyCtx        context.Context
+	emptyCancel     context.CancelFunc
 }
 
 // DeviceMeta exposes a registered device and its metadata for external queries.
@@ -83,6 +85,12 @@ func NewWithBusId(busId uint32) (*VirtualBus, error) {
 func (vb *VirtualBus) Add(dev usb.Device) (context.Context, error) {
 	vb.mutex.Lock()
 	defer vb.mutex.Unlock()
+
+	if vb.emptyCancel != nil {
+		vb.emptyCancel()
+		vb.emptyCancel = nil
+		vb.emptyCtx = nil
+	}
 
 	for _, d := range vb.devices {
 		if d.dev == dev {
@@ -146,6 +154,18 @@ func (vb *VirtualBus) Devices() []usb.Device {
 	return out
 }
 
+func (vb *VirtualBus) GetBusEmptyContext() context.Context {
+	vb.mutex.Lock()
+	defer vb.mutex.Unlock()
+	if len(vb.devices) > 0 {
+		return nil
+	}
+	if vb.emptyCtx == nil {
+		vb.emptyCtx, vb.emptyCancel = context.WithCancel(context.Background())
+	}
+	return vb.emptyCtx
+}
+
 // RemoveDeviceByID removes a device by its  ID (e.g., "1").
 // Returns error if not found.
 func (vb *VirtualBus) RemoveDeviceByID(deviceID string) error {
@@ -158,6 +178,7 @@ func (vb *VirtualBus) RemoveDeviceByID(deviceID string) error {
 			}
 			delete(vb.allocatedDevIDs, d.meta.DevId)
 			vb.devices = append(vb.devices[:i], vb.devices[i+1:]...)
+
 			return nil
 		}
 	}

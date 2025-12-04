@@ -132,21 +132,21 @@ func TestBusDeviceAdd(t *testing.T) {
 
 // Verify that a device added via API is auto-removed if no stream connects within the configured timeout.
 func TestBusDeviceAdd_NoConnection_TimeoutCleanup(t *testing.T) {
-	// We need to control API DeviceHandlerConnectTimeout, so set up API server manually (not via StartAPIServer).
-	usbSrv := usb.New(usb.ServerConfig{Addr: "127.0.0.1:0"}, slog.Default(), log.NewRaw(nil))
+	usbSrv := usb.New(usb.ServerConfig{
+		Addr:              "127.0.0.1:0",
+		ConnectionTimeout: time.Millisecond * 500,
+	}, slog.Default(), log.NewRaw(nil))
 
 	b, err := virtualbus.NewWithBusId(80100)
 	require.NoError(t, err)
 	require.NoError(t, usbSrv.AddBus(b))
 
-	// Choose a free TCP address for API server
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
 	addr := ln.Addr().String()
 	_ = ln.Close()
 
-	// Start API server with a very short timeout
-	apiCfg := api.ServerConfig{Addr: addr, DeviceHandlerConnectTimeout: 200 * time.Millisecond}
+	apiCfg := api.ServerConfig{Addr: addr, DeviceHandlerConnectTimeout: 500 * time.Millisecond}
 	apiSrv := api.New(usbSrv, addr, apiCfg, slog.Default())
 	r := apiSrv.Router()
 	r.Register("bus/{id}/add", handler.BusDeviceAdd(usbSrv, apiSrv))
@@ -165,15 +165,16 @@ func TestBusDeviceAdd_NoConnection_TimeoutCleanup(t *testing.T) {
 	_, err = c.DeviceAdd(80100, "xbox360", nil)
 	require.NoError(t, err)
 
-	// Immediately after add, the device should be present (server now registers bus/{id}/list)
 	list, err := c.DevicesList(80100)
 	require.NoError(t, err)
 	require.Len(t, list.Devices, 1)
 
-	// Wait slightly beyond timeout to allow auto-removal
-	time.Sleep(350 * time.Millisecond)
+	require.Eventually(t, func() bool {
+		list, _ := c.DevicesList(80100)
+		return list != nil && len(list.Devices) == 0
+	}, 3*time.Second, 50*time.Millisecond)
 
-	list2, err := c.DevicesList(80100)
-	require.NoError(t, err)
-	assert.Len(t, list2.Devices, 0)
+	require.Eventually(t, func() bool {
+		return len(usbSrv.ListBuses()) == 0
+	}, 3*time.Second, 50*time.Millisecond)
 }

@@ -141,8 +141,30 @@ func (s *Server) RemoveDeviceByID(busID uint32, deviceID string) error {
 	if !ok {
 		return fmt.Errorf("bus %d not found", busID)
 	}
+	err := bus.RemoveDeviceByID(deviceID)
+	if err != nil {
+		return err
+	}
 
-	return bus.RemoveDeviceByID(deviceID)
+	if emptyCtx := bus.GetBusEmptyContext(); emptyCtx != nil {
+		go func() {
+			select {
+			case <-emptyCtx.Done():
+				// Cancelled - a new device was added
+				return
+			case <-time.After(s.config.ConnectionTimeout):
+				if b := s.GetBus(busID); b != nil && len(b.Devices()) == 0 {
+					if err := s.RemoveBus(busID); err != nil {
+						s.logger.Error("timeout: failed to remove empty bus", "busID", busID, "error", err)
+					} else {
+						s.logger.Info("timeout: removed empty bus", "busID", busID)
+					}
+				}
+			}
+		}()
+	}
+
+	return nil
 }
 
 // ListBuses returns a snapshot of active bus numbers.
@@ -501,7 +523,6 @@ func isClientDisconnect(err error) bool {
 	}
 	var opErr *net.OpError
 	if errors.As(err, &opErr) {
-		// On many platforms the underlying error will be a syscall.Errno
 		switch t := opErr.Err.(type) {
 		case syscall.Errno:
 			if t == syscall.ECONNRESET || t == syscall.EPIPE {
@@ -509,7 +530,6 @@ func isClientDisconnect(err error) bool {
 			}
 		}
 	}
-	// Fallback to checking the message for platform-specific strings.
 	e := strings.ToLower(err.Error())
 	if strings.Contains(e, "connection reset by peer") || strings.Contains(e, "forcibly closed") || strings.Contains(e, "an existing connection was forcibly closed") || strings.Contains(e, "aborted") {
 		return true
@@ -517,7 +537,6 @@ func isClientDisconnect(err error) bool {
 	return false
 }
 
-// processSubmit handles control transfers for enumeration on EP0.
 func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []byte, out []byte) []byte {
 	if ep != 0 {
 		return dev.HandleTransfer(ep, dir, out)
@@ -591,7 +610,6 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 	return nil
 }
 
-// buildConfigDescriptor builds a configuration descriptor for the device.
 func buildConfigDescriptor(desc *usb.Descriptor) []byte {
 	var b bytes.Buffer
 	h := usb.ConfigHeader{
