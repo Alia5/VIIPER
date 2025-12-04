@@ -84,7 +84,7 @@ pub struct AsyncDeviceStream {
     reader: std::sync::Arc<tokio::sync::Mutex<OwnedReadHalf>>,
     writer: std::sync::Arc<tokio::sync::Mutex<OwnedWriteHalf>>,
     cancel_token: Option<tokio_util::sync::CancellationToken>,
-    disconnect_callback: Option<Box<dyn FnOnce() + Send + 'static>>,
+    disconnect_callback: std::sync::Mutex<Option<Box<dyn FnOnce() + Send + 'static>>>,
 }
 
 #[cfg(feature = "async")]
@@ -98,7 +98,7 @@ impl AsyncDeviceStream {
             reader: std::sync::Arc::new(tokio::sync::Mutex::new(reader)),
             writer: std::sync::Arc::new(tokio::sync::Mutex::new(writer)),
             cancel_token: None,
-            disconnect_callback: None,
+            disconnect_callback: std::sync::Mutex::new(None),
         })
     }
 
@@ -147,7 +147,10 @@ impl AsyncDeviceStream {
         let reader = self.reader.clone();
         let cancel_token = tokio_util::sync::CancellationToken::new();
         let cancel_clone = cancel_token.clone();
-        let disconnect = self.disconnect_callback.take();
+		let Ok(mut guard) = self.disconnect_callback.lock() else {
+			return Err(ViiperError::UnexpectedResponse("Disconnect callback mutex poisoned".into()));
+		};
+		let disconnect = guard.take();
 
         tokio::spawn(async move {
             loop {
@@ -173,8 +176,11 @@ impl AsyncDeviceStream {
     where
         F: FnOnce() + Send + 'static,
     {
-        self.disconnect_callback = Some(Box::new(callback));
-        Ok(())
+		let Ok(mut guard) = self.disconnect_callback.lock() else {
+			return Err(ViiperError::UnexpectedResponse("Disconnect callback mutex poisoned".into()));
+		};
+		*guard = Some(Box::new(callback));
+		Ok(())
     }
 
     /// Send raw bytes to the device.
