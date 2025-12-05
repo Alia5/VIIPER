@@ -31,6 +31,7 @@ func (s *Server) Run(logger *slog.Logger, rawLogger log.RawLogger) error {
 func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger log.RawLogger) error {
 	s.UsbServerConfig.ConnectionTimeout = s.ConnectionTimeout
 	s.ApiServerConfig.ConnectionTimeout = s.ConnectionTimeout
+	s.UsbServerConfig.BusCleanupTimeout = s.ApiServerConfig.DeviceHandlerConnectTimeout
 
 	logger.Info("Starting VIIPER USB-IP server", "addr", s.UsbServerConfig.Addr)
 	usbSrv := usb.New(s.UsbServerConfig, logger, rawLogger)

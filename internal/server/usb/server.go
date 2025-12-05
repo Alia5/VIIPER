@@ -148,11 +148,12 @@ func (s *Server) RemoveDeviceByID(busID uint32, deviceID string) error {
 
 	if emptyCtx := bus.GetBusEmptyContext(); emptyCtx != nil {
 		go func() {
+			slog.Debug("Started bus cleanup goroutine (RemoveDeviceByID)")
 			select {
 			case <-emptyCtx.Done():
 				// Cancelled - a new device was added
 				return
-			case <-time.After(s.config.ConnectionTimeout):
+			case <-time.After(s.config.BusCleanupTimeout):
 				if b := s.GetBus(busID); b != nil && len(b.Devices()) == 0 {
 					if err := s.RemoveBus(busID); err != nil {
 						s.logger.Error("timeout: failed to remove empty bus", "busID", busID, "error", err)
@@ -162,6 +163,15 @@ func (s *Server) RemoveDeviceByID(busID uint32, deviceID string) error {
 				}
 			}
 		}()
+	} else {
+		s.logger.Debug("No bus empty context; Cleaning bus immediately")
+		if b := s.GetBus(busID); b != nil && len(b.Devices()) == 0 {
+			if err := s.RemoveBus(busID); err != nil {
+				s.logger.Error("timeout: failed to remove empty bus", "busID", busID, "error", err)
+			} else {
+				s.logger.Info("timeout: removed empty bus", "busID", busID)
+			}
+		}
 	}
 
 	return nil
@@ -449,6 +459,34 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 		select {
 		case <-ctx.Done():
 			s.logger.Info("device removed, closing URB stream")
+			busID := owningBus.BusID()
+			if emptyCtx := owningBus.GetBusEmptyContext(); emptyCtx != nil {
+				go func() {
+					slog.Debug("Started bus cleanup goroutine (HandleUrbStream ctx.Done)")
+					select {
+					case <-emptyCtx.Done():
+						// Cancelled - a new device was added
+						return
+					case <-time.After(s.config.BusCleanupTimeout):
+						if b := s.GetBus(busID); b != nil && len(b.Devices()) == 0 {
+							if err := s.RemoveBus(busID); err != nil {
+								s.logger.Error("timeout: failed to remove empty bus", "busID", busID, "error", err)
+							} else {
+								s.logger.Info("timeout: removed empty bus", "busID", busID)
+							}
+						}
+					}
+				}()
+			} else {
+				s.logger.Debug("No bus empty context; Cleaning bus immediately")
+				if b := s.GetBus(busID); b != nil && len(b.Devices()) == 0 {
+					if err := s.RemoveBus(busID); err != nil {
+						s.logger.Error("timeout: failed to remove empty bus", "busID", busID, "error", err)
+					} else {
+						s.logger.Info("timeout: removed empty bus", "busID", busID)
+					}
+				}
+			}
 			return nil
 		default:
 		}

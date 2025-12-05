@@ -135,6 +135,7 @@ func TestBusDeviceAdd_NoConnection_TimeoutCleanup(t *testing.T) {
 	usbSrv := usb.New(usb.ServerConfig{
 		Addr:              "127.0.0.1:0",
 		ConnectionTimeout: time.Millisecond * 500,
+		BusCleanupTimeout: time.Millisecond * 500,
 	}, slog.Default(), log.NewRaw(nil))
 
 	b, err := virtualbus.NewWithBusId(80100)
