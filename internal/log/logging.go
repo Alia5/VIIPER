@@ -7,9 +7,11 @@ package log
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
+	"strings"
 )
 
 // LevelTrace defines a custom slog level below Debug for very verbose output.
@@ -30,6 +32,33 @@ func ParseLevel(s string) slog.Level {
 	default:
 		return slog.LevelInfo
 	}
+}
+
+// SetupLogger builds a slog.Logger with console and optional file handlers.
+func SetupLogger(logLevel, logFile string) (*slog.Logger, []io.Closer, error) {
+	level := ParseLevel(logLevel)
+	var handlers []slog.Handler
+
+	if logFile == "" {
+		stdoutHandler := &colorHandler{w: os.Stdout, level: level}
+		handlers = append(handlers, LevelFilter{pass: func(l slog.Level) bool { return l < slog.LevelError }, h: stdoutHandler})
+
+		stderrHandler := &colorHandler{w: os.Stderr, level: slog.LevelError}
+		handlers = append(handlers, LevelFilter{pass: func(l slog.Level) bool { return l >= slog.LevelError }, h: stderrHandler})
+	} else {
+		handlers = append(handlers, slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: level}))
+	}
+	var closeFiles []io.Closer
+	if logFile != "" {
+		f, err := os.OpenFile(logFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
+		if err != nil {
+			return nil, nil, err
+		}
+		closeFiles = append(closeFiles, f)
+		handlers = append(handlers, slog.NewTextHandler(f, &slog.HandlerOptions{Level: level}))
+	}
+	logger := slog.New(MultiHandler{hs: handlers})
+	return logger, closeFiles, nil
 }
 
 // MultiHandler fans out records to multiple handlers.
@@ -92,29 +121,61 @@ func (f LevelFilter) WithGroup(name string) slog.Handler {
 	return LevelFilter{pass: f.pass, h: f.h.WithGroup(name)}
 }
 
-// SetupLogger builds a slog.Logger with console and optional file handlers.
-func SetupLogger(logLevel, logFile string) (*slog.Logger, []io.Closer, error) {
-	level := ParseLevel(logLevel)
-	var handlers []slog.Handler
+type colorHandler struct {
+	w     io.Writer
+	level slog.Leveler
+}
 
-	if logFile == "" {
-		stdoutHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level})
-		handlers = append(handlers, LevelFilter{pass: func(l slog.Level) bool { return l < slog.LevelError }, h: stdoutHandler})
+func (h *colorHandler) Enabled(_ context.Context, level slog.Level) bool {
+	return level >= h.level.Level()
+}
 
-		stderrHandler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError})
-		handlers = append(handlers, LevelFilter{pass: func(l slog.Level) bool { return l >= slog.LevelError }, h: stderrHandler})
-	} else {
-		handlers = append(handlers, slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: level}))
+func (h *colorHandler) Handle(_ context.Context, r slog.Record) error {
+	buf := strings.Builder{}
+
+	buf.WriteString("\033[90m")
+	buf.WriteString(r.Time.Format("2006-01-02T15:04:05.000000Z07:00"))
+	buf.WriteString("\033[0m ")
+
+	var color string
+	switch {
+	case r.Level >= slog.LevelError:
+		color = "\033[31m"
+	case r.Level >= slog.LevelWarn:
+		color = "\033[33m"
+	case r.Level >= slog.LevelInfo:
+		color = "\033[32m"
+	case r.Level >= slog.LevelDebug:
+		color = "\033[34m"
+	case r.Level >= LevelTrace:
+		color = "\033[35m"
+	default:
+		color = "\033[0m"
 	}
-	var closeFiles []io.Closer
-	if logFile != "" {
-		f, err := os.OpenFile(logFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
-		if err != nil {
-			return nil, nil, err
-		}
-		closeFiles = append(closeFiles, f)
-		handlers = append(handlers, slog.NewTextHandler(f, &slog.HandlerOptions{Level: level}))
-	}
-	logger := slog.New(MultiHandler{hs: handlers})
-	return logger, closeFiles, nil
+	buf.WriteString(color)
+	buf.WriteString(fmt.Sprintf("%5s", r.Level.String()))
+	buf.WriteString("\033[0m")
+
+	buf.WriteString(" ")
+	buf.WriteString(r.Message)
+
+	r.Attrs(func(a slog.Attr) bool {
+		buf.WriteString(" ")
+		buf.WriteString(a.Key)
+		buf.WriteString("=")
+		buf.WriteString(a.Value.String())
+		return true
+	})
+
+	buf.WriteString("\n")
+	_, err := h.w.Write([]byte(buf.String()))
+	return err
+}
+
+func (h *colorHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return h
+}
+
+func (h *colorHandler) WithGroup(name string) slog.Handler {
+	return h
 }
