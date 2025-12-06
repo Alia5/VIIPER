@@ -89,7 +89,7 @@ func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 		return err
 	}
 
-	logger.Info("Generated Rust SDK", "dir", projectDir)
+	logger.Info("Generated Rust client library", "dir", projectDir)
 	return nil
 }
 

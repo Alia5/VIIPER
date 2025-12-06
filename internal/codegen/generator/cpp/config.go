@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const configTemplate = `// Auto-generated VIIPER C++ SDK
+const configTemplate = `// Auto-generated VIIPER C++ Client Library
 // DO NOT EDIT - This file is generated from the VIIPER server codebase
 
 #pragma once
@@ -16,7 +16,7 @@ const configTemplate = `// Auto-generated VIIPER C++ SDK
 // JSON Parser Configuration
 // ============================================================================
 //
-// VIIPER C++ SDK requires a JSON library for parsing API responses.
+// VIIPER C++ Client Library requires a JSON library for parsing API responses.
 // You must define VIIPER_JSON_INCLUDE before including viiper.hpp
 //
 // Option 1: Use nlohmann::json (recommended)

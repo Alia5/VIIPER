@@ -229,10 +229,10 @@ Full working examples are available in the repository:
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated SDKs work
-- [C SDK Documentation](c.md): Generated C SDK usage
-- [C++ SDK Documentation](cpp.md): Header-only C++ SDK
-- [C# SDK Documentation](csharp.md): .NET SDK
-- [Rust SDK Documentation](rust.md): Rust SDK
-- [TypeScript SDK Documentation](typescript.md): Node.js SDK
+- [Generator Documentation](generator.md): How generated client libraries work
+- [C Client Library Documentation](c.md): Generated C client library usage
+- [C++ Client Library Documentation](cpp.md): Header-only C++ client library
+- [C# Client Library Documentation](csharp.md): .NET client library
+- [Rust Client Library Documentation](rust.md): Rust client library
+- [TypeScript Client Library Documentation](typescript.md): Node.js client library
 - [API Overview](../api/overview.md): Management API reference

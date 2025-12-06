@@ -1,10 +1,10 @@
-# C# SDK Documentation
+# C# Client Library Documentation
 
-The VIIPER C# SDK provides a modern, type-safe .NET client library for interacting with VIIPER servers and controlling virtual devices.
+The VIIPER C# client library provides a modern, type-safe .NET client library for interacting with VIIPER servers and controlling virtual devices.
 
 ## Overview
 
-The C# SDK features:
+The C# client library features:
 
 - **Async/await support**: Full async API with cancellation token support
 - **Type-safe**: Generated classes with enums, structs, and helper maps
@@ -13,7 +13,7 @@ The C# SDK features:
 - **Zero external dependencies**: Uses only built-in .NET libraries
 
 !!! note "License"
-    The C# SDK is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
+    The C# client library is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
     The core VIIPER server remains under its original license.
 
 ## Installation
@@ -206,7 +206,7 @@ await using var device = await client.ConnectDeviceAsync(busId, deviceId);
 
 ## Generated Constants and Maps
 
-The C# SDK automatically generates enums and helper maps for each device type.
+The C# client library automatically generates enums and helper maps for each device type.
 
 ### Keyboard Constants
 
@@ -235,7 +235,7 @@ bool capsLock = (leds & (byte)LED.CapsLock) != 0;
 
 ### Helper Maps
 
-The SDK generates useful lookup maps for working with keyboard input:
+The client library generates useful lookup maps for working with keyboard input:
 
 **CharToKey Map** - Convert ASCII characters to key codes:
 
@@ -457,7 +457,7 @@ dotnet run -- localhost
 
 ## Project Structure
 
-Generated SDK layout:
+Generated client library layout:
 
 ```text
 clients/csharp/Viiper.Client/
@@ -502,12 +502,12 @@ The generated code uses nullable annotations. You may see warnings like CS8601/C
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated SDKs work
-- [Go SDK Documentation](go.md): Reference implementation patterns
-- [Rust SDK Documentation](rust.md): Rust SDK with sync/async support
-- [TypeScript SDK Documentation](typescript.md): Node.js SDK
-- [C SDK Documentation](c.md): Alternative SDK for native integration
-- [C++ SDK Documentation](cpp.md): Header-only C++ SDK
+- [Generator Documentation](generator.md): How generated client libraries work
+- [Go Client Documentation](go.md): Reference implementation patterns
+- [Rust Client Library Documentation](rust.md): Rust client library with sync/async support
+- [TypeScript Client Library Documentation](typescript.md): Node.js client library
+- [C Client Library Documentation](c.md): Alternative client library for native integration
+- [C++ Client Library Documentation](cpp.md): Header-only C++ client library
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
 

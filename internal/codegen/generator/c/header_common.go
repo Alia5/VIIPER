@@ -13,7 +13,7 @@ import (
 const commonHeaderTmpl = `#ifndef VIIPER_H
 #define VIIPER_H
 
-/* Auto-generated VIIPER - C SDK: common header */
+/* Auto-generated VIIPER - C Client Library: common header */
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,7 +78,7 @@ typedef struct {
 {{end}}
 {{end}}
 
-/* Free helpers for DTOs (call to release memory allocated by the SDK) */
+/* Free helpers for DTOs (call to release memory allocated by the client library) */
 {{range .DTOs}}
 {{if ne .Name "Device"}}
 VIIPER_API void viiper_free_{{snakecase .Name}}(viiper_{{snakecase .Name}}_t* v);
@@ -141,7 +141,7 @@ VIIPER_API viiper_error_t viiper_device_send(
 );
 
 /* Register callback for device output (device → client, async)
- * User provides buffer - SDK reads directly into it and calls callback with byte count */
+ * User provides buffer - client library reads directly into it and calls callback with byte count */
 VIIPER_API void viiper_device_on_output(
     viiper_device_t* device,
     void* buffer,

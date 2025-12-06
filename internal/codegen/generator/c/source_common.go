@@ -10,7 +10,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 )
 
-const commonSourceTmpl = `/* Auto-generated VIIPER - C SDK: common source */
+const commonSourceTmpl = `/* Auto-generated VIIPER - C Client Library: common source */
 
 #include "viiper.h"
 #include <stdio.h>

@@ -37,22 +37,22 @@ viiper server --usb.addr=:9000 --api.addr=:9001
 
 VIIPER provides multiple ways to interact with the API. Choose the method that works best for you.
 
-### Option 1: Using Client SDKs (Recommended)
+### Option 1: Using Client Libraries (Recommended)
 
-Client SDKs are available for C, C#, Go, and TypeScript. They handle the protocol details automatically, providing type-safe interfaces and device-specific helpers.
+Client libraries are available for C, C#, Go, and TypeScript. They handle the protocol details automatically, providing type-safe interfaces and device-specific helpers.
 
-For complete SDK documentation and code examples, see:
+For complete client library documentation and code examples, see:
 
-- [C SDK Documentation](../clients/c.md)
-- [C# SDK Documentation](../clients/csharp.md)
-- [TypeScript SDK Documentation](../clients/typescript.md)
+- [C Client Library Documentation](../clients/c.md)
+- [C# Client Library Documentation](../clients/csharp.md)
+- [TypeScript Client Library Documentation](../clients/typescript.md)
 - [Go Client Documentation](../clients/go.md)
 
 Full working examples for all device types are available in the `examples/` directory of the repository.
 
 ### Option 2: Using Raw TCP (netcat)
 
-For quick testing without SDKs:
+For quick testing without client libraries:
 
 ```bash
 # Create a bus
@@ -139,7 +139,7 @@ Now that you have a working setup:
 
 1. **Explore Examples**: Check the `examples/` directory for complete working programs in C, C#, Go, and TypeScript
 2. **Read API Documentation**: Learn about all available [API commands](../api/overview.md)
-3. **Choose an SDK**: Pick a [client SDK](../clients/generator.md) for your preferred language
+3. **Choose a Client Library**: Pick a [client library](../clients/generator.md) for your preferred language
 4. **Review Device Specs**: Understand device-specific protocols in [Devices](../devices/keyboard.md)
 
 ## Troubleshooting
@@ -213,5 +213,5 @@ If you have VIIPER running as a service, your application's instance may conflic
 
 - [CLI Reference](../cli/overview.md) - Complete command documentation
 - [API Reference](../api/overview.md) - Management API protocol
-- [Client SDKs](../clients/generator.md) - Language-specific client libraries
+- [Client Libraries](../clients/generator.md) - Language-specific client libraries
 - [Configuration](../cli/configuration.md) - Environment variables and config files

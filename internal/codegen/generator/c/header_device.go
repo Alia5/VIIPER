@@ -15,7 +15,7 @@ import (
 const deviceHeaderTmpl = `#ifndef VIIPER_{{upper .Device}}_H
 #define VIIPER_{{upper .Device}}_H
 
-/* Auto-generated VIIPER - C SDK: {{.Device}} device */
+/* Auto-generated VIIPER - C Client Library: {{.Device}} device */
 
 /* Minimal path fix: include common header without duplicated module path */
 #include "viiper.h"

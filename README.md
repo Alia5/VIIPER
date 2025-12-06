@@ -1,10 +1,9 @@
 <img src="docs/viiper.svg" align="right" width="128"/>
 <br />
 
-
 [![Build Status](https://github.com/alia5/VIIPER/actions/workflows/snapshots.yml/badge.svg)](https://github.com/alia5/VIIPER/actions/workflows/snapshots.yml)
 [![License: GPL-3.0](https://img.shields.io/github/license/alia5/VIIPER)](https://github.com/alia5/VIIPER/blob/main/LICENSE.txt)
-[![Client SDKs: MIT](https://img.shields.io/badge/Client_SDKs-MIT-green)](https://github.com/alia5/VIIPER/blob/main/internal/codegen/common/license.go)
+[![Client Libraries: MIT](https://img.shields.io/badge/Client_Libraries-MIT-green)](https://github.com/alia5/VIIPER/blob/main/internal/codegen/common/license.go)
 [![Release](https://img.shields.io/github/v/release/alia5/VIIPER?include_prereleases&sort=semver)](https://github.com/alia5/VIIPER/releases)
 [![Downloads](https://img.shields.io/github/downloads/alia5/VIIPER/total?logo=github)](https://github.com/alia5/VIIPER/releases)
 [![Issues](https://img.shields.io/github/issues/alia5/VIIPER)](https://github.com/alia5/VIIPER/issues)
@@ -15,10 +14,8 @@
 [![NuGet downloads](https://img.shields.io/nuget/dt/Viiper.Client?logo=nuget&label=downloads)](https://www.nuget.org/packages/Viiper.Client/)
 [![crates.io version](https://img.shields.io/crates/v/viiper-client?logo=rust)](https://crates.io/crates/viiper-client)
 [![crates.io downloads](https://img.shields.io/crates/d/viiper-client?logo=rust&label=downloads)](https://crates.io/crates/viiper-client)
-[![C SDK](https://img.shields.io/badge/C_SDK-artifact-blueviolet)](https://github.com/Alia5/VIIPER/releases)
-[![C++ SDK](https://img.shields.io/badge/C++_SDK-Header_Only-blue)](https://github.com/Alia5/VIIPER/releases)
-
-
+[![C Client Library](https://img.shields.io/badge/C_Client_Library-artifact-blueviolet)](https://github.com/Alia5/VIIPER/releases)
+[![C++ Client Library](https://img.shields.io/badge/C++_Client_Library-Header_Only-blue)](https://github.com/Alia5/VIIPER/releases)
 
 # VIIPER 🐍
 
@@ -54,7 +51,7 @@ All devices _**can and must be**_ controlled programmatically via an API.
 - ✅ Cross-platform: works on Linux and Windows
 - ✅ Flexible logging (including raw USB packet logs)
 - ✅ API server for device/bus management and controlling virtual devices programmatically
-- ✅ Multiple client SDKs for easy integration; see [Client SDKs](docs/api/overview.md)  
+- ✅ Multiple client libraries for easy integration; see [Client Libraries](docs/api/overview.md)  
   MIT Licensed
 
 ## 🔌 Requirements
@@ -104,6 +101,7 @@ make build
 The binary will be in `dist/viiper` (or `dist/viiper.exe` on Windows).
 
 For more build options:
+
 ```bash
 make help              # Show all available targets
 make test              # Run tests

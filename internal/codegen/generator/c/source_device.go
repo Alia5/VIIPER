@@ -12,7 +12,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/scanner"
 )
 
-const deviceSourceTmpl = `/* Auto-generated VIIPER - C SDK: device source ({{.Device}}) */
+const deviceSourceTmpl = `/* Auto-generated VIIPER - C Client Library: device source ({{.Device}}) */
 
 #include "viiper.h"
 #include "viiper_{{.Device}}.h"

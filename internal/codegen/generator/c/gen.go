@@ -60,6 +60,6 @@ func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 		return err
 	}
 
-	logger.Info("Generated C SDK", "dir", outputDir)
+	logger.Info("Generated C client library", "dir", outputDir)
 	return nil
 }

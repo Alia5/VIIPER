@@ -6,12 +6,12 @@ A standard 5-button mouse with vertical and horizontal scroll wheels. Reports re
 - Interface/Endpoint: IN 0x81 (mouse input report)
 - Device type id (for API add): `mouse`
 
-## Client SDK Support
+## Client Library Support
 
-The wire protocol is abstracted by client SDKs. The **Go client** includes built-in types (`/device/mouse`), and **generated SDKs** provide equivalent structures with proper packing.  
+The wire protocol is abstracted by client libraries. The **Go client** includes built-in types (`/device/mouse`), and **generated client libraries** provide equivalent structures with proper packing.  
 You don't need to manually construct packets, just use the provided types and send them via the device stream.
 
-See: [Go Client](../clients/go.md), [Generated SDKs](../clients/generator.md)
+See: [Go Client](../clients/go.md), [Generated Client Libraries](../clients/generator.md)
 
 ## HID report format (host-facing)
 
@@ -46,7 +46,7 @@ printf "bus/create\0" | nc localhost 3242
 printf 'bus/1/add {"type":"mouse"}\0' | nc localhost 3242
 ```
 
-Or use one of the [client SDKs](../clients/generator.md) which handle the protocol automatically.
+Or use one of the [client libraries](../clients/generator.md) which handle the protocol automatically.
 
 ## Examples
 

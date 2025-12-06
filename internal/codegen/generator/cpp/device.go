@@ -9,7 +9,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 )
 
-const deviceTemplate = `// Auto-generated VIIPER C++ SDK
+const deviceTemplate = `// Auto-generated VIIPER C++ Client Library
 // DO NOT EDIT - This file is generated from the VIIPER server codebase
 
 #pragma once

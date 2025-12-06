@@ -40,7 +40,7 @@ func New(outputDir string, logger *slog.Logger) *Generator {
 func (g *Generator) GenAll() error {
 	for lang := range generators {
 		if err := g.GenerateLang(lang); err != nil {
-			return fmt.Errorf("generate %s SDK: %w", lang, err)
+			return fmt.Errorf("generate %s client library: %w", lang, err)
 		}
 	}
 	return nil
@@ -56,7 +56,7 @@ func (g *Generator) GenerateLang(lang string) error {
 		return fmt.Errorf("unsupported language '%s' (supported: %v)", lang, supported)
 	}
 
-	g.logger.Info("Generating SDK", "language", lang)
+	g.logger.Info("Generating client library", "language", lang)
 
 	md, err := g.ScanAll()
 	if err != nil {
@@ -72,7 +72,7 @@ func (g *Generator) GenerateLang(lang string) error {
 		return err
 	}
 
-	g.logger.Info("SDK generation complete", "language", lang, "output", outputPath)
+	g.logger.Info("Client library generation complete", "language", lang, "output", outputPath)
 	return nil
 }
 

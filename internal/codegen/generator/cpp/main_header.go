@@ -14,7 +14,7 @@ const mainHeaderTemplate = `{{.Header}}
 #pragma once
 
 // ============================================================================
-// VIIPER C++ SDK - Header-Only Library
+// VIIPER C++ Client Library - Header-Only Library
 // ============================================================================
 //
 // Version: {{.Major}}.{{.Minor}}.{{.Patch}}

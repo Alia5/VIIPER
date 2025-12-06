@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const socketTemplate = `// Auto-generated VIIPER C++ SDK
+const socketTemplate = `// Auto-generated VIIPER C++ Client Library
 // DO NOT EDIT - This file is generated from the VIIPER server codebase
 
 #pragma once

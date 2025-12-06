@@ -9,10 +9,10 @@ import (
 	"text/template"
 )
 
-const packageTemplate = `{
+const packageJSONTemplate = `{
   "name": "viiperclient",
   "version": "{{.Version}}",
-  "description": "VIIPER Client SDK for TypeScript/Node.js",
+  "description": "VIIPER Client Library for TypeScript/Node.js",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -76,7 +76,7 @@ func generateProject(logger *slog.Logger, projectDir, version string) error {
 }
 
 func packageTemplateFor(version string) string {
-	tmpl, err := template.New("pkg").Parse(packageTemplate)
+	tmpl, err := template.New("pkg").Parse(packageJSONTemplate)
 	if err != nil {
 		return "{}"
 	}

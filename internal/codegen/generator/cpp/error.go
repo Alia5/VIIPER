@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const errorTemplate = `// Auto-generated VIIPER C++ SDK
+const errorTemplate = `// Auto-generated VIIPER C++ Client Library
 // DO NOT EDIT - This file is generated from the VIIPER server codebase
 
 #pragma once
@@ -19,7 +19,7 @@ const errorTemplate = `// Auto-generated VIIPER C++ SDK
 namespace viiper {
 
 // ============================================================================
-// Error (simplified, generic like Rust SDK)
+// Error (simplified, generic like Rust client library)
 // ============================================================================
 
 struct Error {

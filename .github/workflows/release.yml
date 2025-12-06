@@ -24,8 +24,8 @@ jobs:
             mode: release
             tag_name: ${{ github.ref_name }}
 
-    client-sdks:
-        name: SDK smoke builds and pack
+    client-libraries:
+        name: Client library smoke builds and pack
         uses: ./.github/workflows/clients_ci.yml
         with:
             artifact_suffix: "-Release"
@@ -34,7 +34,7 @@ jobs:
 
     create-release:
         name: Create Release
-        needs: [build, generate-changelog, client-sdks]
+        needs: [build, generate-changelog, client-libraries]
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
@@ -96,15 +96,15 @@ jobs:
               with:
                   user: ${{ secrets.NUGET_USER }}
 
-            # Publish SDKs to npm and NuGet using OIDC trusted publishing
-            - name: Publish TypeScript SDK to npm
+            # Publish client libraries to npm and NuGet using OIDC trusted publishing
+            - name: Publish TypeScript client library to npm
               working-directory: release_files
               shell: bash
               run: |
                   set -euo pipefail
-                  TS_TARBALL="viiper-typescript-sdk.tgz"
+                  TS_TARBALL="viiper-typescript-client-library.tgz"
                   if [ ! -f "$TS_TARBALL" ]; then
-                    echo "ERROR: Missing TypeScript SDK tarball: $TS_TARBALL" >&2
+                    echo "ERROR: Missing TypeScript client library tarball: $TS_TARBALL" >&2
                     ls -la
                     exit 1
                   fi
@@ -112,11 +112,11 @@ jobs:
                   PKG_VERSION=$(tar -xOzf "$TS_TARBALL" package/package.json | grep '"version"' | head -1 | sed -E 's/.*"version" *: *"([^"]+)".*/\1/')
                   PKG_NAME=$(tar -xOzf "$TS_TARBALL" package/package.json | grep '"name"' | head -1 | sed -E 's/.*"name" *: *"([^"]+)".*/\1/')
                   if [ -z "$PKG_VERSION" ]; then
-                    echo "ERROR: Failed to extract version from TypeScript SDK tarball" >&2
+                    echo "ERROR: Failed to extract version from TypeScript client library tarball" >&2
                     exit 1
                   fi
                   if [ -z "$PKG_NAME" ]; then
-                    echo "ERROR: Failed to extract package name from TypeScript SDK tarball" >&2
+                    echo "ERROR: Failed to extract package name from TypeScript client library tarball" >&2
                     exit 1
                   fi
                   echo "Package version: $PKG_VERSION"
@@ -137,14 +137,14 @@ jobs:
                   npm config delete always-auth || true
                   npm publish "$TS_TARBALL" --provenance --access public --tag "$NPM_TAG"
 
-            - name: Publish C# SDK to NuGet
+            - name: Publish C# client library to NuGet
               working-directory: release_files
               shell: bash
               run: |
                   set -euo pipefail
-                  NUPKG="viiper-csharp-sdk-nupkg.nupkg"
+                  NUPKG="viiper-csharp-client-library-nupkg.nupkg"
                   if [ ! -f "$NUPKG" ]; then
-                    echo "ERROR: Missing C# SDK package: $NUPKG" >&2
+                    echo "ERROR: Missing C# client library package: $NUPKG" >&2
                     ls -la
                     exit 1
                   fi
@@ -158,16 +158,16 @@ jobs:
               id: crates_io_auth
               uses: rust-lang/crates-io-auth-action@v1
 
-            - name: Publish Rust SDK to crates.io
+            - name: Publish Rust client library to crates.io
               working-directory: release_files
               shell: bash
               env:
                   CARGO_REGISTRY_TOKEN: ${{ steps.crates_io_auth.outputs.token }}
               run: |
                   set -euo pipefail
-                  CRATE="viiper-rust-sdk.crate"
+                  CRATE="viiper-rust-client-library.crate"
                   if [ ! -f "$CRATE" ]; then
-                    echo "ERROR: Missing Rust SDK crate: $CRATE" >&2
+                    echo "ERROR: Missing Rust client library crate: $CRATE" >&2
                     ls -la
                     exit 1
                   fi

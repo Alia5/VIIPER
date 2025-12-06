@@ -6,5 +6,5 @@ import "fmt"
 // commentPrefix is the line comment token for the target language (e.g., "//").
 // langLabel is a human readable language label to include (e.g., "TypeScript", "C#").
 func FileHeader(commentPrefix, langLabel string) string {
-	return fmt.Sprintf("%s Auto-generated VIIPER %s SDK\n%s DO NOT EDIT - This file is generated from the VIIPER server codebase\n\n", commentPrefix, langLabel, commentPrefix)
+	return fmt.Sprintf("%s Auto-generated VIIPER %s Client Library\n%s DO NOT EDIT - This file is generated from the VIIPER server codebase\n\n", commentPrefix, langLabel, commentPrefix)
 }

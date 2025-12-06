@@ -22,7 +22,7 @@ const projectTemplate = `<Project Sdk="Microsoft.NET.Sdk">
     <PackageId>Viiper.Client</PackageId>
     <Version>{{.Version}}</Version>
     <Authors>Peter Repukat</Authors>
-    <Description>VIIPER Client SDK for C#</Description>
+    <Description>VIIPER Client Library for C#</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Alia5/VIIPER</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Alia5/VIIPER</RepositoryUrl>

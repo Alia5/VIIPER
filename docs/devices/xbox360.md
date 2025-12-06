@@ -6,12 +6,12 @@ The Xbox 360 virtual gamepad emulates an XInput-compatible controller that most 
 - Interfaces/Endpoints: single HID interface with one IN interrupt endpoint and one OUT interrupt endpoint for rumble
 - Device type id (for API add): `xbox360`
 
-## Client SDK Support
+## Client Library Support
 
-The wire protocol is abstracted by client SDKs. The **Go client** includes built-in types (`/device/xbox360`), and **generated SDKs** provide equivalent structures with proper packing.  
+The wire protocol is abstracted by client libraries. The **Go client** includes built-in types (`/device/xbox360`), and **generated client libraries** provide equivalent structures with proper packing.  
 You don't need to manually construct packets, just use the provided types and send them via the device stream.
 
-See: [Go Client](../clients/go.md), [Generated SDKs](../clients/generator.md)
+See: [Go Client](../clients/go.md), [Generated Client Libraries](../clients/generator.md)
 
 ## Adding the device
 
@@ -27,7 +27,7 @@ printf 'bus/1/add {"type":"xbox360"}\0' | nc localhost 3242
 
 The API returns a Device object with `busId`, `devId`, and other details. Attach it from a USB/IP client, then open a stream to drive input and receive rumble.
 
-Or use one of the [client SDKs](../clients/generator.md) which handle the protocol automatically.
+Or use one of the [client libraries](../clients/generator.md) which handle the protocol automatically.
 
 ## Streaming protocol
 

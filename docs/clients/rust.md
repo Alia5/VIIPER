@@ -1,10 +1,10 @@
-# Rust SDK Documentation
+# Rust Client Library Documentation
 
-The VIIPER Rust SDK provides a type-safe, zero-cost abstraction client library for interacting with VIIPER servers and controlling virtual devices.
+The VIIPER Rust client library provides a type-safe, zero-cost abstraction client library for interacting with VIIPER servers and controlling virtual devices.
 
 ## Overview
 
-The Rust SDK features:
+The Rust client library features:
 
 - **Sync and Async APIs**: Choose between blocking `ViiperClient` or async `AsyncViiperClient` (with `async` feature)
 - **Type-safe**: Generated structs with constants, helper maps, and `DeviceInput` trait implementations
@@ -13,14 +13,14 @@ The Rust SDK features:
 - **Tokio-based async**: Optional `async` feature for async/await support with Tokio runtime
 
 !!! note "License"
-    The Rust SDK is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
+    The Rust client library is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
     The core VIIPER server remains under its original license.
 
 ## Installation
 
 ### 1. Using the Published Crate (Recommended)
 
-Install the SDK using Cargo:
+Install the client library using Cargo:
 
 ```bash
 cargo add viiper-client
@@ -289,7 +289,7 @@ stream.on_output(|reader| {
 
 ## Generated Constants and Maps
 
-The Rust SDK generates constants and lazy-static maps for each device type.
+The Rust client library generates constants and lazy-static maps for each device type.
 
 ### Keyboard Constants
 
@@ -322,7 +322,7 @@ let caps_lock = (leds & LED_CAPS_LOCK) != 0;
 
 ### Helper Maps
 
-The SDK generates useful lookup maps for working with keyboard input:
+The client library generates useful lookup maps for working with keyboard input:
 
 **CHAR_TO_KEY** - Convert ASCII characters to key codes:
 
@@ -462,7 +462,7 @@ pub struct MouseInput {
 
 ## Error Handling
 
-The SDK uses a custom `ViiperError` type for all errors:
+The client library uses a custom `ViiperError` type for all errors:
 
 ```rust
 use viiper_client::ViiperError;
@@ -489,7 +489,7 @@ if let Err(ViiperError::Protocol(problem)) = result {
 
 ## Features
 
-The Rust SDK supports optional features:
+The Rust client library supports optional features:
 
 | Feature | Description | Dependencies |
 |---------|-------------|--------------|
@@ -540,7 +540,7 @@ cargo run --release -p virtual_x360_pad_async -- localhost:3242
 
 ## Project Structure
 
-Generated SDK layout:
+Generated client library layout:
 
 ```text
 clients/rust/
@@ -587,12 +587,12 @@ viiper-client = { version = "0.1", features = ["async"] }
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated SDKs work
-- [Go SDK Documentation](go.md): Reference implementation patterns
-- [C# SDK Documentation](csharp.md): Alternative managed language SDK
-- [TypeScript SDK Documentation](typescript.md): Node.js SDK
-- [C SDK Documentation](c.md): Native C SDK
-- [C++ SDK Documentation](cpp.md): Header-only C++ SDK
+- [Generator Documentation](generator.md): How generated client libraries work
+- [Go Client Documentation](go.md): Reference implementation patterns
+- [C# Client Library Documentation](csharp.md): Alternative managed language client library
+- [TypeScript Client Library Documentation](typescript.md): Node.js client library
+- [C Client Library Documentation](c.md): Native C client library
+- [C++ Client Library Documentation](cpp.md): Header-only C++ client library
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
 

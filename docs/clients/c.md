@@ -1,10 +1,10 @@
-# C SDK Documentation
+# C Client Library Documentation
 
-The VIIPER C SDK provides a lightweight, dependency-free client library for interacting with VIIPER servers and controlling virtual devices.
+The VIIPER C client library provides a lightweight, dependency-free client library for interacting with VIIPER servers and controlling virtual devices.
 
 ## Overview
 
-The C SDK features:
+The C client library features:
 
 - **Device-agnostic streaming API**: Uniform interface for all device types
 - **Zero dependencies**: Pure C99, no external libraries required
@@ -13,20 +13,20 @@ The C SDK features:
 - **Thread-safe**: Recommended: one `viiper_client_t` per thread
 
 !!! note "License"
-    The C SDK is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
+    The C client library is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
     The core VIIPER server remains under its original license.
 
 ## Installation
 
 ### Building from Source
 
-The C SDK is generated from the VIIPER server codebase:
+The C client library is generated from the VIIPER server codebase:
 
 ```bash
 go run ./cmd/viiper codegen --lang=c
 ```
 
-Build the SDK:
+Build the client library:
 
 ```bash
 cd ../clients/c
@@ -40,7 +40,7 @@ cmake --build build --config Release
 **CMake:**
 
 ```cmake
-# Add viiper SDK
+# Add viiper client library
 add_subdirectory(path/to/clients/c)
 target_link_libraries(your_target PRIVATE viiper)
 
@@ -212,7 +212,7 @@ viiper_device_close(device);
 
 Each device type has specific packet formats, constants, and wire protocols. For wire format details and usage patterns, see the [Devices](../devices/) section of the documentation.
 
-The C SDK provides generated structs and constants in device-specific headers (e.g., `viiper_keyboard.h`, `viiper_mouse.h`, `viiper_xbox360.h`).
+The C client library provides generated structs and constants in device-specific headers (e.g., `viiper_keyboard.h`, `viiper_mouse.h`, `viiper_xbox360.h`).
 
 ## Struct Packing
 
@@ -287,10 +287,10 @@ cmake --build build --config Release
 
 ## See Also
 
-- [Generator Documentation](generator.md): How the C SDK is generated
+- [Generator Documentation](generator.md): How the C client library is generated
 - [Go Client Documentation](go.md): Reference implementation
-- [C++ SDK Documentation](cpp.md): Header-only C++ SDK
-- [C# SDK Documentation](csharp.md): .NET SDK
-- [Rust SDK Documentation](rust.md): Rust SDK
-- [TypeScript SDK Documentation](typescript.md): Node.js SDK
+- [C++ Client Library Documentation](cpp.md): Header-only C++ client library
+- [C# Client Library Documentation](csharp.md): .NET client library
+- [Rust Client Library Documentation](rust.md): Rust client library
+- [TypeScript Client Library Documentation](typescript.md): Node.js client library
 - [API Overview](../api/overview.md): Management API reference

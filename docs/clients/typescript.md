@@ -1,10 +1,10 @@
-# TypeScript SDK Documentation
+# TypeScript Client Library Documentation
 
-The VIIPER TypeScript SDK provides a modern, type-safe Node.js client library for interacting with VIIPER servers and controlling virtual devices.
+The VIIPER TypeScript client library provides a modern, type-safe Node.js client library for interacting with VIIPER servers and controlling virtual devices.
 
 ## Overview
 
-The TypeScript SDK features:
+The TypeScript client library features:
 
 - **Type-safe API**: Structured request/response types with proper TypeScript definitions
 - **Event-driven**: EventEmitter-based output handling for device feedback (LEDs, rumble)
@@ -13,14 +13,14 @@ The TypeScript SDK features:
 - **Zero external dependencies**: Uses only built-in Node.js libraries
 
 !!! note "License"
-    The TypeScript SDK is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
+    The TypeScript client library is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
     The core VIIPER server remains under its original license.
 
 ## Installation
 
-### 1. Using the Published NPM Package (Recommended)
+### 1. Using the Published Package (Recommended)
 
-Install the SDK from the public npm registry:
+Install the client library from the public npm registry:
 
 ```bash
 npm install viiperclient
@@ -295,7 +295,7 @@ const capsLock = (leds & LED.CapsLock) !== 0;
 
 ### Helper Maps
 
-The SDK generates useful lookup maps for working with keyboard input:
+The client library generates useful lookup maps for working with keyboard input:
 
 **CharToKey Map** - Convert ASCII characters to key codes:
 
@@ -512,12 +512,12 @@ Some quick troubleshooting tips for the TypeScript SDK and device streams:
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated SDKs work
-- [Go SDK Documentation](go.md): Reference implementation patterns
-- [C# SDK Documentation](csharp.md): Alternative managed language SDK
-- [Rust SDK Documentation](rust.md): Rust SDK with sync/async support
-- [C SDK Documentation](c.md): Alternative SDK for native integration
-- [C++ SDK Documentation](cpp.md): Header-only C++ SDK
+- [Generator Documentation](generator.md): How generated client libraries work
+- [Go Client Documentation](go.md): Reference implementation patterns
+- [C# Client Library Documentation](csharp.md): Alternative managed language client library
+- [Rust Client Library Documentation](rust.md): Rust client library with sync/async support
+- [C Client Library Documentation](c.md): Alternative client library for native integration
+- [C++ Client Library Documentation](cpp.md): Header-only C++ client library
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
 

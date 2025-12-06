@@ -7,7 +7,7 @@ import (
 )
 
 type Codegen struct {
-	Output string `help:"Output directory for generated SDKs (repo-root relative). Default resolves to <repo>/clients" default:"./clients" env:"VIIPER_CODEGEN_OUTPUT"`
+	Output string `help:"Output directory for generated client libraries (repo-root relative). Default resolves to <repo>/clients" default:"./clients" env:"VIIPER_CODEGEN_OUTPUT"`
 	Lang   string `help:"Target language: c, cpp, csharp, rust, typescript, or 'all'" default:"all" enum:"c,cpp,csharp,rust,typescript,all" env:"VIIPER_CODEGEN_LANG"`
 }
 

@@ -1,277 +1,277 @@
-name: SDK CI
+name: Client Libraries CI
 
 on:
-  pull_request:
-    branches: ["**"]
-  workflow_call:
-    inputs:
-      artifact_suffix:
-        required: false
-        type: string
-        default: ""
-        description: "Suffix to add to artifact names"
-      upload_artifacts:
-        required: false
-        type: boolean
-        default: false
-        description: "Whether to upload SDK artifacts"
-      version:
-        required: false
-        type: string
-        default: ""
-        description: "Override version injected via ldflags (e.g. tag v1.2.3)"
+    pull_request:
+        branches: ["**"]
+    workflow_call:
+        inputs:
+            artifact_suffix:
+                required: false
+                type: string
+                default: ""
+                description: "Suffix to append to artifact names"
+            upload_artifacts:
+                required: false
+                type: boolean
+                default: false
+                description: "Whether to upload client library artifacts"
+            version:
+                required: false
+                type: string
+                default: ""
+                description: "Override version injected via ldflags (e.g. tag v1.2.3)"
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  codegen:
-    name: Code generation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    codegen:
+        name: Code generation
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
-          cache: true
-          cache-dependency-path: go.sum
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: stable
+                  cache: true
+                  cache-dependency-path: go.sum
 
-      - name: Run code generation
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -n "${{ inputs.version }}" ]; then
-            echo "Running codegen with injected version: ${{ inputs.version }}"
-            go run -ldflags "-X github.com/Alia5/VIIPER/internal/codegen/common.Version=${{ inputs.version }}" ./cmd/viiper codegen
-          else
-            echo "Running codegen with default dev version"
-            go run ./cmd/viiper codegen
-          fi
+            - name: Run code generation
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  if [ -n "${{ inputs.version }}" ]; then
+                    echo "Running codegen with injected version: ${{ inputs.version }}"
+                    go run -ldflags "-X github.com/Alia5/VIIPER/internal/codegen/common.Version=${{ inputs.version }}" ./cmd/viiper codegen
+                  else
+                    echo "Running codegen with default dev version"
+                    go run ./cmd/viiper codegen
+                  fi
 
-      - name: Upload generated clients
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-clients
-          path: clients/
-          retention-days: 1
+            - name: Upload generated clients
+              uses: actions/upload-artifact@v4
+              with:
+                  name: generated-clients
+                  path: clients/
+                  retention-days: 1
 
-  typescript:
-    name: TypeScript SDK
-    needs: codegen
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    typescript:
+        name: TypeScript Client Library
+        needs: codegen
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Download generated clients
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-clients
-          path: clients/
+            - name: Download generated clients
+              uses: actions/download-artifact@v4
+              with:
+                  name: generated-clients
+                  path: clients/
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: |
-            clients/typescript/package-lock.json
-            examples/typescript/package-lock.json
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "24"
+                  cache: "npm"
+                  cache-dependency-path: |
+                      clients/typescript/package-lock.json
+                      examples/typescript/package-lock.json
 
-      - name: Build TypeScript SDK
-        working-directory: clients/typescript
-        run: |
-          npm install
-          npm run build
-          npm pack
+            - name: Build TypeScript Client Library
+              working-directory: clients/typescript
+              run: |
+                  npm install
+                  npm run build
+                  npm pack
 
-      - name: Build TypeScript examples (smoke)
-        working-directory: examples/typescript
-        run: |
-          npm install
-          npm run build
+            - name: Build TypeScript examples (smoke)
+              working-directory: examples/typescript
+              run: |
+                  npm install
+                  npm run build
 
-      - name: Rename TypeScript SDK tarball
-        if: ${{ inputs.upload_artifacts }}
-        working-directory: clients/typescript
-        run: |
-          for file in viiperclient-*.tgz; do
-            if [ -f "$file" ]; then
-              mv "$file" "viiperclient-typescript-sdk${{ inputs.artifact_suffix }}.tgz"
-            fi
-          done
+            - name: Rename TypeScript Client Library tarball
+              if: ${{ inputs.upload_artifacts }}
+              working-directory: clients/typescript
+              run: |
+                  for file in viiperclient-*.tgz; do
+                    if [ -f "$file" ]; then
+                      mv "$file" "viiperclient-typescript-client-library${{ inputs.artifact_suffix }}.tgz"
+                    fi
+                  done
 
-      - name: Upload TypeScript SDK tarball
-        if: ${{ inputs.upload_artifacts }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: typescript-sdk${{ inputs.artifact_suffix }}
-          path: clients/typescript/viiperclient-typescript-sdk${{ inputs.artifact_suffix }}.tgz
-          if-no-files-found: error
+            - name: Upload TypeScript Client Library tarball
+              if: ${{ inputs.upload_artifacts }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: typescript-client-library${{ inputs.artifact_suffix }}
+                  path: clients/typescript/viiperclient-typescript-client-library${{ inputs.artifact_suffix }}.tgz
+                  if-no-files-found: error
 
-  csharp:
-    name: C# SDK
-    needs: codegen
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    csharp:
+        name: C# Client Library
+        needs: codegen
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Download generated clients
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-clients
-          path: clients/
+            - name: Download generated clients
+              uses: actions/download-artifact@v4
+              with:
+                  name: generated-clients
+                  path: clients/
 
-      - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+            - name: Set up .NET SDK
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: "8.0.x"
 
-      - name: Pack C# SDK
-        run: dotnet pack clients/csharp/Viiper.Client/Viiper.Client.csproj -c Release -o artifacts/nuget
+            - name: Pack C# Client Library
+              run: dotnet pack clients/csharp/Viiper.Client/Viiper.Client.csproj -c Release -o artifacts/nuget
 
-      - name: Build C# examples (smoke)
-        run: |
-          dotnet build examples/csharp/virtual_keyboard/VirtualKeyboard.csproj -c Release
-          dotnet build examples/csharp/virtual_mouse/VirtualMouse.csproj -c Release
-          dotnet build examples/csharp/virtual_x360_pad/VirtualX360Pad.csproj -c Release
+            - name: Build C# examples (smoke)
+              run: |
+                  dotnet build examples/csharp/virtual_keyboard/VirtualKeyboard.csproj -c Release
+                  dotnet build examples/csharp/virtual_mouse/VirtualMouse.csproj -c Release
+                  dotnet build examples/csharp/virtual_x360_pad/VirtualX360Pad.csproj -c Release
 
-      - name: Upload C# SDK nupkg
-        if: ${{ inputs.upload_artifacts }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: csharp-sdk-nupkg${{ inputs.artifact_suffix }}
-          path: artifacts/nuget/*.nupkg
-          if-no-files-found: error
+            - name: Upload C# Client Library nupkg
+              if: ${{ inputs.upload_artifacts }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: csharp-client-library-nupkg${{ inputs.artifact_suffix }}
+                  path: artifacts/nuget/*.nupkg
+                  if-no-files-found: error
 
-  c-sdk:
-    name: C SDK
-    needs: codegen
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    c-sdk:
+        name: C Client Library
+        needs: codegen
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Download generated clients
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-clients
-          path: clients/
+            - name: Download generated clients
+              uses: actions/download-artifact@v4
+              with:
+                  name: generated-clients
+                  path: clients/
 
-      - name: Set up CMake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.26.x'
+            - name: Set up CMake
+              uses: jwlawson/actions-setup-cmake@v2
+              with:
+                  cmake-version: "3.26.x"
 
-      - name: Build C SDK
-        run: |
-          cmake -S clients/c -B clients/c/build
-          cmake --build clients/c/build --config Release --parallel
+            - name: Build C Client Library
+              run: |
+                  cmake -S clients/c -B clients/c/build
+                  cmake --build clients/c/build --config Release --parallel
 
-      - name: Build C examples (smoke)
-        run: |
-          cmake -S examples/c -B examples/c/build
-          cmake --build examples/c/build --config Release --parallel
+            - name: Build C examples (smoke)
+              run: |
+                  cmake -S examples/c -B examples/c/build
+                  cmake --build examples/c/build --config Release --parallel
 
-      - name: Archive C SDK source
-        if: ${{ inputs.upload_artifacts }}
-        run: tar -czf c-sdk-source${{ inputs.artifact_suffix }}.tar.gz -C clients/c --exclude='build' .
+            - name: Archive C Client Library source
+              if: ${{ inputs.upload_artifacts }}
+              run: tar -czf c-client-library-source${{ inputs.artifact_suffix }}.tar.gz -C clients/c --exclude='build' .
 
-      - name: Upload C SDK source
-        if: ${{ inputs.upload_artifacts }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: c-sdk-source${{ inputs.artifact_suffix }}
-          path: c-sdk-source${{ inputs.artifact_suffix }}.tar.gz
-          if-no-files-found: error
+            - name: Upload C Client Library source
+              if: ${{ inputs.upload_artifacts }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: c-client-library-source${{ inputs.artifact_suffix }}
+                  path: c-client-library-source${{ inputs.artifact_suffix }}.tar.gz
+                  if-no-files-found: error
 
-  cpp-sdk:
-    name: C++ SDK
-    needs: codegen
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    cpp-sdk:
+        name: C++ Client Library
+        needs: codegen
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Download generated clients
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-clients
-          path: clients/
+            - name: Download generated clients
+              uses: actions/download-artifact@v4
+              with:
+                  name: generated-clients
+                  path: clients/
 
-      - name: Set up CMake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.26.x'
+            - name: Set up CMake
+              uses: jwlawson/actions-setup-cmake@v2
+              with:
+                  cmake-version: "3.26.x"
 
-      - name: Build C++ examples (smoke)
-        run: |
-          cmake -S examples/cpp -B examples/cpp/build -DCMAKE_BUILD_TYPE=Release
-          cmake --build examples/cpp/build --config Release --parallel
+            - name: Build C++ examples (smoke)
+              run: |
+                  cmake -S examples/cpp -B examples/cpp/build -DCMAKE_BUILD_TYPE=Release
+                  cmake --build examples/cpp/build --config Release --parallel
 
-      - name: Archive C++ SDK headers
-        if: ${{ inputs.upload_artifacts }}
-        run: |
-          cd clients/cpp
-          zip -r ../../cpp-sdk-headers${{ inputs.artifact_suffix }}.zip include/
+            - name: Archive C++ Client Library headers
+              if: ${{ inputs.upload_artifacts }}
+              run: |
+                  cd clients/cpp
+                  zip -r ../../cpp-client-library-headers${{ inputs.artifact_suffix }}.zip include/
 
-      - name: Upload C++ SDK headers
-        if: ${{ inputs.upload_artifacts }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: cpp-sdk-headers${{ inputs.artifact_suffix }}
-          path: cpp-sdk-headers${{ inputs.artifact_suffix }}.zip
-          if-no-files-found: error
+            - name: Upload C++ Client Library headers
+              if: ${{ inputs.upload_artifacts }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: cpp-client-library-headers${{ inputs.artifact_suffix }}
+                  path: cpp-client-library-headers${{ inputs.artifact_suffix }}.zip
+                  if-no-files-found: error
 
-  rust:
-    name: Rust SDK
-    needs: codegen
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    rust:
+        name: Rust Client Library
+        needs: codegen
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Download generated clients
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-clients
-          path: clients/
+            - name: Download generated clients
+              uses: actions/download-artifact@v4
+              with:
+                  name: generated-clients
+                  path: clients/
 
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
 
-      - name: Build Rust SDK
-        working-directory: clients/rust
-        run: |
-          cargo build --release
-          cargo build --release --features async
+            - name: Build Rust Client Library
+              working-directory: clients/rust
+              run: |
+                  cargo build --release
+                  cargo build --release --features async
 
-      - name: Package Rust SDK
-        working-directory: clients/rust
-        run: cargo package --allow-dirty --no-verify
+            - name: Package Rust Client Library
+              working-directory: clients/rust
+              run: cargo package --allow-dirty --no-verify
 
-      - name: Build Rust examples (smoke)
-        working-directory: examples/rust
-        run: cargo build --release
+            - name: Build Rust examples (smoke)
+              working-directory: examples/rust
+              run: cargo build --release
 
-      - name: Rename Rust SDK crate
-        if: ${{ inputs.upload_artifacts }}
-        working-directory: clients/rust/target/package
-        run: |
-          for file in viiper-client-*.crate; do
-            if [ -f "$file" ]; then
-              mv "$file" "viiper-client-rust-sdk${{ inputs.artifact_suffix }}.crate"
-            fi
-          done
+            - name: Rename Rust Client Library crate
+              if: ${{ inputs.upload_artifacts }}
+              working-directory: clients/rust/target/package
+              run: |
+                  for file in viiper-client-*.crate; do
+                    if [ -f "$file" ]; then
+                      mv "$file" "viiper-client-rust-client-library${{ inputs.artifact_suffix }}.crate"
+                    fi
+                  done
 
-      - name: Upload Rust SDK crate
-        if: ${{ inputs.upload_artifacts }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: rust-sdk${{ inputs.artifact_suffix }}
-          path: clients/rust/target/package/viiper-client-rust-sdk${{ inputs.artifact_suffix }}.crate
-          if-no-files-found: error
+            - name: Upload Rust Client Library crate
+              if: ${{ inputs.upload_artifacts }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: rust-client-library${{ inputs.artifact_suffix }}
+                  path: clients/rust/target/package/viiper-client-rust-client-library${{ inputs.artifact_suffix }}.crate
+                  if-no-files-found: error

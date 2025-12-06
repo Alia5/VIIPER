@@ -41,7 +41,7 @@ All devices _**can and must be**_ controlled programmatically via an API.
 - ✅ Cross-platform: works on Linux and Windows
 - ✅ Flexible logging (including raw USB packet logs)
 - ✅ API server for device/bus management and controlling virtual devices programmatically
-- ✅ Multiple client SDKs for easy integration; see [Client SDKs](api/overview.md)  
+- ✅ Multiple client libraries for easy integration; see [Client Libraries](api/overview.md)  
   MIT Licensed
 
 ---

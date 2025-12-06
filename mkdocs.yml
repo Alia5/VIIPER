@@ -69,11 +69,11 @@ nav:
     - API Overview: api/overview.md
     - Go Client: clients/go.md
     - Generator Documentation: clients/generator.md
-    - C SDK: clients/c.md
-    - C++ SDK: clients/cpp.md
-    - C# SDK: clients/csharp.md
-    - Rust SDK: clients/rust.md
-    - TypeScript SDK: clients/typescript.md
+    - C Client Library: clients/c.md
+    - C++ Client Library: clients/cpp.md
+    - C# Client Library: clients/csharp.md
+    - Rust Client Library: clients/rust.md
+    - TypeScript Client Library: clients/typescript.md
   - Devices:
     - Xbox 360 Controller: devices/xbox360.md
     - Keyboard: devices/keyboard.md

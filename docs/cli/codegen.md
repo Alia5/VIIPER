@@ -1,6 +1,6 @@
 # Code Generation Command
 
-The `codegen` command generates type-safe client SDKs from Go source code annotations.
+The `codegen` command generates type-safe client libraries from Go source code annotations.
 
 ## Usage
 
@@ -16,7 +16,7 @@ Scans the VIIPER server codebase to extract:
 - Device wire formats from `viiper:wire` comment tags
 - Device constants (keycodes, modifiers, button masks)
 
-Then generates client SDKs with:
+Then generates client libraries with:
 
 - Management API clients
 - Device-agnostic stream wrappers
@@ -30,7 +30,7 @@ Then generates client SDKs with:
 
 ### `--output`
 
-Output directory for generated SDKs (relative to repository root).
+Output directory for generated client libraries (relative to repository root).
 
 **Default:** `clients`  
 **Environment Variable:** `VIIPER_CODEGEN_OUTPUT`
@@ -38,7 +38,7 @@ Output directory for generated SDKs (relative to repository root).
 **Example:**
 
 ```bash
-viiper codegen --output=../sdk-output
+viiper codegen --output=../client-libs-output
 ```
 
 ### `--lang`
@@ -52,28 +52,28 @@ Target language to generate.
 **Examples:**
 
 ```bash
-# Generate all SDKs
+# Generate all client libraries
 viiper codegen --lang=all
 
-# Generate C SDK only
+# Generate C client library only
 viiper codegen --lang=c
 
-# Generate C# SDK only
+# Generate C# client library only
 viiper codegen --lang=csharp
 
-# Generate TypeScript SDK only
+# Generate TypeScript client library only
 viiper codegen --lang=typescript
 ```
 
 ## Examples
 
-### Generate All SDKs
+### Generate All Client Libraries
 
 ```bash
 go run ./cmd/viiper codegen
 ```
 
-### Generate C SDK and Rebuild Examples
+### Generate C Client Library and Rebuild Examples
 
 ```bash
 go run ./cmd/viiper codegen --lang=c
@@ -94,5 +94,5 @@ Run codegen when any of these change:
 ## See Also
 
 - [Generator Documentation](../clients/generator.md): Detailed explanation of tagging system and code generation flow
-- [C SDK Documentation](../clients/c.md): C-specific usage and build instructions
+- [C Client Library Documentation](../clients/c.md): C-specific usage and build instructions
 - [Configuration](configuration.md): Global configuration options

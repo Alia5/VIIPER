@@ -1,10 +1,10 @@
-# C++ SDK Documentation
+# C++ Client Library Documentation
 
-The VIIPER C++ SDK provides a modern, header-only C++20 client library for interacting with VIIPER servers and controlling virtual devices.
+The VIIPER C++ client library provides a modern, header-only C++20 client library for interacting with VIIPER servers and controlling virtual devices.
 
 ## Overview
 
-The C++ SDK features:
+The C++ client library features:
 
 - **Header-only**: No separate compilation required, just include and use
 - **Modern C++20**: Uses concepts, designated initializers, std::optional, smart pointers
@@ -14,12 +14,12 @@ The C++ SDK features:
 - **Cross-platform**: Windows (MSVC) and POSIX (GCC/Clang)
 
 !!! warning "JSON Parser Required"
-    The C++ SDK requires a JSON library to be provided by the user. You **must** define `VIIPER_JSON_INCLUDE`, `VIIPER_JSON_NAMESPACE`, and `VIIPER_JSON_TYPE` before including the SDK headers.
-    
+    The C++ client library requires a JSON library to be provided by the user. You **must** define `VIIPER_JSON_INCLUDE`, `VIIPER_JSON_NAMESPACE`, and `VIIPER_JSON_TYPE` before including the client library headers.
+
     **Recommended**: [nlohmann/json](https://github.com/nlohmann/json) - a header-only JSON library that can be easily integrated.
 
 !!! note "License"
-    The C++ SDK is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
+    The C++ client library is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
     The core VIIPER server remains under its original license.
 
 ## Installation
@@ -61,11 +61,11 @@ target_link_libraries(your_target PRIVATE nlohmann_json::nlohmann_json)
 go run ./cmd/viiper codegen --lang=cpp
 ```
 
-The SDK will be generated in `clients/cpp/include/viiper/`.
+The client library will be generated in `clients/cpp/include/viiper/`.
 
 ## JSON Parser Configuration
 
-Before including the VIIPER SDK, you must configure a JSON parser. The SDK is designed to work with any JSON library that provides a compatible interface.
+Before including the VIIPER client library, you must configure a JSON parser. The client library is designed to work with any JSON library that provides a compatible interface.
 
 ### Using nlohmann/json (Recommended)
 
@@ -295,7 +295,7 @@ The device is also automatically stopped when the `ViiperDevice` is destroyed.
 
 ## Generated Constants and Maps
 
-The C++ SDK automatically generates constants and helper maps for each device type.
+The C++ client library automatically generates constants and helper maps for each device type.
 
 ### Keyboard Constants
 
@@ -322,7 +322,7 @@ bool caps_lock = (leds & viiper::keyboard::LEDCapsLock) != 0;
 
 ### Helper Maps
 
-The SDK generates useful lookup maps for working with keyboard input:
+The client library generates useful lookup maps for working with keyboard input:
 
 **CHAR_TO_KEY Map** - Convert ASCII characters to key codes:
 
@@ -507,9 +507,9 @@ clients/cpp/include/viiper/
 - **JSON library** (nlohmann/json recommended)
 - **Platform**: Windows (MSVC 2019+) or POSIX (GCC 10+, Clang 10+)
 
-### Windows-specific
+### Windows-Specific
 
-The SDK uses Winsock2 for networking. Link against `Ws2_32.lib` (done automatically via `#pragma comment`).
+The client library uses Winsock2 for networking. Link against `Ws2_32.lib` (done automatically via `#pragma comment`).
 
 ### POSIX-specific
 
@@ -547,11 +547,11 @@ viiper server --api-addr localhost:3242
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated SDKs work
-- [C SDK Documentation](c.md): Pure C alternative
-- [Rust SDK Documentation](rust.md): Rust SDK with sync/async support
-- [C# SDK Documentation](csharp.md): .NET SDK
-- [TypeScript SDK Documentation](typescript.md): Node.js SDK
+- [Generator Documentation](generator.md): How generated client libraries work
+- [C Client Library Documentation](c.md): Pure C alternative
+- [Rust Client Library Documentation](rust.md): Rust client library with sync/async support
+- [C# Client Library Documentation](csharp.md): .NET client library
+- [TypeScript Client Library Documentation](typescript.md): Node.js client library
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
 

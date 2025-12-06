@@ -71,6 +71,6 @@ func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 		return err
 	}
 
-	logger.Info("Generated TypeScript SDK", "dir", projectDir)
+	logger.Info("Generated TypeScript client library", "dir", projectDir)
 	return nil
 }

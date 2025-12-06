@@ -2,16 +2,16 @@
 
 VIIPER ships a lightweight TCP API for managing virtual buses/devices and for device-specific streaming. It's designed to be trivial to drive from any language that can open a TCP socket and send null-byte-terminated commands.
 
-!!! tip "Client SDKs Available"
-    Generated client libraries are available that abstract away the protocol details described below. For most use cases, you should use one of the provided SDKs rather than implementing the raw protocol yourself:
-    
+!!! tip "Client Libraries Available"
+    Generated client libraries are available that abstract away the protocol details described below. For most use cases, you should use one of the provided client libraries rather than implementing the raw protocol yourself:
+
     - [Go Client](../clients/go.md): Reference implementation included in the repository
     - [Generator Documentation](../clients/generator.md): Information about code generation
-    - [C SDK](../clients/c.md): Generated C library with type-safe device streams
-    - [C++ SDK](../clients/cpp.md): Header-only C++20 library (requires external JSON parser)
-    - [C# SDK](../clients/csharp.md): Generated .NET library with async/await support
-    - [TypeScript SDK](../clients/typescript.md): Generated Node.js library with EventEmitter streams
-    - [Rust SDK](../clients/rust.md): Generated Rust library with sync/async support
+    - [C Client Library](../clients/c.md): Generated C library with type-safe device streams
+    - [C++ Client Library](../clients/cpp.md): Header-only C++20 library (requires external JSON parser)
+    - [C# Client Library](../clients/csharp.md): Generated .NET library with async/await support
+    - [TypeScript Client Library](../clients/typescript.md): Generated Node.js library with EventEmitter streams
+    - [Rust Client Library](../clients/rust.md): Generated Rust library with sync/async support
 
     
     The documentation below is provided for reference and for implementing clients in languages not yet supported by the generator.
@@ -36,36 +36,36 @@ Tip: You can experiment with `nc`/`ncat` or PowerShell’s `tcpclient` to send l
 The server registers the following commands and streams:
 
 - `bus/list`
-    - List all virtual bus IDs.
-    - Response: `{ "buses": [1, 2, ...] }`
+  - List all virtual bus IDs.
+  - Response: `{ "buses": [1, 2, ...] }`
 
 - `bus/create [busId]`
-    - Create a new bus. If `busId` (numeric) is provided, VIIPER attempts to create the bus with that id; otherwise it picks the next free id.
-    - Payload: Optional numeric bus ID (e.g., `5`)
-    - Response: `{ "busId": <id> }`
+  - Create a new bus. If `busId` (numeric) is provided, VIIPER attempts to create the bus with that id; otherwise it picks the next free id.
+  - Payload: Optional numeric bus ID (e.g., `5`)
+  - Response: `{ "busId": <id> }`
 
 - `bus/remove <busId>`
-    - Remove a bus and all devices on it.
-    - Payload: Numeric bus ID (e.g., `1`)
-    - Response: `{ "busId": <id> }`
+  - Remove a bus and all devices on it.
+  - Payload: Numeric bus ID (e.g., `1`)
+  - Response: `{ "busId": <id> }`
 
 - `bus/{id}/list`
-    - List devices on a bus.
-    - Response: `{ "devices": [{ "busId": 1, "devId": "1", "vid": "0x045e", "pid": "0x028e", "type": "xbox360" }, ...] }`
+  - List devices on a bus.
+  - Response: `{ "devices": [{ "busId": 1, "devId": "1", "vid": "0x045e", "pid": "0x028e", "type": "xbox360" }, ...] }`
 
 - `bus/{id}/add <json_payload>`
-    - Add a device to a bus.
-    - Payload: JSON object with device creation parameters: `{"type": "<deviceType>", "idVendor": <optional_vid>, "idProduct": <optional_pid>}`
-    - Example: `{"type": "xbox360"}` or `{"type": "keyboard", "idVendor": 1234, "idProduct": 5678}`
-    - Response: JSON device object with fields: `{"busId": <id>, "devId": "<devId>", "vid": "0x045e", "pid": "0x028e", "type": "xbox360"}`
-    - Important: After add, the server starts a connect timer (default `5s`). You must open a device stream (see below) before the timeout expires, otherwise the device is auto-removed.
-    - If [auto-attach](../cli/server.md#api.auto-attach-local-client) is enabled (default) the server automatically attaches the new device to a local USBIP client on the same host (localhost only).  
+  - Add a device to a bus.
+  - Payload: JSON object with device creation parameters: `{"type": "<deviceType>", "idVendor": <optional_vid>, "idProduct": <optional_pid>}`
+  - Example: `{"type": "xbox360"}` or `{"type": "keyboard", "idVendor": 1234, "idProduct": 5678}`
+  - Response: JSON device object with fields: `{"busId": <id>, "devId": "<devId>", "vid": "0x045e", "pid": "0x028e", "type": "xbox360"}`
+  - Important: After add, the server starts a connect timer (default `5s`). You must open a device stream (see below) before the timeout expires, otherwise the device is auto-removed.
+  - If [auto-attach](../cli/server.md#api.auto-attach-local-client) is enabled (default) the server automatically attaches the new device to a local USBIP client on the same host (localhost only).  
     Failures (missing tool, non-zero exit) are logged but do not affect the API response.
 
 - `bus/{id}/remove <deviceId>`
-    - Remove a device by its device number on that bus.
-    - Payload: Numeric device ID (e.g., `1` for device 1-1 on the bus)
-    - Response: `{ "busId": <id>, "devId": "<dev>" }`
+  - Remove a device by its device number on that bus.
+  - Payload: Numeric device ID (e.g., `1` for device 1-1 on the bus)
+  - Response: `{ "busId": <id>, "devId": "<dev>" }`
 
 ### Streaming endpoint
 
@@ -81,14 +81,14 @@ The server registers the following commands and streams:
 Direction: client ➜ server (input state)
 
 - Fixed 14-byte packets, little-endian layout:
-    - `Buttons` uint32 (4 bytes)
-    - `LT` uint8, `RT` uint8 (2 bytes)
-    - `LX, LY, RX, RY` int16 each (8 bytes)
+  - `Buttons` uint32 (4 bytes)
+  - `LT` uint8, `RT` uint8 (2 bytes)
+  - `LX, LY, RX, RY` int16 each (8 bytes)
 
 Direction: server ➜ client (rumble)
 
 - Fixed 2-byte packets:
-    - `LeftMotor` uint8, `RightMotor` uint8
+  - `LeftMotor` uint8, `RightMotor` uint8
 
 See `/device/xbox360/protocol.go` for full details.
 
@@ -97,13 +97,13 @@ See `/device/xbox360/protocol.go` for full details.
 Direction: client ➜ server (keys pressed)
 
 - Variable-length packets per frame:
-    - Header: Modifiers uint8, KeyCount uint8
-    - Body: KeyCount bytes of HID Usage IDs for currently pressed (non-modifier) keys
+  - Header: Modifiers uint8, KeyCount uint8
+  - Body: KeyCount bytes of HID Usage IDs for currently pressed (non-modifier) keys
 
 Direction: server ➜ client (LED state)
 
 - 1-byte packets whenever host LED state changes:
-    - Bit 0 NumLock, Bit 1 CapsLock, Bit 2 ScrollLock
+  - Bit 0 NumLock, Bit 1 CapsLock, Bit 2 ScrollLock
 
 Host-facing HID input report is 34 bytes: [Modifiers (1), Reserved (1), 256-bit key bitmap (32)].
 
@@ -114,9 +114,9 @@ See `/device/keyboard/` for helpers and constants.
 Direction: client ➜ server (motion/buttons)
 
 - Fixed 5-byte packets per frame:
-    - Buttons uint8 (bits 0..4)
-    - dX int8, dY int8
-    - Wheel int8, Pan int8
+  - Buttons uint8 (bits 0..4)
+  - dX int8, dY int8
+  - Wheel int8, Pan int8
 
 Direction: server ➜ client
 
@@ -127,9 +127,9 @@ Note: Motion and wheel deltas are consumed after each IN report so movement is r
 Note on protocol compatibility:
 
 - The wire format is modeled after the XInput gamepad state (XINPUT_GAMEPAD) but is not byte‑for‑byte identical. Key differences:
-    - Buttons are encoded as a 32‑bit little‑endian field (XInput uses a 16‑bit bitmask), making the packet 14 bytes instead of 12.
-    - No header or framing: packets are fixed‑length and back‑to‑back on the TCP stream.
-    - Endianness is little‑endian for all multi‑byte fields.
+  - Buttons are encoded as a 32‑bit little‑endian field (XInput uses a 16‑bit bitmask), making the packet 14 bytes instead of 12.
+  - No header or framing: packets are fixed‑length and back‑to‑back on the TCP stream.
+  - Endianness is little‑endian for all multi‑byte fields.
 
 ## Example sessions
 

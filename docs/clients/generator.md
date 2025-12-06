@@ -2,7 +2,7 @@
 
 ## Overview
 
-The VIIPER client generator scans Go source code to extract API routes, device wire formats, and constants; then emits type-safe client SDKs for multiple languages.
+The VIIPER client generator scans Go source code to extract API routes, device wire formats, and constants; then emits type-safe client libraries for multiple languages.
 
 **What it extracts:**
 
@@ -10,18 +10,18 @@ The VIIPER client generator scans Go source code to extract API routes, device w
 - Device wire formats from `viiper:wire` comment tags  
 - All exported constants from device packages (automatic)
 
-**Output:** Type-safe client SDKs for multiple target languages
+**Output:** Type-safe client libraries for multiple target languages
 
 !!! note "License"
-    All generated client SDKs are licensed under the **MIT License**, providing maximum flexibility for integration into your projects. The core VIIPER server remains under its original license.
+    All generated client libraries are licensed under the **MIT License**, providing maximum flexibility for integration into your projects. The core VIIPER server remains under its original license.
 
 ## Running the Generator
 
 ```bash
-go run ./cmd/viiper codegen --lang=all        # Generate all SDKs
-go run ./cmd/viiper codegen --lang=c          # Generate C SDK only
-go run ./cmd/viiper codegen --lang=csharp     # Generate C# SDK only
-go run ./cmd/viiper codegen --lang=typescript # Generate TypeScript SDK only
+go run ./cmd/viiper codegen --lang=all        # Generate all client libraries
+go run ./cmd/viiper codegen --lang=c          # Generate C client library only
+go run ./cmd/viiper codegen --lang=csharp     # Generate C# client library only
+go run ./cmd/viiper codegen --lang=typescript # Generate TypeScript client library only
 ```
 
 **Output directory**: `clients/` (relative to repository root)
@@ -218,14 +218,13 @@ Run codegen when any of these change:
 - **C#**: Enums for constant groups; `Dictionary<K,V>` with static helper methods for maps; `ViiperDevice` class with `OnOutput` event; async/await for management API; struct packing via attributes.  
 - **TypeScript**: Enums for constant groups; `Record<K, V>` objects with `Get`/`Has` helper functions for maps; manual byte encoding via `BinaryWriter`/`BinaryReader`; `ViiperDevice` class with EventEmitter for output; `addDeviceAndConnect` convenience method; builds with `tsc`.  
 
-
 ## Further Reading
 
 - [Design Document](../design.md): Architectural rationale and detailed generation strategy
 - [Go Client Documentation](go.md): Go reference client usage
-- [C SDK Documentation](c.md): C-specific usage, build, and examples
-- [C# SDK Documentation](csharp.md): C#-specific usage, async patterns, and map helpers
-- [TypeScript SDK Documentation](typescript.md): TypeScript-specific usage, EventEmitter patterns, and examples
+- [C Client Library Documentation](c.md): C-specific usage, build, and examples
+- [C# Client Library Documentation](csharp.md): C#-specific usage, async patterns, and map helpers
+- [TypeScript Client Library Documentation](typescript.md): TypeScript-specific usage, EventEmitter patterns, and examples
 
 ---
 
