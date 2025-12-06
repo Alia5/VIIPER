@@ -1608,7 +1608,6 @@
 <p><img src="viiper.svg" align="right" width="200"/>
 <br /></p>
 <h1 id="viiper-documentation">VIIPER Documentation</h1>
-<p>Welcome to the VIIPER documentation!</p>
 <p>VIIPER is a tool to create virtual input devices using USBIP.</p>
 <h2 id="quick-links">Quick Links</h2>
 <ul>
@@ -1620,22 +1619,27 @@
 <h2 id="what-is-viiper">What is VIIPER?</h2>
 <p>VIIPER creates virtual USB input devices using the USBIP protocol.<br />
 These virtual devices appear as real hardware to the operating system and applications, allowing you to emulate controllers, keyboards, and other input devices without physical hardware.</p>
-<p>VIIPER is a self-contained, standalone binary that uses USBIP to handle the USB protocol layer.<br />
-Device emulation happens in userspace code instead of kernel drivers, so no kernel programming is required to add new device types.<br />
-Users need USBIP installed once (built into Linux, usbip-win2 for Windows), after that VIIPER runs without additional dependencies or system-wide installation.<br />
-The binary is portable and can be bundled with your application.</p>
+<ul>
+<li>VIIPER abstracts away all USB / USBIP details.  </li>
+<li>Device emulation happens in userspace code instead of kernel drivers, so no kernel programming is required to add new device types.  </li>
+<li>Users need USBIP installed once (built into Linux, usbip-win2 for Windows), after that VIIPER runs without additional dependencies or system-wide installation.  </li>
+</ul>
+<p>VIIPER <em>currently</em> comes in a single flavor:</p>
+<ul>
+<li>a self-contained, (no dependencies) portable, standalone executable.<br />
+  providing a lightweight TCP based API for feeder application development.  </li>
+<li>There will eventually be a library version (libVIIPER) that you can link against directly from your application.<br />
+For more information, see <a href="#why-is-this-a-standalone-executable-that-i-have-to-interface-via-tcp-and-not-a-shared-object-library-in-itself">FAQ</a>  </li>
+</ul>
 <p>Beyond device emulation, VIIPER can proxy real USB devices for traffic inspection and reverse engineering.</p>
-<p>VIIPER provides a liehgtweight TCP based API for feeder application development.</p>
 <h3 id="features">✨ Features</h3>
 <ul>
-<li>✅ Virtual input device emulation over IP using USBIP<ul>
+<li>✅ Virtual input device emulation over IP using USBIP</li>
 <li>✅ Xbox 360 controller emulation (virtual device); see <a href="devices/xbox360/">Devices › Xbox 360 Controller</a></li>
 <li>✅ HID Keyboard with N-key rollover and LED feedback; see <a href="devices/keyboard/">Devices › Keyboard</a></li>
 <li>✅ HID Mouse with 5 buttons and horizontal/vertical wheel; see <a href="devices/mouse/">Devices › Mouse</a></li>
 <li>🔜 ???<br />
-  🔜 Future plugin system allows for more device types (other gamepads, specialized HID)</li>
-</ul>
-</li>
+      🔜 Future plugin system allows for more device types (other gamepads, specialized HID)</li>
 <li>✅ USBIP server mode: expose virtual devices to remote clients</li>
 <li>✅ <strong>Automatic local attachment</strong>: automatically controls usbip client on localhost to attach devices (enabled by default)</li>
 <li>✅ Proxy mode: forward real USB devices and inspect/record traffic (for reversing)</li>
