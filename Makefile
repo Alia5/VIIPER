@@ -133,7 +133,7 @@ ifeq ($(OS),Windows_NT)
 	@echo Generating Windows version info...
 	@go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
 	@powershell -NoProfile -NonInteractive -File scripts/inject-version.ps1 "$(VERSION)" "$(VERSIONINFO_JSON)" "versioninfo.tmp.json"
-	@cd $(SRC_DIR) && goversioninfo -o $(RESOURCE_SYSO) versioninfo.tmp.json
+	@cd $(SRC_DIR) && goversioninfo -64 -o $(RESOURCE_SYSO) versioninfo.tmp.json
 	@del versioninfo.tmp.json
 else
 	@echo Skipping versioninfo generation on non-Windows platform
