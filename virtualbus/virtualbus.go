@@ -15,9 +15,8 @@ import (
 const basepath = "/sys/devices/pci0000:00/0000:00:08.1/0000:00:04:00.3/usb"
 
 var (
-	globalBusCounter uint32
-	allocatedBusIds  = make(map[uint32]bool)
-	globalMutex      sync.Mutex
+	allocatedBusIds = make(map[uint32]bool)
+	globalMutex     sync.Mutex
 )
 
 // VirtualBus manages USB bus topology and auto-assigns device addresses.
@@ -38,19 +37,14 @@ type DeviceMeta struct {
 }
 
 // New creates a new VirtualBus instance with a unique auto-assigned bus number.
-func New() *VirtualBus {
+func New(busID uint32) *VirtualBus {
 	globalMutex.Lock()
 	defer globalMutex.Unlock()
 
-	busId := globalBusCounter
-	if busId == 0 {
-		busId = 1
-	}
-	globalBusCounter = busId + 1
-	allocatedBusIds[busId] = true
+	allocatedBusIds[busID] = true
 
 	return &VirtualBus{
-		busId:           busId,
+		busId:           busID,
 		nextDevID:       0,
 		allocatedDevIDs: make(map[uint32]bool),
 	}

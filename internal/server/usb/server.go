@@ -195,6 +195,18 @@ func (s *Server) GetBus(busID uint32) *virtualbus.VirtualBus {
 	return s.busses[busID]
 }
 
+func (s *Server) NextFreeBusID() uint32 {
+	s.busesMu.Lock()
+	defer s.busesMu.Unlock()
+	var id uint32 = 1
+	for {
+		if _, exists := s.busses[id]; !exists {
+			return id
+		}
+		id++
+	}
+}
+
 // ListenAndServe starts the USB-IP server and handles incoming connections.
 func (s *Server) ListenAndServe() error {
 	ln, err := net.Listen("tcp", s.config.Addr)

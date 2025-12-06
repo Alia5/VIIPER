@@ -36,7 +36,8 @@ func BusCreate(s *usb.Server) api.HandlerFunc {
 			return nil
 		}
 
-		b := virtualbus.New()
+		busId := s.NextFreeBusID()
+		b := virtualbus.New(busId)
 		if err := s.AddBus(b); err != nil {
 			return api.ErrInternal(fmt.Sprintf("failed to add bus: %v", err))
 		}
