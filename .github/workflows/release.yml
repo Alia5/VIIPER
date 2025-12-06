@@ -220,9 +220,6 @@ jobs:
                   body: |
                       ## VIIPER Release ${{ steps.build_info.outputs.version }}
 
-                      Release Date: ${{ steps.build_info.outputs.date }} ${{ steps.build_info.outputs.time }}
-
-                      ### Changes
                       ${{ needs.generate-changelog.outputs.changelog }}
                   files: release_files/*
                   prerelease: false

@@ -113,13 +113,10 @@ jobs:
                   body: |
                       Automated development build.
 
-                      Version: ${{ steps.build_info.outputs.version }}
-                      Date: ${{ steps.build_info.outputs.date }} ${{ steps.build_info.outputs.time }}
                       Commit: [${{ steps.build_info.outputs.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
 
                       ⚠️ These are the latest development builds and may contain bugs or unfinished features.
 
-                      ### Changes
                       ${{ needs.generate-changelog.outputs.changelog }}
                   files: |
                       ./release_files/*
