@@ -27,7 +27,7 @@
     
     
       
-        <title>C SDK - VIIPER Documentation</title>
+        <title>C Client Library - VIIPER Documentation</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#c-sdk-documentation" class="md-skip">
+        <a href="#c-client-library-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              C SDK
+              C Client Library
             
           </span>
         </div>
@@ -899,7 +899,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -917,7 +917,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -1181,7 +1181,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -1209,7 +1209,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -1237,7 +1237,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1265,7 +1265,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1720,10 +1720,10 @@
   
 
 
-<h1 id="c-sdk-documentation">C SDK Documentation</h1>
-<p>The VIIPER C SDK provides a lightweight, dependency-free client library for interacting with VIIPER servers and controlling virtual devices.</p>
+<h1 id="c-client-library-documentation">C Client Library Documentation</h1>
+<p>The VIIPER C client library provides a lightweight, dependency-free client library for interacting with VIIPER servers and controlling virtual devices.</p>
 <h2 id="overview">Overview</h2>
-<p>The C SDK features:</p>
+<p>The C client library features:</p>
 <ul>
 <li><strong>Device-agnostic streaming API</strong>: Uniform interface for all device types</li>
 <li><strong>Zero dependencies</strong>: Pure C99, no external libraries required</li>
@@ -1733,15 +1733,15 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">License</p>
-<p>The C SDK is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
+<p>The C client library is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
 The core VIIPER server remains under its original license.</p>
 </div>
 <h2 id="installation">Installation</h2>
 <h3 id="building-from-source">Building from Source</h3>
-<p>The C SDK is generated from the VIIPER server codebase:</p>
+<p>The C client library is generated from the VIIPER server codebase:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
 </code></pre></div>
-<p>Build the SDK:</p>
+<p>Build the client library:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>../clients/c
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cmake<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-G<span class="w"> </span><span class="s2">&quot;Visual Studio 17 2022&quot;</span><span class="w">  </span><span class="c1"># Windows</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>cmake<span class="w"> </span>-B<span class="w"> </span>build<span class="w">                              </span><span class="c1"># POSIX</span>
@@ -1749,7 +1749,7 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <h3 id="linking-to-your-project">Linking to Your Project</h3>
 <p><strong>CMake:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c"># Add viiper SDK</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c"># Add viiper client library</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">add_subdirectory</span><span class="p">(</span><span class="s">path/to/clients/c</span><span class="p">)</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">your_target</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">viiper</span><span class="p">)</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
@@ -1898,7 +1898,7 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <h2 id="device-specific-notes">Device-Specific Notes</h2>
 <p>Each device type has specific packet formats, constants, and wire protocols. For wire format details and usage patterns, see the <a href="../devices/">Devices</a> section of the documentation.</p>
-<p>The C SDK provides generated structs and constants in device-specific headers (e.g., <code>viiper_keyboard.h</code>, <code>viiper_mouse.h</code>, <code>viiper_xbox360.h</code>).</p>
+<p>The C client library provides generated structs and constants in device-specific headers (e.g., <code>viiper_keyboard.h</code>, <code>viiper_mouse.h</code>, <code>viiper_xbox360.h</code>).</p>
 <h2 id="struct-packing">Struct Packing</h2>
 <p>All device I/O structs use <code>#pragma pack(1)</code> to ensure wire compatibility (no padding).</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="cp">#pragma pack(push, 1)</span>
@@ -1952,12 +1952,12 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <h2 id="see-also">See Also</h2>
 <ul>
-<li><a href="../generator/">Generator Documentation</a>: How the C SDK is generated</li>
+<li><a href="../generator/">Generator Documentation</a>: How the C client library is generated</li>
 <li><a href="../go/">Go Client Documentation</a>: Reference implementation</li>
-<li><a href="../cpp/">C++ SDK Documentation</a>: Header-only C++ SDK</li>
-<li><a href="../csharp/">C# SDK Documentation</a>: .NET SDK</li>
-<li><a href="../rust/">Rust SDK Documentation</a>: Rust SDK</li>
-<li><a href="../typescript/">TypeScript SDK Documentation</a>: Node.js SDK</li>
+<li><a href="../cpp/">C++ Client Library Documentation</a>: Header-only C++ client library</li>
+<li><a href="../csharp/">C# Client Library Documentation</a>: .NET client library</li>
+<li><a href="../rust/">Rust Client Library Documentation</a>: Rust client library</li>
+<li><a href="../typescript/">TypeScript Client Library Documentation</a>: Node.js client library</li>
 <li><a href="../../api/overview/">API Overview</a>: Management API reference</li>
 </ul>
 

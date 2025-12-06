@@ -27,7 +27,7 @@
     
     
       
-        <title>Rust SDK - VIIPER Documentation</title>
+        <title>Rust Client Library - VIIPER Documentation</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#rust-sdk-documentation" class="md-skip">
+        <a href="#rust-client-library-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Rust SDK
+              Rust Client Library
             
           </span>
         </div>
@@ -890,7 +890,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -918,7 +918,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -946,7 +946,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -983,7 +983,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1001,7 +1001,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1387,7 +1387,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1964,10 +1964,10 @@
   
 
 
-<h1 id="rust-sdk-documentation">Rust SDK Documentation</h1>
-<p>The VIIPER Rust SDK provides a type-safe, zero-cost abstraction client library for interacting with VIIPER servers and controlling virtual devices.</p>
+<h1 id="rust-client-library-documentation">Rust Client Library Documentation</h1>
+<p>The VIIPER Rust client library provides a type-safe, zero-cost abstraction client library for interacting with VIIPER servers and controlling virtual devices.</p>
 <h2 id="overview">Overview</h2>
-<p>The Rust SDK features:</p>
+<p>The Rust client library features:</p>
 <ul>
 <li><strong>Sync and Async APIs</strong>: Choose between blocking <code>ViiperClient</code> or async <code>AsyncViiperClient</code> (with <code>async</code> feature)</li>
 <li><strong>Type-safe</strong>: Generated structs with constants, helper maps, and <code>DeviceInput</code> trait implementations</li>
@@ -1977,12 +1977,12 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">License</p>
-<p>The Rust SDK is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
+<p>The Rust client library is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
 The core VIIPER server remains under its original license.</p>
 </div>
 <h2 id="installation">Installation</h2>
 <h3 id="1-using-the-published-crate-recommended">1. Using the Published Crate (Recommended)</h3>
-<p>Install the SDK using Cargo:</p>
+<p>Install the client library using Cargo:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>cargo<span class="w"> </span>add<span class="w"> </span>viiper-client
 </code></pre></div>
 <p>For async support:</p>
@@ -2208,7 +2208,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">}).</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;Failed to register callback&quot;</span><span class="p">);</span>
 </code></pre></div>
 <h2 id="generated-constants-and-maps">Generated Constants and Maps</h2>
-<p>The Rust SDK generates constants and lazy-static maps for each device type.</p>
+<p>The Rust client library generates constants and lazy-static maps for each device type.</p>
 <h3 id="keyboard-constants">Keyboard Constants</h3>
 <p><strong>Key Constants:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">use</span><span class="w"> </span><span class="n">viiper_client</span><span class="p">::</span><span class="n">devices</span><span class="p">::</span><span class="n">keyboard</span><span class="p">::</span><span class="o">*</span><span class="p">;</span>
@@ -2229,7 +2229,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="kd">let</span><span class="w"> </span><span class="n">caps_lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">leds</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">LED_CAPS_LOCK</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="helper-maps">Helper Maps</h3>
-<p>The SDK generates useful lookup maps for working with keyboard input:</p>
+<p>The client library generates useful lookup maps for working with keyboard input:</p>
 <p><strong>CHAR_TO_KEY</strong> - Convert ASCII characters to key codes:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">use</span><span class="w"> </span><span class="n">viiper_client</span><span class="p">::</span><span class="n">devices</span><span class="p">::</span><span class="n">keyboard</span><span class="p">::</span><span class="n">CHAR_TO_KEY</span><span class="p">;</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
@@ -2335,7 +2335,7 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <p><strong>Wire format:</strong> Fixed 5 bytes, packed structure</p>
 <h2 id="error-handling">Error Handling</h2>
-<p>The SDK uses a custom <code>ViiperError</code> type for all errors:</p>
+<p>The client library uses a custom <code>ViiperError</code> type for all errors:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">use</span><span class="w"> </span><span class="n">viiper_client</span><span class="p">::</span><span class="n">ViiperError</span><span class="p">;</span>
 <a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>
 <a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="k">match</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">bus_list</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -2355,7 +2355,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="features">Features</h2>
-<p>The Rust SDK supports optional features:</p>
+<p>The Rust client library supports optional features:</p>
 <table>
 <thead>
 <tr>
@@ -2422,7 +2422,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>cargo<span class="w"> </span>run<span class="w"> </span>--release<span class="w"> </span>-p<span class="w"> </span>virtual_x360_pad_async<span class="w"> </span>--<span class="w"> </span>localhost:3242
 </code></pre></div>
 <h2 id="project-structure">Project Structure</h2>
-<p>Generated SDK layout:</p>
+<p>Generated client library layout:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>clients/rust/
 <a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>├── Cargo.toml
 <a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>├── src/
@@ -2457,12 +2457,12 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <h2 id="see-also">See Also</h2>
 <ul>
-<li><a href="../generator/">Generator Documentation</a>: How generated SDKs work</li>
-<li><a href="../go/">Go SDK Documentation</a>: Reference implementation patterns</li>
-<li><a href="../csharp/">C# SDK Documentation</a>: Alternative managed language SDK</li>
-<li><a href="../typescript/">TypeScript SDK Documentation</a>: Node.js SDK</li>
-<li><a href="../c/">C SDK Documentation</a>: Native C SDK</li>
-<li><a href="../cpp/">C++ SDK Documentation</a>: Header-only C++ SDK</li>
+<li><a href="../generator/">Generator Documentation</a>: How generated client libraries work</li>
+<li><a href="../go/">Go Client Documentation</a>: Reference implementation patterns</li>
+<li><a href="../csharp/">C# Client Library Documentation</a>: Alternative managed language client library</li>
+<li><a href="../typescript/">TypeScript Client Library Documentation</a>: Node.js client library</li>
+<li><a href="../c/">C Client Library Documentation</a>: Native C client library</li>
+<li><a href="../cpp/">C++ Client Library Documentation</a>: Header-only C++ client library</li>
 <li><a href="../../api/overview/">API Overview</a>: Management API reference</li>
 <li><a href="../devices/">Device Documentation</a>: Wire formats and device-specific details</li>
 </ul>

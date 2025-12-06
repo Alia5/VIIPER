@@ -27,7 +27,7 @@
     
     
       
-        <title>C++ SDK - VIIPER Documentation</title>
+        <title>C++ Client Library - VIIPER Documentation</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#c-sdk-documentation" class="md-skip">
+        <a href="#c-client-library-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              C++ SDK
+              C++ Client Library
             
           </span>
         </div>
@@ -890,7 +890,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -927,7 +927,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -945,7 +945,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -1308,7 +1308,7 @@
   <a href="#windows-specific" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Windows-specific
+        Windows-Specific
       
     </span>
   </a>
@@ -1376,7 +1376,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -1404,7 +1404,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1432,7 +1432,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1989,7 +1989,7 @@
   <a href="#windows-specific" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Windows-specific
+        Windows-Specific
       
     </span>
   </a>
@@ -2054,10 +2054,10 @@
   
 
 
-<h1 id="c-sdk-documentation">C++ SDK Documentation</h1>
-<p>The VIIPER C++ SDK provides a modern, header-only C++20 client library for interacting with VIIPER servers and controlling virtual devices.</p>
+<h1 id="c-client-library-documentation">C++ Client Library Documentation</h1>
+<p>The VIIPER C++ client library provides a modern, header-only C++20 client library for interacting with VIIPER servers and controlling virtual devices.</p>
 <h2 id="overview">Overview</h2>
-<p>The C++ SDK features:</p>
+<p>The C++ client library features:</p>
 <ul>
 <li><strong>Header-only</strong>: No separate compilation required, just include and use</li>
 <li><strong>Modern C++20</strong>: Uses concepts, designated initializers, std::optional, smart pointers</li>
@@ -2068,12 +2068,12 @@
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">JSON Parser Required</p>
-<p>The C++ SDK requires a JSON library to be provided by the user. You <strong>must</strong> define <code>VIIPER_JSON_INCLUDE</code>, <code>VIIPER_JSON_NAMESPACE</code>, and <code>VIIPER_JSON_TYPE</code> before including the SDK headers.</p>
+<p>The C++ client library requires a JSON library to be provided by the user. You <strong>must</strong> define <code>VIIPER_JSON_INCLUDE</code>, <code>VIIPER_JSON_NAMESPACE</code>, and <code>VIIPER_JSON_TYPE</code> before including the client library headers.</p>
 <p><strong>Recommended</strong>: <a href="https://github.com/nlohmann/json">nlohmann/json</a> - a header-only JSON library that can be easily integrated.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">License</p>
-<p>The C++ SDK is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
+<p>The C++ client library is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
 The core VIIPER server remains under its original license.</p>
 </div>
 <h2 id="installation">Installation</h2>
@@ -2103,9 +2103,9 @@ The core VIIPER server remains under its original license.</p>
 <h3 id="3-generating-from-source">3. Generating from Source</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>cpp
 </code></pre></div>
-<p>The SDK will be generated in <code>clients/cpp/include/viiper/</code>.</p>
+<p>The client library will be generated in <code>clients/cpp/include/viiper/</code>.</p>
 <h2 id="json-parser-configuration">JSON Parser Configuration</h2>
-<p>Before including the VIIPER SDK, you must configure a JSON parser. The SDK is designed to work with any JSON library that provides a compatible interface.</p>
+<p>Before including the VIIPER client library, you must configure a JSON parser. The client library is designed to work with any JSON library that provides a compatible interface.</p>
 <h3 id="using-nlohmannjson-recommended">Using nlohmann/json (Recommended)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Define these BEFORE including viiper headers</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cp">#define VIIPER_JSON_INCLUDE &lt;nlohmann/json.hpp&gt;</span>
@@ -2286,7 +2286,7 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <p>The device is also automatically stopped when the <code>ViiperDevice</code> is destroyed.</p>
 <h2 id="generated-constants-and-maps">Generated Constants and Maps</h2>
-<p>The C++ SDK automatically generates constants and helper maps for each device type.</p>
+<p>The C++ client library automatically generates constants and helper maps for each device type.</p>
 <h3 id="keyboard-constants">Keyboard Constants</h3>
 <p><strong>Key Codes:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viiper</span><span class="o">::</span><span class="n">keyboard</span><span class="o">::</span><span class="n">KeyA</span><span class="p">;</span><span class="w">           </span><span class="c1">// 0x04</span>
@@ -2301,7 +2301,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">caps_lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">leds</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">viiper</span><span class="o">::</span><span class="n">keyboard</span><span class="o">::</span><span class="n">LEDCapsLock</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="helper-maps">Helper Maps</h3>
-<p>The SDK generates useful lookup maps for working with keyboard input:</p>
+<p>The client library generates useful lookup maps for working with keyboard input:</p>
 <p><strong>CHAR_TO_KEY Map</strong> - Convert ASCII characters to key codes:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viiper</span><span class="o">::</span><span class="n">keyboard</span><span class="o">::</span><span class="n">CHAR_TO_KEY</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span><span class="sc">&#39;a&#39;</span><span class="p">));</span>
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">it</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">viiper</span><span class="o">::</span><span class="n">keyboard</span><span class="o">::</span><span class="n">CHAR_TO_KEY</span><span class="p">.</span><span class="n">end</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
@@ -2449,8 +2449,8 @@ The core VIIPER server remains under its original license.</p>
 <li><strong>JSON library</strong> (nlohmann/json recommended)</li>
 <li><strong>Platform</strong>: Windows (MSVC 2019+) or POSIX (GCC 10+, Clang 10+)</li>
 </ul>
-<h3 id="windows-specific">Windows-specific</h3>
-<p>The SDK uses Winsock2 for networking. Link against <code>Ws2_32.lib</code> (done automatically via <code>#pragma comment</code>).</p>
+<h3 id="windows-specific">Windows-Specific</h3>
+<p>The client library uses Winsock2 for networking. Link against <code>Ws2_32.lib</code> (done automatically via <code>#pragma comment</code>).</p>
 <h3 id="posix-specific">POSIX-specific</h3>
 <p>Standard POSIX sockets are used. No additional libraries required.</p>
 <h2 id="troubleshooting">Troubleshooting</h2>
@@ -2472,11 +2472,11 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <h2 id="see-also">See Also</h2>
 <ul>
-<li><a href="../generator/">Generator Documentation</a>: How generated SDKs work</li>
-<li><a href="../c/">C SDK Documentation</a>: Pure C alternative</li>
-<li><a href="../rust/">Rust SDK Documentation</a>: Rust SDK with sync/async support</li>
-<li><a href="../csharp/">C# SDK Documentation</a>: .NET SDK</li>
-<li><a href="../typescript/">TypeScript SDK Documentation</a>: Node.js SDK</li>
+<li><a href="../generator/">Generator Documentation</a>: How generated client libraries work</li>
+<li><a href="../c/">C Client Library Documentation</a>: Pure C alternative</li>
+<li><a href="../rust/">Rust Client Library Documentation</a>: Rust client library with sync/async support</li>
+<li><a href="../csharp/">C# Client Library Documentation</a>: .NET client library</li>
+<li><a href="../typescript/">TypeScript Client Library Documentation</a>: Node.js client library</li>
 <li><a href="../../api/overview/">API Overview</a>: Management API reference</li>
 <li><a href="../devices/">Device Documentation</a>: Wire formats and device-specific details</li>
 </ul>

@@ -1076,7 +1076,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -1104,7 +1104,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -1132,7 +1132,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -1160,7 +1160,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1188,7 +1188,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1569,16 +1569,16 @@
 <h1 id="api-reference">API Reference</h1>
 <p>VIIPER ships a lightweight TCP API for managing virtual buses/devices and for device-specific streaming. It's designed to be trivial to drive from any language that can open a TCP socket and send null-byte-terminated commands.</p>
 <div class="admonition tip">
-<p class="admonition-title">Client SDKs Available</p>
-<p>Generated client libraries are available that abstract away the protocol details described below. For most use cases, you should use one of the provided SDKs rather than implementing the raw protocol yourself:</p>
+<p class="admonition-title">Client Libraries Available</p>
+<p>Generated client libraries are available that abstract away the protocol details described below. For most use cases, you should use one of the provided client libraries rather than implementing the raw protocol yourself:</p>
 <ul>
 <li><a href="../../clients/go/">Go Client</a>: Reference implementation included in the repository</li>
 <li><a href="../../clients/generator/">Generator Documentation</a>: Information about code generation</li>
-<li><a href="../../clients/c/">C SDK</a>: Generated C library with type-safe device streams</li>
-<li><a href="../../clients/cpp/">C++ SDK</a>: Header-only C++20 library (requires external JSON parser)</li>
-<li><a href="../../clients/csharp/">C# SDK</a>: Generated .NET library with async/await support</li>
-<li><a href="../../clients/typescript/">TypeScript SDK</a>: Generated Node.js library with EventEmitter streams</li>
-<li><a href="../../clients/rust/">Rust SDK</a>: Generated Rust library with sync/async support</li>
+<li><a href="../../clients/c/">C Client Library</a>: Generated C library with type-safe device streams</li>
+<li><a href="../../clients/cpp/">C++ Client Library</a>: Header-only C++20 library (requires external JSON parser)</li>
+<li><a href="../../clients/csharp/">C# Client Library</a>: Generated .NET library with async/await support</li>
+<li><a href="../../clients/typescript/">TypeScript Client Library</a>: Generated Node.js library with EventEmitter streams</li>
+<li><a href="../../clients/rust/">Rust Client Library</a>: Generated Rust library with sync/async support</li>
 </ul>
 <p>The documentation below is provided for reference and for implementing clients in languages not yet supported by the generator.</p>
 </div>
@@ -1600,56 +1600,52 @@
 <h2 id="commands">Commands</h2>
 <p>The server registers the following commands and streams:</p>
 <ul>
-<li>
-<p><code>bus/list</code></p>
-<ul>
+<li><code>bus/list</code></li>
 <li>List all virtual bus IDs.</li>
-<li>Response: <code>{ "buses": [1, 2, ...] }</code></li>
-</ul>
+<li>
+<p>Response: <code>{ "buses": [1, 2, ...] }</code></p>
 </li>
 <li>
 <p><code>bus/create [busId]</code></p>
-<ul>
+</li>
 <li>Create a new bus. If <code>busId</code> (numeric) is provided, VIIPER attempts to create the bus with that id; otherwise it picks the next free id.</li>
 <li>Payload: Optional numeric bus ID (e.g., <code>5</code>)</li>
-<li>Response: <code>{ "busId": &lt;id&gt; }</code></li>
-</ul>
+<li>
+<p>Response: <code>{ "busId": &lt;id&gt; }</code></p>
 </li>
 <li>
 <p><code>bus/remove &lt;busId&gt;</code></p>
-<ul>
+</li>
 <li>Remove a bus and all devices on it.</li>
 <li>Payload: Numeric bus ID (e.g., <code>1</code>)</li>
-<li>Response: <code>{ "busId": &lt;id&gt; }</code></li>
-</ul>
+<li>
+<p>Response: <code>{ "busId": &lt;id&gt; }</code></p>
 </li>
 <li>
 <p><code>bus/{id}/list</code></p>
-<ul>
+</li>
 <li>List devices on a bus.</li>
-<li>Response: <code>{ "devices": [{ "busId": 1, "devId": "1", "vid": "0x045e", "pid": "0x028e", "type": "xbox360" }, ...] }</code></li>
-</ul>
+<li>
+<p>Response: <code>{ "devices": [{ "busId": 1, "devId": "1", "vid": "0x045e", "pid": "0x028e", "type": "xbox360" }, ...] }</code></p>
 </li>
 <li>
 <p><code>bus/{id}/add &lt;json_payload&gt;</code></p>
-<ul>
+</li>
 <li>Add a device to a bus.</li>
 <li>Payload: JSON object with device creation parameters: <code>{"type": "&lt;deviceType&gt;", "idVendor": &lt;optional_vid&gt;, "idProduct": &lt;optional_pid&gt;}</code></li>
 <li>Example: <code>{"type": "xbox360"}</code> or <code>{"type": "keyboard", "idVendor": 1234, "idProduct": 5678}</code></li>
 <li>Response: JSON device object with fields: <code>{"busId": &lt;id&gt;, "devId": "&lt;devId&gt;", "vid": "0x045e", "pid": "0x028e", "type": "xbox360"}</code></li>
 <li>Important: After add, the server starts a connect timer (default <code>5s</code>). You must open a device stream (see below) before the timeout expires, otherwise the device is auto-removed.</li>
-<li>If <a href="../../cli/server/#api.auto-attach-local-client">auto-attach</a> is enabled (default) the server automatically attaches the new device to a local USBIP client on the same host (localhost only).<br />
-Failures (missing tool, non-zero exit) are logged but do not affect the API response.</li>
-</ul>
+<li>
+<p>If <a href="../../cli/server/#api.auto-attach-local-client">auto-attach</a> is enabled (default) the server automatically attaches the new device to a local USBIP client on the same host (localhost only).<br />
+    Failures (missing tool, non-zero exit) are logged but do not affect the API response.</p>
 </li>
 <li>
 <p><code>bus/{id}/remove &lt;deviceId&gt;</code></p>
-<ul>
+</li>
 <li>Remove a device by its device number on that bus.</li>
 <li>Payload: Numeric device ID (e.g., <code>1</code> for device 1-1 on the bus)</li>
 <li>Response: <code>{ "busId": &lt;id&gt;, "devId": "&lt;dev&gt;" }</code></li>
-</ul>
-</li>
 </ul>
 <h3 id="streaming-endpoint">Streaming endpoint</h3>
 <ul>
@@ -1663,48 +1659,38 @@ Failures (missing tool, non-zero exit) are logged but do not affect the API resp
 <h4 id="xbox-360-controller-stream-device-type-xbox360">Xbox 360 controller stream (device type: <code>xbox360</code>)</h4>
 <p>Direction: client ➜ server (input state)</p>
 <ul>
-<li>Fixed 14-byte packets, little-endian layout:<ul>
+<li>Fixed 14-byte packets, little-endian layout:</li>
 <li><code>Buttons</code> uint32 (4 bytes)</li>
 <li><code>LT</code> uint8, <code>RT</code> uint8 (2 bytes)</li>
 <li><code>LX, LY, RX, RY</code> int16 each (8 bytes)</li>
 </ul>
-</li>
-</ul>
 <p>Direction: server ➜ client (rumble)</p>
 <ul>
-<li>Fixed 2-byte packets:<ul>
+<li>Fixed 2-byte packets:</li>
 <li><code>LeftMotor</code> uint8, <code>RightMotor</code> uint8</li>
-</ul>
-</li>
 </ul>
 <p>See <code>/device/xbox360/protocol.go</code> for full details.</p>
 <h4 id="hid-keyboard-stream-device-type-keyboard">HID keyboard stream (device type: <code>keyboard</code>)</h4>
 <p>Direction: client ➜ server (keys pressed)</p>
 <ul>
-<li>Variable-length packets per frame:<ul>
+<li>Variable-length packets per frame:</li>
 <li>Header: Modifiers uint8, KeyCount uint8</li>
 <li>Body: KeyCount bytes of HID Usage IDs for currently pressed (non-modifier) keys</li>
 </ul>
-</li>
-</ul>
 <p>Direction: server ➜ client (LED state)</p>
 <ul>
-<li>1-byte packets whenever host LED state changes:<ul>
+<li>1-byte packets whenever host LED state changes:</li>
 <li>Bit 0 NumLock, Bit 1 CapsLock, Bit 2 ScrollLock</li>
-</ul>
-</li>
 </ul>
 <p>Host-facing HID input report is 34 bytes: [Modifiers (1), Reserved (1), 256-bit key bitmap (32)].</p>
 <p>See <code>/device/keyboard/</code> for helpers and constants.</p>
 <h4 id="hid-mouse-stream-device-type-mouse">HID mouse stream (device type: <code>mouse</code>)</h4>
 <p>Direction: client ➜ server (motion/buttons)</p>
 <ul>
-<li>Fixed 5-byte packets per frame:<ul>
+<li>Fixed 5-byte packets per frame:</li>
 <li>Buttons uint8 (bits 0..4)</li>
 <li>dX int8, dY int8</li>
 <li>Wheel int8, Pan int8</li>
-</ul>
-</li>
 </ul>
 <p>Direction: server ➜ client</p>
 <ul>
@@ -1713,12 +1699,10 @@ Failures (missing tool, non-zero exit) are logged but do not affect the API resp
 <p>Note: Motion and wheel deltas are consumed after each IN report so movement is relative.</p>
 <p>Note on protocol compatibility:</p>
 <ul>
-<li>The wire format is modeled after the XInput gamepad state (XINPUT_GAMEPAD) but is not byte‑for‑byte identical. Key differences:<ul>
+<li>The wire format is modeled after the XInput gamepad state (XINPUT_GAMEPAD) but is not byte‑for‑byte identical. Key differences:</li>
 <li>Buttons are encoded as a 32‑bit little‑endian field (XInput uses a 16‑bit bitmask), making the packet 14 bytes instead of 12.</li>
 <li>No header or framing: packets are fixed‑length and back‑to‑back on the TCP stream.</li>
 <li>Endianness is little‑endian for all multi‑byte fields.</li>
-</ul>
-</li>
 </ul>
 <h2 id="example-sessions">Example sessions</h2>
 <h3 id="using-netcat-linuxmacos">Using netcat (Linux/macOS)</h3>

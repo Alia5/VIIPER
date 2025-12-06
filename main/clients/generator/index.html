@@ -1114,7 +1114,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -1142,7 +1142,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -1170,7 +1170,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -1198,7 +1198,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1226,7 +1226,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1644,23 +1644,23 @@
 
 <h1 id="viiper-client-generator-documentation">VIIPER Client Generator Documentation</h1>
 <h2 id="overview">Overview</h2>
-<p>The VIIPER client generator scans Go source code to extract API routes, device wire formats, and constants; then emits type-safe client SDKs for multiple languages.</p>
+<p>The VIIPER client generator scans Go source code to extract API routes, device wire formats, and constants; then emits type-safe client libraries for multiple languages.</p>
 <p><strong>What it extracts:</strong></p>
 <ul>
 <li>API routes and DTOs from management API handlers  </li>
 <li>Device wire formats from <code>viiper:wire</code> comment tags  </li>
 <li>All exported constants from device packages (automatic)</li>
 </ul>
-<p><strong>Output:</strong> Type-safe client SDKs for multiple target languages</p>
+<p><strong>Output:</strong> Type-safe client libraries for multiple target languages</p>
 <div class="admonition note">
 <p class="admonition-title">License</p>
-<p>All generated client SDKs are licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects. The core VIIPER server remains under its original license.</p>
+<p>All generated client libraries are licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects. The core VIIPER server remains under its original license.</p>
 </div>
 <h2 id="running-the-generator">Running the Generator</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all<span class="w">        </span><span class="c1"># Generate all SDKs</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c<span class="w">          </span><span class="c1"># Generate C SDK only</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp<span class="w">     </span><span class="c1"># Generate C# SDK only</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript<span class="w"> </span><span class="c1"># Generate TypeScript SDK only</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all<span class="w">        </span><span class="c1"># Generate all client libraries</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c<span class="w">          </span><span class="c1"># Generate C client library only</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp<span class="w">     </span><span class="c1"># Generate C# client library only</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript<span class="w"> </span><span class="c1"># Generate TypeScript client library only</span>
 </code></pre></div>
 <p><strong>Output directory</strong>: <code>clients/</code> (relative to repository root)</p>
 <h2 id="comment-tag-system">Comment Tag System</h2>
@@ -1819,9 +1819,9 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <ul>
 <li><a href="../design.md">Design Document</a>: Architectural rationale and detailed generation strategy</li>
 <li><a href="../go/">Go Client Documentation</a>: Go reference client usage</li>
-<li><a href="../c/">C SDK Documentation</a>: C-specific usage, build, and examples</li>
-<li><a href="../csharp/">C# SDK Documentation</a>: C#-specific usage, async patterns, and map helpers</li>
-<li><a href="../typescript/">TypeScript SDK Documentation</a>: TypeScript-specific usage, EventEmitter patterns, and examples</li>
+<li><a href="../c/">C Client Library Documentation</a>: C-specific usage, build, and examples</li>
+<li><a href="../csharp/">C# Client Library Documentation</a>: C#-specific usage, async patterns, and map helpers</li>
+<li><a href="../typescript/">TypeScript Client Library Documentation</a>: TypeScript-specific usage, EventEmitter patterns, and examples</li>
 </ul>
 <hr />
 <p>For questions or contributions, see the main VIIPER repository.</p>

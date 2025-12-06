@@ -27,7 +27,7 @@
     
     
       
-        <title>C# SDK - VIIPER Documentation</title>
+        <title>C# Client Library - VIIPER Documentation</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#c-sdk-documentation" class="md-skip">
+        <a href="#c-client-library-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              C# SDK
+              C# Client Library
             
           </span>
         </div>
@@ -890,7 +890,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -918,7 +918,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -955,7 +955,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -973,7 +973,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -1398,7 +1398,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1426,7 +1426,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -2042,10 +2042,10 @@
   
 
 
-<h1 id="c-sdk-documentation">C# SDK Documentation</h1>
-<p>The VIIPER C# SDK provides a modern, type-safe .NET client library for interacting with VIIPER servers and controlling virtual devices.</p>
+<h1 id="c-client-library-documentation">C# Client Library Documentation</h1>
+<p>The VIIPER C# client library provides a modern, type-safe .NET client library for interacting with VIIPER servers and controlling virtual devices.</p>
 <h2 id="overview">Overview</h2>
-<p>The C# SDK features:</p>
+<p>The C# client library features:</p>
 <ul>
 <li><strong>Async/await support</strong>: Full async API with cancellation token support</li>
 <li><strong>Type-safe</strong>: Generated classes with enums, structs, and helper maps</li>
@@ -2055,7 +2055,7 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">License</p>
-<p>The C# SDK is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
+<p>The C# client library is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
 The core VIIPER server remains under its original license.</p>
 </div>
 <h2 id="installation">Installation</h2>
@@ -2200,7 +2200,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">await</span><span class="w"> </span><span class="k">using</span><span class="w"> </span><span class="nn">var</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">ConnectDeviceAsync</span><span class="p">(</span><span class="n">busId</span><span class="p">,</span><span class="w"> </span><span class="n">deviceId</span><span class="p">);</span>
 </code></pre></div>
 <h2 id="generated-constants-and-maps">Generated Constants and Maps</h2>
-<p>The C# SDK automatically generates enums and helper maps for each device type.</p>
+<p>The C# client library automatically generates enums and helper maps for each device type.</p>
 <h3 id="keyboard-constants">Keyboard Constants</h3>
 <p><strong>Key Enum:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">using</span><span class="w"> </span><span class="nn">Viiper.Client.Devices.Keyboard</span><span class="p">;</span>
@@ -2217,7 +2217,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">capsLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">leds</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="n">LED</span><span class="p">.</span><span class="n">CapsLock</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="helper-maps">Helper Maps</h3>
-<p>The SDK generates useful lookup maps for working with keyboard input:</p>
+<p>The client library generates useful lookup maps for working with keyboard input:</p>
 <p><strong>CharToKey Map</strong> - Convert ASCII characters to key codes:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">CharToKey</span><span class="p">.</span><span class="n">TryGetValue</span><span class="p">((</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="p">{</span>
@@ -2387,7 +2387,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>dotnet<span class="w"> </span>run<span class="w"> </span>--<span class="w"> </span>localhost
 </code></pre></div>
 <h2 id="project-structure">Project Structure</h2>
-<p>Generated SDK layout:</p>
+<p>Generated client library layout:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>clients/csharp/Viiper.Client/
 <a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>├── ViiperClient.cs              # Management API client
 <a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>├── ViiperDevice.cs              # Device stream wrapper
@@ -2420,12 +2420,12 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <h2 id="see-also">See Also</h2>
 <ul>
-<li><a href="../generator/">Generator Documentation</a>: How generated SDKs work</li>
-<li><a href="../go/">Go SDK Documentation</a>: Reference implementation patterns</li>
-<li><a href="../rust/">Rust SDK Documentation</a>: Rust SDK with sync/async support</li>
-<li><a href="../typescript/">TypeScript SDK Documentation</a>: Node.js SDK</li>
-<li><a href="../c/">C SDK Documentation</a>: Alternative SDK for native integration</li>
-<li><a href="../cpp/">C++ SDK Documentation</a>: Header-only C++ SDK</li>
+<li><a href="../generator/">Generator Documentation</a>: How generated client libraries work</li>
+<li><a href="../go/">Go Client Documentation</a>: Reference implementation patterns</li>
+<li><a href="../rust/">Rust Client Library Documentation</a>: Rust client library with sync/async support</li>
+<li><a href="../typescript/">TypeScript Client Library Documentation</a>: Node.js client library</li>
+<li><a href="../c/">C Client Library Documentation</a>: Alternative client library for native integration</li>
+<li><a href="../cpp/">C++ Client Library Documentation</a>: Header-only C++ client library</li>
 <li><a href="../../api/overview/">API Overview</a>: Management API reference</li>
 <li><a href="../devices/">Device Documentation</a>: Wire formats and device-specific details</li>
 </ul>

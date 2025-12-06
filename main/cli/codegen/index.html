@@ -815,10 +815,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#generate-all-sdks" class="md-nav__link">
+  <a href="#generate-all-client-libraries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Generate All SDKs
+        Generate All Client Libraries
       
     </span>
   </a>
@@ -826,10 +826,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#generate-c-sdk-and-rebuild-examples" class="md-nav__link">
+  <a href="#generate-c-client-library-and-rebuild-examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Generate C SDK and Rebuild Examples
+        Generate C Client Library and Rebuild Examples
       
     </span>
   </a>
@@ -1059,7 +1059,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -1087,7 +1087,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -1115,7 +1115,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -1143,7 +1143,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1171,7 +1171,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1464,10 +1464,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#generate-all-sdks" class="md-nav__link">
+  <a href="#generate-all-client-libraries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Generate All SDKs
+        Generate All Client Libraries
       
     </span>
   </a>
@@ -1475,10 +1475,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#generate-c-sdk-and-rebuild-examples" class="md-nav__link">
+  <a href="#generate-c-client-library-and-rebuild-examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Generate C SDK and Rebuild Examples
+        Generate C Client Library and Rebuild Examples
       
     </span>
   </a>
@@ -1533,7 +1533,7 @@
 
 
 <h1 id="code-generation-command">Code Generation Command</h1>
-<p>The <code>codegen</code> command generates type-safe client SDKs from Go source code annotations.</p>
+<p>The <code>codegen</code> command generates type-safe client libraries from Go source code annotations.</p>
 <h2 id="usage">Usage</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
 </code></pre></div>
@@ -1544,7 +1544,7 @@
 <li>Device wire formats from <code>viiper:wire</code> comment tags</li>
 <li>Device constants (keycodes, modifiers, button masks)</li>
 </ul>
-<p>Then generates client SDKs with:</p>
+<p>Then generates client libraries with:</p>
 <ul>
 <li>Management API clients</li>
 <li>Device-agnostic stream wrappers</li>
@@ -1557,11 +1557,11 @@
 </div>
 <h2 id="flags">Flags</h2>
 <h3 id="-output"><code>--output</code></h3>
-<p>Output directory for generated SDKs (relative to repository root).</p>
+<p>Output directory for generated client libraries (relative to repository root).</p>
 <p><strong>Default:</strong> <code>clients</code><br />
 <strong>Environment Variable:</strong> <code>VIIPER_CODEGEN_OUTPUT</code></p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--output<span class="o">=</span>../sdk-output
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--output<span class="o">=</span>../client-libs-output
 </code></pre></div>
 <h3 id="-lang"><code>--lang</code></h3>
 <p>Target language to generate.</p>
@@ -1569,23 +1569,23 @@
 <strong>Default:</strong> <code>all</code><br />
 <strong>Environment Variable:</strong> <code>VIIPER_CODEGEN_LANG</code></p>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Generate all SDKs</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Generate all client libraries</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Generate C SDK only</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Generate C client library only</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Generate C# SDK only</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Generate C# client library only</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># Generate TypeScript SDK only</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># Generate TypeScript client library only</span>
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript
 </code></pre></div>
 <h2 id="examples">Examples</h2>
-<h3 id="generate-all-sdks">Generate All SDKs</h3>
+<h3 id="generate-all-client-libraries">Generate All Client Libraries</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen
 </code></pre></div>
-<h3 id="generate-c-sdk-and-rebuild-examples">Generate C SDK and Rebuild Examples</h3>
+<h3 id="generate-c-client-library-and-rebuild-examples">Generate C Client Library and Rebuild Examples</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>examples/c
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--config<span class="w"> </span>Release
@@ -1602,7 +1602,7 @@
 <h2 id="see-also">See Also</h2>
 <ul>
 <li><a href="../../clients/generator/">Generator Documentation</a>: Detailed explanation of tagging system and code generation flow</li>
-<li><a href="../../clients/c/">C SDK Documentation</a>: C-specific usage and build instructions</li>
+<li><a href="../../clients/c/">C Client Library Documentation</a>: C-specific usage and build instructions</li>
 <li><a href="../configuration/">Configuration</a>: Global configuration options</li>
 </ul>
 

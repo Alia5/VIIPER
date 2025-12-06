@@ -887,7 +887,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -915,7 +915,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -943,7 +943,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -971,7 +971,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -999,7 +999,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1172,10 +1172,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#client-sdk-support" class="md-nav__link">
+  <a href="#client-library-support" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Client SDK Support
+        Client Library Support
       
     </span>
   </a>
@@ -1346,10 +1346,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#client-sdk-support" class="md-nav__link">
+  <a href="#client-library-support" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Client SDK Support
+        Client Library Support
       
     </span>
   </a>
@@ -1451,10 +1451,10 @@
 <li>OUT: 0x01 (LED output report)</li>
 <li>Device type id (for API add): <code>keyboard</code></li>
 </ul>
-<h2 id="client-sdk-support">Client SDK Support</h2>
-<p>The wire protocol is abstracted by client SDKs. The <strong>Go client</strong> includes built-in types (<code>/device/keyboard</code>), and <strong>generated SDKs</strong> provide equivalent structures with proper packing.<br />
+<h2 id="client-library-support">Client Library Support</h2>
+<p>The wire protocol is abstracted by client libraries. The <strong>Go client</strong> includes built-in types (<code>/device/keyboard</code>), and <strong>generated client libraries</strong> provide equivalent structures with proper packing.<br />
 You don't need to manually construct packets, just use the provided types and send them via the device stream.</p>
-<p>See: <a href="../../clients/go/">Go Client</a>, <a href="../../clients/generator/">Generated SDKs</a></p>
+<p>See: <a href="../../clients/go/">Go Client</a>, <a href="../../clients/generator/">Generated Client Libraries</a></p>
 <h2 id="hid-report-format-host-facing">HID report format (host-facing)</h2>
 <p>Input (device → host): 34 bytes</p>
 <ul>
@@ -1497,7 +1497,7 @@ You don't need to manually construct packets, just use the provided types and se
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Add keyboard device with JSON payload</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;bus/1/add {&quot;type&quot;:&quot;keyboard&quot;}\0&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
 </code></pre></div>
-<p>Or use one of the <a href="../../clients/generator/">client SDKs</a> which handle the protocol automatically.</p>
+<p>Or use one of the <a href="../../clients/generator/">client libraries</a> which handle the protocol automatically.</p>
 <h2 id="examples">Examples</h2>
 <p>A runnable example that types “Hello!” followed by Enter every few seconds is provided in <code>examples/virtual_keyboard/</code>.</p>
 

@@ -27,7 +27,7 @@
     
     
       
-        <title>TypeScript SDK - VIIPER Documentation</title>
+        <title>TypeScript Client Library - VIIPER Documentation</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#typescript-sdk-documentation" class="md-skip">
+        <a href="#typescript-client-library-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              TypeScript SDK
+              TypeScript Client Library
             
           </span>
         </div>
@@ -890,7 +890,7 @@
   <span class="md-ellipsis">
     
   
-    C SDK
+    C Client Library
   
 
     
@@ -918,7 +918,7 @@
   <span class="md-ellipsis">
     
   
-    C++ SDK
+    C++ Client Library
   
 
     
@@ -946,7 +946,7 @@
   <span class="md-ellipsis">
     
   
-    C# SDK
+    C# Client Library
   
 
     
@@ -974,7 +974,7 @@
   <span class="md-ellipsis">
     
   
-    Rust SDK
+    Rust Client Library
   
 
     
@@ -1011,7 +1011,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1029,7 +1029,7 @@
   <span class="md-ellipsis">
     
   
-    TypeScript SDK
+    TypeScript Client Library
   
 
     
@@ -1078,10 +1078,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-using-the-published-npm-package-recommended" class="md-nav__link">
+  <a href="#1-using-the-published-package-recommended" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Using the Published NPM Package (Recommended)
+        1. Using the Published Package (Recommended)
       
     </span>
   </a>
@@ -1658,10 +1658,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-using-the-published-npm-package-recommended" class="md-nav__link">
+  <a href="#1-using-the-published-package-recommended" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Using the Published NPM Package (Recommended)
+        1. Using the Published Package (Recommended)
       
     </span>
   </a>
@@ -2020,10 +2020,10 @@
   
 
 
-<h1 id="typescript-sdk-documentation">TypeScript SDK Documentation</h1>
-<p>The VIIPER TypeScript SDK provides a modern, type-safe Node.js client library for interacting with VIIPER servers and controlling virtual devices.</p>
+<h1 id="typescript-client-library-documentation">TypeScript Client Library Documentation</h1>
+<p>The VIIPER TypeScript client library provides a modern, type-safe Node.js client library for interacting with VIIPER servers and controlling virtual devices.</p>
 <h2 id="overview">Overview</h2>
-<p>The TypeScript SDK features:</p>
+<p>The TypeScript client library features:</p>
 <ul>
 <li><strong>Type-safe API</strong>: Structured request/response types with proper TypeScript definitions</li>
 <li><strong>Event-driven</strong>: EventEmitter-based output handling for device feedback (LEDs, rumble)</li>
@@ -2033,12 +2033,12 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">License</p>
-<p>The TypeScript SDK is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
+<p>The TypeScript client library is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
 The core VIIPER server remains under its original license.</p>
 </div>
 <h2 id="installation">Installation</h2>
-<h3 id="1-using-the-published-npm-package-recommended">1. Using the Published NPM Package (Recommended)</h3>
-<p>Install the SDK from the public npm registry:</p>
+<h3 id="1-using-the-published-package-recommended">1. Using the Published Package (Recommended)</h3>
+<p>Install the client library from the public npm registry:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>npm<span class="w"> </span>install<span class="w"> </span>viiperclient
 </code></pre></div>
 <p>Or with pnpm / yarn:</p>
@@ -2242,7 +2242,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">capsLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">leds</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nx">LED</span><span class="p">.</span><span class="nx">CapsLock</span><span class="p">)</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="helper-maps">Helper Maps</h3>
-<p>The SDK generates useful lookup maps for working with keyboard input:</p>
+<p>The client library generates useful lookup maps for working with keyboard input:</p>
 <p><strong>CharToKey Map</strong> - Convert ASCII characters to key codes:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Keyboard</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;viiperclient&quot;</span><span class="p">;</span>
 <a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
@@ -2411,12 +2411,12 @@ The core VIIPER server remains under its original license.</p>
 </ul>
 <h2 id="see-also">See Also</h2>
 <ul>
-<li><a href="../generator/">Generator Documentation</a>: How generated SDKs work</li>
-<li><a href="../go/">Go SDK Documentation</a>: Reference implementation patterns</li>
-<li><a href="../csharp/">C# SDK Documentation</a>: Alternative managed language SDK</li>
-<li><a href="../rust/">Rust SDK Documentation</a>: Rust SDK with sync/async support</li>
-<li><a href="../c/">C SDK Documentation</a>: Alternative SDK for native integration</li>
-<li><a href="../cpp/">C++ SDK Documentation</a>: Header-only C++ SDK</li>
+<li><a href="../generator/">Generator Documentation</a>: How generated client libraries work</li>
+<li><a href="../go/">Go Client Documentation</a>: Reference implementation patterns</li>
+<li><a href="../csharp/">C# Client Library Documentation</a>: Alternative managed language client library</li>
+<li><a href="../rust/">Rust Client Library Documentation</a>: Rust client library with sync/async support</li>
+<li><a href="../c/">C Client Library Documentation</a>: Alternative client library for native integration</li>
+<li><a href="../cpp/">C++ Client Library Documentation</a>: Header-only C++ client library</li>
 <li><a href="../../api/overview/">API Overview</a>: Management API reference</li>
 <li><a href="../devices/">Device Documentation</a>: Wire formats and device-specific details</li>
 </ul>
