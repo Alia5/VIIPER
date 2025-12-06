@@ -670,10 +670,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pre-built-binaries-recommended" class="md-nav__link">
+  <a href="#portable-deployment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pre-built Binaries (Recommended)
+        Portable Deployment
       
     </span>
   </a>
@@ -681,10 +681,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#portable-deployment" class="md-nav__link">
+  <a href="#pre-built-binaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Portable Deployment
+        Pre-built Binaries
       
     </span>
   </a>
@@ -1593,10 +1593,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pre-built-binaries-recommended" class="md-nav__link">
+  <a href="#portable-deployment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pre-built Binaries (Recommended)
+        Portable Deployment
       
     </span>
   </a>
@@ -1604,10 +1604,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#portable-deployment" class="md-nav__link">
+  <a href="#pre-built-binaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Portable Deployment
+        Pre-built Binaries
       
     </span>
   </a>
@@ -1679,8 +1679,15 @@
 
 
 <h1 id="installation">Installation</h1>
+<p>VIIPER <em>currently</em> comes in a single flavor:</p>
+<ul>
+<li>a standalone executable that exposes an API over TCP.</li>
+<li>There will eventually be a shared-library version (libVIIPER) that you can link against directly from your application.<br />
+For more information, see <a href="https://github.com/Alia5/VIIPER#why-is-this-a-standalone-executable-that-i-have-to-interface-via-tcp-and-not-a-shared-object-library-in-itself">FAQ</a></li>
+</ul>
 <h2 id="requirements">Requirements</h2>
-<p>VIIPER relies on USBIP. You must have USBIP installed on your system.</p>
+<p>VIIPER relies on USBIP.<br />
+You must have a USBIP-Client implementation available on your system to use VIIPER's virtual devices.</p>
 <h3 id="linux">Linux</h3>
 <h4 id="ubuntudebian">Ubuntu/Debian</h4>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>linux-tools-generic
@@ -1713,12 +1720,6 @@
 </code></pre></div>
 <p>If you don't plan to use the auto-attach feature, you can skip this setup and disable it with <code>--api.auto-attach-local-client=false</code>.</p>
 <h2 id="installing-viiper">Installing VIIPER</h2>
-<h3 id="pre-built-binaries-recommended">Pre-built Binaries (Recommended)</h3>
-<p>Download the latest release from the <a href="https://github.com/Alia5/VIIPER/releases">GitHub Releases</a> page. Pre-built binaries are available for:</p>
-<ul>
-<li>Windows (x64, ARM64)</li>
-<li>Linux (x64, ARM64)</li>
-</ul>
 <h3 id="portable-deployment">Portable Deployment</h3>
 <p>VIIPER does not require system-wide installation.<br />
 The <code>viiper</code> executable is completely self-contained (and statically linked) and can be:</p>
@@ -1738,6 +1739,12 @@ The <code>viiper</code> executable is completely self-contained (and statically 
 <li>Check if VIIPER is already running before starting their own instance</li>
 </ul>
 </div>
+<h3 id="pre-built-binaries">Pre-built Binaries</h3>
+<p>Download the latest release from the <a href="https://github.com/Alia5/VIIPER/releases">GitHub Releases</a> page. Pre-built binaries are available for:</p>
+<ul>
+<li>Windows (x64, ARM64)</li>
+<li>Linux (x64, ARM64)</li>
+</ul>
 <h3 id="building-from-source">Building from Source</h3>
 <p>Building from source is only necessary if you need to modify VIIPER or target an unsupported platform.</p>
 <h4 id="prerequisites">Prerequisites</h4>
