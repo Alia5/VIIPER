@@ -21,12 +21,8 @@
 
 **Virtual** **I**nput over **IP** **E**mulato**R**
 
-VIIPER is a tool to create virtual input devices using USBIP.
-
-## ℹ️ About VIIPER
-
-VIIPER creates virtual USB input devices using the USBIP protocol.  
-These virtual devices appear as real hardware to the operating system and applications, allowing you to emulate controllers, keyboards, and other input devices without physical hardware.
+VIIPER creates virtual USB input devices using USBIP via a simple API.  
+These virtual devices appear as real hardware, indistinguishable to the operating system and applications, allowing you to emulate controllers, keyboards, and other input devices as you see fit.
 
 - VIIPER abstracts away all USB / USBIP details.  
 - Device emulation happens in userspace code instead of kernel drivers, so no kernel programming is required to add new device types.  
