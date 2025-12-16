@@ -1408,20 +1408,20 @@
 You don't need to manually construct packets, just use the provided types and send them via the device stream.</p>
 <p>See: <a href="../../clients/go/">Go Client</a>, <a href="../../clients/generator/">Generated Client Libraries</a></p>
 <h2 id="hid-report-format-host-facing">HID report format (host-facing)</h2>
-<p>Input (device → host): 5 bytes</p>
+<p>Input (device → host): 9 bytes</p>
 <ul>
 <li>Byte 0: Buttons bitfield (bits 0..4 for buttons 1..5)</li>
-<li>Byte 1: X delta (int8)</li>
-<li>Byte 2: Y delta (int8)</li>
-<li>Byte 3: Vertical wheel (int8; positive up)</li>
-<li>Byte 4: Horizontal wheel/pan (int8; positive right)</li>
+<li>Bytes 1-2: X delta (int16 little-endian, -32768 to +32767)</li>
+<li>Bytes 3-4: Y delta (int16 little-endian, -32768 to +32767)</li>
+<li>Bytes 5-6: Vertical wheel (int16 little-endian; positive up)</li>
+<li>Bytes 7-8: Horizontal wheel/pan (int16 little-endian; positive right)</li>
 </ul>
 <p>Deltas are consumed after each IN report so motion is truly relative and not repeated across host polls.</p>
 <h2 id="device-stream-protocol-client-facing">Device stream protocol (client-facing)</h2>
 <p>Wire format from your client into VIIPER:</p>
 <ul>
-<li>Fixed 5-byte packets matching the HID report layout:
-  [Buttons, dX, dY, Wheel, Pan]</li>
+<li>Fixed 9-byte packets matching the HID report layout:
+  [Buttons, dX_lo, dX_hi, dY_lo, dY_hi, Wheel_lo, Wheel_hi, Pan_lo, Pan_hi]</li>
 </ul>
 <p>Buttons persist until changed; motion/wheel deltas are applied once and reset.</p>
 <h2 id="adding-the-device">Adding the device</h2>
