@@ -29,7 +29,7 @@ func (r *handler) StreamHandler() api.StreamHandlerFunc {
 			return fmt.Errorf("device is not mouse")
 		}
 
-		buf := make([]byte, 5)
+		buf := make([]byte, 9)
 		for {
 			if _, err := io.ReadFull(conn, buf); err != nil {
 				if err == io.EOF {

@@ -423,14 +423,14 @@ const rightMotor = data.readUInt8(1);
 ```typescript
 interface MouseInput {
   Buttons: number;  // Button flags
-  Dx: number;       // Relative X movement (-128 to 127)
-  Dy: number;       // Relative Y movement (-128 to 127)
-  Wheel: number;    // Vertical scroll (-128 to 127)
-  Pan: number;      // Horizontal scroll (-128 to 127)
+  Dx: number;       // Relative X movement (-32768 to 32767)
+  Dy: number;       // Relative Y movement (-32768 to 32767)
+  Wheel: number;    // Vertical scroll (-32768 to 32767)
+  Pan: number;      // Horizontal scroll (-32768 to 32767)
 }
 ```
 
-**Wire format:** Fixed 5 bytes, packed structure
+**Wire format:** Fixed 9 bytes, int16 values little-endian
 
 ## Configuration and Advanced Usage
 

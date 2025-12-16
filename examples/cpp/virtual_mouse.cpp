@@ -93,8 +93,8 @@ int main(int argc, char** argv) {
 
     while (running && stream->is_connected()) {
         // Move diagonally: (+step,+step) then (-step,-step) next tick
-        std::int8_t dx = static_cast<std::int8_t>(step * dir);
-        std::int8_t dy = static_cast<std::int8_t>(step * dir);
+        std::int16_t dx = static_cast<std::int16_t>(step * dir);
+        std::int16_t dy = static_cast<std::int16_t>(step * dir);
         dir *= -1;
 
         // One-shot movement report (diagonal)

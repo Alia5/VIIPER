@@ -95,7 +95,7 @@ fn main() {
     // Send a short movement once every 3 seconds for easy local testing.
     // Followed by a short click and a single scroll notch.
     let mut dir = 1;
-    let step = 50; // move diagonally by 50 px in X and Y
+    let step = 50; // move diagonally by 50 px in X and Y (now supports up to ±32767)
 
     loop {
         // Move diagonally: (+step,+step) then (-step,-step) next tick

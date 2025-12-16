@@ -15,13 +15,13 @@ See: [Go Client](../clients/go.md), [Generated Client Libraries](../clients/gene
 
 ## HID report format (host-facing)
 
-Input (device → host): 5 bytes
+Input (device → host): 9 bytes
 
 - Byte 0: Buttons bitfield (bits 0..4 for buttons 1..5)
-- Byte 1: X delta (int8)
-- Byte 2: Y delta (int8)
-- Byte 3: Vertical wheel (int8; positive up)
-- Byte 4: Horizontal wheel/pan (int8; positive right)
+- Bytes 1-2: X delta (int16 little-endian, -32768 to +32767)
+- Bytes 3-4: Y delta (int16 little-endian, -32768 to +32767)
+- Bytes 5-6: Vertical wheel (int16 little-endian; positive up)
+- Bytes 7-8: Horizontal wheel/pan (int16 little-endian; positive right)
 
 Deltas are consumed after each IN report so motion is truly relative and not repeated across host polls.
 
@@ -29,8 +29,8 @@ Deltas are consumed after each IN report so motion is truly relative and not rep
 
 Wire format from your client into VIIPER:
 
-- Fixed 5-byte packets matching the HID report layout:
-  [Buttons, dX, dY, Wheel, Pan]
+- Fixed 9-byte packets matching the HID report layout:
+  [Buttons, dX_lo, dX_hi, dY_lo, dY_hi, Wheel_lo, Wheel_hi, Pan_lo, Pan_hi]
 
 Buttons persist until changed; motion/wheel deltas are applied once and reset.
 

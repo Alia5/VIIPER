@@ -88,8 +88,8 @@ func main() {
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 
 	// Alternate direction to keep the pointer near its origin.
-	dir := int8(1)
-	const step = int8(50) // move diagonally by 50 px in X and Y
+	dir := int16(1)
+	const step = int16(50) // move diagonally by 50 px in X and Y
 	fmt.Println("Every 3s: move diagonally by 50px (X and Y), then click and scroll. Press Ctrl+C to stop.")
 	for {
 		select {

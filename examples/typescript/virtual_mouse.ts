@@ -75,7 +75,7 @@ async function main() {
   // Send a short movement once every 3 seconds for easy local testing.
   // Followed by a short click and a single scroll notch.
   let dir = 1;
-  const step = 50; // move diagonally by 50 px in X and Y
+  const step = 50; // move diagonally by 50 px in X and Y (now supports up to ±32767)
   let running = true;
 
   console.log("Every 3s: move diagonally by 50px (X and Y), then click and scroll. Press Ctrl+C to stop.");

@@ -64,12 +64,12 @@ device.OnDisconnect = () => Console.WriteLine("!!! Server disconnected");
 
 // Send movement/click/scroll every 3s
 var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
-sbyte dir = 1; const sbyte step = 50;
+short dir = 1; const short step = 50;
 Console.WriteLine("Every 3s: move diagonally by 50px, click left, scroll +1. Ctrl+C to stop.");
 while (await timer.WaitForNextTickAsync())
 {
-    var dx = (sbyte)(step * dir);
-    var dy = (sbyte)(step * dir);
+    var dx = (short)(step * dir);
+    var dy = (short)(step * dir);
     dir = (sbyte)-dir;
 
     await device.SendAsync(new MouseInput { Dx = dx, Dy = dy, Buttons = 0, Wheel = 0, Pan = 0 });
