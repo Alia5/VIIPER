@@ -23,7 +23,8 @@ This starts two services:
 - **API Server** on port `3242` (device management)
 
 !!! tip "Auto-attach Feature"
-    By default, VIIPER automatically attaches newly created devices to the local machine. You can disable this with `--api.auto-attach-local-client=false`.
+    By default, VIIPER automatically attaches newly created devices to the local machine. You can disable this with `--api.auto-attach-local-client=false`.  
+    **Linux users:** Auto-attach requires running VIIPER with `sudo` as USBIP attach operations need elevated permissions.
 
 ### Custom Ports
 
@@ -208,6 +209,22 @@ Ensure the device is attached via USBIP AND you've opened a device stream via th
 **Multiple VIIPER instances:**
 
 If you have VIIPER running as a service, your application's instance may conflict. Either connect to the existing instance or use different ports.
+
+### Linux: Permission Denied When Attaching Devices
+
+**On Linux, USBIP attach operations require root permissions.**
+
+Run VIIPER with `sudo`:
+
+```bash
+sudo viiper server
+```
+
+Or if manually attaching devices, use `sudo` with the `usbip attach` command:
+
+```bash
+sudo usbip attach --remote=localhost --tcp-port=3241 --busid=1-1
+```
 
 ## See Also
 
