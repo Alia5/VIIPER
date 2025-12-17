@@ -216,10 +216,8 @@ jobs:
               uses: softprops/action-gh-release@v1
               with:
                   tag_name: ${{ steps.build_info.outputs.tag_name }}
-                  name: "Release ${{ steps.build_info.outputs.version }}"
+                  name: "VIIPER ${{ steps.build_info.outputs.version }}"
                   body: |
-                      ## VIIPER Release ${{ steps.build_info.outputs.version }}
-
                       ${{ needs.generate-changelog.outputs.changelog }}
                   files: release_files/*
                   prerelease: false

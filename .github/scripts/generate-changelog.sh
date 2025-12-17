@@ -88,12 +88,6 @@ done
 {
   echo "## Changelog for $VERSION_TITLE"
   echo ""
-  if [[ -z "$TAG_OR_RANGE" ]]; then
-    echo "This page shows unreleased changes in the development version."
-  else
-    echo "Release Date: $(date +'%Y-%m-%d')"
-  fi
-  echo ""
   echo "$CONTEXT_MSG"
   echo ""
   
