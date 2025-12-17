@@ -763,6 +763,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#linux-permission-denied-when-attaching-devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux: Permission Denied When Attaching Devices
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1674,6 +1685,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#linux-permission-denied-when-attaching-devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux: Permission Denied When Attaching Devices
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1729,7 +1751,8 @@
 </ul>
 <div class="admonition tip">
 <p class="admonition-title">Auto-attach Feature</p>
-<p>By default, VIIPER automatically attaches newly created devices to the local machine. You can disable this with <code>--api.auto-attach-local-client=false</code>.</p>
+<p>By default, VIIPER automatically attaches newly created devices to the local machine. You can disable this with <code>--api.auto-attach-local-client=false</code>.<br />
+<strong>Linux users:</strong> Auto-attach requires running VIIPER with <code>sudo</code> as USBIP attach operations need elevated permissions.</p>
 </div>
 <h3 id="custom-ports">Custom Ports</h3>
 <p>To use different ports:</p>
@@ -1862,6 +1885,14 @@
 <p>Ensure the device is attached via USBIP AND you've opened a device stream via the API to send input data.</p>
 <p><strong>Multiple VIIPER instances:</strong></p>
 <p>If you have VIIPER running as a service, your application's instance may conflict. Either connect to the existing instance or use different ports.</p>
+<h3 id="linux-permission-denied-when-attaching-devices">Linux: Permission Denied When Attaching Devices</h3>
+<p><strong>On Linux, USBIP attach operations require root permissions.</strong></p>
+<p>Run VIIPER with <code>sudo</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo<span class="w"> </span>viiper<span class="w"> </span>server
+</code></pre></div>
+<p>Or if manually attaching devices, use <code>sudo</code> with the <code>usbip attach</code> command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo<span class="w"> </span>usbip<span class="w"> </span>attach<span class="w"> </span>--remote<span class="o">=</span>localhost<span class="w"> </span>--tcp-port<span class="o">=</span><span class="m">3241</span><span class="w"> </span>--busid<span class="o">=</span><span class="m">1</span>-1
+</code></pre></div>
 <h2 id="see-also">See Also</h2>
 <ul>
 <li><a href="../../cli/overview/">CLI Reference</a> - Complete command documentation</li>
