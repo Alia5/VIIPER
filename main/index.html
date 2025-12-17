@@ -1634,12 +1634,14 @@ For more information, see <a href="#why-is-this-a-standalone-executable-that-i-h
 <p>Beyond device emulation, VIIPER can proxy real USB devices for traffic inspection and reverse engineering.</p>
 <h3 id="features">✨ Features</h3>
 <ul>
-<li>✅ Virtual input device emulation over IP using USBIP</li>
+<li>✅ Virtual input device emulation over IP using USBIP<ul>
 <li>✅ Xbox 360 controller emulation (virtual device); see <a href="devices/xbox360/">Devices › Xbox 360 Controller</a></li>
 <li>✅ HID Keyboard with N-key rollover and LED feedback; see <a href="devices/keyboard/">Devices › Keyboard</a></li>
 <li>✅ HID Mouse with 5 buttons and horizontal/vertical wheel; see <a href="devices/mouse/">Devices › Mouse</a></li>
-<li>🔜 ???<br />
-      🔜 Future plugin system allows for more device types (other gamepads, specialized HID)</li>
+<li>🔜 ???  <br />
+  🔜 Future plugin system allows for more device types (other gamepads, specialized HID)</li>
+</ul>
+</li>
 <li>✅ USBIP server mode: expose virtual devices to remote clients</li>
 <li>✅ <strong>Automatic local attachment</strong>: automatically controls usbip client on localhost to attach devices (enabled by default)</li>
 <li>✅ Proxy mode: forward real USB devices and inspect/record traffic (for reversing)</li>

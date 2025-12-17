@@ -670,17 +670,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#portable-deployment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Portable Deployment
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#pre-built-binaries" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -692,6 +681,61 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#automated-install-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automated Install Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-startup-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Startup Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="System Startup Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#viiper-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        viiper install
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viiper-uninstall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        viiper uninstall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#building-from-source" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -722,11 +766,6 @@
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1593,17 +1632,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#portable-deployment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Portable Deployment
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#pre-built-binaries" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1615,6 +1643,61 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#automated-install-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automated Install Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-startup-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Startup Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="System Startup Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#viiper-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        viiper install
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viiper-uninstall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        viiper uninstall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#building-from-source" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1645,11 +1728,6 @@
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1718,11 +1796,9 @@ You must have a USBIP-Client implementation available on your system to use VIIP
 <p>Check if the module is loaded:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>lsmod<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>vhci_hcd
 </code></pre></div>
-<p>If you don't plan to use the auto-attach feature, you can skip this setup and disable it with <code>--api.auto-attach-local-client=false</code>.</p>
 <h2 id="installing-viiper">Installing VIIPER</h2>
-<h3 id="portable-deployment">Portable Deployment</h3>
 <p>VIIPER does not require system-wide installation.<br />
-The <code>viiper</code> executable is completely self-contained (and statically linked) and can be:</p>
+The <code>viiper</code> executable is completely self-contained (and fully portable without any dependencies, except USBIP) and can be:</p>
 <ul>
 <li>Placed in any directory</li>
 <li>Shipped alongside your application</li>
@@ -1732,12 +1808,10 @@ The <code>viiper</code> executable is completely self-contained (and statically 
 <p>This makes VIIPER ideal for embedding in applications or distributing as part of a software package.</p>
 <div class="admonition warning">
 <p class="admonition-title">Daemon/Service Conflicts</p>
-<p>If VIIPER is already running as a system service or daemon on the target machine, be aware of potential port conflicts. Applications should either:</p>
-<ul>
-<li>Connect to the existing VIIPER instance (if accessible)</li>
-<li>Use a custom port via <code>--api.addr</code> flag to run a separate instance</li>
-<li>Check if VIIPER is already running before starting their own instance</li>
-</ul>
+<p>If VIIPER is already running as a system service or daemon on the target machine, be aware of potential port conflicts. Applications should:
+- Check if VIIPER is already running before starting their own instance
+- Connect to the existing VIIPER instance (if accessible)
+- Use a custom port via <code>--api.addr</code> flag to run a separate instance</p>
 </div>
 <h3 id="pre-built-binaries">Pre-built Binaries</h3>
 <p>Download the latest release from the <a href="https://github.com/Alia5/VIIPER/releases">GitHub Releases</a> page. Pre-built binaries are available for:</p>
@@ -1745,9 +1819,97 @@ The <code>viiper</code> executable is completely self-contained (and statically 
 <li>Windows (x64, ARM64)</li>
 <li>Linux (x64, ARM64)</li>
 </ul>
-<h3 id="building-from-source">Building from Source</h3>
+<h3 id="automated-install-script">Automated Install Script</h3>
+<p>Regardless of portability, it can be convenient to have VIIPER start automatically on system boot, especially if end users want to use your application through a network or you want to enable that possibility.  </p>
+<p>The following scripts will download a VIIPER release, install it to a system location, and configure it to start automatically on boot.  </p>
+<div class="admonition info">
+<p class="admonition-title">For Application Developers</p>
+<p>The installation scripts are intended for <strong>end-users</strong> setting up a permanent VIIPER service on their system.  </p>
+<p>If you're developing an application that uses VIIPER, I <strong>strongly</strong> encourage you to <strong>not</strong> install a permanent VIIPER service on your users machines. </p>
+<p>Instead, bundle the (no dependencies, portable) VIIPER binary with your application and start/stop the server directly from your application as needed.<br />
+You may need to check for existing VIIPER instances or use a custom port via <code>--api.addr</code> to avoid conflicts.   </p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">USBIP not included</p>
+<p>The install scripts do <strong>not</strong> install/setup USBIP.<br />
+Make sure a USBIP-client is installed and configured before installing VIIPER.</p>
+</div>
+<p><strong>Linux:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://alia5.github.io/VIIPER/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+</code></pre></div>
+<p>Installs to: <code>/usr/local/bin/viiper</code></p>
+<p><strong>Windows (PowerShell):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">irm </span><span class="n">https</span><span class="p">://</span><span class="n">alia5</span><span class="p">.</span><span class="n">github</span><span class="p">.</span><span class="n">io</span><span class="p">/</span><span class="n">VIIPER</span><span class="p">/</span><span class="n">install</span><span class="p">.</span><span class="n">ps1</span> <span class="p">|</span> <span class="nb">iex</span>
+</code></pre></div>
+<p>Installs to: <code>%LOCALAPPDATA%\VIIPER\viiper.exe</code></p>
+<p>The scripts will:</p>
+<ol>
+<li>Download the specified VIIPER binary version</li>
+<li>Install it to the system location</li>
+<li>Configure automatic startup (Registry RunKey on Windows, systemd service on Linux)</li>
+<li>Start the VIIPER server</li>
+</ol>
+<p><strong>Version-Specific Installation:</strong></p>
+<p>The install scripts are version-aware based on where you download them from:</p>
+<ul>
+<li>
+<p><strong>Latest stable release:</strong><br />
+<code>curl -fsSL https://alia5.github.io/VIIPER/install.sh | sh</code></p>
+</li>
+<li>
+<p><strong>Specific version (e.g., v0.2.2):</strong><br />
+<code>curl -fsSL https://alia5.github.io/VIIPER/0.2.2/install.sh | sh</code></p>
+</li>
+<li>
+<p><strong>Latest <em>pre</em>-release (development snapshot):</strong><br />
+<code>curl -fsSL https://alia5.github.io/VIIPER/main/install.sh | sh</code></p>
+</li>
+</ul>
+<h2 id="system-startup-configuration">System Startup Configuration</h2>
+<p>The <code>install</code> and <code>uninstall</code> commands configure automatic startup for the VIIPER binary.</p>
+<div class="admonition info">
+<p class="admonition-title">What These Commands Do</p>
+<p>These commands <strong>do not copy or move</strong> the VIIPER binary. They configure your system to automatically run the binary from its <strong>current location</strong> when the system boots.</p>
+<p>Make sure the binary is in a permanent location before running <code>viiper install</code>!</p>
+</div>
+<h3 id="viiper-install"><code>viiper install</code></h3>
+<p>Configures VIIPER to start automatically on system boot:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>viiper<span class="w"> </span>install
+</code></pre></div>
+<ul>
+<li><strong>Windows</strong>:  </li>
+<li>Adds entry to Registry RunKey: <code>HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run\VIIPER</code></li>
+<li>Value: <code>"&lt;current-exe-path&gt;" server</code></li>
+<li>Kills any previous autorun instances</li>
+<li>
+<p>Starts the server</p>
+</li>
+<li>
+<p><strong>Linux</strong>:  </p>
+</li>
+<li>Creates systemd service: <code>/etc/systemd/system/viiper.service</code></li>
+<li>Service ExecStart points to current binary path</li>
+<li>Enables and starts the service</li>
+</ul>
+<h3 id="viiper-uninstall"><code>viiper uninstall</code></h3>
+<p>Removes VIIPER from system startup and stops any running instance:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>viiper<span class="w"> </span>uninstall
+</code></pre></div>
+<ul>
+<li><strong>Windows</strong>:  </li>
+<li>Removes Registry RunKey entry</li>
+<li>
+<p>Kills any running autorun instances</p>
+</li>
+<li>
+<p><strong>Linux</strong>:  </p>
+</li>
+<li>Stops and disables the systemd service</li>
+<li>Removes <code>/etc/systemd/system/viiper.service</code></li>
+</ul>
+<h2 id="building-from-source">Building from Source</h2>
 <p>Building from source is only necessary if you need to modify VIIPER or target an unsupported platform.</p>
-<h4 id="prerequisites">Prerequisites</h4>
+<h3 id="prerequisites">Prerequisites</h3>
 <ul>
 <li><a href="https://go.dev/">Go</a> 1.25 or newer</li>
 <li>USBIP installed</li>
@@ -1757,15 +1919,15 @@ The <code>viiper</code> executable is completely self-contained (and statically 
 </ul>
 </li>
 </ul>
-<h4 id="build-steps">Build Steps</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Alia5/VIIPER.git
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>VIIPER
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>make<span class="w"> </span>build
+<h3 id="build-steps">Build Steps</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Alia5/VIIPER.git
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">cd</span><span class="w"> </span>VIIPER
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>make<span class="w"> </span>build
 </code></pre></div>
 <p>The compiled binary will be in <code>dist/viiper</code> (or <code>dist/viiper.exe</code> on Windows).</p>
 <p><strong>Additional build targets:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>make<span class="w"> </span><span class="nb">help</span><span class="w">          </span><span class="c1"># Show all available make targets</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>make<span class="w"> </span><span class="nb">test</span><span class="w">          </span><span class="c1"># Run tests</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>make<span class="w"> </span><span class="nb">help</span><span class="w">          </span><span class="c1"># Show all available make targets</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>make<span class="w"> </span><span class="nb">test</span><span class="w">          </span><span class="c1"># Run tests</span>
 </code></pre></div>
 
 
