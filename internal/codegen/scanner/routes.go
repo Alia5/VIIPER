@@ -38,7 +38,6 @@ type PayloadInfo struct {
 	Notes      string      `json:"notes,omitempty"`      // Additional guidance for generators
 }
 
-
 // ScanRoutes scans the specified Go file for router.Register() and router.RegisterStream() calls
 // and returns metadata about discovered routes.
 func ScanRoutes(filePath string) ([]RouteInfo, error) {
