@@ -1343,6 +1343,53 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># Single run, 1000 fixed iterations per sub benchmark</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>go<span class="w"> </span>run<span class="w"> </span>./scripts/lat_bench.go<span class="w"> </span>-benchtime<span class="o">=</span>1000x<span class="w"> </span>-count<span class="o">=</span><span class="m">1</span><span class="w"> </span>-format<span class="w"> </span>markdown
 </code></pre></div>
+<p>Results (Arch Linux / SteamDeck Kernel / Steam Deck LCD / Go 1.25+, 10k iterations):</p>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Count</th>
+<th>ns/op</th>
+<th>% of Full</th>
+<th>Client Share %</th>
+<th>Latency Share %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1_Go-Client-Write</td>
+<td>10000</td>
+<td>10668</td>
+<td>11.98</td>
+<td>100.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>2_InputDelay-Without-Client</td>
+<td>10000</td>
+<td>74154</td>
+<td>83.25</td>
+<td>0.00</td>
+<td>100.00</td>
+</tr>
+<tr>
+<td>3_E2E-InputDelay</td>
+<td>10000</td>
+<td>89078</td>
+<td>100.00</td>
+<td>11.98</td>
+<td>88.02</td>
+</tr>
+<tr>
+<td>4_E2E-PressAndRelease</td>
+<td>10000</td>
+<td>184870</td>
+<td>207.54</td>
+<td>11.54</td>
+<td>88.46</td>
+</tr>
+</tbody>
+</table>
 <p>Example output (Windows / AMD Ryzen 9 3900X / Go 1.25+, 10k iterations):</p>
 <table>
 <thead>
@@ -1398,7 +1445,7 @@ Use a larger <code>-count</code> if you want to increase the number of runs.</p>
 <li><code>% of Full</code> falls back to the largest ns/op if the baseline row is missing.</li>
 <li>All benchmarking must run with parallelism 1 in underlying benches.</li>
 <li>Benchmarks use a tight polling loop using SDL3 to detect input state changes on the emulated device.</li>
-<li>Benchmarks must be run without any other game controllers connected and without an already running VIIPER server instance.</li>
+<li>Benchmarks must be run without an already running VIIPER server instance.</li>
 </ul>
 
 
