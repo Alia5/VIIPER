@@ -98,6 +98,13 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 	defer sdl.Quit()
 	sdl.Init(sdl.INIT_GAMEPAD)
 
+	sdl.UpdateGamepads()
+	existingGamepads, _ := sdl.GetGamepads()
+	existingGamepadSet := make(map[sdl.JoystickID]bool)
+	for _, id := range existingGamepads {
+		existingGamepadSet[id] = true
+	}
+
 	s := cmd.Server{
 		UsbServerConfig: usb.ServerConfig{
 			Addr:              ":3241",
@@ -108,7 +115,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 			AutoAttachLocalClient:       true,
 			DeviceHandlerConnectTimeout: time.Second * 5,
 		},
-		ConnectionTimeout: 5,
+		ConnectionTimeout: 5 * time.Second,
 	}
 	logger := slog.Default()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -138,6 +145,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 	if err != nil {
 		b.Fatalf("DeviceAdd failed: %v", err)
 	}
+
 	devStream, err := c.OpenStream(ctx, busID, devInfo.DevId)
 	if err != nil {
 		b.Fatalf("OpenStream failed: %v", err)
@@ -148,18 +156,23 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 	for range 10 {
 		sdl.UpdateGamepads()
 		gIDs, _ := sdl.GetGamepads()
-		if len(gIDs) > 0 {
-			gamepad, err = gIDs[0].OpenGamepad()
-			defer gamepad.Close()
-			if err != nil {
-				b.Fatalf("OpenGamepad failed: %v", err)
+		for _, id := range gIDs {
+			if !existingGamepadSet[id] {
+				gamepad, err = id.OpenGamepad()
+				if err != nil {
+					b.Fatalf("OpenGamepad failed: %v", err)
+				}
+				defer gamepad.Close()
+				break
 			}
+		}
+		if gamepad != nil {
 			break
 		}
 		time.Sleep(time.Second * 1)
 	}
 	if gamepad == nil {
-		b.Fatalf("No gamepad found for testing")
+		b.Fatalf("No new gamepad found for testing (expected VIIPER virtual device)")
 	}
 	padChann := make(chan bool)
 	prevPadPressed := false

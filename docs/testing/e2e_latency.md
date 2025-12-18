@@ -40,6 +40,15 @@ cd testing/e2e
 go run ./scripts/lat_bench.go -benchtime=1000x -count=1 -format markdown
 ```
 
+Results (Arch Linux / SteamDeck Kernel / Steam Deck LCD / Go 1.25+, 10k iterations):
+
+| Benchmark | Count | ns/op | % of Full | Client Share % | Latency Share % |
+|-----------|-------|-------|-----------|----------------|-----------------|
+| 1_Go-Client-Write | 10000 | 10668 | 11.98 | 100.00 | 0.00 |
+| 2_InputDelay-Without-Client | 10000 | 74154 | 83.25 | 0.00 | 100.00 |
+| 3_E2E-InputDelay | 10000 | 89078 | 100.00 | 11.98 | 88.02 |
+| 4_E2E-PressAndRelease | 10000 | 184870 | 207.54 | 11.54 | 88.46 |
+
 Example output (Windows / AMD Ryzen 9 3900X / Go 1.25+, 10k iterations):
 
 | Benchmark | Count | ns/op | % of Full | Client Share % | Latency Share % |
@@ -58,4 +67,4 @@ Use a larger `-count` if you want to increase the number of runs.
 - `% of Full` falls back to the largest ns/op if the baseline row is missing.
 - All benchmarking must run with parallelism 1 in underlying benches.
 - Benchmarks use a tight polling loop using SDL3 to detect input state changes on the emulated device.
-- Benchmarks must be run without any other game controllers connected and without an already running VIIPER server instance.
+- Benchmarks must be run without an already running VIIPER server instance.
