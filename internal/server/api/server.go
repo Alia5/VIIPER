@@ -79,6 +79,11 @@ func (a *Server) serve() {
 			a.logger.Info("API accept error", "error", err)
 			return
 		}
+		if tcpConn, ok := c.(*net.TCPConn); ok {
+			if err := tcpConn.SetNoDelay(true); err != nil {
+				a.logger.Warn("failed to set TCP_NODELAY", "error", err)
+			}
+		}
 		go a.handleConn(c)
 	}
 }

@@ -31,6 +31,7 @@ const socketTemplate = `// Auto-generated VIIPER C++ Client Library
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -144,6 +145,10 @@ public:
 
             if (::connect(sock, ptr->ai_addr, static_cast<int>(ptr->ai_addrlen)) == 0) {
                 fd_ = sock;
+                
+                int flag = 1;
+                ::setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<const char*>(&flag), sizeof(flag));
+                
                 if (timeout_ms_ > 0) {
                     auto timeout_result = apply_timeout_internal();
                     if (timeout_result.is_error()) {

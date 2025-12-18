@@ -49,6 +49,7 @@ export class ViiperClient {
 		return new Promise<T>((resolve, reject) => {
 			const socket = new Socket();
 			socket.connect(this.port, this.host, () => {
+				socket.setNoDelay(true);
 				let line = path; // preserve case
 				if (payload && payload.length > 0) line += ' ' + payload;
 				line += '\0';
@@ -69,7 +70,6 @@ export class ViiperClient {
 							reject(e);
 							return;
 						}
-						// Typed error detection (RFC 7807 style)
 						if (parsed && typeof parsed === 'object' && 'status' in parsed && parsed.status >= 400) {
 							socket.end();
 							reject(new Error(String(parsed.status) + ' ' + parsed.title + ': ' + parsed.detail));
@@ -89,6 +89,7 @@ export class ViiperClient {
 		return new Promise<ViiperDevice>((resolve, reject) => {
 			const socket = new Socket();
 			socket.connect(this.port, this.host, () => {
+				socket.setNoDelay(true);
 				const line = ` + "`" + `bus/${busId}/${devId}\0` + "`" + `;
 				socket.write(encoder.encode(line));
 				resolve(new ViiperDevice(socket));

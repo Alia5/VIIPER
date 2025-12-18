@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"net/url"
 	"strings"
@@ -91,6 +92,13 @@ func (c *Transport) DoCtx(ctx context.Context, path string, payload any, pathPar
 		return "", fmt.Errorf("dial: %w", err)
 	}
 	defer conn.Close()
+
+	if tcpConn, ok := conn.(*net.TCPConn); ok {
+		if err := tcpConn.SetNoDelay(true); err != nil {
+			slog.Warn("failed to set TCP_NODELAY", "error", err)
+		}
+	}
+
 	if c.cfg.WriteTimeout > 0 {
 		_ = conn.SetWriteDeadline(time.Now().Add(c.cfg.WriteTimeout))
 	}

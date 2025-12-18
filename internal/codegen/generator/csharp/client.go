@@ -56,6 +56,7 @@ public class ViiperClient : IDisposable
     {
         using var client = new TcpClient();
         await client.ConnectAsync(_host, _port, cancellationToken);
+        client.NoDelay = true;
         
         using var stream = client.GetStream();
         
@@ -102,6 +103,7 @@ public class ViiperClient : IDisposable
 	{
 		var client = new TcpClient();
 		await client.ConnectAsync(_host, _port, cancellationToken);
+		client.NoDelay = true;
 		var stream = client.GetStream();
 		// Streaming handshake uses null terminator (same framing as management).
 		var streamPath = $"bus/{{lb}}busId{{rb}}/{{lb}}devId{{rb}}\0";

@@ -226,6 +226,11 @@ func (s *Server) ListenAndServe() error {
 			s.logger.Error("Accept error", "error", err)
 			continue
 		}
+		if tcpConn, ok := c.(*net.TCPConn); ok {
+			if err := tcpConn.SetNoDelay(true); err != nil {
+				s.logger.Warn("failed to set TCP_NODELAY", "error", err)
+			}
+		}
 		s.logger.Info("Client connected", "remote", c.RemoteAddr())
 		go func() {
 			if err := s.handleConn(c); err != nil {

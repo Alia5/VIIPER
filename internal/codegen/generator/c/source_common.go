@@ -24,6 +24,7 @@ static int viiper_wsa_init_once = 0;
 #else
 #  include <sys/types.h>
 #  include <sys/socket.h>
+#  include <netinet/tcp.h>
 #  include <netdb.h>
 #  include <unistd.h>
 #  include <pthread.h>
@@ -219,7 +220,16 @@ static int viiper_connect(const char* host, uint16_t port) {
     for (struct addrinfo* p = res; p; p = p->ai_next) {
         int s = (int)socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (s < 0) continue;
-        if (connect(s, p->ai_addr, (int)p->ai_addrlen) == 0) { fd = s; break; }
+        if (connect(s, p->ai_addr, (int)p->ai_addrlen) == 0) {
+            int flag = 1;
+#if defined(_WIN32) || defined(_WIN64)
+            setsockopt(s, IPPROTO_TCP, TCP_NODELAY, (const char*)&flag, sizeof(flag));
+#else
+            setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
+#endif
+            fd = s;
+            break;
+        }
 #if defined(_WIN32) || defined(_WIN64)
         closesocket(s);
 #else

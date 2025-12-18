@@ -35,6 +35,7 @@ impl ViiperClient {
         payload: Option<&str>,
     ) -> Result<T, ViiperError> {
         let mut stream = TcpStream::connect(self.addr)?;
+        stream.set_nodelay(true)?;
 
         stream.write_all(path.as_bytes())?;
         if let Some(p) = payload {
@@ -83,7 +84,8 @@ pub struct DeviceStream {
 impl DeviceStream {
     pub fn connect(addr: SocketAddr, bus_id: u32, dev_id: &str) -> Result<Self, ViiperError> {
         let mut stream = TcpStream::connect(addr)?;
-        let handshake = format!("bus/{}/{}\0", bus_id, dev_id);
+		stream.set_nodelay(true)?;
+		let handshake = format!("bus/{}/{}\0", bus_id, dev_id);
         stream.write_all(handshake.as_bytes())?;
         Ok(Self { 
             stream,

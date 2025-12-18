@@ -6,6 +6,7 @@ import (
 	"encoding"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"sync"
 	"time"
@@ -37,6 +38,12 @@ func (c *Client) OpenStream(ctx context.Context, busID uint32, devID string) (*D
 	conn, err := d.DialContext(ctx, "tcp", addr)
 	if err != nil {
 		return nil, fmt.Errorf("dial: %w", err)
+	}
+
+	if tcpConn, ok := conn.(*net.TCPConn); ok {
+		if err := tcpConn.SetNoDelay(true); err != nil {
+			slog.Warn("failed to set TCP_NODELAY", "error", err)
+		}
 	}
 
 	streamPath := fmt.Sprintf("bus/%d/%s\x00", busID, devID)
