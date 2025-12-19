@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#viiper-documentation" class="md-skip">
+        <a href="#viiper" class="md-skip">
           Skip to content
         </a>
       
@@ -478,10 +478,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
+  <a href="#features-roadmap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✨ Features
+        ✨🛣️ Features / Roadmap
       
     </span>
   </a>
@@ -1448,10 +1448,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
+  <a href="#features-roadmap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✨ Features
+        ✨🛣️ Features / Roadmap
       
     </span>
   </a>
@@ -1607,8 +1607,8 @@
 
 <p><img src="viiper.svg" align="right" width="200"/>
 <br /></p>
-<h1 id="viiper-documentation">VIIPER Documentation</h1>
-<p>VIIPER is a tool to create virtual input devices using USBIP.</p>
+<h1 id="viiper">VIIPER 🐍</h1>
+<p><strong>Virtual</strong> <strong>I</strong>nput over <strong>IP</strong> <strong>E</strong>mulato<strong>R</strong></p>
 <h2 id="quick-links">Quick Links</h2>
 <ul>
 <li><a href="getting-started/installation/">Installation</a></li>
@@ -1617,12 +1617,12 @@
 <li><a href="https://github.com/Alia5/VIIPER">GitHub Repository</a></li>
 </ul>
 <h2 id="what-is-viiper">What is VIIPER?</h2>
-<p>VIIPER creates virtual USB input devices using the USBIP protocol.<br />
-These virtual devices appear as real hardware to the operating system and applications, allowing you to emulate controllers, keyboards, and other input devices without physical hardware.</p>
+<p>VIIPER lets developers create virtual USB input devices (like game controllers, keyboards, and mice) that can be controlled programmatically (even over a network!) (using USBIP under the hood).<br />
+These virtual devices are indistinguishable from real hardware to the operating system and applications, enabling seamless integration for testing, automation, and remote control scenarios.</p>
 <ul>
 <li>VIIPER abstracts away all USB / USBIP details.  </li>
 <li>Device emulation happens in userspace code instead of kernel drivers, so no kernel programming is required to add new device types.  </li>
-<li>Users need USBIP installed once (built into Linux, usbip-win2 for Windows), after that VIIPER runs without additional dependencies or system-wide installation.  </li>
+<li>Users need USBIP installed once (built into Linux, usbip-win2 for Windows), after that VIIPER can run without additional dependencies or system-wide installation.  </li>
 </ul>
 <p>VIIPER <em>currently</em> comes in a single flavor:</p>
 <ul>
@@ -1632,23 +1632,23 @@ These virtual devices appear as real hardware to the operating system and applic
 For more information, see <a href="#why-is-this-a-standalone-executable-that-i-have-to-interface-via-tcp-and-not-a-shared-object-library-in-itself">FAQ</a>  </li>
 </ul>
 <p>Beyond device emulation, VIIPER can proxy real USB devices for traffic inspection and reverse engineering.</p>
-<h3 id="features">✨ Features</h3>
+<h3 id="features-roadmap">✨🛣️ Features / Roadmap</h3>
 <ul>
 <li>✅ Virtual input device emulation over IP using USBIP<ul>
-<li>✅ Xbox 360 controller emulation (virtual device); see <a href="devices/xbox360/">Devices › Xbox 360 Controller</a></li>
-<li>✅ HID Keyboard with N-key rollover and LED feedback; see <a href="devices/keyboard/">Devices › Keyboard</a></li>
-<li>✅ HID Mouse with 5 buttons and horizontal/vertical wheel; see <a href="devices/mouse/">Devices › Mouse</a></li>
-<li>🔜 ???  <br />
+<li>✅ Xbox 360 controller emulation; see <a href="docs/devices/xbox360.md">Devices › Xbox 360 Controller</a></li>
+<li>✅ HID Keyboard with N-key rollover and LED feedback; see <a href="docs/devices/keyboard.md">Devices › Keyboard</a></li>
+<li>✅ HID Mouse with 5 buttons and horizontal/vertical wheel; see <a href="docs/devices/mouse.md">Devices › Mouse</a></li>
+<li>🔜 Xbox One / Series(?) controller emulation</li>
+<li>🔜 PS4 controller emulation</li>
+<li>🔜 ???<br />
   🔜 Future plugin system allows for more device types (other gamepads, specialized HID)</li>
 </ul>
 </li>
-<li>✅ USBIP server mode: expose virtual devices to remote clients</li>
 <li>✅ <strong>Automatic local attachment</strong>: automatically controls usbip client on localhost to attach devices (enabled by default)</li>
 <li>✅ Proxy mode: forward real USB devices and inspect/record traffic (for reversing)</li>
-<li>✅ Cross-platform: works on Linux and Windows</li>
+<li>✅ Cross-platform: works on Linux and Windows, <strong>0</strong> dependencies portable binary</li>
 <li>✅ Flexible logging (including raw USB packet logs)</li>
-<li>✅ API server for device/bus management and controlling virtual devices programmatically</li>
-<li>✅ Multiple client libraries for easy integration; see <a href="api/overview/">Client Libraries</a><br />
+<li>✅ Multiple client libraries for easy integration; see <a href="docs/api/overview.md">Client Libraries</a><br />
   MIT Licensed</li>
 <li>🔜 <em>libVIIPER</em> to link against, directly incoporating VIIPER into your feeder application.  </li>
 </ul>

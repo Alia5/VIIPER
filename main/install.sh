@@ -48,14 +48,30 @@ chmod +x viiper
 INSTALL_DIR="/usr/local/bin"
 INSTALL_PATH="$INSTALL_DIR/viiper"
 
+IS_UPDATE=0
+if [ -f "$INSTALL_PATH" ]; then
+	IS_UPDATE=1
+fi
+
 echo "Installing binary to $INSTALL_PATH..."
 sudo mkdir -p "$INSTALL_DIR"
 sudo cp viiper "$INSTALL_PATH"
 sudo chmod +x "$INSTALL_PATH"
 
-echo "Configuring system startup..."
-sudo "$INSTALL_PATH" install
+if [ "$IS_UPDATE" -eq 1 ]; then
+	echo "Existing VIIPER installation detected (update). Preserving startup/autostart configuration..."
+	# On update, do NOT run `viiper install` (it would enable/restart the systemd service).
+	# We only replace the binary so the previous enable/disable choice remains intact.
+else
+	echo "Configuring system startup..."
+	sudo "$INSTALL_PATH" install
+fi
 
 echo "VIIPER installed successfully!"
 echo "Binary installed to: $INSTALL_PATH"
-echo "VIIPER server is now running and will start automatically on boot."
+if [ "$IS_UPDATE" -eq 1 ]; then
+	echo "Update complete. Startup/autostart configuration was left unchanged."
+	echo "If VIIPER is running, restart it to use the updated binary."
+else
+	echo "VIIPER server is now running and will start automatically on boot."
+fi
