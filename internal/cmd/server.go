@@ -54,6 +54,7 @@ func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger
 
 	apiSrv := api.New(usbSrv, s.ApiServerConfig.Addr, s.ApiServerConfig, logger)
 	r := apiSrv.Router()
+	r.Register("ping", handler.Ping())
 	r.Register("bus/list", handler.BusList(usbSrv))
 	r.Register("bus/create", handler.BusCreate(usbSrv))
 	r.Register("bus/remove", handler.BusRemove(usbSrv))

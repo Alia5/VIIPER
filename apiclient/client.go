@@ -28,6 +28,21 @@ func NewWithConfig(addr string, cfg *Config) *Client {
 // This is primarily useful for testing or when advanced transport configuration is needed.
 func WithTransport(t *Transport) *Client { return &Client{transport: t} }
 
+// Ping returns the version and identity of the VIIPER server.
+func (c *Client) Ping() (*apitypes.PingResponse, error) {
+	return c.PingCtx(context.Background())
+}
+
+// PingCtx is the context-aware version of Ping.
+func (c *Client) PingCtx(ctx context.Context) (*apitypes.PingResponse, error) {
+	const path = "ping"
+	raw, err := c.transport.DoCtx(ctx, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return parse[apitypes.PingResponse](raw)
+}
+
 // BusCreate creates a new virtual USB bus with the specified bus number.
 // Returns the created bus ID or an error if the bus number is already allocated.
 func (c *Client) BusCreate(busID uint32) (*apitypes.BusCreateResponse, error) {

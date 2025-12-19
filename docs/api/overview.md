@@ -31,9 +31,11 @@ Tip: You can experiment with `nc`/`ncat` or PowerShell’s `tcpclient` to send l
 !!! warning "Connection timing and auto‑cleanup"
     After you add a device with `bus/{id}/add`, you must connect to its streaming endpoint within the configured `DeviceHandlerConnectTimeout` (default: 5s). If no stream connection is established in time, the device is automatically removed. Likewise, when a stream disconnects, a reconnection timer with the same timeout starts; if the client doesn’t reconnect before it expires, the device is removed.
 
-## Commands
+## Endpoints
 
-The server registers the following commands and streams:
+- `ping`
+  - Simple identity and version check.
+  - Response: `{ "server": "VIIPER", "version": "1.2.3[-dev-abcd]" }`
 
 - `bus/list`
   - List all virtual bus IDs.

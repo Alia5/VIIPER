@@ -79,7 +79,8 @@ This makes VIIPER ideal for embedding in applications or distributing as part of
 
 !!! warning "Daemon/Service Conflicts"
     If VIIPER is already running as a system service or daemon on the target machine, be aware of potential port conflicts. Applications should:
-    - Check if VIIPER is already running before starting their own instance
+    - Check if VIIPER is already running before starting their own instance  
+      - use the `ping` API endpoint to check for VIIPER presence and version  
     - Connect to the existing VIIPER instance (if accessible)
     - Use a custom port via `--api.addr` flag to run a separate instance
 
@@ -144,14 +145,13 @@ The install scripts are version-aware based on where you download them from:
 - **Latest _pre_-release (development snapshot):**  
   `curl -fsSL https://alia5.github.io/VIIPER/main/install.sh | sh`
 
-
 ## System Startup Configuration
 
 The `install` and `uninstall` commands configure automatic startup for the VIIPER binary.
 
 !!! info "What These Commands Do"
     These commands **do not copy or move** the VIIPER binary. They configure your system to automatically run the binary from its **current location** when the system boots.
-    
+
     Make sure the binary is in a permanent location before running `viiper install`!
 
 ### `viiper install`

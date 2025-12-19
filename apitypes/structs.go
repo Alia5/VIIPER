@@ -17,6 +17,11 @@ type ApiError struct {
 	Detail string `json:"detail"`
 }
 
+type PingResponse struct {
+	Server  string `json:"server"`
+	Version string `json:"version"`
+}
+
 func (e *ApiError) Error() string {
 	if e == nil {
 		return "<nil>"
