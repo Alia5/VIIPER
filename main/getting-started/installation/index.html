@@ -1809,7 +1809,8 @@ The <code>viiper</code> executable is completely self-contained (and fully porta
 <div class="admonition warning">
 <p class="admonition-title">Daemon/Service Conflicts</p>
 <p>If VIIPER is already running as a system service or daemon on the target machine, be aware of potential port conflicts. Applications should:
-- Check if VIIPER is already running before starting their own instance
+- Check if VIIPER is already running before starting their own instance<br />
+  - use the <code>ping</code> API endpoint to check for VIIPER presence and version<br />
 - Connect to the existing VIIPER instance (if accessible)
 - Use a custom port via <code>--api.addr</code> flag to run a separate instance</p>
 </div>

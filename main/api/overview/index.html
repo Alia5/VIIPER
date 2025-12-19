@@ -870,15 +870,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
+  <a href="#endpoints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Commands
+        Endpoints
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Commands">
+    <nav class="md-nav" aria-label="Endpoints">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1419,15 +1419,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
+  <a href="#endpoints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Commands
+        Endpoints
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Commands">
+    <nav class="md-nav" aria-label="Endpoints">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1597,10 +1597,16 @@
 <p class="admonition-title">Connection timing and auto‑cleanup</p>
 <p>After you add a device with <code>bus/{id}/add</code>, you must connect to its streaming endpoint within the configured <code>DeviceHandlerConnectTimeout</code> (default: 5s). If no stream connection is established in time, the device is automatically removed. Likewise, when a stream disconnects, a reconnection timer with the same timeout starts; if the client doesn’t reconnect before it expires, the device is removed.</p>
 </div>
-<h2 id="commands">Commands</h2>
-<p>The server registers the following commands and streams:</p>
+<h2 id="endpoints">Endpoints</h2>
 <ul>
-<li><code>bus/list</code></li>
+<li><code>ping</code></li>
+<li>Simple identity and version check.</li>
+<li>
+<p>Response: <code>{ "server": "VIIPER", "version": "1.2.3[-dev-abcd]" }</code></p>
+</li>
+<li>
+<p><code>bus/list</code></p>
+</li>
 <li>List all virtual bus IDs.</li>
 <li>
 <p>Response: <code>{ "buses": [1, 2, ...] }</code></p>
