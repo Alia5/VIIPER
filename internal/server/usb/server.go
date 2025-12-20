@@ -1,6 +1,7 @@
 package usb
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/binary"
 	"errors"
@@ -19,6 +20,101 @@ import (
 	"github.com/Alia5/VIIPER/usbip"
 	"github.com/Alia5/VIIPER/virtualbus"
 )
+
+type batchingWriter struct {
+	mu           sync.Mutex
+	w            *bufio.Writer
+	flushEvery   time.Duration
+	flushAtBytes int
+	stopCh       chan struct{}
+	closeOnce    sync.Once
+	err          error
+}
+
+const (
+	retSubmitHeaderSize = 0x30
+
+	// avoid windows socket overhead while keeping latency very low.
+	writeBatcherBufferSize   = 256 * 1024
+	writeBatcherFlushEvery   = 1 * time.Millisecond
+	writeBatcherFlushAtBytes = 64 * 1024
+)
+
+func newBatchingWriter(dst io.Writer, bufSize int, flushEvery time.Duration, flushAtBytes int) *batchingWriter {
+	if bufSize <= 0 {
+		bufSize = writeBatcherBufferSize
+	}
+	if flushAtBytes < 0 {
+		flushAtBytes = 0
+	}
+	if flushAtBytes > bufSize {
+		flushAtBytes = bufSize
+	}
+	bw := &batchingWriter{
+		w:            bufio.NewWriterSize(dst, bufSize),
+		flushEvery:   flushEvery,
+		flushAtBytes: flushAtBytes,
+		stopCh:       make(chan struct{}),
+	}
+	if flushEvery > 0 {
+		go bw.flushLoop()
+	}
+	return bw
+}
+
+func (b *batchingWriter) flushLoop() {
+	t := time.NewTicker(b.flushEvery)
+	defer t.Stop()
+	for {
+		select {
+		case <-t.C:
+			_ = b.Flush()
+		case <-b.stopCh:
+			return
+		}
+	}
+}
+
+func (b *batchingWriter) Write(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	if b.err != nil {
+		return 0, b.err
+	}
+
+	n, err := b.w.Write(p)
+	if err != nil {
+		b.err = err
+		return n, err
+	}
+	if b.flushAtBytes > 0 && b.w.Buffered() >= b.flushAtBytes {
+		if err := b.w.Flush(); err != nil {
+			b.err = err
+			return n, err
+		}
+	}
+	return n, nil
+}
+
+func (b *batchingWriter) Flush() error {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	if b.err != nil {
+		return b.err
+	}
+	if err := b.w.Flush(); err != nil {
+		b.err = err
+		return err
+	}
+	return nil
+}
+
+func (b *batchingWriter) Close() error {
+	b.closeOnce.Do(func() {
+		close(b.stopCh)
+	})
+	return b.Flush()
+}
 
 const (
 	// USB standard request codes
@@ -450,6 +546,9 @@ func (lc *logConn) Write(p []byte) (int, error) {
 func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 	_ = conn.SetDeadline(time.Time{})
 
+	bw := newBatchingWriter(conn, writeBatcherBufferSize, writeBatcherFlushEvery, writeBatcherFlushAtBytes)
+	defer func() { _ = bw.Close() }()
+
 	var owningBus *virtualbus.VirtualBus
 	for _, b := range s.busses {
 		devices := b.Devices()
@@ -522,7 +621,7 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 			s.logger.Debug("USBIP_CMD_UNLINK", "seq", seq, "unlink", unlinkSeq)
 			// Reply with -ECONNRESET
 			ret := usbip.RetUnlink{Basic: usbip.HeaderBasic{Command: usbip.RetUnlinkCode, Seqnum: seq, Devid: 0, Dir: 0, Ep: 0}, Status: errConnReset}
-			_ = ret.Write(conn)
+			_ = ret.Write(bw)
 			continue
 		}
 		if cmd != usbip.CmdSubmitCode {
@@ -551,14 +650,17 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 			ErrorCount:      0,
 		}
 		var out bytes.Buffer
+		out.Grow(retSubmitHeaderSize)
 		if err := ret.Write(&out); err != nil {
 			return fmt.Errorf("build RET_SUBMIT header: %w", err)
 		}
-		if len(respData) > 0 {
-			out.Write(respData)
-		}
-		if _, err := conn.Write(out.Bytes()); err != nil {
+		if _, err := bw.Write(out.Bytes()); err != nil {
 			return fmt.Errorf("write RET_SUBMIT: %w", err)
+		}
+		if len(respData) > 0 {
+			if _, err := bw.Write(respData); err != nil {
+				return fmt.Errorf("write RET_SUBMIT payload: %w", err)
+			}
 		}
 		_ = xferFlags
 		_ = devid
