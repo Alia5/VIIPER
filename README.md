@@ -183,8 +183,10 @@ Useful for reverse engineering USB protocols and understanding how devices commu
 
 ### What about TCP overhead or input latency performance?
 
-End-to-end input latency for virtual devices created with VIIPER is typically well below 1 millisecond on a modern desktop (e.g. Windows / Ryzen 3900X test machine).  
-Detailed methodology and sample runs can be found in [E2E Latency Benchmarks](docs/testing/e2e_latency.md).
+End-to-end input latency for virtual devices created with VIIPER could be typically well below 1 millisecond on a modern desktop (e.g. Windows / Ryzen 3900X test machine).  
+Detailed methodology and sample runs can be found in [E2E Latency Benchmarks](testing/e2e_latency.md).  
+However, to not stress the CPU excessively, reports get batched and sent every millisecond. So the best you will achive is a 1000Hz update rate, which is more than enough and more than what most real hardware devices provide.  
+_Note_: Actual device polling rates may be lower depending on the device type and configuration.
 
 ---
 
