@@ -9,7 +9,12 @@ API_URL="https://api.github.com/repos/${REPO}/releases/tags/${VIIPER_VERSION}"
 
 echo "Fetching VIIPER release: $VIIPER_VERSION..."
 RELEASE_DATA=$(curl -fsSL "$API_URL")
-VERSION=$(echo "$RELEASE_DATA" | grep -o '"tag_name":"[^"]*' | cut -d'"' -f4)
+# GitHub API JSON is typically formatted like: "tag_name": "v0.3.0" (note the whitespace).
+# Be permissive about whitespace so we don't fail to parse valid responses.
+VERSION=$(printf '%s' "$RELEASE_DATA" \
+	| grep -Eo '"tag_name"[[:space:]]*:[[:space:]]*"[^"]+"' \
+	| head -n 1 \
+	| cut -d'"' -f4)
 
 if [ -z "$VERSION" ]; then
 	echo "Error: Could not fetch VIIPER release" >&2
