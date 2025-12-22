@@ -6,6 +6,7 @@ repo_url: https://github.com/Alia5/VIIPER
 
 theme:
   name: material
+  logo: viiper.svg
   palette:
     # Light mode
     - media: "(prefers-color-scheme: light)"
