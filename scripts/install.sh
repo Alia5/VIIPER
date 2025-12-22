@@ -56,6 +56,11 @@ if [ -f "$INSTALL_PATH" ]; then
 	IS_UPDATE=1
 fi
 
+if [ "$IS_UPDATE" -eq 1 ]; then
+	echo "Stopping VIIPER service if running..."
+	sudo systemctl stop viiper.service || true
+fi
+
 echo "Installing binary to $INSTALL_PATH..."
 sudo mkdir -p "$INSTALL_DIR"
 sudo cp viiper "$INSTALL_PATH"
@@ -116,8 +121,11 @@ else
 	echo "Configuring system startup..."
 	ensure_modules_persist
 	modprobe_vhci
-	sudo "$INSTALL_PATH" install
 fi
+
+
+echo "Creating systemd service..."
+sudo "$INSTALL_PATH" install
 
 if [ "$STEAMOS_RW_TOGGLED" -eq 1 ]; then
 	echo "Re-enabling SteamOS read-only root..."
