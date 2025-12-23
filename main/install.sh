@@ -178,8 +178,16 @@ else
 	esac
 fi
 
+if [ "$IS_UPDATE" -eq 1 ]; then
+	echo "Existing VIIPER installation detected. Preserving startup/autostart configuration..."
+else
+	echo "Configuring system startup..."
+fi
+
 echo "Checking vhci_hcd kernel module..."
+MODULE_ALREADY_LOADED=0
 if lsmod | grep -q vhci_hcd; then
+	MODULE_ALREADY_LOADED=1
 	echo "vhci_hcd module is already loaded"
 else
 	echo "Loading vhci_hcd kernel module..."
@@ -190,39 +198,17 @@ else
 	fi
 fi
 
-
-ensure_modules_persist() {
-	local conf="/etc/modules-load.d/viiper.conf"
-	if ! lsmod | grep -q vhci_hcd; then
-		echo "Configuring vhci_hcd to load at boot..."
-		if echo "vhci_hcd" | sudo tee "$conf" >/dev/null; then
-			echo "Module persistence configured: $conf"
-		else
-			echo "Warning: failed to write $conf. VHCI may not load automatically after reboot."
-		fi
+MODULES_CONF="/etc/modules-load.d/viiper.conf"
+if [ $MODULE_ALREADY_LOADED -eq 0 ]; then
+	echo "Configuring vhci_hcd to load at boot..."
+	if echo "vhci_hcd" | sudo tee "$MODULES_CONF" >/dev/null; then
+		echo "Module persistence configured: $MODULES_CONF"
 	else
-		echo "vhci_hcd module is already loaded, skipping autoload configuration"
+		echo "Warning: Could not configure module persistence"
 	fi
-}
-
-modprobe_vhci() {
-	if ! lsmod | grep -q vhci_hcd; then
-		echo "Loading vhci_hcd module now..."
-		if sudo modprobe vhci_hcd; then
-			echo "vhci_hcd loaded."
-		else
-			echo "Warning: failed to load vhci_hcd. VIIPER may still run if the module is already present."
-		fi
-	fi
-}
-
-if [ "$IS_UPDATE" -eq 1 ]; then
-	echo "Existing VIIPER installation detected. Preserving startup/autostart configuration..."
 else
-	echo "Configuring system startup..."
+	echo "vhci_hcd module is already loaded, skipping autoload configuration"
 fi
-ensure_modules_persist
-modprobe_vhci
 
 if [ "$SKIP_INSTALL" -eq 0 ]; then
 	echo "Creating systemd service..."
