@@ -1837,10 +1837,14 @@ The <code>viiper</code> executable is completely self-contained (and fully porta
 <p>Instead, bundle the (no dependencies, portable) VIIPER binary with your application and start/stop the server directly from your application as needed.<br />
 You may need to check for existing VIIPER instances or use a custom port via <code>--api.addr</code> to avoid conflicts.   </p>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">USBIP not included</p>
-<p>The install scripts do <strong>not</strong> install/setup USBIP.<br />
-Make sure a USBIP-client is installed and configured before installing VIIPER.</p>
+<div class="admonition info">
+<p class="admonition-title">USBIP installed by scripts</p>
+<p>The install scripts install and configure USBIP for you:</p>
+<ul>
+<li><strong>Windows:</strong> installs the usbip-win2 driver (admin prompt) and prompts for a reboot when drivers were added.</li>
+<li><strong>Linux:</strong> installs USBIP via the distro package manager (when available), loads <code>vhci_hcd</code>, and configures it to autoload.</li>
+</ul>
+<p>If the automated USBIP setup fails, follow the <a href="usbip.md">USBIP guide</a> to finish manually.</p>
 </div>
 <p><strong>Linux:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://alia5.github.io/VIIPER/stable/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
@@ -1854,8 +1858,9 @@ Make sure a USBIP-client is installed and configured before installing VIIPER.</
 <ol>
 <li>Download the specified VIIPER binary version</li>
 <li>Install it to the system location</li>
+<li>Install and configure USBIP (driver on Windows; packages/modules on Linux)</li>
 <li>Configure automatic startup (Registry RunKey on Windows, systemd service on Linux)</li>
-<li>Start the VIIPER server</li>
+<li>Start/restart the VIIPER service</li>
 </ol>
 <p><strong>Version-Specific Installation:</strong></p>
 <p>The install scripts are version-aware based on where you download them from:</p>
