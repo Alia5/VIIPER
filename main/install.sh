@@ -48,7 +48,7 @@ fi
 
 chmod +x viiper
 
-NEW_VERSION=$(./viiper --help -p > /dev/null | grep -Eo 'Version: [^ ]+' | head -1 | cut -d' ' -f2)
+NEW_VERSION=$(./viiper --help -p | grep -Eo 'Version: [^ ]+' | head -1 | cut -d' ' -f2)
 if [ -z "$NEW_VERSION" ]; then
 	echo "Warning: Could not extract version from downloaded binary"
 	NEW_VERSION="unknown"
@@ -63,7 +63,7 @@ SKIP_INSTALL=0
 if [ -f "$INSTALL_PATH" ]; then
 	IS_UPDATE=1
 
-	OLD_VERSION=$("$INSTALL_PATH" --help -p > /dev/null | grep -Eo 'Version: [^ ]+' | head -1 | cut -d' ' -f2)
+	OLD_VERSION=$("$INSTALL_PATH" --help -p | grep -Eo 'Version: [^ ]+' | head -1 | cut -d' ' -f2)
 	if [ -z "$OLD_VERSION" ]; then
 		echo "Warning: Could not extract version from installed binary"
 		OLD_VERSION="unknown"
