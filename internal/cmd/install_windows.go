@@ -33,7 +33,7 @@ func install(logger *slog.Logger) error {
 		return err
 	}
 
-	value := fmt.Sprintf("%q server", exePath)
+	value := fmt.Sprintf("\"%s\" server", exePath)
 	key, _, err := registry.CreateKey(registry.CURRENT_USER, runKeyPath, registry.ALL_ACCESS)
 	if err != nil {
 		return err
