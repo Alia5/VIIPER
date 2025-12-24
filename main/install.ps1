@@ -178,7 +178,7 @@ pnputil.exe /add-driver usbip2_ude.inf /install
     if (-not $isUpdate) {
         Write-Host "Configuring system startup..."
     }
-    & $installPath install
+    Start-Process -WindowStyle Hidden  "$installPath" -ArgumentList "install"
     
     Write-Host "VIIPER installed successfully!" -ForegroundColor Green
     Write-Host "Binary installed to: $installPath"
