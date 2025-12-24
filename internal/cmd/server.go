@@ -13,6 +13,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/internal/server/api/handler"
 	"github.com/Alia5/VIIPER/internal/server/usb"
+	"github.com/Alia5/VIIPER/internal/util"
 )
 
 type Server struct {
@@ -76,7 +77,19 @@ func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger
 
 	if err := apiSrv.Start(); err != nil {
 		logger.Error("failed to start API server", "error", err)
+		if util.IsRunFromGUI() {
+			fmt.Println("Press any key to exit...")
+			var b []byte = make([]byte, 1)
+			_, _ = os.Stdin.Read(b)
+		}
 		return err
+	}
+
+	if util.IsRunFromGUI() {
+		go (func() {
+			time.Sleep(250 * time.Millisecond)
+			util.HideConsoleWindow()
+		})()
 	}
 
 	select {
