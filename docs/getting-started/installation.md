@@ -8,72 +8,74 @@ For more information, see [FAQ](https://github.com/Alia5/VIIPER#why-is-this-a-st
 
 ## Requirements
 
+### USBIP
+
 VIIPER relies on USBIP.  
 You must have a USBIP-Client implementation available on your system to use VIIPER's virtual devices.
 
-### Windows
+=== "Windows"
 
-[usbip-win2](https://github.com/vadimgrn/usbip-win2) is by far the most complete implementation of USBIP for Windows (comes with a **SIGNED** kernel mode driver).
+    [usbip-win2](https://github.com/vadimgrn/usbip-win2) is by far the most complete implementation of USBIP for Windows (comes with a **SIGNED** kernel mode driver).
 
-**Install and done 😉**
+    **Install and done 😉**
 
-!!! warning "USBIP-Win2 security issue"
-    The releases of usbip-win2 **currently** (at the time of writing) install the publicly available test signing CA as a _trusted root CA_ on your system.  
-    You can safely remove this CA after installation using `certmgr.msc` (run as admin) and removing the "USBIP" from the "Trusted Root Certification Authorities" -> "Certificates" list.
+    !!! warning "USBIP-Win2 security issue"
+        The releases of usbip-win2 **currently** (at the time of writing) install the publicly available test signing CA as a _trusted root CA_ on your system.  
+        You can safely remove this CA after installation using `certmgr.msc` (run as admin) and removing the "USBIP" from the "Trusted Root Certification Authorities" -> "Certificates" list.
 
-    **Alternativly**, you can download and istall the **latest pre-release** driver manually from the
-    [OSSign repository](https://github.com/OSSign/vadimgrn--usbip-win2/releases), which has this issue fixed already.  
-    _Note_ that the installer does not work, only the driver `.cat,.inf,.sys` files.
+        **Alternativly**, you can download and istall the **latest pre-release** driver manually from the
+        [OSSign repository](https://github.com/OSSign/vadimgrn--usbip-win2/releases), which has this issue fixed already.  
+        _Note_ that the installer does not work, only the driver `.cat,.inf,.sys` files.
 
-### Linux
+=== "Linux"
 
-#### Ubuntu/Debian
+    #### Ubuntu/Debian
 
-```bash
-sudo apt install linux-tools-generic
-```
+    ```bash
+    sudo apt install linux-tools-generic
+    ```
 
-[Ubuntu USBIP Manual](https://manpages.ubuntu.com/manpages/noble/man8/usbip.8.html)
+    [Ubuntu USBIP Manual](https://manpages.ubuntu.com/manpages/noble/man8/usbip.8.html)
 
-#### Arch Linux
+    #### Arch Linux
 
-```bash
-sudo pacman -S usbip
-```
+    ```bash
+    sudo pacman -S usbip
+    ```
 
-[Arch Wiki: USBIP](https://wiki.archlinux.org/title/USB/IP)
+    [Arch Wiki: USBIP](https://wiki.archlinux.org/title/USB/IP)
 
-### Linux Kernel Module Setup
+    ### Linux Kernel Module Setup
 
-!!! info "USBIP Client Requirement"
-    USBIP requires the `vhci-hcd` (Virtual Host Controller Interface) kernel module on Linux for client operations. This includes VIIPER's auto-attach feature and manual device attachment.
+    !!! info "USBIP Client Requirement"
+        USBIP requires the `vhci-hcd` (Virtual Host Controller Interface) kernel module on Linux for client operations. This includes VIIPER's auto-attach feature and manual device attachment.
 
-Most Linux distributions include this module but don't load it automatically.
+    Most Linux distributions include this module but don't load it automatically.
 
-#### One-Time Setup
+    #### One-Time Setup
 
-To load the module automatically on boot:
+    To load the module automatically on boot:
 
-```bash
-echo "vhci-hcd" | sudo tee /etc/modules-load.d/vhci-hcd.conf
-sudo modprobe vhci-hcd
-```
+    ```bash
+    echo "vhci-hcd" | sudo tee /etc/modules-load.d/vhci-hcd.conf
+    sudo modprobe vhci-hcd
+    ```
 
-#### Manual Loading
+    #### Manual Loading
 
-To load the module for the current session only:
+    To load the module for the current session only:
 
-```bash
-sudo modprobe vhci-hcd
-```
+    ```bash
+    sudo modprobe vhci-hcd
+    ```
 
-#### Verification
+    #### Verification
 
-Check if the module is loaded:
+    Check if the module is loaded:
 
-```bash
-lsmod | grep vhci_hcd
-```
+    ```bash
+    lsmod | grep vhci_hcd
+    ```
 
 ## Installing VIIPER
 
@@ -93,6 +95,10 @@ This makes VIIPER ideal for embedding in applications or distributing as part of
       - use the `ping` API endpoint to check for VIIPER presence and version  
     - Connect to the existing VIIPER instance (if accessible)
     - Use a custom port via `--api.addr` flag to run a separate instance
+
+!!! info "Linux Permissions"
+    On Linux, attaching devices via USBIP requires root permissions.  
+    You can run VIIPER with `sudo`, or configure appropriate udev rules to allow non-root users to attach devices.
 
 ### Pre-built Binaries
 
@@ -123,29 +129,37 @@ The following scripts will download a VIIPER release, install it to a system loc
 
     If the automated USBIP setup fails, follow the [USBIP guide](usbip.md) to finish manually.
 
-**Linux:**
+=== "Windows"
 
-```bash
-curl -fsSL https://alia5.github.io/VIIPER/stable/install.sh | sh
-```
+    ```powershell
+    irm https://alia5.github.io/VIIPER/stable/install.ps1 | iex
+    ```
 
-Installs to: `/usr/local/bin/viiper`
+    Installs to: `%LOCALAPPDATA%\VIIPER\viiper.exe`
 
-**Windows (PowerShell):**
+    The scripts will:
 
-```powershell
-irm https://alia5.github.io/VIIPER/stable/install.ps1 | iex
-```
+    1. Download the specified VIIPER binary version
+    2. Install it to the system location
+    3. Install and configure USBIP (driver on Windows; packages/modules on Linux)
+    4. Configure automatic startup (Registry RunKey on Windows, systemd service on Linux)
+    5. Start/restart the VIIPER service
 
-Installs to: `%LOCALAPPDATA%\VIIPER\viiper.exe`
+=== "Linux"
 
-The scripts will:
+    ```bash
+    curl -fsSL https://alia5.github.io/VIIPER/stable/install.sh | sh
+    ```
 
-1. Download the specified VIIPER binary version
-2. Install it to the system location
-3. Install and configure USBIP (driver on Windows; packages/modules on Linux)
-4. Configure automatic startup (Registry RunKey on Windows, systemd service on Linux)
-5. Start/restart the VIIPER service
+    Installs to: `/usr/local/bin/viiper`
+
+    The scripts will:
+
+    1. Download the specified VIIPER binary version
+    2. Install it to the system location
+    3. Attempt to install and configure USBIP 
+    4. Load the `vhci_hcd` kernel module and configure it to autoload on boot
+    5. Configure and run a systemd service
 
 **Version-Specific Installation:**
 
@@ -213,8 +227,8 @@ Building from source is only necessary if you need to modify VIIPER or target an
 - [Go](https://go.dev/) 1.25 or newer
 - USBIP installed
 - (Optional) [Make](https://www.gnu.org/software/make/)
-    - Linux/macOS: Usually pre-installed
-    - Windows: `winget install ezwinports.make`
+  - Linux/macOS: Usually pre-installed
+  - Windows: `winget install ezwinports.make`
 
 ### Build Steps
 
