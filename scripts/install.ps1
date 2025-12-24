@@ -175,23 +175,21 @@ pnputil.exe /add-driver usbip2_ude.inf /install
         Write-Host "USBIP drivers already installed" -ForegroundColor Green
     }
 
-    if (-not $skipInstall) {
-        if (-not $isUpdate) {
-            Write-Host "Configuring system startup..."
-        }
-        & $installPath install
+    if (-not $isUpdate) {
+        Write-Host "Configuring system startup..."
     }
+    & $installPath install
     
     Write-Host "VIIPER installed successfully!" -ForegroundColor Green
     Write-Host "Binary installed to: $installPath"
     if ($isUpdate) {
         if ($skipInstall) {
-            Write-Host "Binary already at correct version or newer. Skipping installation."
+            Write-Host "Binary already at correct version or newer. Skipping binary copy."
         }
         else {
             Write-Host "Update complete. Startup/autostart configuration was left unchanged."
-            Write-Host "VIIPER service has been restarted."
         }
+        Write-Host "VIIPER service has been restarted."
     }
     else {
         Write-Host "VIIPER server is now running and will start automatically on boot."
