@@ -11,7 +11,7 @@ import (
 	"github.com/Alia5/VIIPER/virtualbus"
 	"github.com/stretchr/testify/assert"
 
-	viiperTesting "github.com/Alia5/VIIPER/testing"
+	viiperTesting "github.com/Alia5/VIIPER/_testing"
 
 	_ "github.com/Alia5/VIIPER/internal/registry" // Register devices
 )

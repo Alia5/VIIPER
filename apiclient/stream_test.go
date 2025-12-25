@@ -12,11 +12,11 @@ import (
 	apitypes "github.com/Alia5/VIIPER/apitypes"
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/device/xbox360"
+	htesting "github.com/Alia5/VIIPER/internal/_testing"
 	"github.com/Alia5/VIIPER/internal/log"
 	api "github.com/Alia5/VIIPER/internal/server/api"
 	handler "github.com/Alia5/VIIPER/internal/server/api/handler"
 	"github.com/Alia5/VIIPER/internal/server/usb"
-	htesting "github.com/Alia5/VIIPER/internal/testing"
 	pusb "github.com/Alia5/VIIPER/usb"
 	"github.com/Alia5/VIIPER/virtualbus"
 

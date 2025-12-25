@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/Alia5/VIIPER/device"
+	th "github.com/Alia5/VIIPER/internal/_testing"
 	"github.com/Alia5/VIIPER/internal/server/api"
-	th "github.com/Alia5/VIIPER/internal/testing"
 	"github.com/Alia5/VIIPER/usb"
 )
 

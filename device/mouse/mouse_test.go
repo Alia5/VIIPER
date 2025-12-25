@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
+	viiperTesting "github.com/Alia5/VIIPER/_testing"
 	"github.com/Alia5/VIIPER/apiclient"
 	"github.com/Alia5/VIIPER/device/mouse"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/internal/server/api/handler"
-	viiperTesting "github.com/Alia5/VIIPER/testing"
 	"github.com/Alia5/VIIPER/virtualbus"
 	"github.com/stretchr/testify/assert"
 

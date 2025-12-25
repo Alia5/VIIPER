@@ -11,10 +11,10 @@ import (
 
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/device/xbox360"
+	th "github.com/Alia5/VIIPER/internal/_testing"
 	"github.com/Alia5/VIIPER/internal/log"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	srvusb "github.com/Alia5/VIIPER/internal/server/usb"
-	th "github.com/Alia5/VIIPER/internal/testing"
 	pusb "github.com/Alia5/VIIPER/usb"
 	"github.com/Alia5/VIIPER/virtualbus"
 )

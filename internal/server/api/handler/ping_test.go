@@ -8,10 +8,10 @@ import (
 
 	"github.com/Alia5/VIIPER/apiclient"
 	"github.com/Alia5/VIIPER/apitypes"
+	handlerTest "github.com/Alia5/VIIPER/internal/_testing"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/internal/server/api/handler"
 	"github.com/Alia5/VIIPER/internal/server/usb"
-	handlerTest "github.com/Alia5/VIIPER/internal/testing"
 )
 
 func TestPing(t *testing.T) {

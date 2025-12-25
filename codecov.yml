@@ -1,5 +1,4 @@
 ignore:
   - "examples/go/**/*"
-  - "testing/**/*"
-  - "internal/testing/**/*"
+  - "**/_testing/**/*.go"
   - "cmd/viiper/**/*"

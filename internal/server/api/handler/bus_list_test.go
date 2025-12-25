@@ -6,10 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/Alia5/VIIPER/apiclient"
+	handlerTest "github.com/Alia5/VIIPER/internal/_testing"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/internal/server/api/handler"
 	"github.com/Alia5/VIIPER/internal/server/usb"
-	handlerTest "github.com/Alia5/VIIPER/internal/testing"
 	"github.com/Alia5/VIIPER/virtualbus"
 )
 

@@ -8,22 +8,22 @@ package main
 //
 // Usage examples:
 //   # Run benchmarks (count=5) and emit markdown
-//   go run ./testing/e2e/scripts/lat_bench.go -format markdown -count 5 > latency.md
+//   go run ./_testing/e2e/scripts/lat_bench.go -format markdown -count 5 > latency.md
 //
 //   # Parse existing benchmark output instead of running (offline mode)
-//   go run ./testing/e2e/scripts/lat_bench.go -format table -input bench.txt
+//   go run ./_testing/e2e/scripts/lat_bench.go -format table -input bench.txt
 //
 //   # Produce JSON for CI consumption
-//   go run ./testing/e2e/scripts/lat_bench.go -format json -count 3
+//   go run ./_testing/e2e/scripts/lat_bench.go -format json -count 3
 //
 //   # Fixed iteration benchtime (5000 operations per sub benchmark)
-//   go run ./testing/e2e/scripts/lat_bench.go -benchtime 5000x -format markdown > latency.md
+//   go run ./_testing/e2e/scripts/lat_bench.go -benchtime 5000x -format markdown > latency.md
 //
 //   # Time based benchtime (2 seconds per benchmark)
-//   go run ./testing/e2e/scripts/lat_bench.go -benchtime 2s -format table
+//   go run ./_testing/e2e/scripts/lat_bench.go -benchtime 2s -format table
 //
 //   # Default benchtime when not specified is 1000x (fixed iterations)
-//   go run ./testing/e2e/scripts/lat_bench.go -format table              # implicit -benchtime=1000x
+//   go run ./_testing/e2e/scripts/lat_bench.go -format table              # implicit -benchtime=1000x
 //
 // The tool always:
 //   * Groups repeated benchmark cycles when count > 1

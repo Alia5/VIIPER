@@ -1,6 +1,6 @@
 # E2E Latency Benchmarks
 
-The script `viiper/testing/e2e/scripts/lat_bench.go` runs (or parses) end‑to‑end input latency benchmarks and produces enriched output (table, markdown, or JSON).
+The script `viiper/_testing/e2e/scripts/lat_bench.go` runs (or parses) end‑to‑end input latency benchmarks and produces enriched output (table, markdown, or JSON).
 
 It groups repeated cycles when `-count > 1` and uses the single press E2E measurement (`E2E-InputDelay`) as the 100% baseline.
 
