@@ -1,0 +1,5 @@
+ignore:
+  - "examples/go/**/*"
+  - "testing/**/*"
+  - "internal/testing/**/*"
+  - "cmd/viiper/**/*"
