@@ -4,6 +4,9 @@ package usb
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
+
+	"github.com/Alia5/VIIPER/usb/hid"
 )
 
 // USB descriptor type constants
@@ -25,6 +28,8 @@ const (
 	HIDDescLen       = 9
 )
 
+type Data []uint8
+
 // Descriptor holds all static descriptor/config data for a device.
 type Descriptor struct {
 	Device     DeviceDescriptor
@@ -34,11 +39,21 @@ type Descriptor struct {
 
 // InterfaceConfig holds all descriptors for a single interface for bus management.
 type InterfaceConfig struct {
-	Descriptor    InterfaceDescriptor
-	Endpoints     []EndpointDescriptor
-	HIDDescriptor []byte // optional HID class descriptor (0x21)
-	HIDReport     []byte // optional HID report descriptor (0x22)
-	VendorData    []byte // optional vendor-specific bytes
+	Descriptor InterfaceDescriptor
+	Endpoints  []EndpointDescriptor
+
+	// HID describes a HID-class interface (bInterfaceClass=0x03).
+	// If set, the server will emit the HID descriptor (0x21) in the configuration
+	// descriptor and serve the report descriptor (0x22) via GET_DESCRIPTOR.
+	HID *HIDFunction
+
+	// ClassDescriptors are additional interface-level class-specific descriptors
+	// emitted as part of the configuration descriptor (after the interface descriptor
+	// and before the endpoints).
+	//
+	// This is also used for vendor-specific interfaces that need to expose opaque
+	// descriptors (e.g. type 0x21 blobs on Xbox360).
+	ClassDescriptors []ClassSpecificDescriptor
 }
 
 // EncodeStringDescriptor converts a UTF-8 string to a USB string descriptor byte array.
@@ -161,32 +176,103 @@ func (e EndpointDescriptor) Write(b *bytes.Buffer) {
 
 }
 
-// HIDDescriptor (class descriptor, 0x21) with one subordinate report descriptor (0x22).
-type HIDDescriptor struct {
-	BcdHID            uint16 // LE
-	BCountryCode      uint8
-	BNumDescriptors   uint8
-	ClassDescType     uint8  // 0x22 (report)
-	WDescriptorLength uint16 // LE, report descriptor length
+// HIDSubDescriptor is one subordinate descriptor entry in the HID class descriptor.
+//
+// Type is typically ReportDescType (0x22). If Type==ReportDescType and Length==0,
+// the server will auto-fill Length from the associated HID report descriptor at
+// serialization time.
+type HIDSubDescriptor struct {
+	Type   uint8
+	Length uint16 // LE
 }
 
-func (h HIDDescriptor) Write(b *bytes.Buffer) {
-	b.WriteByte(HIDDescLen)
+// HIDDescriptor is the HID class descriptor (0x21) for HID-class interfaces.
+//
+// bDescriptorType is fixed to HIDDescType (0x21).
+// bLength is auto-calculated as: 6 + 3*len(Descriptors).
+type HIDDescriptor struct {
+	BcdHID       uint16 // LE
+	BCountryCode uint8
+	Descriptors  []HIDSubDescriptor
+}
+
+func (h HIDDescriptor) IsZero() bool {
+	return h.BcdHID == 0 && h.BCountryCode == 0 && len(h.Descriptors) == 0
+}
+
+func (h HIDDescriptor) Write(b *bytes.Buffer, reportLen uint16) error {
+	if len(h.Descriptors) == 0 {
+		return fmt.Errorf("usb: HIDDescriptor has no subordinate descriptors")
+	}
+	b.WriteByte(uint8(6 + 3*len(h.Descriptors)))
 	b.WriteByte(HIDDescType)
 	_ = binary.Write(b, binary.LittleEndian, h.BcdHID)
 	b.WriteByte(h.BCountryCode)
-	b.WriteByte(h.BNumDescriptors)
-	b.WriteByte(h.ClassDescType)
-	_ = binary.Write(b, binary.LittleEndian, h.WDescriptorLength)
-
+	b.WriteByte(uint8(len(h.Descriptors)))
+	for _, sd := range h.Descriptors {
+		b.WriteByte(sd.Type)
+		l := sd.Length
+		if sd.Type == ReportDescType && l == 0 {
+			l = reportLen
+		}
+		_ = binary.Write(b, binary.LittleEndian, l)
+	}
+	return nil
 }
 
-// ReportDescriptor is a container for HID report descriptor bytes (0x22).
-// Builders can populate Data to emit via Bytes().
-type ReportDescriptor struct {
-	Data []byte
+// ClassSpecificDescriptor represents an opaque class-specific interface descriptor.
+//
+// It auto-calculates bLength and hardcodes bDescriptorType. Payload contains all bytes
+// after the (bLength,bDescriptorType) header.
+type ClassSpecificDescriptor struct {
+	DescriptorType uint8
+	Payload        Data
 }
 
-func (r ReportDescriptor) Bytes() []byte {
-	return r.Data
+func (d ClassSpecificDescriptor) Bytes() Data {
+	out := make([]uint8, 0, 2+len(d.Payload))
+	out = append(out, uint8(2+len(d.Payload)))
+	out = append(out, d.DescriptorType)
+	out = append(out, d.Payload...)
+	return Data(out)
+}
+
+// HIDFunction bundles the HID class descriptor (0x21) and the report descriptor (0x22)
+// for a HID-class interface.
+type HIDFunction struct {
+	Descriptor HIDDescriptor
+	Report     hid.Report
+}
+
+func (f HIDFunction) reportLen() (uint16, error) {
+	rb, err := f.Report.Bytes()
+	if err != nil {
+		return 0, err
+	}
+	if len(rb) > 0xFFFF {
+		return 0, fmt.Errorf("usb: HID report descriptor too large: %d", len(rb))
+	}
+	return uint16(len(rb)), nil
+}
+
+// DescriptorBytes returns the HID class descriptor (0x21) bytes.
+func (f HIDFunction) DescriptorBytes() (Data, error) {
+	rl, err := f.reportLen()
+	if err != nil {
+		return nil, err
+	}
+	var b bytes.Buffer
+	if err := f.Descriptor.Write(&b, rl); err != nil {
+		return nil, err
+	}
+	return Data(b.Bytes()), nil
+}
+
+// ReportBytes returns the HID report descriptor (0x22) bytes.
+func (f HIDFunction) ReportBytes() (Data, error) {
+	rb, err := f.Report.Bytes()
+	if err != nil {
+		return nil, err
+	}
+	return Data(rb), nil
 }

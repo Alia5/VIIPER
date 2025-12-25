@@ -739,7 +739,7 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 		case usbDescTypeDevice:
 			data = desc.Bytes()
 		case usbDescTypeConfiguration:
-			data = buildConfigDescriptor(desc)
+			data = s.buildConfigDescriptor(desc)
 		case usbDescTypeString:
 			if s, ok := desc.Strings[dindex]; ok {
 				data = usb.EncodeStringDescriptor(s)
@@ -759,11 +759,31 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 		var data []byte
 		if int(iface) < len(desc.Interfaces) {
 			ifaceConf := desc.Interfaces[iface]
-			switch dtype {
-			case usbDescTypeHID:
-				data = ifaceConf.HIDDescriptor
-			case usbDescTypeHIDReport:
-				data = ifaceConf.HIDReport
+			if ifaceConf.HID != nil {
+				switch dtype {
+				case usbDescTypeHID:
+					d, err := ifaceConf.HID.DescriptorBytes()
+					if err != nil {
+						s.logger.Error("failed to build HID descriptor", "iface", iface, "error", err)
+						return nil
+					}
+					data = []byte(d)
+				case usbDescTypeHIDReport:
+					d, err := ifaceConf.HID.ReportBytes()
+					if err != nil {
+						s.logger.Error("failed to build HID report descriptor", "iface", iface, "error", err)
+						return nil
+					}
+					data = []byte(d)
+				}
+			}
+			if len(data) == 0 {
+				for _, cd := range ifaceConf.ClassDescriptors {
+					if cd.DescriptorType == dtype {
+						data = []byte(cd.Bytes())
+						break
+					}
+				}
 			}
 		}
 		if len(data) == 0 {
@@ -779,7 +799,7 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 	return nil
 }
 
-func buildConfigDescriptor(desc *usb.Descriptor) []byte {
+func (s *Server) buildConfigDescriptor(desc *usb.Descriptor) []byte {
 	var b bytes.Buffer
 	h := usb.ConfigHeader{
 		WTotalLength:        0, // to be patched
@@ -792,14 +812,20 @@ func buildConfigDescriptor(desc *usb.Descriptor) []byte {
 	h.Write(&b)
 	for _, iface := range desc.Interfaces {
 		iface.Descriptor.Write(&b)
-		if len(iface.HIDDescriptor) > 0 {
-			b.Write(iface.HIDDescriptor)
+		if iface.HID != nil {
+			hd, err := iface.HID.DescriptorBytes()
+			if err != nil {
+				s.logger.Error("failed to build HID descriptor", "iface", iface.Descriptor.BInterfaceNumber, "error", err)
+				// Stall/return minimal config descriptor.
+				return nil
+			}
+			b.Write([]byte(hd))
+		}
+		for _, cd := range iface.ClassDescriptors {
+			b.Write([]byte(cd.Bytes()))
 		}
 		for _, ep := range iface.Endpoints {
 			ep.Write(&b)
-		}
-		if len(iface.VendorData) > 0 {
-			b.Write(iface.VendorData)
 		}
 	}
 
