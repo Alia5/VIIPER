@@ -12,6 +12,7 @@ permissions:
 jobs:
     build:
         uses: ./.github/workflows/build_base.yml
+        secrets: inherit
         with:
             artifact_suffix: "-Release"
             upload_artifacts: true

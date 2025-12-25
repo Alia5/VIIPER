@@ -34,6 +34,7 @@ jobs:
     build:
         needs: calculate-version
         uses: ./.github/workflows/build_base.yml
+        secrets: inherit
         with:
             artifact_suffix: "-Snapshot"
             upload_artifacts: true

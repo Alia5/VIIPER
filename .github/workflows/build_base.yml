@@ -47,7 +47,14 @@ jobs:
                   fi
 
             - name: Run tests
-              run: make test
+              run: go test -count=1 -v -coverprofile="coverage.txt" ./...
+
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v5
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  directory: .
+                  fail_ci_if_error: true
 
     build:
         name: Build binaries (${{ matrix.target.goos }}/${{ matrix.target.goarch }})

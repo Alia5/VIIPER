@@ -1,15 +1,16 @@
 name: PR-Check
 
 on:
-  pull_request:
-    branches:
-      - '**'
+    pull_request:
+        branches:
+            - "**"
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  build:
-    uses: ./.github/workflows/build_base.yml
-    with:
-      upload_artifacts: false
+    build:
+        uses: ./.github/workflows/build_base.yml
+        secrets: inherit
+        with:
+            upload_artifacts: false
