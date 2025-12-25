@@ -74,6 +74,14 @@ func (s *SteamDeck) HandleTransfer(ep uint32, dir uint32, _ []byte) []byte {
 		return nil
 	}
 	switch ep {
+	case 2: // 0x82 - dummy keyboard interface (iface 0)
+		// Keep Windows HID stack happy
+		// no actual lizard-mode behavior.
+		atomic.AddUint64(&s.tick, 1)
+		return make([]byte, 8)
+	case 3: // 0x83 - dummy mouse interface (iface 1)
+		atomic.AddUint64(&s.tick, 1)
+		return make([]byte, 4)
 	case 1: // 0x81 - controller input reports
 		seq := uint32(atomic.AddUint64(&s.tick, 1))
 		st := s.getInputStateSnapshot()
@@ -104,13 +112,38 @@ func (s *SteamDeck) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex,
 	// Our descriptor includes placeholder interfaces for kb/M and the actual controller
 	// HID interface at idx 2.
 	iface := uint8(wIndex & 0xFF)
-	if iface != 2 {
-		return nil, false
-	}
 
 	reportType := uint8(wValue >> 8)
 	// reportID := uint8(wValue & 0xFF) // We don't use report IDs (but may see 0).
 	_ = uint8(wValue & 0xFF)
+
+	// HID-class handling for the dummy interfaces so Windows doesn't flag them as malfunctioning.
+	if iface == 0 || iface == 1 {
+		want := int(wLength)
+		switch {
+		case bmRequestType == hidReqTypeClassInToInterface && bRequest == hidReqGetReport:
+			if want <= 0 {
+				return nil, true
+			}
+			return make([]byte, want), true
+		case bmRequestType == hidReqTypeClassOutToInterface && (bRequest == hidReqSetReport || bRequest == 0x0A || bRequest == 0x0B):
+			return nil, true
+		case bmRequestType == hidReqTypeClassInToInterface && (bRequest == 0x02 || bRequest == 0x03):
+			if want <= 0 {
+				return nil, true
+			}
+			resp := make([]byte, want)
+			if bRequest == 0x03 {
+				resp[0] = 0x01
+			}
+			return resp, true
+		}
+		return nil, false
+	}
+
+	if iface != 2 {
+		return nil, false
+	}
 
 	switch {
 	case bmRequestType == hidReqTypeClassInToInterface && bRequest == hidReqGetReport:
@@ -148,6 +181,68 @@ func (s *SteamDeck) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex,
 	}
 
 	return nil, false
+}
+
+var dummyKeyboardReportDescriptor = hid.Report{
+	Items: []hid.Item{
+		hid.UsagePage{Page: hid.UsagePageGenericDesktop},
+		hid.Usage{Usage: hid.UsageKeyboard},
+		hid.Collection{Kind: hid.CollectionApplication, Items: []hid.Item{
+			hid.UsagePage{Page: hid.UsagePageKeyboard},
+			hid.UsageMinimum{Min: 0xE0},
+			hid.UsageMaximum{Max: 0xE7},
+			hid.LogicalMinimum{Min: 0},
+			hid.LogicalMaximum{Max: 1},
+			hid.ReportSize{Bits: 1},
+			hid.ReportCount{Count: 8},
+			hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+
+			hid.ReportSize{Bits: 8},
+			hid.ReportCount{Count: 1},
+			hid.Input{Flags: hid.MainConst},
+
+			hid.LogicalMinimum{Min: 0},
+			hid.LogicalMaximum{Max: 255},
+			hid.UsageMinimum{Min: 0x00},
+			hid.UsageMaximum{Max: 0xFF},
+			hid.ReportSize{Bits: 8},
+			hid.ReportCount{Count: 6},
+			hid.Input{Flags: hid.MainData | hid.MainArray | hid.MainAbs},
+		}},
+	},
+}
+
+var dummyMouseReportDescriptor = hid.Report{
+	Items: []hid.Item{
+		hid.UsagePage{Page: hid.UsagePageGenericDesktop},
+		hid.Usage{Usage: hid.UsageMouse},
+		hid.Collection{Kind: hid.CollectionApplication, Items: []hid.Item{
+			hid.Usage{Usage: hid.UsagePointer},
+			hid.Collection{Kind: hid.CollectionPhysical, Items: []hid.Item{
+				hid.UsagePage{Page: hid.UsagePageButton},
+				hid.UsageMinimum{Min: 0x01},
+				hid.UsageMaximum{Max: 0x03},
+				hid.LogicalMinimum{Min: 0},
+				hid.LogicalMaximum{Max: 1},
+				hid.ReportSize{Bits: 1},
+				hid.ReportCount{Count: 3},
+				hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+				hid.ReportSize{Bits: 5},
+				hid.ReportCount{Count: 1},
+				hid.Input{Flags: hid.MainConst},
+
+				hid.UsagePage{Page: hid.UsagePageGenericDesktop},
+				hid.Usage{Usage: hid.UsageX},
+				hid.Usage{Usage: hid.UsageY},
+				hid.Usage{Usage: hid.UsageWheel},
+				hid.LogicalMinimum{Min: -127},
+				hid.LogicalMaximum{Max: 127},
+				hid.ReportSize{Bits: 8},
+				hid.ReportCount{Count: 3},
+				hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainRel},
+			}},
+		}},
+	},
 }
 
 func (s *SteamDeck) getFeatureResponse(want int) []byte {
@@ -339,29 +434,61 @@ var defaultDescriptor = usb.Descriptor{
 	// they are (AFAIK) only used for FW updates
 	Interfaces: []usb.InterfaceConfig{
 		{
-			// Placeholder interface 0 (no endpoints)
+			// Placeholder interface 0
 			// IS needed for steam to open the device
 			Descriptor: usb.InterfaceDescriptor{
 				BInterfaceNumber:   0x00,
 				BAlternateSetting:  0x00,
-				BNumEndpoints:      0x00,
-				BInterfaceClass:    0xFF,
-				BInterfaceSubClass: 0x00,
-				BInterfaceProtocol: 0x00,
+				BNumEndpoints:      0x01,
+				BInterfaceClass:    0x03,
+				BInterfaceSubClass: 0x01,
+				BInterfaceProtocol: 0x01,
 				IInterface:         0x00,
+			},
+			HID: &usb.HIDFunction{
+				Descriptor: usb.HIDDescriptor{
+					BcdHID:       0x0111,
+					BCountryCode: 0x00,
+					Descriptors:  []usb.HIDSubDescriptor{{Type: usb.ReportDescType}},
+				},
+				Report: dummyKeyboardReportDescriptor,
+			},
+			Endpoints: []usb.EndpointDescriptor{
+				{
+					BEndpointAddress: 0x82,
+					BMAttributes:     0x03,
+					WMaxPacketSize:   0x0008,
+					BInterval:        0x0A,
+				},
 			},
 		},
 		{
-			// Placeholder interface 1 (no endpoints)
+			// Placeholder interface 1
 			// IS needed for steam to open the device
 			Descriptor: usb.InterfaceDescriptor{
 				BInterfaceNumber:   0x01,
 				BAlternateSetting:  0x00,
-				BNumEndpoints:      0x00,
-				BInterfaceClass:    0xFF,
-				BInterfaceSubClass: 0x00,
-				BInterfaceProtocol: 0x00,
+				BNumEndpoints:      0x01,
+				BInterfaceClass:    0x03,
+				BInterfaceSubClass: 0x01,
+				BInterfaceProtocol: 0x02,
 				IInterface:         0x00,
+			},
+			HID: &usb.HIDFunction{
+				Descriptor: usb.HIDDescriptor{
+					BcdHID:       0x0111,
+					BCountryCode: 0x00,
+					Descriptors:  []usb.HIDSubDescriptor{{Type: usb.ReportDescType}},
+				},
+				Report: dummyMouseReportDescriptor,
+			},
+			Endpoints: []usb.EndpointDescriptor{
+				{
+					BEndpointAddress: 0x83,
+					BMAttributes:     0x03,
+					WMaxPacketSize:   0x0004,
+					BInterval:        0x0A,
+				},
 			},
 		},
 		// Actual "controller" descriptor
