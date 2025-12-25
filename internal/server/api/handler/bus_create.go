@@ -21,6 +21,11 @@ func BusCreate(s *usb.Server) api.HandlerFunc {
 			if err != nil {
 				return api.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
 			}
+
+			if busId == 0 {
+				busId = uint64(s.NextFreeBusID())
+			}
+
 			b, err := virtualbus.NewWithBusId(uint32(busId))
 			if err != nil {
 				return api.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))

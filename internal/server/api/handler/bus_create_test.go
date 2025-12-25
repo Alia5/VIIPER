@@ -64,6 +64,12 @@ func TestBusCreate(t *testing.T) {
 			expectedResponse: `{"status":400,"title":"Bad Request","detail":"invalid busId: strconv.ParseUint: parsing \"foo\": invalid syntax"}`,
 		},
 		{
+			name:             "0 bus number chooses next free",
+			setup:            nil,
+			payload:          "0",
+			expectedResponse: `{"busId":1}`,
+		},
+		{
 			name:             "negative bus number",
 			setup:            nil,
 			payload:          "-1",
