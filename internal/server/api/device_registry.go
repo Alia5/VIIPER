@@ -38,6 +38,17 @@ func GetRegistration(name string) DeviceRegistration {
 	return deviceRegistry[toLower(name)]
 }
 
+// ListDeviceTypes returns a list of all registered device type names.
+func ListDeviceTypes() []string {
+	deviceRegistryMu.RLock()
+	defer deviceRegistryMu.RUnlock()
+	types := make([]string, 0, len(deviceRegistry))
+	for name := range deviceRegistry {
+		types = append(types, name)
+	}
+	return types
+}
+
 // GetStreamHandler retrieves the stream handler for a registered device type.
 // Returns nil if not found. Name lookup is case-insensitive.
 func GetStreamHandler(name string) StreamHandlerFunc {

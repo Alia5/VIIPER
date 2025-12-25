@@ -49,6 +49,15 @@ func (a *Server) USB() *usb.Server { return a.usbs }
 // Config returns the server configuration.
 func (a *Server) Config() ServerConfig { return a.config }
 
+// Addr returns the actual address the server is listening on.
+// If Start hasn't been called yet, it returns the configured address.
+func (a *Server) Addr() string {
+	if a.ln != nil {
+		return a.ln.Addr().String()
+	}
+	return a.addr
+}
+
 // Start listens on the configured address and serves incoming API commands.
 func (a *Server) Start() error {
 	ln, err := net.Listen("tcp", a.addr)
@@ -56,6 +65,9 @@ func (a *Server) Start() error {
 		return err
 	}
 	a.ln = ln
+
+	a.addr = ln.Addr().String()
+	a.config.Addr = a.addr
 	a.logger.Info("API listening", "addr", a.addr)
 	go a.serve()
 	return nil
@@ -241,5 +253,4 @@ func (a *Server) handleConn(conn net.Conn) {
 	}
 	connLogger.Error("api unknown path", "path", path)
 	a.writeError(w, ErrNotFound(fmt.Sprintf("unknown path: %s", path)))
-	return
 }

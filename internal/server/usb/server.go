@@ -303,6 +303,16 @@ func (s *Server) NextFreeBusID() uint32 {
 	}
 }
 
+func (s *Server) Addr() string {
+	if s.ln != nil {
+		return s.ln.Addr().String()
+	}
+	if s.config != nil {
+		return s.config.Addr
+	}
+	return ""
+}
+
 // ListenAndServe starts the USB-IP server and handles incoming connections.
 func (s *Server) ListenAndServe() error {
 	ln, err := net.Listen("tcp", s.config.Addr)
@@ -310,6 +320,7 @@ func (s *Server) ListenAndServe() error {
 		return err
 	}
 	s.ln = ln
+	s.config.Addr = ln.Addr().String()
 	s.readyOnce.Do(func() { close(s.ready) })
 	s.logger.Info("USBIP server listening", "addr", s.config.Addr)
 	for {
@@ -354,7 +365,8 @@ func (s *Server) Close() error {
 
 // GetListenPort extracts and returns the port number from the server's listen address.
 func (s *Server) GetListenPort() uint16 {
-	_, portStr, err := net.SplitHostPort(s.config.Addr)
+	addr := s.Addr()
+	_, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
 		return 0
 	}
