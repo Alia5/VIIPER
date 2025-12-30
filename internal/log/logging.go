@@ -58,6 +58,7 @@ func SetupLogger(logLevel, logFile string) (*slog.Logger, []io.Closer, error) {
 		handlers = append(handlers, slog.NewTextHandler(f, &slog.HandlerOptions{Level: level}))
 	}
 	logger := slog.New(MultiHandler{hs: handlers})
+	slog.SetDefault(logger)
 	return logger, closeFiles, nil
 }
 
