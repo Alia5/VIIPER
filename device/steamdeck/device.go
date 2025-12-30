@@ -24,7 +24,7 @@ type SteamDeck struct {
 	featureMu       sync.Mutex
 	featureResponse []byte // cached 65-byte (or 64-byte) feature response
 
-	hapticFunc func(HapticState)
+	outputFunc func(OutputState)
 	descriptor usb.Descriptor
 }
 
@@ -47,9 +47,9 @@ func New(o *device.CreateOptions) *SteamDeck {
 	return d
 }
 
-// SetRumbleCallback sets a callback that will be invoked when rumble commands arrive.
-func (s *SteamDeck) SetRumbleCallback(f func(HapticState)) {
-	s.hapticFunc = f
+// SetOutputCallback sets a callback that will be invoked on device output
+func (s *SteamDeck) SetOutputCallback(f func(OutputState)) {
+	s.outputFunc = f
 }
 
 // UpdateInputState updates the controller's current input state (thread-safe).
@@ -318,26 +318,8 @@ func (s *SteamDeck) handleFeatureReport(data []byte) {
 		s.setFeatureResponse(buildEmptyResponse(msgType))
 	}
 
-	if msgType != FeatureIDTriggerRumbleCmd {
-		return
-	}
+	// TODO: outputstuff
 
-	// FeatureReportMsg:
-	//   [0]=type, [1]=length, [2..]=payload
-	// MsgSimpleRumbleCmd payload starts at offset 2:
-	//   [2]=unRumbleType
-	//   [3:5]=unIntensity
-	//   [5:7]=unLeftMotorSpeed
-	//   [7:9]=unRightMotorSpeed
-	if len(data) < 9 {
-		return
-	}
-	left := binary.LittleEndian.Uint16(data[5:7])
-	right := binary.LittleEndian.Uint16(data[7:9])
-
-	if s.hapticFunc != nil {
-		s.hapticFunc(HapticState{LeftMotor: left, RightMotor: right})
-	}
 }
 
 func buildEmptyResponse(msgType uint8) []byte {

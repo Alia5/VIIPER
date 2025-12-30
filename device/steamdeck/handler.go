@@ -29,20 +29,18 @@ func (h *handler) StreamHandler() api.StreamHandlerFunc {
 			return fmt.Errorf("device is not steamdeck")
 		}
 
-		// Device -> client: rumble feedback (2x uint16 little-endian)
-		sdev.SetRumbleCallback(func(r HapticState) {
-			data, err := r.MarshalBinary()
-			if err != nil {
-				logger.Error("failed to marshal rumble", "error", err)
-				return
-			}
-			if _, err := conn.Write(data); err != nil {
-				logger.Error("failed to send rumble", "error", err)
-			}
+		sdev.SetOutputCallback(func(r OutputState) {
+			//	TODO: Uncomment
+			// data, err := r.MarshalBinary()
+			// if err != nil {
+			// 	logger.Error("failed to marshal rumble", "error", err)
+			// 	return
+			// }
+			// if _, err := conn.Write(data); err != nil {
+			// 	logger.Error("failed to send rumble", "error", err)
+			// }
 		})
 
-		// Client -> device: raw 64-byte controller reports
-		// Client -> device: InputState frames (fixed-size, little-endian)
 		buf := make([]byte, InputStateSize)
 		for {
 			if _, err := io.ReadFull(conn, buf); err != nil {
@@ -53,7 +51,6 @@ func (h *handler) StreamHandler() api.StreamHandlerFunc {
 				return fmt.Errorf("read input state: %w", err)
 			}
 
-			// Copy buf because ReadFull reuses it.
 			frame := make([]byte, InputStateSize)
 			copy(frame, buf)
 			var st InputState

@@ -2,7 +2,6 @@ package steamdeck
 
 import (
 	"encoding/binary"
-	"fmt"
 	"io"
 )
 
@@ -149,28 +148,6 @@ func (s *InputState) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-// HapticState is the client-facing representation of Steam Deck haptic feedback.
-// Values are 16-bit "motor" speeds as used by SDL's Steam Deck HID driver.
-// viiper:wire steamdeck s2c leftMotor:u16 rightMotor:u16
-type HapticState struct {
-	LeftMotor  uint16
-	RightMotor uint16
-}
-
-// MarshalBinary encodes HapticState as 4 bytes (2x uint16 little-endian).
-func (r HapticState) MarshalBinary() ([]byte, error) {
-	b := make([]byte, 4)
-	binary.LittleEndian.PutUint16(b[0:2], r.LeftMotor)
-	binary.LittleEndian.PutUint16(b[2:4], r.RightMotor)
-	return b, nil
-}
-
-// UnmarshalBinary decodes HapticState from 4 bytes (2x uint16 little-endian).
-func (r *HapticState) UnmarshalBinary(data []byte) error {
-	if len(data) < 4 {
-		return fmt.Errorf("Invalid haptic packet len, got %d, want 4", len(data))
-	}
-	r.LeftMotor = binary.LittleEndian.Uint16(data[0:2])
-	r.RightMotor = binary.LittleEndian.Uint16(data[2:4])
-	return nil
+type OutputState struct {
+	// TODO:
 }
