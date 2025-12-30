@@ -44,7 +44,6 @@ Beyond device emulation, VIIPER can proxy real USB devices for traffic inspectio
   - ✅ Xbox 360 controller emulation; see [Devices › Xbox 360 Controller](docs/devices/xbox360.md)
   - ✅ HID Keyboard with N-key rollover and LED feedback; see [Devices › Keyboard](docs/devices/keyboard.md)
   - ✅ HID Mouse with 5 buttons and horizontal/vertical wheel; see [Devices › Mouse](docs/devices/mouse.md)
-  - ✅ Steam Deck (jupiter) controller emulation
   - 🔜 Xbox One / Series(?) controller emulation
   - 🔜 PS4 controller emulation
   - 🔜 ???  

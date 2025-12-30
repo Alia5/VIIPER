@@ -77,7 +77,6 @@ nav:
     - TypeScript Client Library: clients/typescript.md
   - Devices:
     - Xbox 360 Controller: devices/xbox360.md
-    - Steam Deck Controller: devices/steamdeck.md
     - Keyboard: devices/keyboard.md
     - Mouse: devices/mouse.md
   - Changelog: changelog/
