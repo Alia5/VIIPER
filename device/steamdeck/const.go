@@ -32,17 +32,75 @@ const (
 	HIDFeatureReportWinSize = 65
 )
 
-// Feature message IDs used by the Steam Deck controller protocol.
-// Values from SDL's `steam/controller_constants.h`.
+// Feature Report Message IDs
 const (
-	FeatureIDClearDigitalMappings = 0x81
-	FeatureIDGetAttributesValues  = 0x83
-	FeatureIDSetSettingsValues    = 0x87
-	FeatureIDLoadDefaultSettings  = 0x8E
-	FeatureIDGetStringAttribute   = 0xAE
+	FeatureIDSetDigitalMappings        = 0x80
+	FeatureIDClearDigitalMappings      = 0x81
+	FeatureIDGetAttributesValues       = 0x83
+	FeatureIDSetDefaultDigitalMappings = 0x85
+	FeatureIDFactoryReset              = 0x86
+	FeatureIDSetSettingsValues         = 0x87
+	FeatureIDClearSettingsValues       = 0x88
+	FeatureIDSetControllerMode         = 0x8D
+	FeatureIDLoadDefaultSettings       = 0x8E
+	FeatureIDTriggerHapticPulse        = 0x8F
+	FeatureIDTurnOffController         = 0x9F
+	FeatureIDGetStringAttribute        = 0xAE
+	FeatureIDCalibrateGyro             = 0xB5
+	FeatureIDPlayAudio                 = 0xB6
+	FeatureIDCalibrateJoystick         = 0xBF
+	FeatureIDCalibrateAnalogTriggers   = 0xC0
+	FeatureIDSetAudioMapping           = 0xC1
+	FeatureIDResetIMU                  = 0xCE
+	FeatureIDTriggerHapticCmd          = 0xEA
+	FeatureIDTriggerRumbleCmd          = 0xEB
+)
 
-	FeatureIDTriggerHapticCmd = 0xEA
-	FeatureIDTriggerRumbleCmd = 0xEB
+// Haptic types
+const (
+	HapticTypeOff      = 0
+	HapticTypeTick     = 1
+	HapticTypeClick    = 2
+	HapticTypeTone     = 3
+	HapticTypeRumble   = 4
+	HapticTypeNoise    = 5
+	HapticTypeScript   = 6
+	HapticTypeLogSweep = 7
+)
+
+// Haptic sides
+const (
+	HapticSideLeft  = 0x01
+	HapticSideRight = 0x02
+	HapticSideBoth  = 0x03
+)
+
+// Haptic intensity levels
+const (
+	HapticIntensitySystem = 0
+	HapticIntensityShort  = 1
+	HapticIntensityMedium = 2
+	HapticIntensityLong   = 3
+	HapticIntensityInsane = 4
+)
+
+// Haptic pulse priority
+const (
+	HapticPulseNormal           = 0x00
+	HapticPulseHighPriority     = 0x01
+	HapticPulseVeryHighPriority = 0x02
+	HapticPulseIgnoreUserPrefs  = 0x03
+)
+
+// Audio cues
+const (
+	AudioStartup     = 0
+	AudioShutdown    = 1
+	AudioPair        = 2
+	AudioPairSuccess = 3
+	AudioIdentify    = 4
+	AudioLizardMode  = 5
+	AudioNormalMode  = 6
 )
 
 // ControllerAttributes enum values (SDL `ControllerAttributes`).
