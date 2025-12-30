@@ -297,8 +297,6 @@ func (s *SteamDeck) handleFeatureReport(data []byte) {
 	}
 
 	msgType := data[0]
-	// msgLen := data[1]
-	_ = data[1]
 
 	// If this request expects a response, queue it so the following GET_REPORT(feature)
 	// returns exactly what SDL's ReadResponse() expects.
@@ -318,8 +316,11 @@ func (s *SteamDeck) handleFeatureReport(data []byte) {
 		s.setFeatureResponse(buildEmptyResponse(msgType))
 	}
 
-	// TODO: outputstuff
-
+	if s.outputFunc != nil {
+		s.outputFunc(OutputState{
+			Payload: [64]byte(data),
+		})
+	}
 }
 
 func buildEmptyResponse(msgType uint8) []byte {

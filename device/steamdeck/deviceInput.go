@@ -147,7 +147,3 @@ func (s *InputState) UnmarshalBinary(data []byte) error {
 
 	return nil
 }
-
-type OutputState struct {
-	// TODO:
-}

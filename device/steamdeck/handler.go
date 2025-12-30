@@ -30,15 +30,18 @@ func (h *handler) StreamHandler() api.StreamHandlerFunc {
 		}
 
 		sdev.SetOutputCallback(func(r OutputState) {
-			//	TODO: Uncomment
-			// data, err := r.MarshalBinary()
-			// if err != nil {
-			// 	logger.Error("failed to marshal rumble", "error", err)
-			// 	return
-			// }
-			// if _, err := conn.Write(data); err != nil {
-			// 	logger.Error("failed to send rumble", "error", err)
-			// }
+
+			msgType := r.Payload[0]
+			logger.Debug("received output report", "type", msgType)
+
+			data, err := r.MarshalBinary()
+			if err != nil {
+				logger.Error("failed to marshal output", "error", err)
+				return
+			}
+			if _, err := conn.Write(data); err != nil {
+				logger.Error("failed to send output", "error", err)
+			}
 		})
 
 		buf := make([]byte, InputStateSize)
