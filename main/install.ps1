@@ -99,6 +99,7 @@ try {
                     }
                     catch { }
                 }
+                Start-Sleep -Milliseconds 500
             }
         }
 
