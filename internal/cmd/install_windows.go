@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Alia5/VIIPER/internal/configpaths"
 	"golang.org/x/sys/windows/registry"
 )
 
@@ -33,7 +34,16 @@ func install(logger *slog.Logger) error {
 		return err
 	}
 
-	value := fmt.Sprintf("\"%s\" server", exePath)
+	cfgDir, err := configpaths.DefaultConfigDir()
+	if err != nil {
+		return fmt.Errorf("failed to resolve config dir: %w", err)
+	}
+	logFile := filepath.Join(cfgDir, "viiper.log")
+	if err := os.MkdirAll(cfgDir, 0o755); err != nil {
+		return fmt.Errorf("failed to create log directory %s: %w", cfgDir, err)
+	}
+
+	value := fmt.Sprintf("\"%s\" server --log.file \"%s\"", exePath, logFile)
 	key, _, err := registry.CreateKey(registry.CURRENT_USER, runKeyPath, registry.ALL_ACCESS)
 	if err != nil {
 		return err
@@ -50,11 +60,11 @@ func install(logger *slog.Logger) error {
 		}
 	}
 
-	if err := exec.Command(exePath, "server").Start(); err != nil {
+	if err := exec.Command(exePath, "server", "--log.file", logFile).Start(); err != nil {
 		return fmt.Errorf("failed to start server: %w", err)
 	}
 
-	logger.Info("VIIPER install completed for Windows autorun", "exe", exePath)
+	logger.Info("VIIPER install completed for Windows autorun", "exe", exePath, "logFile", logFile)
 	return nil
 }
 
