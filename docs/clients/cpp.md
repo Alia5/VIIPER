@@ -2,12 +2,10 @@
 
 The VIIPER C++ client library provides a modern, header-only C++20 client library for interacting with VIIPER servers and controlling virtual devices.
 
-## Overview
-
 The C++ client library features:
 
 - **Header-only**: No separate compilation required, just include and use
-- **Modern C++20**: Uses concepts, designated initializers, std::optional, smart pointers
+- **C++20**: Uses concepts, designated initializers, std::optional, smart pointers
 - **Type-safe**: Generated structs with constants and helper maps
 - **Callback-based output**: Register lambdas for device feedback (LEDs, rumble)
 - **Thread-safe**: Separate mutexes for send/recv operations
@@ -55,12 +53,6 @@ find_package(nlohmann_json REQUIRED)
 target_link_libraries(your_target PRIVATE nlohmann_json::nlohmann_json)
 ```
 
-### 3. Generating from Source
-
-```bash
-go run ./cmd/viiper codegen --lang=cpp
-```
-
 The client library will be generated in `clients/cpp/include/viiper/`.
 
 ## JSON Parser Configuration
@@ -100,7 +92,7 @@ Example with a custom library:
 #include <viiper/viiper.hpp>
 ```
 
-## Quick Start
+## Example
 
 ```cpp
 #define VIIPER_JSON_INCLUDE <nlohmann/json.hpp>
@@ -166,25 +158,14 @@ int main() {
 }
 ```
 
-## Device Stream API
+## Device Control/Feedback
 
-### Creating a Device Stream
+### Creating a Device + Control/Feedback Stream
 
 The simplest way to add a device and connect:
 
 ```cpp
 auto [device_info, stream] = client.addDeviceAndConnect(bus_id, {.type = "xbox360"}).value();
-```
-
-With custom VID/PID:
-
-```cpp
-viiper::Devicecreaterequest req = {
-    .type = "keyboard",
-    .idvendor = 0x1234,
-    .idproduct = 0x5678
-};
-auto [device_info, stream] = client.addDeviceAndConnect(bus_id, req).value();
 ```
 
 Or manually add and connect:
@@ -238,7 +219,7 @@ viiper::xbox360::Input input = {
 stream->send(input);
 ```
 
-### Receiving Output (Callbacks)
+### Receiving Feedback
 
 For devices that send feedback (rumble, LEDs), register a callback:
 
@@ -292,6 +273,7 @@ stream->stop();  // Stops the output thread and closes the connection
 ```
 
 The device is also automatically stopped when the `ViiperDevice` is destroyed.
+The VIIPER server automatically removes the device when the stream is closed after a short timeout.
 
 ## Generated Constants and Maps
 
@@ -358,64 +340,6 @@ bool needs_shift = viiper::keyboard::SHIFT_CHARS.contains(static_cast<std::uint8
 std::uint16_t buttons = viiper::xbox360::ButtonA | viiper::xbox360::ButtonB;
 ```
 
-**All Button Constants:**
-
-```cpp
-viiper::xbox360::ButtonDPadUp
-viiper::xbox360::ButtonDPadDown
-viiper::xbox360::ButtonDPadLeft
-viiper::xbox360::ButtonDPadRight
-viiper::xbox360::ButtonStart
-viiper::xbox360::ButtonBack
-viiper::xbox360::ButtonLThumb
-viiper::xbox360::ButtonRThumb
-viiper::xbox360::ButtonLShoulder
-viiper::xbox360::ButtonRShoulder
-viiper::xbox360::ButtonGuide
-viiper::xbox360::ButtonA
-viiper::xbox360::ButtonB
-viiper::xbox360::ButtonX
-viiper::xbox360::ButtonY
-```
-
-## Practical Example: Typing Text
-
-Using the generated maps to type a string:
-
-```cpp
-void type_string(viiper::ViiperDevice& stream, const std::string& text) {
-    for (char ch : text) {
-        auto it = viiper::keyboard::CHAR_TO_KEY.find(static_cast<std::uint8_t>(ch));
-        if (it == viiper::keyboard::CHAR_TO_KEY.end()) continue;
-        std::uint8_t key = it->second;
-
-        std::uint8_t mods = 0;
-        if (viiper::keyboard::SHIFT_CHARS.contains(static_cast<std::uint8_t>(ch))) {
-            mods = viiper::keyboard::ModLeftShift;
-        }
-
-        // Press key
-        viiper::keyboard::Input down = {
-            .modifiers = mods,
-            .keys = {key},
-        };
-        stream.send(down);
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-        // Release key
-        viiper::keyboard::Input up = {
-            .modifiers = 0,
-            .keys = {},
-        };
-        stream.send(up);
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-}
-
-// Usage
-type_string(*stream, "Hello, World!");
-```
-
 ## Error Handling
 
 All API methods return `Result<T>`, which is either a value or an error:
@@ -480,41 +404,6 @@ cmake --build . --config Release
 ./virtual_x360_pad localhost:3242
 ```
 
-## Project Structure
-
-Generated SDK layout:
-
-```text
-clients/cpp/include/viiper/
-├── viiper.hpp              # Main include (includes all others)
-├── config.hpp              # JSON configuration macros
-├── error.hpp               # Result<T> and Error types
-├── types.hpp               # API request/response types
-├── client.hpp              # ViiperClient management API
-├── device.hpp              # ViiperDevice stream wrapper
-├── detail/
-│   ├── socket.hpp          # Cross-platform socket wrapper
-│   └── json.hpp            # JSON parsing helpers
-└── devices/
-    ├── keyboard.hpp        # Keyboard constants, Input, Output
-    ├── mouse.hpp           # Mouse constants, Input
-    └── xbox360.hpp         # Xbox360 constants, Input, Output
-```
-
-## Requirements
-
-- **C++20** or later
-- **JSON library** (nlohmann/json recommended)
-- **Platform**: Windows (MSVC 2019+) or POSIX (GCC 10+, Clang 10+)
-
-### Windows-Specific
-
-The client library uses Winsock2 for networking. Link against `Ws2_32.lib` (done automatically via `#pragma comment`).
-
-### POSIX-specific
-
-Standard POSIX sockets are used. No additional libraries required.
-
 ## Troubleshooting
 
 **Error: VIIPER_JSON_INCLUDE must be defined**
@@ -554,7 +443,3 @@ viiper server --api-addr localhost:3242
 - [TypeScript Client Library Documentation](typescript.md): Node.js client library
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
-
----
-
-For questions or contributions, see the main VIIPER repository.

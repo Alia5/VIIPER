@@ -69,12 +69,12 @@ nav:
   - API & Clients:
     - API Overview: api/overview.md
     - Go Client: clients/go.md
-    - Generator Documentation: clients/generator.md
     - C Client Library: clients/c.md
     - C++ Client Library: clients/cpp.md
     - C# Client Library: clients/csharp.md
     - Rust Client Library: clients/rust.md
     - TypeScript Client Library: clients/typescript.md
+    - Generator Documentation: clients/generator.md
   - Devices:
     - Xbox 360 Controller: devices/xbox360.md
     - DualShock 4 Controller: devices/dualshock4.md

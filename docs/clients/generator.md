@@ -224,7 +224,3 @@ Run codegen when any of these change:
 - [C Client Library Documentation](c.md): C-specific usage, build, and examples
 - [C# Client Library Documentation](csharp.md): C#-specific usage, async patterns, and map helpers
 - [TypeScript Client Library Documentation](typescript.md): TypeScript-specific usage, EventEmitter patterns, and examples
-
----
-
-For questions or contributions, see the main VIIPER repository.

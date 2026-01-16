@@ -2,8 +2,6 @@
 
 The VIIPER C# client library provides a modern, type-safe .NET client library for interacting with VIIPER servers and controlling virtual devices.
 
-## Overview
-
 The C# client library features:
 
 - **Async/await support**: Full async API with cancellation token support
@@ -28,7 +26,8 @@ dotnet add package Viiper.Client
 
 Package page: [Viiper.Client on NuGet](https://www.nuget.org/packages/Viiper.Client/)
 
-> Pre-release / snapshot builds are **not** published to NuGet. They are only available as GitHub Release artifacts (e.g. `dev-latest`) or by building from source.
+!!! info "Pre-Releases"
+    Pre-release / snapshot builds are **not** published to NuGet. They are only available as GitHub Release artifacts (e.g. `dev-latest`) or by building from source.
 
 To use a snapshot `.nupkg` from a GitHub Release:
 
@@ -60,17 +59,7 @@ Use this when modifying the generator or contributing new device types:
 </ItemGroup>
 ```
 
-### 3. Generating from Source (Advanced / Contributors)
-
-Only required when enhancing VIIPER itself:
-
-```bash
-go run ./cmd/viiper codegen --lang=csharp
-cd clients/csharp
-dotnet build -c Release Viiper.Client
-```
-
-## Quick Start
+## Example
 
 ```csharp
 using Viiper.Client;
@@ -113,26 +102,14 @@ await device.SendAsync(input);
 await client.BusDeviceRemoveAsync(busId, deviceResp.DevId);
 ```
 
-## Device Stream API
+## Device Control/Feedback
 
-### Creating a Device Stream
+### Creating a Device + Control/Feedback Stream
 
 The simplest way to add a device and connect:
 
 ```csharp
 var deviceReq = new DeviceCreateRequest { Type = "xbox360" };
-var deviceResp = await client.BusDeviceAddAsync(busId, deviceReq);
-var device = await client.ConnectDeviceAsync(busId, deviceResp.DevId);
-```
-
-With custom VID/PID:
-
-```csharp
-var deviceReq = new DeviceCreateRequest { 
-    Type = "keyboard", 
-    IdVendor = 0x1234, 
-    IdProduct = 0x5678 
-};
 var deviceResp = await client.BusDeviceAddAsync(busId, deviceReq);
 var device = await client.ConnectDeviceAsync(busId, deviceResp.DevId);
 ```
@@ -163,7 +140,7 @@ var input = new Xbox360Input
 await device.SendAsync(input);
 ```
 
-### Receiving Output (Events)
+### Receiving Feedback
 
 For devices that send feedback (rumble, LEDs), subscribe to the `OnOutput` event:
 
@@ -203,6 +180,8 @@ device.Dispose();
 // or
 await using var device = await client.ConnectDeviceAsync(busId, deviceId);
 ```
+
+The VIIPER server automatically removes the device when the stream is closed after a short timeout.
 
 ## Generated Constants and Maps
 
@@ -260,109 +239,6 @@ if (KeyName.TryGetValue((byte)Key.F1, out var name))
 ```csharp
 bool needsShift = ShiftChars.ContainsKey((byte)'A');  // true for uppercase
 ```
-
-## Practical Example: Typing Text
-
-Using the generated maps to type a string:
-
-```csharp
-async Task TypeString(ViiperDevice device, string text)
-{
-    foreach (char c in text)
-    {
-        if (!CharToKey.TryGetValue((byte)c, out var key))
-            continue;
-        
-        byte mods = ShiftChars.ContainsKey((byte)c) 
-            ? (byte)Mod.LeftShift 
-            : (byte)0;
-        
-        // Press
-        await device.SendAsync(new KeyboardInput
-        {
-            Modifiers = mods,
-            Count = 1,
-            Keys = new[] { (byte)key }
-        });
-        await Task.Delay(50);
-        
-        // Release
-        await device.SendAsync(new KeyboardInput
-        {
-            Modifiers = 0,
-            Count = 0,
-            Keys = Array.Empty<byte>()
-        });
-        await Task.Delay(50);
-    }
-}
-
-// Usage
-await TypeString(device, "Hello, World!");
-```
-
-## Device-Specific Wire Formats
-
-### Keyboard Input
-
-```csharp
-public struct KeyboardInput
-{
-    public byte Modifiers;    // Modifier flags (Ctrl, Shift, Alt, GUI)
-    public byte Count;        // Number of keys in Keys array
-    public byte[] Keys;       // Key codes (max 6 for HID compliance)
-}
-```
-
-**Wire format:** 1 byte modifiers + 1 byte count + N bytes keys (variable-length)
-
-### Keyboard Output (LEDs)
-
-```csharp
-// Single byte with LED flags
-byte leds = data[0];
-bool numLock = (leds & (byte)LED.NumLock) != 0;
-```
-
-### Xbox360 Input
-
-```csharp
-public struct Xbox360Input
-{
-    public ushort Buttons;     // Button flags
-    public byte LeftTrigger;   // 0-255
-    public byte RightTrigger;  // 0-255
-    public short ThumbLX;      // -32768 to 32767
-    public short ThumbLY;      // -32768 to 32767
-    public short ThumbRX;      // -32768 to 32767
-    public short ThumbRY;      // -32768 to 32767
-}
-```
-
-**Wire format:** Fixed 14 bytes, packed structure
-
-### Xbox360 Output (Rumble)
-
-```csharp
-// Two bytes: left motor + right motor (0-255 each)
-byte leftMotor = data[0];
-byte rightMotor = data[1];
-```
-
-### Mouse Input
-
-```csharp
-public struct MouseInput
-{
-    public byte Buttons;  // Button flags
-    public sbyte X;       // Relative X movement (-128 to 127)
-    public sbyte Y;       // Relative Y movement (-128 to 127)
-    public sbyte Wheel;   // Vertical scroll
-    public sbyte Pan;     // Horizontal scroll
-}
-```
-
-**Wire format:** Fixed 5 bytes, packed structure
 
 ## Configuration and Advanced Usage
 
@@ -455,31 +331,6 @@ cd examples/csharp/virtual_keyboard
 dotnet run -- localhost
 ```
 
-## Project Structure
-
-Generated client library layout:
-
-```text
-clients/csharp/Viiper.Client/
-├── ViiperClient.cs              # Management API client
-├── ViiperDevice.cs              # Device stream wrapper
-├── Types/
-│   ├── BusListResponse.cs       # API response types
-│   ├── BusCreateResponse.cs
-│   └── ...
-└── Devices/
-        ├── Keyboard/
-        │   ├── KeyboardInput.cs     # Wire format struct
-        │   └── KeyboardConstants.cs # Enums + maps
-        ├── Mouse/
-        │   ├── MouseInput.cs
-        │   └── MouseConstants.cs
-        └── Xbox360/
-                ├── Xbox360Input.cs
-                ├── Xbox360Output.cs
-                └── Xbox360Constants.cs
-```
-
 ## Troubleshooting
 
 **Build Errors:**
@@ -510,7 +361,3 @@ The generated code uses nullable annotations. You may see warnings like CS8601/C
 - [C++ Client Library Documentation](cpp.md): Header-only C++ client library
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
-
----
-
-For questions or contributions, see the main VIIPER repository.

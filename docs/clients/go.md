@@ -1,17 +1,16 @@
 # Go Client Documentation
 
-The Go client is the reference implementation for interacting with VIIPER servers. It's included in the repository under `/apiclient` and `/device`.
-
-## Overview
+The Go client is the reference implementation for interacting with the VIIPER TCP API.
+It's included in the repository under `/apiclient` (and `/device`).
 
 The Go client features:
 
 - **Type-safe API**: Structured request/response types with context support
-- **Device streams**: Bidirectional communication using `encoding.BinaryMarshaler`/`BinaryUnmarshaler`
+- **Device Control/Feedback**: Bidirectional binary communication
 - **Built-in**: No code generation needed; part of the main repository
 - **Flexible timeouts**: Configurable connection and I/O timeouts
 
-## Quick Start
+## Example
 
 ```go
 package main
@@ -76,11 +75,11 @@ func main() {
 }
 ```
 
-## Device Stream API
+## Device Control/Feedback API
 
 ### Creating and Connecting
 
-// The simplest way to add a device and open its stream (nil opts):
+The simplest way to add a device and open its control stream (nil opts):
 
 ```go
 // Use default VID/PID for the device type
@@ -93,35 +92,10 @@ defer stream.Close()
 log.Printf("Connected to device %s", resp.ID)
 ```
 
-// Or specify VID/PID using CreateOptions:
-
-```go
-opts := &device.CreateOptions{
-  IdVendor:  func() *uint16 { v := uint16(0x1234); return &v }(),
-  IdProduct: func() *uint16 { p := uint16(0x5678); return &p }(),
-}
-stream2, resp2, err := client.AddDeviceAndConnect(ctx, busID, "keyboard", opts)
-if err != nil {
-  log.Fatal(err)
-}
-defer stream2.Close()
-
-log.Printf("Connected to device %s (custom VID/PID)", resp2.ID)
-```
-
-Or connect to an existing device:
-
-```go
-stream, err := client.OpenStream(ctx, busID, deviceID)
-if err != nil {
-  log.Fatal(err)
-}
-defer stream.Close()
-```
-
 ### Sending Input
 
-Device input is sent using structs that implement `encoding.BinaryMarshaler`:
+Device input is sent using structs that implement `encoding.BinaryMarshaler`.  
+Every device package (e.g. `device/xbox360`) provides type-safe input state structs.  
 
 ```go
 import "github.com/Alia5/VIIPER/device/xbox360"
@@ -136,7 +110,7 @@ if err := stream.WriteBinary(input); err != nil {
 }
 ```
 
-### Receiving Output (Callbacks)
+### Receiving Feedback
 
 For devices that send feedback (rumble, LEDs), use `StartReading` with a decode function:
 
@@ -171,15 +145,18 @@ go func() {
 }()
 ```
 
-### Closing a Stream
+### Closing a Stream / Removing a Device
 
 ```go
 stream.Close()
 ```
 
+The VIIPER server automatically removes the device when the stream is closed after a short timeout.
+
 ## Device-Specific Notes
 
-Each device type has specific wire formats and helper methods. For wire format details and usage patterns, see the [Devices](../devices/) section of the documentation.
+Each device type has specific wire formats and helper methods.  
+For wire format details and usage patterns, see the [Devices](../devices/) section of the documentation.
 
 The Go client provides device packages under `/device/` with type-safe structs and constants (e.g., `keyboard.InputState`, `keyboard.KeyA`, `mouse.Btn_Left`).
 
@@ -226,6 +203,7 @@ Full working examples are available in the repository:
 - **Virtual Mouse**: `examples/go/virtual_mouse/main.go`
 - **Virtual Keyboard**: `examples/go/virtual_keyboard/main.go`
 - **Virtual Xbox360 Controller**: `examples/go/virtual_x360_pad/main.go`
+- More examples are always being added!
 
 ## See Also
 

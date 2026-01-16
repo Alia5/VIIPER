@@ -1,10 +1,8 @@
 # Configuration
 
-VIIPER can be configured via:
+Aside from passing CLI flags, VIIPER can also be configured via environment variables and configuration files.
 
-- Command-line flags
-- Environment variables
-- Configuration files (JSON/YAML/TOML)
+For configuration files, VIIPER supports `JSON`, `YAML`, and `TOML` formats.
 
 ## Environment Variables
 
@@ -38,13 +36,14 @@ All command-line flags have corresponding environment variables for easier deplo
 
 ## Configuration Files
 
-VIIPER supports JSON, YAML, and TOML configuration files. Generate a starter file with:
+VIIPER supports JSON, YAML, and TOML configuration files.  
+Generate a starter file (default configuration) with:
 
 ```bash
-viiper config init server --format=json   # or yaml|toml
+viiper config init server --format=json   # or yaml/toml
 ```
 
-If no output path is provided, the file is written to the current working directory (e.g., server.json, proxy.yaml).
+If no output path is provided, the file is written to the current working directory (e.g., `server.json`, `proxy.yaml`).
 
 You can also specify a custom location:
 
@@ -52,7 +51,7 @@ You can also specify a custom location:
 viiper config init server --format=json --output ./server.json
 ```
 
-To use a specific configuration file when starting VIIPER, pass the --config flag (or set VIIPER_CONFIG):
+To use a specific configuration file when starting VIIPER, pass the --config flag (or set the `VIIPER_CONFIG` environment variable):
 
 ```bash
 viiper --config ./server.json server
@@ -64,52 +63,52 @@ If --config is not provided, VIIPER will search for configuration in this order 
 2. Platform config directory (see above): server.(json|yaml|yml|toml), proxy.(json|yaml|yml|toml), config.(json|yaml|yml|toml)
 3. Linux system-wide: /etc/viiper/server.(json|yaml|yml|toml), /etc/viiper/proxy.(json|yaml|yml|toml), /etc/viiper/config.(json|yaml|yml|toml)
 
-Example JSON configurations:
-
-Server:
-
-```json
-{
-  "api": {
-    "addr": ":3242",
-    "device-handler-connect-timeout": "5s",
-    "auto-attach-local-client": true
-  },
-  "usb": {
-    "addr": ":3241"
-  },
-  "connection-timeout": "30s"
-}
-```
-
-Proxy:
-
-```json
-{
-  "listen-addr": ":3241",
-  "upstream-addr": "127.0.0.1:3242",
-  "connection-timeout": "30s"
-}
-```
-
 ## Configuration Examples
 
-### Using Environment Variables
+=== "Config files"
 
-Create a `.env` file or export variables:
+    Server:
 
-```bash
-export VIIPER_LOG_LEVEL=debug
-export VIIPER_USB_ADDR=:3241
-export VIIPER_API_ADDR=:3242
-export VIIPER_LOG_FILE=/var/log/viiper.log
-```
+    ```json
+    {
+    "api": {
+        "addr": ":3242",
+        "device-handler-connect-timeout": "5s",
+        "auto-attach-local-client": true
+    },
+    "usb": {
+        "addr": ":3241"
+    },
+    "connection-timeout": "30s"
+    }
+    ```
 
-Then run:
+    Proxy:
 
-```bash
-viiper server
-```
+    ```json
+    {
+    "listen-addr": ":3241",
+    "upstream-addr": "127.0.0.1:3242",
+    "connection-timeout": "30s"
+    }
+    ```
+
+=== "Environment Variables"
+
+    Create a `.env` file or export variables:
+
+    ```bash
+    export VIIPER_LOG_LEVEL=debug
+    export VIIPER_USB_ADDR=:3241
+    export VIIPER_API_ADDR=:3242
+    export VIIPER_LOG_FILE=/var/log/viiper.log
+    ```
+
+    Then run:
+
+    ```bash
+    viiper server
+    ```
 
 ### Systemd Service
 

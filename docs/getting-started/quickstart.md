@@ -1,10 +1,8 @@
 # Quick Start
 
-This guide walks you through setting up VIIPER and creating your first virtual device.
+## 📋 Prerequisites
 
-## Prerequisites
-
-Before starting, ensure you have:
+Ensure you have:
 
 1. **USBIP installed** on your system (see [Installation](installation.md#requirements))
 2. **VIIPER binary** downloaded from [GitHub Releases](https://github.com/Alia5/VIIPER/releases) or [built from source](installation.md#building-from-source)
@@ -20,78 +18,120 @@ viiper server
 This starts two services:
 
 - **USBIP Server** on port `3241` (standard USBIP protocol)
-- **API Server** on port `3242` (device management)
+- **VIIPER API Server** on port `3242` (management and device interactions)
 
 !!! tip "Auto-attach Feature"
     By default, VIIPER automatically attaches newly created devices to the local machine. You can disable this with `--api.auto-attach-local-client=false`.  
     **Linux users:** Auto-attach requires running VIIPER with `sudo` as USBIP attach operations need elevated permissions.
 
-### Custom Ports
+!!! info "Custom Ports"
+    To use different ports:
 
-To use different ports:
+    ```bash
+    viiper server --usb.addr=:9000 --api.addr=:9001
+    ```
 
-```bash
-viiper server --usb.addr=:9000 --api.addr=:9001
-```
+    See [CLI Reference](../cli/overview.md) for all available options.
 
-## Creating Your First Virtual Device
+## 🎮 Creating Your First Virtual Device
 
-VIIPER provides multiple ways to interact with the API. Choose the method that works best for you.
+VIIPER provides multiple ways to interact with the API.  
+Choose the method that works best for you.
 
 ### Option 1: Using Client Libraries (Recommended)
 
-Client libraries are available for C, C#, Go, and TypeScript. They handle the protocol details automatically, providing type-safe interfaces and device-specific helpers.
+Client libraries are (at time of writing) available for C, C++, C#, Go, Rust, and TypeScript. They handle the protocol details automatically, providing type-safe interfaces and device-specific helpers.
 
 For complete client library documentation and code examples, see:
 
 - [C Client Library Documentation](../clients/c.md)
+- [C++ Client Library Documentation](../clients/cpp.md)
 - [C# Client Library Documentation](../clients/csharp.md)
 - [TypeScript Client Library Documentation](../clients/typescript.md)
 - [Go Client Documentation](../clients/go.md)
+- [Rust Client Documentation](../clients/rust.md)
 
 Full working examples for all device types are available in the `examples/` directory of the repository.
 
-### Option 2: Using Raw TCP (netcat)
+### Example
 
-For quick testing without client libraries:
+For a minimal example, we'll be using TypeScript (as there are more Javascript devs than Insects on this planet), but you can checkout any of the examples provided in the [API Reference](../../api/overview.md)
 
-```bash
-# Create a bus
-printf "bus/create\0" | nc localhost 3242
-# Response: {"busId":1}
+This minimal example creates a virtual Xbox 360 controller and sends an input state to press the "A" button, left bumper, half-press the left trigger, and push the left analog-stick to the right.  
 
-# Add a keyboard device
-printf 'bus/1/add {"type":"keyboard"}\0' | nc localhost 3242
-# Response: {"busId":1,"devId":"1","vid":"0x2e8a","pid":"0x0010","type":"keyboard"}
+Error handling is omitted for brevity.
 
-# List devices on the bus
-printf "bus/1/list\0" | nc localhost 3242
+```typescript
+import { ViiperClient, ViiperDevice, Xbox360, Types } from "viiperclient";
+const { Xbox360Input, Button } = Xbox360;
+
+const client = new ViiperClient("localhost", 3242);
+const bus_create_response = await client.buscreate();
+
+const { device, response: addResp } = await client.addDeviceAndConnect(
+    bus_create_response.busId,
+    { type: "xbox360"}
+);
+
+device.send(new Xbox360Input({
+        Buttons: Button.A | Button.LB,
+        // Left trigger half-pressed
+        Lt: 128,
+        Rt: 0,
+        // Left joystick pushed to the right
+        Lx: 32768,
+        Ly: 0,
+        Rx: 0,
+        Ry: 0,
+}));
 ```
 
-!!! note "Protocol Details"
-    The API uses TCP with null-byte (`\0`) terminated requests. See [API Reference](../api/overview.md) for complete protocol documentation.
+### Option 2: Using Raw TCP
 
-### Option 3: Using PowerShell Helper Script
+VIIPER provides a lightweight TCP API for direct interaction.  
+See: [API Reference](../api/overview.md) for complete documentation.
 
-VIIPER includes a PowerShell helper script for Windows users:
+For quick testing you can use `netcat` on Linux or the provided PowerShell helper script on Windows.
 
-```powershell
-# Load the helper script
-. .\scripts\viiper-api.ps1
+=== "Netcat"
 
-# Create a bus
-Invoke-ViiperAPI "bus/create"
+    ```bash
+    # Create a bus
+    printf "bus/create\0" | nc localhost 3242
+    # Response: {"busId":1}
 
-# Add a device
-Invoke-ViiperAPI 'bus/1/add {"type":"keyboard"}'
-```
+    # Add a keyboard device
+    printf 'bus/1/add {"type":"keyboard"}\0' | nc localhost 3242
+    # Response: {"busId":1,"devId":"1","vid":"0x2e8a","pid":"0x0010","type":"keyboard"}
 
-## Attaching Devices (USBIP)
+    # List devices on the bus
+    printf "bus/1/list\0" | nc localhost 3242
+    ```
+
+    !!! note "Protocol Details"
+        The API uses TCP with null-byte (`\0`) terminated requests. See [API Reference](../api/overview.md) for complete protocol documentation.
+
+=== "PowerShell"
+
+    VIIPER includes a PowerShell helper script for Windows users:
+
+    ```powershell
+    # Load the helper script
+    . .\scripts\viiper-api.ps1
+
+    # Create a bus
+    Invoke-ViiperAPI "bus/create"
+
+    # Add a device
+    Invoke-ViiperAPI 'bus/1/add {"type":"keyboard"}'
+    ```
+
+## 🔌 Attaching Devices (USBIP)
 
 After creating a device via the API, attach it using your system's USBIP client.
 
 !!! success "Automatic Attachment"
-    If you're running VIIPER on the same machine where you want to use the device, it's likely already attached automatically! Check your device manager or `lsusb` to confirm.
+    If you're running VIIPER on the same machine where you want to use the device, it's likely already attached automatically! Check the Windows device manager or `lsusb` to confirm.
 
 ### Manual Attachment
 
@@ -128,13 +168,13 @@ If auto-attach is disabled or you're connecting from a remote machine:
     # Check Device Manager to verify attachment
     ```
 
-## Available Device Types
+## 🧰 Available Device Types
 
 VIIPER supports multiple virtual device types including keyboards, mice, and game controllers. Each device type has its own protocol and capabilities.
 
 For a complete list of supported devices, their specifications, and wire protocols, see the [Devices](../devices/) documentation.
 
-## Next Steps
+## ➡️ Next Steps
 
 Now that you have a working setup:
 
@@ -143,7 +183,7 @@ Now that you have a working setup:
 3. **Choose a Client Library**: Pick a [client library](../clients/generator.md) for your preferred language
 4. **Review Device Specs**: Understand device-specific protocols in [Devices](../devices/keyboard.md)
 
-## Troubleshooting
+## 🆘 Troubleshooting
 
 ### Server Won't Start
 
@@ -226,7 +266,7 @@ Or if manually attaching devices, use `sudo` with the `usbip attach` command:
 sudo usbip attach --remote=localhost --tcp-port=3241 --busid=1-1
 ```
 
-## See Also
+## 🔗 See Also
 
 - [CLI Reference](../cli/overview.md) - Complete command documentation
 - [API Reference](../api/overview.md) - Management API protocol

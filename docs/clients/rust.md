@@ -2,8 +2,6 @@
 
 The VIIPER Rust client library provides a type-safe, zero-cost abstraction client library for interacting with VIIPER servers and controlling virtual devices.
 
-## Overview
-
 The Rust client library features:
 
 - **Sync and Async APIs**: Choose between blocking `ViiperClient` or async `AsyncViiperClient` (with `async` feature)
@@ -46,24 +44,129 @@ Use this when modifying the generator or contributing new device types:
 viiper-client = { path = "../../clients/rust" }
 ```
 
-### 3. Generating from Source (Advanced / Contributors)
+## Example
 
-Only required when enhancing VIIPER itself:
+=== "Sync"
 
-```bash
-go run ./cmd/viiper codegen --lang=rust
-cd clients/rust
-cargo build --release
-```
+    ```rust
+    use viiper_client::{ViiperClient, devices::keyboard::*};
+    use std::net::ToSocketAddrs;
 
-## Quick Start (Sync)
+    fn main() {
+        // Create new Viiper client
+        let addr = "localhost:3242"
+            .to_socket_addrs()
+            .expect("Invalid address")
+            .next()
+            .expect("No address resolved");
+        let client = ViiperClient::new(addr);
 
-```rust
-use viiper_client::{ViiperClient, devices::keyboard::*};
-use std::net::ToSocketAddrs;
+        // Find or create a bus
+        let bus_id = match client.bus_list() {
+            Ok(resp) if resp.buses.is_empty() => {
+                client.bus_create(None).expect("Failed to create bus").bus_id
+            }
+            Ok(resp) => *resp.buses.first().unwrap(),
+            Err(e) => panic!("BusList error: {}", e),
+        };
 
-fn main() {
-    // Create new Viiper client
+        // Add device
+        let device_info = client.bus_device_add(
+            bus_id,
+            &viiper_client::types::DeviceCreateRequest {
+                r#type: Some("keyboard".to_string()),
+                id_vendor: None,
+                id_product: None,
+            },
+        ).expect("Failed to add device");
+
+        // Connect to device stream
+        let mut stream = client
+            .connect_device(device_info.bus_id, &device_info.dev_id)
+            .expect("Failed to connect");
+
+        println!("Connected to device {} on bus {}", device_info.dev_id, device_info.bus_id);
+
+        // Send keyboard input
+        let input = KeyboardInput {
+            modifiers: MOD_LEFT_SHIFT,
+            count: 1,
+            keys: vec![KEY_H],
+        };
+        stream.send(&input).expect("Failed to send input");
+
+        // Cleanup
+        let _ = client.bus_device_remove(device_info.bus_id, Some(&device_info.dev_id));
+    }
+    ```
+
+=== "Async"
+
+    ```rust
+    use tokio::time::{sleep, Duration};
+    use viiper_client::{AsyncViiperClient, devices::keyboard::*};
+    use std::net::ToSocketAddrs;
+
+    #[tokio::main]
+    async fn main() {
+        // Create new Viiper client
+        let addr = "localhost:3242"
+            .to_socket_addrs()
+            .expect("Invalid address")
+            .next()
+            .expect("No address resolved");
+        let client = AsyncViiperClient::new(addr);
+
+        // Find or create a bus
+        let bus_id = match client.bus_list().await {
+            Ok(resp) if resp.buses.is_empty() => {
+                client.bus_create(None).await.expect("Failed to create bus").bus_id
+            }
+            Ok(resp) => *resp.buses.first().unwrap(),
+            Err(e) => panic!("BusList error: {}", e),
+        };
+
+        // Add device
+        let device_info = client.bus_device_add(
+            bus_id,
+            &viiper_client::types::DeviceCreateRequest {
+                r#type: Some("keyboard".to_string()),
+                id_vendor: None,
+                id_product: None,
+            },
+        ).await.expect("Failed to add device");
+
+        // Connect to device stream
+        let mut stream = client
+            .connect_device(device_info.bus_id, &device_info.dev_id)
+            .await
+            .expect("Failed to connect");
+
+        println!("Connected to device {} on bus {}", device_info.dev_id, device_info.bus_id);
+
+        // Send keyboard input
+        let input = KeyboardInput {
+            modifiers: MOD_LEFT_SHIFT,
+            count: 1,
+            keys: vec![KEY_H],
+        };
+        stream.send(&input).await.expect("Failed to send input");
+
+        // Cleanup
+        let _ = client.bus_device_remove(device_info.bus_id, Some(&device_info.dev_id)).await;
+    }
+    ```
+
+## Device Control/Feedback
+
+### Creating a Device + Control/Feedback Stream
+
+=== "Sync"
+
+    ```rust
+    use viiper_client::{ViiperClient, types::DeviceCreateRequest};
+    use std::net::ToSocketAddrs;
+
     let addr = "localhost:3242"
         .to_socket_addrs()
         .expect("Invalid address")
@@ -71,145 +174,21 @@ fn main() {
         .expect("No address resolved");
     let client = ViiperClient::new(addr);
 
-    // Find or create a bus
-    let bus_id = match client.bus_list() {
-        Ok(resp) if resp.buses.is_empty() => {
-            client.bus_create(None).expect("Failed to create bus").bus_id
-        }
-        Ok(resp) => *resp.buses.first().unwrap(),
-        Err(e) => panic!("BusList error: {}", e),
-    };
-
-    // Add device
+    // Add device first
     let device_info = client.bus_device_add(
         bus_id,
-        &viiper_client::types::DeviceCreateRequest {
-            r#type: Some("keyboard".to_string()),
+        &DeviceCreateRequest {
+            r#type: Some("xbox360".to_string()),
             id_vendor: None,
             id_product: None,
         },
     ).expect("Failed to add device");
 
-    // Connect to device stream
+    // Then connect to its stream
     let mut stream = client
         .connect_device(device_info.bus_id, &device_info.dev_id)
         .expect("Failed to connect");
-
-    println!("Connected to device {} on bus {}", device_info.dev_id, device_info.bus_id);
-
-    // Send keyboard input
-    let input = KeyboardInput {
-        modifiers: MOD_LEFT_SHIFT,
-        count: 1,
-        keys: vec![KEY_H],
-    };
-    stream.send(&input).expect("Failed to send input");
-
-    // Cleanup
-    let _ = client.bus_device_remove(device_info.bus_id, Some(&device_info.dev_id));
-}
-```
-
-## Quick Start (Async)
-
-```rust
-use tokio::time::{sleep, Duration};
-use viiper_client::{AsyncViiperClient, devices::keyboard::*};
-use std::net::ToSocketAddrs;
-
-#[tokio::main]
-async fn main() {
-    // Create new Viiper client
-    let addr = "localhost:3242"
-        .to_socket_addrs()
-        .expect("Invalid address")
-        .next()
-        .expect("No address resolved");
-    let client = AsyncViiperClient::new(addr);
-
-    // Find or create a bus
-    let bus_id = match client.bus_list().await {
-        Ok(resp) if resp.buses.is_empty() => {
-            client.bus_create(None).await.expect("Failed to create bus").bus_id
-        }
-        Ok(resp) => *resp.buses.first().unwrap(),
-        Err(e) => panic!("BusList error: {}", e),
-    };
-
-    // Add device
-    let device_info = client.bus_device_add(
-        bus_id,
-        &viiper_client::types::DeviceCreateRequest {
-            r#type: Some("keyboard".to_string()),
-            id_vendor: None,
-            id_product: None,
-        },
-    ).await.expect("Failed to add device");
-
-    // Connect to device stream
-    let mut stream = client
-        .connect_device(device_info.bus_id, &device_info.dev_id)
-        .await
-        .expect("Failed to connect");
-
-    println!("Connected to device {} on bus {}", device_info.dev_id, device_info.bus_id);
-
-    // Send keyboard input
-    let input = KeyboardInput {
-        modifiers: MOD_LEFT_SHIFT,
-        count: 1,
-        keys: vec![KEY_H],
-    };
-    stream.send(&input).await.expect("Failed to send input");
-
-    // Cleanup
-    let _ = client.bus_device_remove(device_info.bus_id, Some(&device_info.dev_id)).await;
-}
-```
-
-## Device Stream API
-
-### Creating a Device Stream (Sync)
-
-```rust
-use viiper_client::{ViiperClient, types::DeviceCreateRequest};
-use std::net::ToSocketAddrs;
-
-let addr = "localhost:3242"
-    .to_socket_addrs()
-    .expect("Invalid address")
-    .next()
-    .expect("No address resolved");
-let client = ViiperClient::new(addr);
-
-// Add device first
-let device_info = client.bus_device_add(
-    bus_id,
-    &DeviceCreateRequest {
-        r#type: Some("xbox360".to_string()),
-        id_vendor: None,
-        id_product: None,
-    },
-).expect("Failed to add device");
-
-// Then connect to its stream
-let mut stream = client
-    .connect_device(device_info.bus_id, &device_info.dev_id)
-    .expect("Failed to connect");
-```
-
-With custom VID/PID:
-
-```rust
-let device_info = client.bus_device_add(
-    bus_id,
-    &DeviceCreateRequest {
-        r#type: Some("keyboard".to_string()),
-        id_vendor: Some(0x1234),
-        id_product: Some(0x5678),
-    },
-).expect("Failed to add device");
-```
+    ```
 
 ### Sending Input
 
@@ -230,62 +209,75 @@ let input = Xbox360Input {
 stream.send(&input).expect("Failed to send");
 ```
 
-### Receiving Output (Callbacks)
+### Receiving Feedback
 
 For devices that send feedback (rumble, LEDs), register a callback with `on_output`:
 
-**Sync API:**
+=== "Sync"
 
-```rust
-use viiper_client::devices::keyboard::OUTPUT_SIZE;
+    ```rust
+    use viiper_client::devices::keyboard::OUTPUT_SIZE;
 
-stream.on_output(|reader| {
-    let mut buf = [0u8; OUTPUT_SIZE];
-    reader.read_exact(&mut buf)?;
-    let leds = buf[0];
-    
-    let num_lock = (leds & 0x01) != 0;
-    let caps_lock = (leds & 0x02) != 0;
-    let scroll_lock = (leds & 0x04) != 0;
-    
-    println!("LEDs: Num={} Caps={} Scroll={}", num_lock, caps_lock, scroll_lock);
-    Ok(())
-}).expect("Failed to register callback");
-```
+    stream.on_output(|reader| {
+        let mut buf = [0u8; OUTPUT_SIZE];
+        reader.read_exact(&mut buf)?;
+        let leds = buf[0];
+        
+        let num_lock = (leds & 0x01) != 0;
+        let caps_lock = (leds & 0x02) != 0;
+        let scroll_lock = (leds & 0x04) != 0;
+        
+        println!("LEDs: Num={} Caps={} Scroll={}", num_lock, caps_lock, scroll_lock);
+        Ok(())
+    }).expect("Failed to register callback");
+    ```
 
-**Async API:**
+    For Xbox360 rumble:
 
-```rust
-use tokio::io::AsyncReadExt;
-use viiper_client::devices::keyboard::OUTPUT_SIZE;
+    ```rust
+    stream.on_output(|reader| {
+        let mut buf = [0u8; 2];
+        reader.read_exact(&mut buf)?;
+        let left_motor = buf[0];
+        let right_motor = buf[1];
+        println!("Rumble: Left={} Right={}", left_motor, right_motor);
+        Ok(())
+    }).expect("Failed to register callback");
+    ```
 
-stream.on_output(|stream| async move {
-    let mut buf = [0u8; OUTPUT_SIZE];
-    let mut guard = stream.lock().await;
-    guard.read_exact(&mut buf).await?;
-    drop(guard);
-    
-    let leds = buf[0];
-    let num_lock = (leds & 0x01) != 0;
-    let caps_lock = (leds & 0x02) != 0;
-    
-    println!("LEDs: Num={} Caps={}", num_lock, caps_lock);
-    Ok(())
-}).expect("Failed to register callback");
-```
+=== "Async"
 
-For Xbox360 rumble:
+    ```rust
+    use tokio::io::AsyncReadExt;
+    use viiper_client::devices::keyboard::OUTPUT_SIZE;
 
-```rust
-stream.on_output(|reader| {
-    let mut buf = [0u8; 2];
-    reader.read_exact(&mut buf)?;
-    let left_motor = buf[0];
-    let right_motor = buf[1];
-    println!("Rumble: Left={} Right={}", left_motor, right_motor);
-    Ok(())
-}).expect("Failed to register callback");
-```
+    stream.on_output(|stream| async move {
+        let mut buf = [0u8; OUTPUT_SIZE];
+        let mut guard = stream.lock().await;
+        guard.read_exact(&mut buf).await?;
+        drop(guard);
+        
+        let leds = buf[0];
+        let num_lock = (leds & 0x01) != 0;
+        let caps_lock = (leds & 0x02) != 0;
+        
+        println!("LEDs: Num={} Caps={}", num_lock, caps_lock);
+        Ok(())
+    }).expect("Failed to register callback");
+    ```
+
+    For Xbox360 rumble:
+
+    ```rust
+    stream.on_output(|reader| async move {
+        let mut buf = [0u8; 2];
+        reader.read_exact(&mut buf)?;
+        let left_motor = buf[0];
+        let right_motor = buf[1];
+        println!("Rumble: Left={} Right={}", left_motor, right_motor);
+        Ok(())
+    }).expect("Failed to register callback");
+    ```
 
 ## Generated Constants and Maps
 
@@ -352,114 +344,6 @@ use viiper_client::devices::keyboard::SHIFT_CHARS;
 let needs_shift = SHIFT_CHARS.contains(&b'A');  // true for uppercase
 ```
 
-## Practical Example: Typing Text
-
-Using the generated maps to type a string:
-
-```rust
-use std::thread;
-use std::time::Duration;
-use viiper_client::{DeviceStream, devices::keyboard::*};
-
-fn type_string(stream: &mut DeviceStream, text: &str) -> Result<(), viiper_client::ViiperError> {
-    for ch in text.chars() {
-        let byte = ch as u8;
-        let key = match CHAR_TO_KEY.get(&byte) {
-            Some(&k) => k,
-            None => continue,
-        };
-
-        let mods = if SHIFT_CHARS.contains(&byte) {
-            MOD_LEFT_SHIFT
-        } else {
-            0
-        };
-
-        // Press
-        let down = KeyboardInput {
-            modifiers: mods,
-            count: 1,
-            keys: vec![key],
-        };
-        stream.send(&down)?;
-        thread::sleep(Duration::from_millis(50));
-
-        // Release
-        let up = KeyboardInput {
-            modifiers: 0,
-            count: 0,
-            keys: vec![],
-        };
-        stream.send(&up)?;
-        thread::sleep(Duration::from_millis(50));
-    }
-    Ok(())
-}
-
-// Usage
-type_string(&mut stream, "Hello, World!")?;
-```
-
-## Device-Specific Wire Formats
-
-### Keyboard Input
-
-```rust
-pub struct KeyboardInput {
-    pub modifiers: u8,    // Modifier flags (Ctrl, Shift, Alt, GUI)
-    pub count: u8,        // Number of keys in keys vec
-    pub keys: Vec<u8>,    // Key codes (max 6 for HID compliance)
-}
-```
-
-**Wire format:** 1 byte modifiers + 1 byte count + N bytes keys (variable-length)
-
-### Keyboard Output (LEDs)
-
-```rust
-// Single byte with LED flags
-let leds = buf[0];
-let num_lock = (leds & LED_NUM_LOCK) != 0;
-```
-
-### Xbox360 Input
-
-```rust
-pub struct Xbox360Input {
-    pub buttons: u32,   // Button flags
-    pub lt: u8,         // Left trigger (0-255)
-    pub rt: u8,         // Right trigger (0-255)
-    pub lx: i16,        // Left stick X (-32768 to 32767)
-    pub ly: i16,        // Left stick Y (-32768 to 32767)
-    pub rx: i16,        // Right stick X (-32768 to 32767)
-    pub ry: i16,        // Right stick Y (-32768 to 32767)
-}
-```
-
-**Wire format:** Fixed 14 bytes, packed structure (little-endian)
-
-### Xbox360 Output (Rumble)
-
-```rust
-// Two bytes: left motor + right motor (0-255 each)
-let left_motor = buf[0];
-let right_motor = buf[1];
-```
-
-### Mouse Input
-
-```rust
-pub struct MouseInput {
-    pub buttons: u8,   // Button flags
-    pub dx: i8,        // Relative X movement (-128 to 127)
-    pub dy: i8,        // Relative Y movement (-128 to 127)
-    pub wheel: i8,     // Vertical scroll
-    pub pan: i8,       // Horizontal scroll
-}
-```
-
-**Wire format:** Fixed 5 bytes, packed structure
-
 ## Error Handling
 
 The client library uses a custom `ViiperError` type for all errors:
@@ -475,7 +359,8 @@ match client.bus_list() {
 }
 ```
 
-The server returns errors as RFC 7807 Problem JSON. The client parses these into `ProblemJson`:
+The server returns errors as RFC 7807 Problem inspired JSON.  
+The client parses these into `ProblemJson`:
 
 ```rust
 use viiper_client::ProblemJson;
@@ -522,69 +407,6 @@ Full working examples are available in the repository:
   - Cycles through buttons
   - Handles rumble feedback
 
-### Running Examples
-
-```bash
-cd examples/rust
-
-# Sync examples
-cargo run --release -p virtual_keyboard_sync -- localhost:3242
-cargo run --release -p virtual_mouse_sync -- localhost:3242
-cargo run --release -p virtual_x360_pad_sync -- localhost:3242
-
-# Async examples
-cargo run --release -p virtual_keyboard_async -- localhost:3242
-cargo run --release -p virtual_mouse_async -- localhost:3242
-cargo run --release -p virtual_x360_pad_async -- localhost:3242
-```
-
-## Project Structure
-
-Generated client library layout:
-
-```text
-clients/rust/
-├── Cargo.toml
-├── src/
-│   ├── lib.rs                 # Re-exports
-│   ├── client.rs              # Sync ViiperClient + DeviceStream
-│   ├── async_client.rs        # Async ViiperClient (feature = "async")
-│   ├── error.rs               # ViiperError, ProblemJson
-│   ├── types.rs               # API request/response types
-│   ├── wire.rs                # DeviceInput/DeviceOutput traits
-│   └── devices/
-│       ├── mod.rs
-│       ├── keyboard/
-│       │   ├── mod.rs
-│       │   ├── input.rs       # KeyboardInput struct
-│       │   ├── output.rs      # Output parsing
-│       │   └── constants.rs   # Keys, mods, LEDs, maps
-│       ├── mouse/
-│       │   └── ...
-│       └── xbox360/
-│           └── ...
-```
-
-## Troubleshooting
-
-**Connection refused:**
-
-Verify VIIPER server is running and listening on the expected API port (default 3242).
-
-```rust
-use std::net::SocketAddr;
-let addr: SocketAddr = "127.0.0.1:3242".parse().expect("Invalid address");
-let client = ViiperClient::new(addr);
-```
-
-**Feature not found errors:**
-
-Make sure to enable the `async` feature if using `AsyncViiperClient`:
-
-```toml
-viiper-client = { version = "0.1", features = ["async"] }
-```
-
 ## See Also
 
 - [Generator Documentation](generator.md): How generated client libraries work
@@ -595,7 +417,3 @@ viiper-client = { version = "0.1", features = ["async"] }
 - [C++ Client Library Documentation](cpp.md): Header-only C++ client library
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
-
----
-
-For questions or contributions, see the main VIIPER repository.

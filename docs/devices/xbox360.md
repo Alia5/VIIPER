@@ -1,52 +1,59 @@
 # Xbox 360 Controller
 
-The Xbox 360 virtual gamepad emulates an XInput-compatible controller that most operating systems and games understand out of the box.
+The Xbox 360 virtual gamepad emulates an XInput-compatible controller that most
+operating systems and games understand out of the box.
 
-- USB IDs: VID 0x045E (Microsoft), PID 0x028E (Xbox 360 Controller)
-- Interfaces/Endpoints: single HID interface with one IN interrupt endpoint and one OUT interrupt endpoint for rumble
-- Device type id (for API add): `xbox360`
+Use `xbox360` as the device type when adding a device via the API or client libraries.
 
 ## Client Library Support
 
-The wire protocol is abstracted by client libraries. The **Go client** includes built-in types (`/device/xbox360`), and **generated client libraries** provide equivalent structures with proper packing.  
-You don't need to manually construct packets, just use the provided types and send them via the device stream.
+The wire protocol is abstracted by client libraries.  
+The **Go client** includes built-in types (`/device/xbox360`),
+and **generated client libraries** provide equivalent structures
+with proper packing.  
 
-See: [Go Client](../clients/go.md), [Generated Client Libraries](../clients/generator.md)
+You don't need to manually construct packets, just use the provided types
+and send/receive them via the device control and feedback stream.  
 
-## Adding the device
+See: [API Reference](../api/overview.md)
 
-Use the API to create a bus and add an Xbox 360 controller. Using the raw API (see [API Reference](../api/overview.md) for details):
-
-```bash
-# Create a bus
-printf "bus/create\0" | nc localhost 3242
-
-# Add xbox360 device with JSON payload
-printf 'bus/1/add {"type":"xbox360"}\0' | nc localhost 3242
-```
-
-The API returns a Device object with `busId`, `devId`, and other details. Attach it from a USB/IP client, then open a stream to drive input and receive rumble.
-
-Or use one of the [client libraries](../clients/generator.md) which handle the protocol automatically.
-
-## Streaming protocol
+## (RAW) Streaming protocol
 
 The device stream is a bidirectional, raw TCP connection with fixed-size packets.
 
-Direction: client → server (input state)
+### Input State
 
-- 14-byte packets, little-endian layout:
-  - Buttons: uint32 (4 bytes)
-  - LT, RT: uint8, uint8 (2 bytes)
-  - LX, LY, RX, RY: int16 each (8 bytes)
+- 14-byte packets, little-endian layout:  
+    - Buttons: uint32 (4 bytes, bitfield)  
+    - Triggers: LT, RT: uint8, uint8 (2 bytes)  
+      0-255 (0=not pressed, 255=fully pressed)
+    - Sticks: LX, LY, RX, RY: int16 each (8 bytes)  
+      0 is center, -32768 is min, 32767 is max
 
-Direction: server → client (rumble feedback)
+### Rumble Feedback
 
-- 2-byte packets:
-  - LeftMotor: uint8, RightMotor: uint8
+- 2-byte packets:  
+    - LeftMotor: uint8, RightMotor: uint8  
+      0-255 intensity values
 
 See `/device/xbox360/inputstate.go` for details.
 
-## Example
+### Button constants
 
-A minimal example program that sends input and reads rumble is provided in `examples/`.
+| Button | Hex Value |
+| -------- | ----------- |
+| D-Pad Up | 0x0001 |
+| D-Pad Down | 0x0002 |
+| D-Pad Left | 0x0004 |
+| D-Pad Right | 0x0008 |
+| Start button | 0x0010 |
+| Back button | 0x0020 |
+| Left stick button | 0x0040 |
+| Right stick button | 0x0080 |
+| Left bumper | 0x0100 |
+| Right bumper | 0x0200 |
+| Xbox/Guide button | 0x0400 |
+| A button | 0x1000 |
+| B button | 0x2000 |
+| X button | 0x4000 |
+| Y button | 0x8000 |

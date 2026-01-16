@@ -1,19 +1,21 @@
 # Proxy Command
 
-Start the VIIPER USBIP proxy for traffic inspection and logging.
+The `proxy` command starts VIIPER in proxy mode, sitting between a USBIP client and a USBIP server.  
+VIIPER intercepts and logs all USB traffic passing through, without handling the devices directly.
+
+This is useful for reverse engineering USB protocols and understanding how devices communicate.
+
+```
+USBIP Client  →  VIIPER Proxy  →  USBIP Server (real devices or VIIPER)
+                      ↓
+              Logs/Captures Traffic
+```
 
 ## Usage
 
 ```bash
 viiper proxy --upstream=<address> [OPTIONS]
 ```
-
-## Description
-
-The `proxy` command starts VIIPER in proxy mode, sitting between a USBIP client and a USBIP server.  
-VIIPER intercepts and logs all USB traffic passing through, without handling the devices directly.
-
-This is useful for reverse engineering USB protocols and understanding how devices communicate.
 
 ## Options
 
@@ -24,23 +26,11 @@ Proxy listen address (where clients connect).
 **Default:** `:3241`  
 **Environment Variable:** `VIIPER_PROXY_ADDR`
 
-**Example:**
-
-```bash
-viiper proxy --listen-addr=:9000 --upstream=192.168.1.100:3240
-```
-
 ### `--upstream`
 
 **Required.** Upstream USBIP server address (where real devices are).
 
 **Environment Variable:** `VIIPER_PROXY_UPSTREAM`
-
-**Example:**
-
-```bash
-viiper proxy --upstream=192.168.1.100:3240
-```
 
 ### `--connection-timeout`
 
@@ -48,12 +38,6 @@ Connection timeout for proxy operations.
 
 **Default:** `30s`  
 **Environment Variable:** `VIIPER_PROXY_TIMEOUT`
-
-**Example:**
-
-```bash
-viiper proxy --upstream=192.168.1.100:3240 --connection-timeout=60s
-```
 
 ## Examples
 
@@ -120,16 +104,6 @@ Route USB traffic through VIIPER to inspect and log all operations:
 ```bash
 viiper proxy --upstream=real-server:3240 --log.level=debug --log.raw-file=traffic.log
 ```
-
-## Proxy Architecture
-
-```
-USBIP Client  →  VIIPER Proxy  →  USBIP Server (real devices)
-                      ↓
-              Logs/Captures Traffic
-```
-
-VIIPER sits in the middle, forwarding all traffic while logging packets for inspection.
 
 ## See Also
 

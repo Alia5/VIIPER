@@ -1,6 +1,7 @@
 # Server Command
 
-Start the VIIPER USBIP server to expose virtual devices.
+Start the VIIPER daemon/server to expose virtual devices.  
+This is the default command you should run when you want to create virtual USB devices using VIIPER.
 
 ## Usage
 
@@ -15,7 +16,7 @@ The `server` command starts the VIIPER USBIP server, which allows you to create 
 The server exposes two interfaces:
 
 1. **USBIP Server** - Standard USBIP protocol for device attachment
-2. **API Server** - Management API for device/bus control
+2. **VIIPER API Server** - Management API for device/bus control
 
 !!! info "Automatic Local Attachment"
     By default, VIIPER automatically attaches newly created devices to the local USBIP client (localhost only).  
@@ -31,12 +32,6 @@ USBIP server listen address.
 **Default:** `:3241`  
 **Environment Variable:** `VIIPER_USB_ADDR`
 
-**Example:**
-
-```bash
-viiper server --usb.addr=0.0.0.0:3241
-```
-
 ### `--api.addr`
 
 API server listen address.
@@ -44,25 +39,12 @@ API server listen address.
 **Default:** `:3242`  
 **Environment Variable:** `VIIPER_API_ADDR`
 
-**Example:**
-
-```bash
-# Enable API on custom port
-viiper server --api.addr=:8080
-```
-
 ### `--api.device-handler-timeout`
 
 Time before auto-cleanup occurs when a device handler has no active connection.
 
 **Default:** `5s`  
 **Environment Variable:** `VIIPER_API_DEVICE_HANDLER_TIMEOUT`
-
-**Example:**
-
-```bash
-viiper server --api.device-handler-timeout=10s
-```
 
 ### `--api.auto-attach-local-client`
 
@@ -85,12 +67,6 @@ Connection operation timeout for both USBIP and API servers.
 
 **Default:** `30s`  
 **Environment Variable:** `VIIPER_CONNECTION_TIMEOUT`
-
-**Example:**
-
-```bash
-viiper server --connection-timeout=60s
-```
 
 ## Examples
 
@@ -135,35 +111,35 @@ Notes:
 - VIIPER's USBIP server listens on `:3241` by default (configurable via `--usb.addr`).
 - The BUSID-DEVICEID you need (e.g. `1-1`) is returned by the API on device add and also visible via `usbip list`.
 
-### Linux
+=== "Windows"
 
-```bash
-# Load the virtual host controller (only needed once per boot)
-sudo modprobe vhci-hcd
+    On Windows, use [usbip-win2](https://github.com/vadimgrn/usbip-win2):
 
-# List exportable devices on the VIIPER host
-usbip list --remote=VIIPER_HOST --tcp-port=3241
+    - GUI: use the client to add a remote host and attach by busid.
+    - CLI (similar flags):
 
-# Attach a device by busid (long flags)
-sudo usbip attach --remote=VIIPER_HOST --tcp-port=3241 --busid=BUSID-DEVICEID
+    ```powershell
+    usbip.exe list --remote VIIPER_HOST --tcp-port 3241
+    usbip.exe attach --remote VIIPER_HOST --tcp-port 3241 --busid BUSID-DEVICEID
+    ```
 
-# Equivalent short-form flags
-sudo usbip --tcp-port 3241 -r VIIPER_HOST -b BUSID-DEVICEID
-```
+=== "Linux"
 
-Replace `VIIPER_HOST` with the server's hostname/IP. If you changed the USBIP port, use that port instead of `3241`.
+    ```bash
+    # Load the virtual host controller (only needed once per boot)
+    sudo modprobe vhci-hcd
 
-### Windows
+    # List exportable devices on the VIIPER host
+    usbip list --remote=VIIPER_HOST --tcp-port=3241
 
-On Windows, use [usbip-win2](https://github.com/vadimgrn/usbip-win2):
+    # Attach a device by busid (long flags)
+    sudo usbip attach --remote=VIIPER_HOST --tcp-port=3241 --busid=BUSID-DEVICEID
 
-- GUI: use the client to add a remote host and attach by busid.
-- CLI (similar flags):
+    # Equivalent short-form flags
+    sudo usbip --tcp-port 3241 -r VIIPER_HOST -b BUSID-DEVICEID
+    ```
 
-```powershell
-usbip.exe list --remote VIIPER_HOST --tcp-port 3241
-usbip.exe attach --remote VIIPER_HOST --tcp-port 3241 --busid BUSID-DEVICEID
-```
+    Replace `VIIPER_HOST` with the server's hostname/IP. If you changed the USBIP port, use that port instead of `3241`.
 
 Once attached, the device will appear to the OS/applications as a local USB device.
 

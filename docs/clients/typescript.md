@@ -2,14 +2,10 @@
 
 The VIIPER TypeScript client library provides a modern, type-safe Node.js client library for interacting with VIIPER servers and controlling virtual devices.
 
-## Overview
-
 The TypeScript client library features:
 
 - **Type-safe API**: Structured request/response types with proper TypeScript definitions
 - **Event-driven**: EventEmitter-based output handling for device feedback (LEDs, rumble)
-- **Auto-generated**: Generated from server code with device-specific Input/Output classes
-- **Modern Node.js**: Targets Node.js 18+ with ES modules
 - **Zero external dependencies**: Uses only built-in Node.js libraries
 
 !!! note "License"
@@ -18,7 +14,7 @@ The TypeScript client library features:
 
 ## Installation
 
-### 1. Using the Published Package (Recommended)
+### 1. Using the Published Package
 
 Install the client library from the public npm registry:
 
@@ -26,17 +22,10 @@ Install the client library from the public npm registry:
 npm install viiperclient
 ```
 
-Or with pnpm / yarn:
-
-```bash
-pnpm add viiperclient
-# or
-yarn add viiperclient
-```
-
 The latest stable version is tagged as `latest`.
 
-> Pre-release / snapshot builds are **not** published to npm. They are only available as GitHub Release artifacts (e.g. `dev-latest`) or by building from source.
+!!! "Pre-Releases"
+    Pre-release / snapshot builds are **not** published to npm. They are only available as GitHub Release artifacts (e.g. `dev-latest`) or by building from source.
 
 To use a snapshot artifact from GitHub:
 
@@ -69,18 +58,7 @@ npm install
 npm run build
 ```
 
-### 3. Generating from Source (Advanced / Contributors)
-
-This is only required if you are contributing to VIIPER or adding device types. Normal users should use the npm package.
-
-```bash
-go run ./cmd/viiper codegen --lang=typescript
-cd clients/typescript
-npm install
-npm run build
-```
-
-## Quick Start
+## Example
 
 ```typescript
 import { ViiperClient, Keyboard } from "viiperclient";
@@ -119,25 +97,14 @@ await device.send(input);
 await client.busdeviceremove(busID, response.devId);
 ```
 
-## Device Stream API
+## Device Control/Feedback
 
-### Creating a Device Stream
+### Creating a Device + Control/Feedback Stream
 
 The simplest way to add a device and connect:
 
 ```typescript
 const deviceReq = { type: "xbox360" };
-const { device, response } = await client.addDeviceAndConnect(busID, deviceReq);
-```
-
-With custom VID/PID:
-
-```typescript
-const deviceReq = { 
-  type: "keyboard", 
-  idVendor: 0x1234, 
-  idProduct: 0x5678 
-};
 const { device, response } = await client.addDeviceAndConnect(busID, deviceReq);
 ```
 
@@ -175,7 +142,7 @@ const input = new Xbox360Input({
 await device.send(input);
 ```
 
-### Receiving Output (Events)
+### Receiving Feedback
 
 For devices that send feedback (rumble, LEDs), subscribe to the `output` event:
 
@@ -211,6 +178,8 @@ device.on("output", (data: Buffer) => {
 ```typescript
 device.close();
 ```
+
+The VIIPER server automatically removes the device when the stream is closed after a short timeout.
 
 ### Error Handling and Events
 
@@ -333,115 +302,6 @@ const { ShiftCharsHas } = Keyboard;
 const needsShift = ShiftCharsHas('A'.codePointAt(0)!);  // true for uppercase
 ```
 
-## Practical Example: Typing Text
-
-Using the generated maps to type a string:
-
-```typescript
-import { ViiperDevice, Keyboard } from "viiperclient";
-
-const { KeyboardInput, CharToKeyGet, ShiftCharsHas, Mod } = Keyboard;
-
-async function typeString(device: ViiperDevice, text: string): Promise<void> {
-  for (const ch of text) {
-    const cp = ch.codePointAt(0)!;
-    const key = CharToKeyGet(cp);
-    if (key === undefined) continue;
-    
-    const mods = ShiftCharsHas(cp) ? Mod.LeftShift : 0;
-    
-    // Press
-    await device.send(new KeyboardInput({
-      Modifiers: mods,
-      Count: 1,
-      Keys: [key]
-    }));
-    await new Promise(r => setTimeout(r, 50));
-    
-    // Release
-    await device.send(new KeyboardInput({
-      Modifiers: 0,
-      Count: 0,
-      Keys: []
-    }));
-    await new Promise(r => setTimeout(r, 50));
-  }
-}
-
-// Usage
-await typeString(device, "Hello, World!");
-```
-
-## Device-Specific Wire Formats
-
-### Keyboard Input
-
-```typescript
-interface KeyboardInput {
-  Modifiers: number;    // Modifier flags (Ctrl, Shift, Alt, GUI)
-  Count: number;        // Number of keys in Keys array
-  Keys: number[];       // Key codes (max 6 for HID compliance)
-}
-```
-
-**Wire format:** 1 byte modifiers + 1 byte count + N bytes keys (variable-length)
-
-### Keyboard Output (LEDs)
-
-```typescript
-// Single byte with LED flags
-const leds = data.readUInt8(0);
-const numLock = (leds & LED.NumLock) !== 0;
-```
-
-### Xbox360 Input
-
-```typescript
-interface Xbox360Input {
-  Buttons: number;     // Button flags
-  Lt: number;          // Left trigger (0-255)
-  Rt: number;          // Right trigger (0-255)
-  Lx: number;          // Left stick X (-32768 to 32767)
-  Ly: number;          // Left stick Y (-32768 to 32767)
-  Rx: number;          // Right stick X (-32768 to 32767)
-  Ry: number;          // Right stick Y (-32768 to 32767)
-}
-```
-
-**Wire format:** Fixed 14 bytes, packed structure
-
-### Xbox360 Output (Rumble)
-
-```typescript
-// Two bytes: left motor + right motor (0-255 each)
-const leftMotor = data.readUInt8(0);
-const rightMotor = data.readUInt8(1);
-```
-
-### Mouse Input
-
-```typescript
-interface MouseInput {
-  Buttons: number;  // Button flags
-  Dx: number;       // Relative X movement (-32768 to 32767)
-  Dy: number;       // Relative Y movement (-32768 to 32767)
-  Wheel: number;    // Vertical scroll (-32768 to 32767)
-  Pan: number;      // Horizontal scroll (-32768 to 32767)
-}
-```
-
-**Wire format:** Fixed 9 bytes, int16 values little-endian
-
-## Configuration and Advanced Usage
-
-### Custom Port
-
-```typescript
-const client = new ViiperClient("localhost", 3242);
-```
-
-Default port is 3242 if not specified.
-
 ### Error Handling
 
 The server returns errors as JSON. The client throws exceptions:
@@ -454,7 +314,7 @@ try {
 }
 ```
 
-Stream errors are surfaced through the EventEmitter error event:
+Device Control/Feedback stream errors are surfaced through the EventEmitter error event:
 
 ```typescript
 device.on('error', (err) => {
@@ -501,15 +361,6 @@ npm run build
 node dist/virtual_keyboard.js localhost:3242
 ```
 
-## Troubleshooting
-
-Some quick troubleshooting tips for the TypeScript SDK and device streams:
-
-- Connection refused / timeout: Verify VIIPER server is running and listening on the expected API port (default 3242). Ensure firewall/ACLs allow TCP connections.
-- Unexpected response or parse errors: The VIIPER API uses null-byte (\x00) terminated requests. Use the provided SDK helper methods or ensure raw sockets append a null terminator when calling the server.
-- Stream closed unexpectedly: Confirm the device stream was opened (device added and connected) and that the device handler did not time out (default 5s reconnect window). Check server logs for reasons.
-- Use examples: See the repository examples in `examples/typescript/` for working end-to-end samples that demonstrate bus creation, device streams, and cleanup.
-
 ## See Also
 
 - [Generator Documentation](generator.md): How generated client libraries work
@@ -520,7 +371,3 @@ Some quick troubleshooting tips for the TypeScript SDK and device streams:
 - [C++ Client Library Documentation](cpp.md): Header-only C++ client library
 - [API Overview](../api/overview.md): Management API reference
 - [Device Documentation](../devices/): Wire formats and device-specific details
-
----
-
-For questions or contributions, see the main VIIPER repository.

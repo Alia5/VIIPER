@@ -2,15 +2,13 @@
 
 The VIIPER C client library provides a lightweight, dependency-free client library for interacting with VIIPER servers and controlling virtual devices.
 
-## Overview
-
 The C client library features:
 
-- **Device-agnostic streaming API**: Uniform interface for all device types
 - **Zero dependencies**: Pure C99, no external libraries required
 - **Cross-platform**: Windows (MSVC) and POSIX (GCC/Clang)
 - **Type-safe**: Generated headers with packed structs and constants
 - **Thread-safe**: Recommended: one `viiper_client_t` per thread
+- **Device-agnostic streaming API**: Uniform interface for all device types
 
 !!! note "License"
     The C client library is licensed under the **MIT License**, providing maximum flexibility for integration into your projects.  
@@ -31,7 +29,7 @@ Build the client library:
 ```bash
 cd ../clients/c
 cmake -B build -G "Visual Studio 17 2022"  # Windows
-cmake -B build                              # POSIX
+cmake -B build                             # LINUX
 cmake --build build --config Release
 ```
 
@@ -60,7 +58,7 @@ endif()
 - Link: `clients/c/build/Release/viiper.lib` (Windows) or `libviiper.a` (POSIX)
 - Runtime: Copy `viiper.dll` next to your executable (Windows)
 
-## Quick Start
+## Example
 
 ```c
 #include <viiper/viiper.h>
@@ -123,11 +121,11 @@ int main(void) {
 }
 ```
 
-## Device Stream API
+## Device Control/Feedback API
 
-### Creating a Device Stream
+### Creating a Device Control/Feedback Stream
 
-Manual approach (add device, then connect):
+Manual (add device, then connect):
 
 ```c
 // Add device first
@@ -187,7 +185,7 @@ viiper_mouse_input_t input = {
 int err = viiper_device_send(device, &input, sizeof(input));
 ```
 
-### Receiving Output (Callbacks)
+### Receiving Feedback (Rumble, LEDs, etc.)
 
 ```c
 void on_led_update(void* user_data, const void* data, size_t len) {
@@ -208,9 +206,12 @@ viiper_device_on_output(device, on_led_update, NULL);
 viiper_device_close(device);
 ```
 
+The VIIPER server automatically removes the device when the stream is closed after a short timeout.
+
 ## Device-Specific Notes
 
-Each device type has specific packet formats, constants, and wire protocols. For wire format details and usage patterns, see the [Devices](../devices/) section of the documentation.
+Each device type has specific packet formats, constants, and wire protocols.  
+For wire format details and usage patterns, see the [Devices](../devices/) section of the documentation.
 
 The C client library provides generated structs and constants in device-specific headers (e.g., `viiper_keyboard.h`, `viiper_mouse.h`, `viiper_xbox360.h`).
 
@@ -228,7 +229,8 @@ typedef struct {
 #pragma pack(pop)
 ```
 
-**Important:** Always ensure your compiler respects packing directives. MSVC and GCC/Clang handle this correctly by default.
+!!! warning "Compiler compatibility"
+    **Important:** Always ensure your compiler respects packing directives. MSVC and GCC/Clang handle this correctly by default.
 
 ## Troubleshooting
 

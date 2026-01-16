@@ -1,16 +1,9 @@
 # Code Generation Command
 
 The `codegen` command generates type-safe client libraries from Go source code annotations.
+The command can only be run from the VIIPER repository root with the source code available.
 
-## Usage
-
-```bash
-viiper codegen [flags]
-```
-
-## Description
-
-Scans the VIIPER server codebase to extract:
+It scans the VIIPER server codebase to extract:
 
 - API routes and response DTOs
 - Device wire formats from `viiper:wire` comment tags
@@ -26,6 +19,14 @@ Then generates client libraries with:
 !!! note "Sourcecode access is required"
     The codegen command requires access to VIIPER source code. Run it from the repository root.
 
+## Usage
+
+```bash
+viiper codegen [flags]
+```
+
+## Description
+
 ## Flags
 
 ### `--output`
@@ -35,12 +36,6 @@ Output directory for generated client libraries (relative to repository root).
 **Default:** `clients`  
 **Environment Variable:** `VIIPER_CODEGEN_OUTPUT`
 
-**Example:**
-
-```bash
-viiper codegen --output=../client-libs-output
-```
-
 ### `--lang`
 
 Target language to generate.
@@ -48,22 +43,6 @@ Target language to generate.
 **Values:** `c`, `csharp`, `typescript`, `all`  
 **Default:** `all`  
 **Environment Variable:** `VIIPER_CODEGEN_LANG`
-
-**Examples:**
-
-```bash
-# Generate all client libraries
-viiper codegen --lang=all
-
-# Generate C client library only
-viiper codegen --lang=c
-
-# Generate C# client library only
-viiper codegen --lang=csharp
-
-# Generate TypeScript client library only
-viiper codegen --lang=typescript
-```
 
 ## Examples
 
@@ -94,5 +73,5 @@ Run codegen when any of these change:
 ## See Also
 
 - [Generator Documentation](../clients/generator.md): Detailed explanation of tagging system and code generation flow
-- [C Client Library Documentation](../clients/c.md): C-specific usage and build instructions
+- [API and Client Reference](../../api/overview.md): API endpoints and data structures
 - [Configuration](configuration.md): Global configuration options
