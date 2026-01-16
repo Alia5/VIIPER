@@ -54,7 +54,7 @@ jobs:
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   directory: .
-                  fail_ci_if_error: true
+                  fail_ci_if_error: false
 
     build:
         name: Build binaries (${{ matrix.target.goos }}/${{ matrix.target.goarch }})

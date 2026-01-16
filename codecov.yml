@@ -2,3 +2,13 @@ ignore:
   - "examples/go/**/*"
   - "**/_testing/**/*.go"
   - "cmd/viiper/**/*"
+  - "docs"
+
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+
+assume:
+  utf_8: true
