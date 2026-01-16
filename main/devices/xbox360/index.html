@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../../clients/typescript/">
+        <link rel="prev" href="../../clients/generator/">
       
       
         <link rel="next" href="../dualshock4/">
@@ -850,34 +850,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../clients/generator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Generator Documentation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../clients/c/" class="md-nav__link">
         
   
@@ -998,6 +970,34 @@
     
   
     TypeScript Client Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clients/generator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generator Documentation
   
 
     
@@ -1153,35 +1153,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adding-the-device" class="md-nav__link">
+  <a href="#raw-streaming-protocol" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adding the device
+        (RAW) Streaming protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="(RAW) Streaming protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input State
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#streaming-protocol" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#rumble-feedback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Streaming protocol
+        Rumble Feedback
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#button-constants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example
+        Button constants
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1350,35 +1367,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adding-the-device" class="md-nav__link">
+  <a href="#raw-streaming-protocol" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adding the device
+        (RAW) Streaming protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="(RAW) Streaming protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input State
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#streaming-protocol" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#rumble-feedback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Streaming protocol
+        Rumble Feedback
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#button-constants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example
+        Button constants
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1403,43 +1437,110 @@
 
 
 <h1 id="xbox-360-controller">Xbox 360 Controller</h1>
-<p>The Xbox 360 virtual gamepad emulates an XInput-compatible controller that most operating systems and games understand out of the box.</p>
-<ul>
-<li>USB IDs: VID 0x045E (Microsoft), PID 0x028E (Xbox 360 Controller)</li>
-<li>Interfaces/Endpoints: single HID interface with one IN interrupt endpoint and one OUT interrupt endpoint for rumble</li>
-<li>Device type id (for API add): <code>xbox360</code></li>
-</ul>
+<p>The Xbox 360 virtual gamepad emulates an XInput-compatible controller that most
+operating systems and games understand out of the box.</p>
+<p>Use <code>xbox360</code> as the device type when adding a device via the API or client libraries.</p>
 <h2 id="client-library-support">Client Library Support</h2>
-<p>The wire protocol is abstracted by client libraries. The <strong>Go client</strong> includes built-in types (<code>/device/xbox360</code>), and <strong>generated client libraries</strong> provide equivalent structures with proper packing.<br />
-You don't need to manually construct packets, just use the provided types and send them via the device stream.</p>
-<p>See: <a href="../../clients/go/">Go Client</a>, <a href="../../clients/generator/">Generated Client Libraries</a></p>
-<h2 id="adding-the-device">Adding the device</h2>
-<p>Use the API to create a bus and add an Xbox 360 controller. Using the raw API (see <a href="../../api/overview/">API Reference</a> for details):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Create a bus</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/create\0&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Add xbox360 device with JSON payload</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;bus/1/add {&quot;type&quot;:&quot;xbox360&quot;}\0&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
-</code></pre></div>
-<p>The API returns a Device object with <code>busId</code>, <code>devId</code>, and other details. Attach it from a USB/IP client, then open a stream to drive input and receive rumble.</p>
-<p>Or use one of the <a href="../../clients/generator/">client libraries</a> which handle the protocol automatically.</p>
-<h2 id="streaming-protocol">Streaming protocol</h2>
+<p>The wire protocol is abstracted by client libraries.<br />
+The <strong>Go client</strong> includes built-in types (<code>/device/xbox360</code>),
+and <strong>generated client libraries</strong> provide equivalent structures
+with proper packing.  </p>
+<p>You don't need to manually construct packets, just use the provided types
+and send/receive them via the device control and feedback stream.  </p>
+<p>See: <a href="../../api/overview/">API Reference</a></p>
+<h2 id="raw-streaming-protocol">(RAW) Streaming protocol</h2>
 <p>The device stream is a bidirectional, raw TCP connection with fixed-size packets.</p>
-<p>Direction: client → server (input state)</p>
+<h3 id="input-state">Input State</h3>
 <ul>
-<li>14-byte packets, little-endian layout:</li>
-<li>Buttons: uint32 (4 bytes)</li>
-<li>LT, RT: uint8, uint8 (2 bytes)</li>
-<li>LX, LY, RX, RY: int16 each (8 bytes)</li>
+<li>14-byte packets, little-endian layout:  <ul>
+<li>Buttons: uint32 (4 bytes, bitfield)  </li>
+<li>Triggers: LT, RT: uint8, uint8 (2 bytes)<br />
+  0-255 (0=not pressed, 255=fully pressed)</li>
+<li>Sticks: LX, LY, RX, RY: int16 each (8 bytes)<br />
+  0 is center, -32768 is min, 32767 is max</li>
 </ul>
-<p>Direction: server → client (rumble feedback)</p>
+</li>
+</ul>
+<h3 id="rumble-feedback">Rumble Feedback</h3>
 <ul>
-<li>2-byte packets:</li>
-<li>LeftMotor: uint8, RightMotor: uint8</li>
+<li>2-byte packets:  <ul>
+<li>LeftMotor: uint8, RightMotor: uint8<br />
+  0-255 intensity values</li>
+</ul>
+</li>
 </ul>
 <p>See <code>/device/xbox360/inputstate.go</code> for details.</p>
-<h2 id="example">Example</h2>
-<p>A minimal example program that sends input and reads rumble is provided in <code>examples/</code>.</p>
+<h3 id="button-constants">Button constants</h3>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>Hex Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D-Pad Up</td>
+<td>0x0001</td>
+</tr>
+<tr>
+<td>D-Pad Down</td>
+<td>0x0002</td>
+</tr>
+<tr>
+<td>D-Pad Left</td>
+<td>0x0004</td>
+</tr>
+<tr>
+<td>D-Pad Right</td>
+<td>0x0008</td>
+</tr>
+<tr>
+<td>Start button</td>
+<td>0x0010</td>
+</tr>
+<tr>
+<td>Back button</td>
+<td>0x0020</td>
+</tr>
+<tr>
+<td>Left stick button</td>
+<td>0x0040</td>
+</tr>
+<tr>
+<td>Right stick button</td>
+<td>0x0080</td>
+</tr>
+<tr>
+<td>Left bumper</td>
+<td>0x0100</td>
+</tr>
+<tr>
+<td>Right bumper</td>
+<td>0x0200</td>
+</tr>
+<tr>
+<td>Xbox/Guide button</td>
+<td>0x0400</td>
+</tr>
+<tr>
+<td>A button</td>
+<td>0x1000</td>
+</tr>
+<tr>
+<td>B button</td>
+<td>0x2000</td>
+</tr>
+<tr>
+<td>X button</td>
+<td>0x4000</td>
+</tr>
+<tr>
+<td>Y button</td>
+<td>0x8000</td>
+</tr>
+</tbody>
+</table>
 
 
 

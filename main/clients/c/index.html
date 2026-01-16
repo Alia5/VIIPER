@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../generator/">
+        <link rel="prev" href="../go/">
       
       
         <link rel="next" href="../cpp/">
@@ -850,34 +850,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../generator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Generator Documentation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -941,17 +913,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -991,10 +952,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Start
+        Example
       
     </span>
   </a>
@@ -1002,22 +963,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#device-stream-api" class="md-nav__link">
+  <a href="#device-controlfeedback-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Device Stream API
+        Device Control/Feedback API
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Device Stream API">
+    <nav class="md-nav" aria-label="Device Control/Feedback API">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#creating-a-device-stream" class="md-nav__link">
+  <a href="#creating-a-device-controlfeedback-stream" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Creating a Device Stream
+        Creating a Device Control/Feedback Stream
       
     </span>
   </a>
@@ -1036,10 +997,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#receiving-output-callbacks" class="md-nav__link">
+  <a href="#receiving-feedback-rumble-leds-etc" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Receiving Output (Callbacks)
+        Receiving Feedback (Rumble, LEDs, etc.)
       
     </span>
   </a>
@@ -1264,6 +1225,34 @@
     
   
     TypeScript Client Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generator Documentation
   
 
     
@@ -1511,17 +1500,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1561,10 +1539,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Start
+        Example
       
     </span>
   </a>
@@ -1572,22 +1550,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#device-stream-api" class="md-nav__link">
+  <a href="#device-controlfeedback-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Device Stream API
+        Device Control/Feedback API
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Device Stream API">
+    <nav class="md-nav" aria-label="Device Control/Feedback API">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#creating-a-device-stream" class="md-nav__link">
+  <a href="#creating-a-device-controlfeedback-stream" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Creating a Device Stream
+        Creating a Device Control/Feedback Stream
       
     </span>
   </a>
@@ -1606,10 +1584,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#receiving-output-callbacks" class="md-nav__link">
+  <a href="#receiving-feedback-rumble-leds-etc" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Receiving Output (Callbacks)
+        Receiving Feedback (Rumble, LEDs, etc.)
       
     </span>
   </a>
@@ -1748,14 +1726,13 @@
 
 <h1 id="c-client-library-documentation">C Client Library Documentation</h1>
 <p>The VIIPER C client library provides a lightweight, dependency-free client library for interacting with VIIPER servers and controlling virtual devices.</p>
-<h2 id="overview">Overview</h2>
 <p>The C client library features:</p>
 <ul>
-<li><strong>Device-agnostic streaming API</strong>: Uniform interface for all device types</li>
 <li><strong>Zero dependencies</strong>: Pure C99, no external libraries required</li>
 <li><strong>Cross-platform</strong>: Windows (MSVC) and POSIX (GCC/Clang)</li>
 <li><strong>Type-safe</strong>: Generated headers with packed structs and constants</li>
 <li><strong>Thread-safe</strong>: Recommended: one <code>viiper_client_t</code> per thread</li>
+<li><strong>Device-agnostic streaming API</strong>: Uniform interface for all device types</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">License</p>
@@ -1770,7 +1747,7 @@ The core VIIPER server remains under its original license.</p>
 <p>Build the client library:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>../clients/c
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cmake<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-G<span class="w"> </span><span class="s2">&quot;Visual Studio 17 2022&quot;</span><span class="w">  </span><span class="c1"># Windows</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>cmake<span class="w"> </span>-B<span class="w"> </span>build<span class="w">                              </span><span class="c1"># POSIX</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>cmake<span class="w"> </span>-B<span class="w"> </span>build<span class="w">                             </span><span class="c1"># LINUX</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--config<span class="w"> </span>Release
 </code></pre></div>
 <h3 id="linking-to-your-project">Linking to Your Project</h3>
@@ -1794,7 +1771,7 @@ The core VIIPER server remains under its original license.</p>
 <li>Link: <code>clients/c/build/Release/viiper.lib</code> (Windows) or <code>libviiper.a</code> (POSIX)</li>
 <li>Runtime: Copy <code>viiper.dll</code> next to your executable (Windows)</li>
 </ul>
-<h2 id="quick-start">Quick Start</h2>
+<h2 id="example">Example</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;viiper/viiper.h&gt;</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;viiper/viiper_keyboard.h&gt;</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
@@ -1854,9 +1831,9 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-3-57" name="__codelineno-3-57" href="#__codelineno-3-57"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <a id="__codelineno-3-58" name="__codelineno-3-58" href="#__codelineno-3-58"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="device-stream-api">Device Stream API</h2>
-<h3 id="creating-a-device-stream">Creating a Device Stream</h3>
-<p>Manual approach (add device, then connect):</p>
+<h2 id="device-controlfeedback-api">Device Control/Feedback API</h2>
+<h3 id="creating-a-device-controlfeedback-stream">Creating a Device Control/Feedback Stream</h3>
+<p>Manual (add device, then connect):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// Add device first</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">device_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;keyboard&quot;</span><span class="p">;</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">viiper_device_create_request_t</span><span class="w"> </span><span class="n">req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
@@ -1907,7 +1884,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
 <a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viiper_device_send</span><span class="p">(</span><span class="n">device</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">input</span><span class="p">));</span>
 </code></pre></div>
-<h3 id="receiving-output-callbacks">Receiving Output (Callbacks)</h3>
+<h3 id="receiving-feedback-rumble-leds-etc">Receiving Feedback (Rumble, LEDs, etc.)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">on_led_update</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">user_data</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">len</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">len</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">leds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="kt">uint8_t</span><span class="o">*</span><span class="p">)</span><span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
@@ -1922,8 +1899,10 @@ The core VIIPER server remains under its original license.</p>
 <h3 id="closing-a-stream">Closing a Stream</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">viiper_device_close</span><span class="p">(</span><span class="n">device</span><span class="p">);</span>
 </code></pre></div>
+<p>The VIIPER server automatically removes the device when the stream is closed after a short timeout.</p>
 <h2 id="device-specific-notes">Device-Specific Notes</h2>
-<p>Each device type has specific packet formats, constants, and wire protocols. For wire format details and usage patterns, see the <a href="../devices/">Devices</a> section of the documentation.</p>
+<p>Each device type has specific packet formats, constants, and wire protocols.<br />
+For wire format details and usage patterns, see the <a href="../devices/">Devices</a> section of the documentation.</p>
 <p>The C client library provides generated structs and constants in device-specific headers (e.g., <code>viiper_keyboard.h</code>, <code>viiper_mouse.h</code>, <code>viiper_xbox360.h</code>).</p>
 <h2 id="struct-packing">Struct Packing</h2>
 <p>All device I/O structs use <code>#pragma pack(1)</code> to ensure wire compatibility (no padding).</p>
@@ -1935,7 +1914,10 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">}</span><span class="w"> </span><span class="n">viiper_mouse_input_t</span><span class="p">;</span>
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="cp">#pragma pack(pop)</span>
 </code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Compiler compatibility</p>
 <p><strong>Important:</strong> Always ensure your compiler respects packing directives. MSVC and GCC/Clang handle this correctly by default.</p>
+</div>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <h3 id="missing-dll-on-windows">Missing DLL on Windows</h3>
 <p><strong>Symptom:</strong> Application crashes immediately with "viiper.dll not found"</p>

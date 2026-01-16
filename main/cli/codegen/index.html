@@ -1022,34 +1022,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../clients/generator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Generator Documentation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../clients/c/" class="md-nav__link">
         
   
@@ -1170,6 +1142,34 @@
     
   
     TypeScript Client Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clients/generator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generator Documentation
   
 
     
@@ -1559,12 +1559,9 @@
 
 
 <h1 id="code-generation-command">Code Generation Command</h1>
-<p>The <code>codegen</code> command generates type-safe client libraries from Go source code annotations.</p>
-<h2 id="usage">Usage</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
-</code></pre></div>
-<h2 id="description">Description</h2>
-<p>Scans the VIIPER server codebase to extract:</p>
+<p>The <code>codegen</code> command generates type-safe client libraries from Go source code annotations.
+The command can only be run from the VIIPER repository root with the source code available.</p>
+<p>It scans the VIIPER server codebase to extract:</p>
 <ul>
 <li>API routes and response DTOs</li>
 <li>Device wire formats from <code>viiper:wire</code> comment tags</li>
@@ -1581,40 +1578,28 @@
 <p class="admonition-title">Sourcecode access is required</p>
 <p>The codegen command requires access to VIIPER source code. Run it from the repository root.</p>
 </div>
+<h2 id="usage">Usage</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
+</code></pre></div>
+<h2 id="description">Description</h2>
 <h2 id="flags">Flags</h2>
 <h3 id="-output"><code>--output</code></h3>
 <p>Output directory for generated client libraries (relative to repository root).</p>
 <p><strong>Default:</strong> <code>clients</code><br />
 <strong>Environment Variable:</strong> <code>VIIPER_CODEGEN_OUTPUT</code></p>
-<p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--output<span class="o">=</span>../client-libs-output
-</code></pre></div>
 <h3 id="-lang"><code>--lang</code></h3>
 <p>Target language to generate.</p>
 <p><strong>Values:</strong> <code>c</code>, <code>csharp</code>, <code>typescript</code>, <code>all</code><br />
 <strong>Default:</strong> <code>all</code><br />
 <strong>Environment Variable:</strong> <code>VIIPER_CODEGEN_LANG</code></p>
-<p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Generate all client libraries</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Generate C client library only</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Generate C# client library only</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># Generate TypeScript client library only</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript
-</code></pre></div>
 <h2 id="examples">Examples</h2>
 <h3 id="generate-all-client-libraries">Generate All Client Libraries</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen
 </code></pre></div>
 <h3 id="generate-c-client-library-and-rebuild-examples">Generate C Client Library and Rebuild Examples</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>examples/c
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--config<span class="w"> </span>Release
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>examples/c
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--config<span class="w"> </span>Release
 </code></pre></div>
 <h2 id="when-to-regenerate">When to Regenerate</h2>
 <p>Run codegen when any of these change:</p>
@@ -1628,7 +1613,7 @@
 <h2 id="see-also">See Also</h2>
 <ul>
 <li><a href="../../clients/generator/">Generator Documentation</a>: Detailed explanation of tagging system and code generation flow</li>
-<li><a href="../../clients/c/">C Client Library Documentation</a>: C-specific usage and build instructions</li>
+<li><a href="../../api/overview.md">API and Client Reference</a>: API endpoints and data structures</li>
 <li><a href="../configuration/">Configuration</a>: Global configuration options</li>
 </ul>
 

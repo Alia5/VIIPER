@@ -848,34 +848,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../clients/generator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Generator Documentation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../clients/c/" class="md-nav__link">
         
   
@@ -996,6 +968,34 @@
     
   
     TypeScript Client Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clients/generator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generator Documentation
   
 
     
@@ -1235,46 +1235,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hid-report-format-host-facing" class="md-nav__link">
+  <a href="#raw-streaming-protocol" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HID report format (host-facing)
+        (RAW) Streaming protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="(RAW) Streaming protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input State
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#device-stream-protocol-client-facing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Device stream protocol (client-facing)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#adding-the-device" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding the device
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Examples
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1359,46 +1343,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hid-report-format-host-facing" class="md-nav__link">
+  <a href="#raw-streaming-protocol" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HID report format (host-facing)
+        (RAW) Streaming protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="(RAW) Streaming protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input State
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#device-stream-protocol-client-facing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Device stream protocol (client-facing)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#adding-the-device" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding the device
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Examples
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1423,44 +1391,37 @@
 
 
 <h1 id="hid-mouse">HID Mouse</h1>
-<p>A standard 5-button mouse with vertical and horizontal scroll wheels. Reports relative motion deltas and supports up to five buttons.</p>
-<ul>
-<li>USB IDs: VID 0x2E8A (Raspberry Pi), PID 0x0011</li>
-<li>Interface/Endpoint: IN 0x81 (mouse input report)</li>
-<li>Device type id (for API add): <code>mouse</code></li>
-</ul>
+<p>A standard 5-button mouse with vertical and horizontal scroll wheels.
+Reports relative motion deltas.</p>
+<p>Use <code>mouse</code> as the device type when adding a device via the API or client libraries.</p>
 <h2 id="client-library-support">Client Library Support</h2>
-<p>The wire protocol is abstracted by client libraries. The <strong>Go client</strong> includes built-in types (<code>/device/mouse</code>), and <strong>generated client libraries</strong> provide equivalent structures with proper packing.<br />
-You don't need to manually construct packets, just use the provided types and send them via the device stream.</p>
-<p>See: <a href="../../clients/go/">Go Client</a>, <a href="../../clients/generator/">Generated Client Libraries</a></p>
-<h2 id="hid-report-format-host-facing">HID report format (host-facing)</h2>
-<p>Input (device → host): 9 bytes</p>
+<p>The wire protocol is abstracted by client libraries.<br />
+The <strong>Go client</strong> includes built-in types (/device/mouse),
+and <strong>generated client libraries</strong> provide equivalent structures
+with proper packing.  </p>
+<p>You don't need to manually construct packets, just use the provided types
+and send them via the device stream.</p>
+<p>See: <a href="../../api/overview/">API Reference</a></p>
+<h2 id="raw-streaming-protocol">(RAW) Streaming protocol</h2>
+<p>The device stream is a bidirectional, raw TCP connection with fixed-size packets.</p>
+<h3 id="input-state">Input State</h3>
 <ul>
-<li>Byte 0: Buttons bitfield (bits 0..4 for buttons 1..5)</li>
-<li>Bytes 1-2: X delta (int16 little-endian, -32768 to +32767)</li>
-<li>Bytes 3-4: Y delta (int16 little-endian, -32768 to +32767)</li>
-<li>Bytes 5-6: Vertical wheel (int16 little-endian; positive up)</li>
-<li>Bytes 7-8: Horizontal wheel/pan (int16 little-endian; positive right)</li>
+<li>9-byte packets, little-endian layout:<ul>
+<li>Buttons: uint8 (1 byte, bitfield) — bits 0..4 for buttons 1..5</li>
+<li>X delta: int16 (2 bytes)<br />
+   -32768 to +32767</li>
+<li>Y delta: int16 (2 bytes)<br />
+   -32768 to +32767</li>
+<li>Vertical wheel: int16 (2 bytes)<br />
+  positive = up</li>
+<li>Horizontal wheel/pan: int16 (2 bytes)<br />
+   positive = right</li>
 </ul>
-<p>Deltas are consumed after each IN report so motion is truly relative and not repeated across host polls.</p>
-<h2 id="device-stream-protocol-client-facing">Device stream protocol (client-facing)</h2>
-<p>Wire format from your client into VIIPER:</p>
-<ul>
-<li>Fixed 9-byte packets matching the HID report layout:
-  [Buttons, dX_lo, dX_hi, dY_lo, dY_hi, Wheel_lo, Wheel_hi, Pan_lo, Pan_hi]</li>
+</li>
 </ul>
-<p>Buttons persist until changed; motion/wheel deltas are applied once and reset.</p>
-<h2 id="adding-the-device">Adding the device</h2>
-<p>Using the raw API (see <a href="../../api/overview/">API Reference</a> for details):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Create a bus</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/create\0&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Add mouse device with JSON payload</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;bus/1/add {&quot;type&quot;:&quot;mouse&quot;}\0&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
-</code></pre></div>
-<p>Or use one of the <a href="../../clients/generator/">client libraries</a> which handle the protocol automatically.</p>
-<h2 id="examples">Examples</h2>
-<p>A runnable example that periodically moves the mouse a short distance, clicks, and scrolls is provided in <code>examples/virtual_mouse/</code>.</p>
+<p>Motion and wheel deltas are consumed after each report and reset;
+buttons persist until changed.</p>
+<p>See <code>/device/mouse/inputstate.go</code> for details.</p>
 
 
 
