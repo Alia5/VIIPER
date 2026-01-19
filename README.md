@@ -87,8 +87,9 @@ For more information, see [FAQ](#why-is-this-a-standalone-executable-that-i-have
 VIIPER includes a lightweight TCP based API for device and bus management, as well as streaming device control.  
 It's designed to be trivial to drive from any language that can open a TCP socket and send null-byte-terminated commands.  
 
-> ⚠️ Most of the time, you don't need to implement that raw protocol yourself, as client libraries are available.  
-See [Client Libraries Available](docs/api/overview.md).
+> [!TIP]
+Most of the time, you don't need to implement that raw protocol yourself, as client libraries are available.  
+See [Client Libraries](docs/api/overview.md).
 
 - The TCP API uses a string-based request/response protocol terminated by null bytes (`\0`) for device and bus management.  
   - Requests have a "_path_" and optional payload (sometimes  JSON).  
