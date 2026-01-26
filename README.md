@@ -17,6 +17,8 @@
 [![crates.io downloads](https://img.shields.io/crates/d/viiper-client?logo=rust&label=downloads)](https://crates.io/crates/viiper-client)
 [![C Client Library](https://img.shields.io/badge/C_Client_Library-artifact-blueviolet)](https://github.com/Alia5/VIIPER/releases)
 [![C++ Client Library](https://img.shields.io/badge/C++_Client_Library-Header_Only-blue)](https://github.com/Alia5/VIIPER/releases)
+[![Discord](https://img.shields.io/discord/368823110817808384?logo=discord&logoColor=white&label=Discord&color=%23535fe5
+)](https://discord.gg/hs34MtcHJY)
 
 # VIIPER 🐍
 
