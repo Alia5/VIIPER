@@ -30,7 +30,7 @@ public interface IBinarySerializable
 public sealed class ViiperDevice : IAsyncDisposable, IDisposable
 {
 	private readonly TcpClient _client;
-	private readonly NetworkStream _stream;
+	private readonly Stream _stream;
 	private readonly CancellationTokenSource _cts = new();
 	private Task? _readLoop;
 	private bool _disposed;
@@ -60,7 +60,7 @@ public sealed class ViiperDevice : IAsyncDisposable, IDisposable
 		set => _onDisconnect = value;
 	}
 
-	internal ViiperDevice(TcpClient client, NetworkStream stream)
+	internal ViiperDevice(TcpClient client, Stream stream)
 	{
 		_client = client;
 		_stream = stream;

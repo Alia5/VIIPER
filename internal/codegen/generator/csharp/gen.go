@@ -38,7 +38,9 @@ func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 	if err := generateClient(logger, projectDir, md); err != nil {
 		return err
 	}
-
+	if err := generateAuthHelper(logger, projectDir); err != nil {
+		return err
+	}
 	if err := generateDevice(logger, projectDir, md); err != nil {
 		return err
 	}

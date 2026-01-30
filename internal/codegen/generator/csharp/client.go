@@ -26,6 +26,7 @@ public class ViiperClient : IDisposable
 {
     private readonly string _host;
     private readonly int _port;
+    private readonly string _password;
     private bool _disposed;
 
     /// <summary>
@@ -33,10 +34,12 @@ public class ViiperClient : IDisposable
     /// </summary>
     /// <param name="host">VIIPER server hostname or IP address</param>
     /// <param name="port">VIIPER API server port (default: 3242)</param>
-    public ViiperClient(string host, int port = 3242)
+    /// <param name="password">Authentication password (default: "" = no auth). Empty string explicitly means no authentication.</param>
+    public ViiperClient(string host, int port = 3242, string password = "")
     {
         _host = host ?? throw new ArgumentNullException(nameof(host));
         _port = port;
+        _password = password ?? "";
     }
 {{range .Routes}}{{if eq .Method "Register"}}
     /// <summary>
@@ -58,9 +61,13 @@ public class ViiperClient : IDisposable
         await client.ConnectAsync(_host, _port, cancellationToken);
         client.NoDelay = true;
         
-        using var stream = client.GetStream();
+        Stream stream = client.GetStream();
         
-		// Build command line: "path[ optional-payload]\0"
+        if (!string.IsNullOrEmpty(_password))
+        {
+            stream = await ViiperAuth.PerformHandshakeAsync(stream, _password, cancellationToken);
+        }
+        
         string commandLine = path.ToLowerInvariant();
         if (!string.IsNullOrEmpty(payload))
         {
@@ -104,7 +111,13 @@ public class ViiperClient : IDisposable
 		var client = new TcpClient();
 		await client.ConnectAsync(_host, _port, cancellationToken);
 		client.NoDelay = true;
-		var stream = client.GetStream();
+		Stream stream = client.GetStream();
+		
+		if (!string.IsNullOrEmpty(_password))
+		{
+			stream = await ViiperAuth.PerformHandshakeAsync(stream, _password, cancellationToken);
+		}
+		
 		// Streaming handshake uses null terminator (same framing as management).
 		var streamPath = $"bus/{{lb}}busId{{rb}}/{{lb}}devId{{rb}}\0";
 		var handshake = Encoding.UTF8.GetBytes(streamPath);
