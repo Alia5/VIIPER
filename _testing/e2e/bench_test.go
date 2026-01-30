@@ -34,12 +34,13 @@ const (
 func Benchmark_Xbox360_Delay(b *testing.B) {
 
 	type bench struct {
-		name   string
-		timeOn func(tw TimeWhat, b *testing.B)
+		name          string
+		timeOn        func(tw TimeWhat, b *testing.B)
+		useEncryption bool
 	}
 	benches := []bench{
 		{
-			name: "1 Go-Client-Write",
+			name: "1 Go-Client-Write (PLAIN)",
 			timeOn: func(tw TimeWhat, b *testing.B) {
 				switch tw {
 				case TimeWhat_ClientWritePress:
@@ -51,7 +52,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 			},
 		},
 		{
-			name: "2 InputDelay-Without-Client",
+			name: "2 InputDelay-Without-Client (PLAIN)",
 			timeOn: func(tw TimeWhat, b *testing.B) {
 				switch tw {
 				case TimeWhat_ClientWritePress:
@@ -63,7 +64,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 			},
 		},
 		{
-			name: "3 E2E-InputDelay",
+			name: "3 E2E-InputDelay (PLAIN)",
 			timeOn: func(tw TimeWhat, b *testing.B) {
 				switch tw {
 				case TimeWhat_ClientWritePress:
@@ -76,7 +77,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 			},
 		},
 		{
-			name: "4 E2E-PressAndRelease",
+			name: "4 E2E-PressAndRelease (PLAIN)",
 			timeOn: func(tw TimeWhat, b *testing.B) {
 				switch tw {
 				case TimeWhat_ClientWritePress:
@@ -89,6 +90,62 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 					b.StartTimer()
 				}
 			},
+		},
+		{
+			name: "1 Go-Client-Write (ENC)",
+			timeOn: func(tw TimeWhat, b *testing.B) {
+				switch tw {
+				case TimeWhat_ClientWritePress:
+					b.StartTimer()
+				case TimeWhat_WaitInput:
+				case TimeWhat_ClientWriteRelease:
+				case TimeWhat_WaitRelease:
+				}
+			},
+			useEncryption: true,
+		},
+		{
+			name: "2 InputDelay-Without-Client (ENC)",
+			timeOn: func(tw TimeWhat, b *testing.B) {
+				switch tw {
+				case TimeWhat_ClientWritePress:
+				case TimeWhat_WaitInput:
+					b.StartTimer()
+				case TimeWhat_ClientWriteRelease:
+				case TimeWhat_WaitRelease:
+				}
+			},
+			useEncryption: true,
+		},
+		{
+			name: "3 E2E-InputDelay (ENC)",
+			timeOn: func(tw TimeWhat, b *testing.B) {
+				switch tw {
+				case TimeWhat_ClientWritePress:
+					b.StartTimer()
+				case TimeWhat_WaitInput:
+					b.StartTimer()
+				case TimeWhat_ClientWriteRelease:
+				case TimeWhat_WaitRelease:
+				}
+			},
+			useEncryption: true,
+		},
+		{
+			name: "4 E2E-PressAndRelease (ENC)",
+			timeOn: func(tw TimeWhat, b *testing.B) {
+				switch tw {
+				case TimeWhat_ClientWritePress:
+					b.StartTimer()
+				case TimeWhat_WaitInput:
+					b.StartTimer()
+				case TimeWhat_ClientWriteRelease:
+					b.StartTimer()
+				case TimeWhat_WaitRelease:
+					b.StartTimer()
+				}
+			},
+			useEncryption: true,
 		},
 	}
 
@@ -115,6 +172,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 			Addr:                        ":3245",
 			AutoAttachLocalClient:       true,
 			DeviceHandlerConnectTimeout: time.Second * 5,
+			Password:                    "testpassword1234",
 		},
 		ConnectionTimeout: 5 * time.Second,
 	}
@@ -126,7 +184,10 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 			panic(err)
 		}
 	}()
-	c := apiclient.New("localhost:3245")
+
+	var c *apiclient.Client
+
+	c = apiclient.New("localhost:3245")
 	var busResp *apitypes.BusCreateResponse
 	var err error
 	for range 10 {
@@ -195,6 +256,9 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 	}()
 
 	for _, bench := range benches {
+		if bench.useEncryption {
+			c = apiclient.NewWithPassword("localhost:3245", "testpassword1234")
+		}
 		b.Run(bench.name, func(b *testing.B) {
 			for b.Loop() {
 				b.StopTimer()

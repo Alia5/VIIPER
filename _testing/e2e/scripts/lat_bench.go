@@ -25,6 +25,11 @@ package main
 //   # Default benchtime when not specified is 1000x (fixed iterations)
 //   go run ./_testing/e2e/scripts/lat_bench.go -format table              # implicit -benchtime=1000x
 //
+//   # Filter benchmarks by encryption status
+//   go run ./_testing/e2e/scripts/lat_bench.go -encryption plain          # only unencrypted (default)
+//   go run ./_testing/e2e/scripts/lat_bench.go -encryption encrypted       # only encrypted
+//   go run ./_testing/e2e/scripts/lat_bench.go -encryption both            # all benchmarks
+//
 // The tool always:
 //   * Groups repeated benchmark cycles when count > 1
 //   * Omits memory statistics (B/op, allocs/op)
@@ -50,13 +55,14 @@ import (
 )
 
 var (
-	flagFormat    = flag.String("format", "table", "Output format: markdown|table|json")
-	flagCount     = flag.Int("count", 1, "Number of benchmark runs when executing go test")
-	flagInput     = flag.String("input", "", "Optional file path with pre-recorded benchmark output to parse instead of running")
-	flagOutFile   = flag.String("out", "", "Optional output file path. If empty prints to stdout")
-	flagBenchtime = flag.String("benchtime", "", "Optional benchtime argument passed to 'go test' (e.g. 2s or 5000x, defaults to 1000x)")
-	flagTestFlags = flag.String("testflags", "", "Arbitrary additional flags passed verbatim to 'go test' (e.g. -testflags='-benchtime=5000x -timeout=120s'). Overrides -benchtime if it includes a benchtime.")
-	flagPkg       = flag.String("pkg", ".", "Package path passed to 'go test'. Default '.' (current directory).")
+	flagFormat     = flag.String("format", "table", "Output format: markdown|table|json")
+	flagCount      = flag.Int("count", 1, "Number of benchmark runs when executing go test")
+	flagInput      = flag.String("input", "", "Optional file path with pre-recorded benchmark output to parse instead of running")
+	flagOutFile    = flag.String("out", "", "Optional output file path. If empty prints to stdout")
+	flagBenchtime  = flag.String("benchtime", "", "Optional benchtime argument passed to 'go test' (e.g. 2s or 5000x, defaults to 1000x)")
+	flagTestFlags  = flag.String("testflags", "", "Arbitrary additional flags passed verbatim to 'go test' (e.g. -testflags='-benchtime=5000x -timeout=120s'). Overrides -benchtime if it includes a benchtime.")
+	flagPkg        = flag.String("pkg", ".", "Package path passed to 'go test'. Default '.' (current directory).")
+	flagEncryption = flag.String("encryption", "plain", "Filter benchmarks by encryption: plain (default, unencrypted only), encrypted (encrypted only), or both (no filtering)")
 )
 
 func main() {
@@ -82,6 +88,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "parse error: %v\n", err)
 		os.Exit(1)
 	}
+	lines = filterByEncryption(lines, *flagEncryption)
 	runs := groupRuns(lines)
 	td := tableData{Timestamp: time.Now(), Count: *flagCount}
 	for i, r := range runs {
@@ -265,6 +272,33 @@ func deriveRun(lines []benchLine) (out []derivedMetrics, notes []string) {
 		notes = append(notes, "Missing roles: "+strings.Join(missing, ", "))
 	}
 	return
+}
+
+func filterByEncryption(lines []benchLine, mode string) []benchLine {
+	mode = strings.ToLower(strings.TrimSpace(mode))
+	if mode == "both" || mode == "all" {
+		return lines
+	}
+
+	wantEncrypted := mode == "encrypted" || mode == "enc"
+	filtered := []benchLine{}
+	for _, line := range lines {
+		// Check if benchmark name contains (ENC) or (PLAIN)
+		isEncrypted := strings.Contains(strings.ToUpper(line.Name), "(ENC)")
+		isPlain := strings.Contains(strings.ToUpper(line.Name), "(PLAIN)")
+
+		if wantEncrypted && isEncrypted {
+			filtered = append(filtered, line)
+		} else if !wantEncrypted && isPlain {
+			filtered = append(filtered, line)
+		} else if !isEncrypted && !isPlain {
+			// If no encryption marker, include in plain mode by default
+			if !wantEncrypted {
+				filtered = append(filtered, line)
+			}
+		}
+	}
+	return filtered
 }
 
 func groupRuns(lines []benchLine) [][]benchLine {
