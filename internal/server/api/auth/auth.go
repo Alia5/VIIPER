@@ -43,7 +43,7 @@ func DeriveKey(password string) ([]byte, error) {
 	)
 }
 
-// DeriveSessionKey creates unique session key from master key and nonces
+// DeriveSessionKey creates unique session key from key and nonces
 // SHA mixing is used for easier client implementations
 func DeriveSessionKey(key, serverNonce, clientNonce []byte) []byte {
 	h := sha256.New()

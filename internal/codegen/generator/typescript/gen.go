@@ -37,6 +37,9 @@ func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 	if err := generateBinaryUtils(logger, utilsDir); err != nil {
 		return err
 	}
+	if err := generateAuthUtils(logger, utilsDir); err != nil {
+		return err
+	}
 	if err := generateTypes(logger, typesDir, md); err != nil {
 		return err
 	}

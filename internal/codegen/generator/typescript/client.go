@@ -18,6 +18,7 @@ import { Socket } from 'net';
 import { TextDecoder, TextEncoder } from 'util';
 import type * as Types from './types/ManagementDtos';
 import { ViiperDevice } from './ViiperDevice';
+import { performAuthHandshake } from './utils/auth';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -25,14 +26,20 @@ const decoder = new TextDecoder();
 /**
  * VIIPER management & streaming API client.
  * Request framing: <path>[ <payload>]\0 (null terminator) ; Response framing: single JSON line ending in \n then connection close.
+ * 
+ * @param host - VIIPER server hostname or IP address
+ * @param port - VIIPER API server port (default: 3242)
+ * @param password - Authentication password (default: "" = no auth). Empty string explicitly means no authentication.
  */
 export class ViiperClient {
 	private host: string;
 	private port: number;
+	private password: string;
 
-	constructor(host: string, port: number = 3242) {
+	constructor(host: string, port: number = 3242, password: string = "") {
 		this.host = host;
 		this.port = port;
+		this.password = password;
 	}
 {{range .Routes}}{{if eq .Method "Register"}}
 	/**
@@ -45,38 +52,51 @@ export class ViiperClient {
 		{{if .ResponseDTO}}return await this.sendRequest<Types.{{.ResponseDTO}}>(path, payload);{{else}}await this.sendRequest<object>(path, payload); return true;{{end}}
 	}
 {{end}}{{end}}
-	private sendRequest<T>(path: string, payload?: string | null): Promise<T> {
-		return new Promise<T>((resolve, reject) => {
+	private async sendRequest<T>(path: string, payload?: string | null): Promise<T> {
+		return new Promise<T>(async (resolve, reject) => {
 			const socket = new Socket();
-			socket.connect(this.port, this.host, () => {
-				socket.setNoDelay(true);
-				let line = path; // preserve case
-				if (payload && payload.length > 0) line += ' ' + payload;
-				line += '\0';
-				socket.write(encoder.encode(line));
-			});
-
-			let buffer = '';
-			socket.on('data', (chunk: Buffer) => {
-				buffer += decoder.decode(chunk);
-				const nlIdx = buffer.indexOf('\n');
-				if (nlIdx !== -1) {
-					const jsonLine = buffer.slice(0, nlIdx);
-					let parsed: any;
-						try {
-							parsed = JSON.parse(jsonLine);
-						} catch (e) {
-							socket.end();
-							reject(e);
-							return;
+			socket.connect(this.port, this.host, async () => {
+				try {
+					socket.setNoDelay(true);
+					
+					let wrappedSocket: Socket | any = socket;
+					if (this.password) {
+						wrappedSocket = await performAuthHandshake(socket, this.password);
+					}
+					
+					let line = path; // preserve case
+					if (payload && payload.length > 0) line += ' ' + payload;
+					line += '\0';
+					wrappedSocket.write(encoder.encode(line));
+					
+					let buffer = '';
+					const handleData = (chunk: Buffer) => {
+						buffer += decoder.decode(chunk);
+						const nlIdx = buffer.indexOf('\n');
+						if (nlIdx !== -1) {
+							const jsonLine = buffer.slice(0, nlIdx);
+							let parsed: any;
+							try {
+								parsed = JSON.parse(jsonLine);
+							} catch (e) {
+								wrappedSocket.end();
+								reject(e);
+								return;
+							}
+							if (parsed && typeof parsed === 'object' && 'status' in parsed && parsed.status >= 400) {
+								wrappedSocket.end();
+								reject(new Error(String(parsed.status) + ' ' + parsed.title + ': ' + parsed.detail));
+								return;
+							}
+							wrappedSocket.end();
+							resolve(parsed as T);
 						}
-						if (parsed && typeof parsed === 'object' && 'status' in parsed && parsed.status >= 400) {
-							socket.end();
-							reject(new Error(String(parsed.status) + ' ' + parsed.title + ': ' + parsed.detail));
-							return;
-						}
-						socket.end();
-						resolve(parsed as T);
+					};
+					
+					wrappedSocket.on('data', handleData);
+				} catch (e) {
+					socket.end();
+					reject(e);
 				}
 			});
 
@@ -86,13 +106,24 @@ export class ViiperClient {
 	}
 
 	async connectDevice(busId: number, devId: string): Promise<ViiperDevice> {
-		return new Promise<ViiperDevice>((resolve, reject) => {
+		return new Promise<ViiperDevice>(async (resolve, reject) => {
 			const socket = new Socket();
-			socket.connect(this.port, this.host, () => {
-				socket.setNoDelay(true);
-				const line = ` + "`" + `bus/${busId}/${devId}\0` + "`" + `;
-				socket.write(encoder.encode(line));
-				resolve(new ViiperDevice(socket));
+			socket.connect(this.port, this.host, async () => {
+				try {
+					socket.setNoDelay(true);
+					
+					let wrappedSocket: Socket | any = socket;
+					if (this.password) {
+						wrappedSocket = await performAuthHandshake(socket, this.password);
+					}
+					
+					const line = ` + "`" + `bus/${busId}/${devId}\0` + "`" + `;
+					wrappedSocket.write(encoder.encode(line));
+					resolve(new ViiperDevice(wrappedSocket));
+				} catch (e) {
+					socket.end();
+					reject(e);
+				}
 			});
 			socket.on('error', reject);
 		});
