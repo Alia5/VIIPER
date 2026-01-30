@@ -13,7 +13,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Alia5/VIIPER/apitypes"
 	"github.com/Alia5/VIIPER/device"
+	"github.com/Alia5/VIIPER/internal/server/api/auth"
+	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
 	"github.com/Alia5/VIIPER/internal/server/usb"
 	pusb "github.com/Alia5/VIIPER/usb"
 )
@@ -42,72 +45,72 @@ func New(s *usb.Server, addr string, config ServerConfig, logger *slog.Logger) *
 }
 
 // Router returns the router used by the API server so callers can register handlers.
-func (a *Server) Router() *Router { return a.router }
+func (s *Server) Router() *Router { return s.router }
 
 // USB returns the underlying USB server.
-func (a *Server) USB() *usb.Server { return a.usbs }
+func (s *Server) USB() *usb.Server { return s.usbs }
 
 // Config returns the server configuration.
-func (a *Server) Config() *ServerConfig { return a.config }
+func (s *Server) Config() *ServerConfig { return s.config }
 
 // Addr returns the actual address the server is listening on.
 // If Start hasn't been called yet, it returns the configured address.
-func (a *Server) Addr() string {
-	if a.ln != nil {
-		return a.ln.Addr().String()
+func (s *Server) Addr() string {
+	if s.ln != nil {
+		return s.ln.Addr().String()
 	}
-	return a.addr
+	return s.addr
 }
 
 // Start listens on the configured address and serves incoming API commands.
-func (a *Server) Start() error {
-	ln, err := net.Listen("tcp", a.addr)
+func (s *Server) Start() error {
+	ln, err := net.Listen("tcp", s.addr)
 	if err != nil {
 		return err
 	}
-	a.ln = ln
+	s.ln = ln
 
-	a.addr = ln.Addr().String()
-	a.config.Addr = a.addr
-	a.logger.Info("API listening", "addr", a.addr)
-	go a.serve()
+	s.addr = ln.Addr().String()
+	s.config.Addr = s.addr
+	s.logger.Info("API listening", "addr", s.addr)
+	go s.serve()
 	return nil
 }
 
 // Close stops the API server.
-func (a *Server) Close() {
-	if a.ln != nil {
-		_ = a.ln.Close()
+func (s *Server) Close() {
+	if s.ln != nil {
+		_ = s.ln.Close()
 	}
 }
 
-func (a *Server) serve() {
+func (s *Server) serve() {
 	for {
-		c, err := a.ln.Accept()
+		c, err := s.ln.Accept()
 		if err != nil {
 			if errors.Is(err, net.ErrClosed) || strings.Contains(strings.ToLower(err.Error()), "use of closed network connection") {
-				a.logger.Info("API server stopped")
+				s.logger.Info("API server stopped")
 				return
 			}
-			a.logger.Info("API accept error", "error", err)
+			s.logger.Info("API accept error", "error", err)
 			return
 		}
 		if tcpConn, ok := c.(*net.TCPConn); ok {
 			if err := tcpConn.SetNoDelay(true); err != nil {
-				a.logger.Warn("failed to set TCP_NODELAY", "error", err)
+				s.logger.Warn("failed to set TCP_NODELAY", "error", err)
 			}
 		}
-		go a.handleConn(c)
+		go s.handleConn(c)
 	}
 }
 
-func (a *Server) writeError(w io.Writer, err error) {
-	apiErr := WrapError(err)
+func (s *Server) writeError(w io.Writer, err error) {
+	apiErr := apierror.WrapError(err)
 	problemJSON, _ := json.Marshal(apiErr)
 	fmt.Fprintf(w, "%s\n", string(problemJSON))
 }
 
-func (a *Server) writeOK(w io.Writer, rest string) {
+func (s *Server) writeOK(w io.Writer, rest string) {
 	if rest == "" {
 		fmt.Fprintln(w)
 	} else {
@@ -115,15 +118,62 @@ func (a *Server) writeOK(w io.Writer, rest string) {
 	}
 }
 
-func (a *Server) handleConn(conn net.Conn) {
+func (s *Server) handleConn(conn net.Conn) {
 	defer conn.Close()
 
 	connCtx, connCancel := context.WithCancel(context.Background())
 	defer connCancel()
 
-	connLogger := a.logger.With("remote", conn.RemoteAddr().String())
+	connLogger := s.logger.With("remote", conn.RemoteAddr().String())
 	r := bufio.NewReader(conn)
 	w := conn
+
+	isAuth, err := auth.IsAuthHandshake(r)
+	if err != nil {
+		connLogger.Error("api handshake check", "error", err)
+		// continue as unauthenticated
+	}
+
+	if !isAuth && s.requiresAuth(conn.RemoteAddr()) {
+		connLogger.Error("authentication required")
+		s.writeError(w, apierror.ErrUnauthorized("authentication required"))
+		return
+	}
+
+	if isAuth {
+		connLogger.Debug("Detected auth attempt")
+		key, err := auth.DeriveKey(s.config.Password)
+		if err != nil {
+			connLogger.Error("derive key failed", "error", err)
+			return
+		}
+
+		clientNonce, serverNonce, err := auth.HandleAuthHandshake(r, w, key, false)
+		if err != nil {
+			var apiErr apitypes.ApiError
+			if errors.As(err, &apiErr) {
+				connLogger.Error("auth handshake failed", "error", err)
+				s.writeError(w, err)
+				return
+			}
+			connLogger.Error("auth handshake failed", "error", err)
+			return
+		}
+
+		sessionKey := auth.DeriveSessionKey(key, serverNonce, clientNonce)
+		secConn, err := auth.WrapConn(conn, sessionKey)
+		if err != nil {
+			connLogger.Error("wrap secure conn failed", "error", err)
+			return
+		}
+		conn = secConn
+		r = bufio.NewReader(conn)
+		w = conn
+
+		connLogger.Debug("authenticated connection established")
+	} else {
+		connLogger.Debug("continuing unauthenticated connection")
+	}
 
 	// Read until null terminator
 	reqData, err := r.ReadString('\x00')
@@ -140,7 +190,7 @@ func (a *Server) handleConn(conn net.Conn) {
 
 	if reqData == "" {
 		connLogger.Error("api empty command")
-		a.writeError(w, ErrBadRequest("empty request"))
+		s.writeError(w, apierror.ErrBadRequest("empty request"))
 		return
 	}
 
@@ -159,45 +209,45 @@ func (a *Server) handleConn(conn net.Conn) {
 
 	if path == "" {
 		connLogger.Error("api empty path")
-		a.writeError(w, ErrBadRequest("empty path"))
+		s.writeError(w, apierror.ErrBadRequest("empty path"))
 		return
 	}
 
 	path = strings.ToLower(path)
 	connLogger.Info("api cmd", "path", path)
 
-	if h, params := a.router.Match(path); h != nil {
+	if h, params := s.router.Match(path); h != nil {
 		req := &Request{Ctx: connCtx, Params: params, Payload: payload}
 		res := &Response{}
 		if err := h(req, res, connLogger); err != nil {
 			connLogger.Error("api handler error", "path", path, "error", err)
-			a.writeError(w, err)
+			s.writeError(w, err)
 			return
 		}
 		connLogger.Debug("api handler success", "path", path)
-		a.writeOK(w, res.JSON)
+		s.writeOK(w, res.JSON)
 		return
-	} else if sh, params := a.router.MatchStream(path); sh != nil {
+	} else if sh, params := s.router.MatchStream(path); sh != nil {
 		connLogger.Info("api stream begin", "path", path)
 		busIDStr, ok := params["busId"]
 		if !ok {
-			a.writeError(w, ErrBadRequest("missing busId parameter"))
+			s.writeError(w, apierror.ErrBadRequest("missing busId parameter"))
 			return
 		}
 		devIDStr, ok := params["deviceid"]
 		if !ok {
-			a.writeError(w, ErrBadRequest("missing deviceid parameter"))
+			s.writeError(w, apierror.ErrBadRequest("missing deviceid parameter"))
 			return
 		}
 
 		busID, err := strconv.ParseUint(busIDStr, 10, 32)
 		if err != nil {
-			a.writeError(w, ErrBadRequest(fmt.Sprintf("invalid busId: %v", err)))
+			s.writeError(w, apierror.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err)))
 			return
 		}
-		bus := a.usbs.GetBus(uint32(busID))
+		bus := s.usbs.GetBus(uint32(busID))
 		if bus == nil {
-			a.writeError(w, ErrNotFound(fmt.Sprintf("bus %d not found", busID)))
+			s.writeError(w, apierror.ErrNotFound(fmt.Sprintf("bus %d not found", busID)))
 			return
 		}
 		var dev pusb.Device
@@ -211,7 +261,7 @@ func (a *Server) handleConn(conn net.Conn) {
 			}
 		}
 		if dev == nil || devCtx == nil {
-			a.writeError(w, ErrNotFound(fmt.Sprintf("device %s not found on bus %d", devIDStr, busID)))
+			s.writeError(w, apierror.ErrNotFound(fmt.Sprintf("device %s not found on bus %d", devIDStr, busID)))
 			return
 		}
 
@@ -228,7 +278,7 @@ func (a *Server) handleConn(conn net.Conn) {
 
 		connTimer = device.GetConnTimer(devCtx)
 		if connTimer != nil {
-			connTimer.Reset(a.config.DeviceHandlerConnectTimeout)
+			connTimer.Reset(s.config.DeviceHandlerConnectTimeout)
 			go func() {
 				select {
 				case <-devCtx.Done():
@@ -253,5 +303,25 @@ func (a *Server) handleConn(conn net.Conn) {
 		return
 	}
 	connLogger.Error("api unknown path", "path", path)
-	a.writeError(w, ErrNotFound(fmt.Sprintf("unknown path: %s", path)))
+	s.writeError(w, apierror.ErrNotFound(fmt.Sprintf("unknown path: %s", path)))
+}
+
+func (s *Server) isLocalHostClient(addr net.Addr) bool {
+	host, _, err := net.SplitHostPort(addr.String())
+	if err != nil {
+		return false
+	}
+	switch host {
+	case "localhost", "127.0.0.1", "[::1]", "::1":
+		return true
+	}
+
+	return false
+}
+
+func (s *Server) requiresAuth(addr net.Addr) bool {
+	if s.isLocalHostClient(addr) {
+		return s.config.RequireLocalHostAuth
+	}
+	return true
 }

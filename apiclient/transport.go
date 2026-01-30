@@ -1,6 +1,7 @@
 package apiclient
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -10,6 +11,9 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/Alia5/VIIPER/internal/server/api/auth"
+	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
 )
 
 // Config controls low-level transport behavior such as timeouts.
@@ -17,6 +21,7 @@ type Config struct {
 	DialTimeout  time.Duration
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
+	Password     string
 }
 
 func defaultConfig() Config {
@@ -41,6 +46,12 @@ type Transport struct {
 
 // NewTransport creates a new low-level transport.
 func NewTransport(addr string) *Transport { return NewTransportWithConfig(addr, nil) }
+
+func NewTransportWithPassword(addr, password string) *Transport {
+	cfg := defaultConfig()
+	cfg.Password = password
+	return NewTransportWithConfig(addr, &cfg)
+}
 
 // NewTransportWithConfig creates a new low-level transport with optional timeouts configuration.
 func NewTransportWithConfig(addr string, cfg *Config) *Transport {
@@ -67,14 +78,14 @@ func NewMockTransport(responder func(path string, payload any, pathParams map[st
 //	string -> UTF-8 bytes
 //	struct/other -> JSON marshaled bytes
 //	nil -> no payload appended
-func (c *Transport) Do(path string, payload any, pathParams map[string]string) (string, error) {
-	return c.DoCtx(context.Background(), path, payload, pathParams)
+func (t *Transport) Do(path string, payload any, pathParams map[string]string) (string, error) {
+	return t.DoCtx(context.Background(), path, payload, pathParams)
 }
 
 // DoCtx is like Do but honors the provided context and configured timeouts.
-func (c *Transport) DoCtx(ctx context.Context, path string, payload any, pathParams map[string]string) (string, error) {
-	if c.mock != nil {
-		return c.mock(path, payload, pathParams)
+func (t *Transport) DoCtx(ctx context.Context, path string, payload any, pathParams map[string]string) (string, error) {
+	if t.mock != nil {
+		return t.mock(path, payload, pathParams)
 	}
 	fullPath := fillPath(path, pathParams)
 	var lineBytes []byte
@@ -86,8 +97,8 @@ func (c *Transport) DoCtx(ctx context.Context, path string, payload any, pathPar
 	if err := ctx.Err(); err != nil {
 		return "", fmt.Errorf("dial: %w", err)
 	}
-	d := &net.Dialer{Timeout: c.cfg.DialTimeout}
-	conn, err := d.DialContext(ctx, "tcp", c.addr)
+	d := &net.Dialer{Timeout: t.cfg.DialTimeout}
+	conn, err := d.DialContext(ctx, "tcp", t.addr)
 	if err != nil {
 		return "", fmt.Errorf("dial: %w", err)
 	}
@@ -99,26 +110,45 @@ func (c *Transport) DoCtx(ctx context.Context, path string, payload any, pathPar
 		}
 	}
 
-	if c.cfg.WriteTimeout > 0 {
-		_ = conn.SetWriteDeadline(time.Now().Add(c.cfg.WriteTimeout))
+	if t.cfg.WriteTimeout > 0 {
+		_ = conn.SetWriteDeadline(time.Now().Add(t.cfg.WriteTimeout))
 	}
-	// Send request with null terminator
+
+	if t.cfg.Password != "" {
+		key, err := auth.DeriveKey(t.cfg.Password)
+		if err != nil {
+			return "", err
+		}
+		r := bufio.NewReader(conn)
+		clientNonce, serverNonce, err := auth.HandleAuthHandshake(r, conn, key, true)
+		if err != nil {
+
+			if strings.Contains(err.Error(), "read handshake response: EOF") {
+				return "", apierror.ErrUnauthorized("invalid password")
+			}
+			return "", err
+		}
+		sessionKey := auth.DeriveSessionKey(key, serverNonce, clientNonce)
+		conn, err = auth.WrapConn(conn, sessionKey)
+		if err != nil {
+			conn.Close()
+			return "", err
+		}
+	}
+
 	if _, err := conn.Write(append(lineBytes, '\x00')); err != nil {
 		return "", fmt.Errorf("write: %w", err)
 	}
-	if c.cfg.ReadTimeout > 0 {
-		_ = conn.SetReadDeadline(time.Now().Add(c.cfg.ReadTimeout))
+	if t.cfg.ReadTimeout > 0 {
+		_ = conn.SetReadDeadline(time.Now().Add(t.cfg.ReadTimeout))
 	}
 	respBytes, err := io.ReadAll(conn)
 	if err != nil && len(respBytes) == 0 {
 		return "", fmt.Errorf("read: %w", err)
 	}
 	resp := string(respBytes)
-	// Trim exactly one trailing newline if present.
-	if strings.HasSuffix(resp, "\n") {
-		resp = strings.TrimSuffix(resp, "\n")
-	}
-	return resp, nil
+
+	return strings.TrimSuffix(resp, "\n"), nil
 }
 
 func fillPath(pattern string, params map[string]string) string {

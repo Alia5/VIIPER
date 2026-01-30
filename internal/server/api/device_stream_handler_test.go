@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/Alia5/VIIPER/device"
-	"github.com/Alia5/VIIPER/device/xbox360"
+	"github.com/Alia5/VIIPER/device/keyboard"
 	htesting "github.com/Alia5/VIIPER/internal/_testing"
 	th "github.com/Alia5/VIIPER/internal/_testing"
 	"github.com/Alia5/VIIPER/internal/log"
@@ -29,7 +29,7 @@ func TestDeviceStreamHandler_Dispatch(t *testing.T) {
 	bus, err := virtualbus.NewWithBusId(90001)
 	require.NoError(t, err)
 	require.NoError(t, srv.AddBus(bus))
-	dev := xbox360.New(nil)
+	dev := keyboard.New(nil)
 	devCtx, err := bus.Add(dev)
 	require.NoError(t, err)
 
@@ -54,15 +54,15 @@ func TestDeviceStreamHandler_Dispatch(t *testing.T) {
 	require.NotNil(t, dv)
 
 	handlerCalled := make(chan bool, 1)
-	testReg := th.CreateMockRegistration(t, "xbox360",
-		func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+	testReg := th.CreateMockRegistration(t, "keyboard",
+		func(o *device.CreateOptions) pusb.Device { return keyboard.New(o) },
 		func(conn net.Conn, d *pusb.Device, l *slog.Logger) error {
 			handlerCalled <- true
 			return nil
 		},
 	)
 
-	api.RegisterDevice("xbox360", testReg)
+	api.RegisterDevice("keyboard", testReg)
 
 	clientConn, serverConn := net.Pipe()
 	defer clientConn.Close()
@@ -91,7 +91,7 @@ func TestAPIServer_StreamRoute_DispatchE2E(t *testing.T) {
 	bus, err := virtualbus.NewWithBusId(70001)
 	require.NoError(t, err)
 	require.NoError(t, srv.AddBus(bus))
-	dev := xbox360.New(nil)
+	dev := keyboard.New(nil)
 	devCtx, err := bus.Add(dev)
 	require.NoError(t, err)
 	meta := device.GetDeviceMeta(devCtx)
@@ -109,14 +109,14 @@ func TestAPIServer_StreamRoute_DispatchE2E(t *testing.T) {
 	require.NotEmpty(t, deviceID)
 
 	handlerCalled := make(chan struct{}, 1)
-	testReg := th.CreateMockRegistration(t, "xbox360",
-		func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+	testReg := th.CreateMockRegistration(t, "keyboard",
+		func(o *device.CreateOptions) pusb.Device { return keyboard.New(o) },
 		func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error {
 			handlerCalled <- struct{}{}
 			return nil
 		},
 	)
-	api.RegisterDevice("xbox360", testReg)
+	api.RegisterDevice("keyboard", testReg)
 
 	c, err := net.Dial("tcp", addr)
 	require.NoError(t, err)

@@ -13,6 +13,7 @@ import (
 
 	apitypes "github.com/Alia5/VIIPER/apitypes"
 	"github.com/Alia5/VIIPER/device"
+	"github.com/Alia5/VIIPER/internal/server/api/auth"
 )
 
 // DeviceStream represents a bidirectional connection to a device stream.
@@ -43,6 +44,24 @@ func (c *Client) OpenStream(ctx context.Context, busID uint32, devID string) (*D
 	if tcpConn, ok := conn.(*net.TCPConn); ok {
 		if err := tcpConn.SetNoDelay(true); err != nil {
 			slog.Warn("failed to set TCP_NODELAY", "error", err)
+		}
+	}
+
+	if c.transport.cfg.Password != "" {
+		key, err := auth.DeriveKey(c.transport.cfg.Password)
+		if err != nil {
+			return nil, err
+		}
+		r := bufio.NewReader(conn)
+		clientNonce, serverNonce, err := auth.HandleAuthHandshake(r, conn, key, true)
+		if err != nil {
+			return nil, err
+		}
+		sessionKey := auth.DeriveSessionKey(key, serverNonce, clientNonce)
+		conn, err = auth.WrapConn(conn, sessionKey)
+		if err != nil {
+			conn.Close()
+			return nil, err
 		}
 	}
 

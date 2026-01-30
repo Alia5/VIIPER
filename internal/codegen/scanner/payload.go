@@ -261,8 +261,10 @@ func blockReturnsError(block *ast.BlockStmt) bool {
 		for _, res := range ret.Results {
 			if call, ok := res.(*ast.CallExpr); ok {
 				if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
-					if ident, ok := sel.X.(*ast.Ident); ok && ident.Name == "api" && strings.HasPrefix(sel.Sel.Name, "Err") {
-						return true
+					if ident, ok := sel.X.(*ast.Ident); ok {
+						if (ident.Name == "api" || ident.Name == "apierror") && strings.HasPrefix(sel.Sel.Name, "Err") {
+							return true
+						}
 					}
 				}
 			}

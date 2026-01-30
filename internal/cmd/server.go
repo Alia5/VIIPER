@@ -6,15 +6,21 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"path"
+	"strings"
 	"syscall"
 	"time"
 
+	"github.com/Alia5/VIIPER/internal/configpaths"
 	"github.com/Alia5/VIIPER/internal/log"
 	"github.com/Alia5/VIIPER/internal/server/api"
+	"github.com/Alia5/VIIPER/internal/server/api/auth"
 	"github.com/Alia5/VIIPER/internal/server/api/handler"
 	"github.com/Alia5/VIIPER/internal/server/usb"
 	"github.com/Alia5/VIIPER/internal/util"
 )
+
+const keyFileName = "viiper.key.txt"
 
 type Server struct {
 	UsbServerConfig   usb.ServerConfig `embed:"" prefix:"usb."`
@@ -35,6 +41,35 @@ func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger
 	s.UsbServerConfig.BusCleanupTimeout = s.ApiServerConfig.DeviceHandlerConnectTimeout
 
 	logger.Info("Starting VIIPER USB-IP server", "addr", s.UsbServerConfig.Addr)
+
+	keyFileDir, err := configpaths.DefaultConfigDir()
+	if err != nil {
+		return fmt.Errorf("failed to resolve key file path: %w", err)
+	}
+	keyFilePath := path.Join(keyFileDir, keyFileName)
+	if pwd, err := os.ReadFile(keyFilePath); err == nil {
+		s.ApiServerConfig.Password = strings.TrimSpace(string(pwd))
+	} else {
+		newPwd, err := auth.GenerateKey()
+		if err != nil {
+			return fmt.Errorf("failed to generate new API password: %w", err)
+		}
+		if err := os.MkdirAll(keyFileDir, 0o700); err != nil {
+			return fmt.Errorf("failed to create config dir for key file: %w", err)
+		}
+		if err := os.WriteFile(keyFilePath, []byte(newPwd), 0o600); err != nil {
+			return fmt.Errorf("failed to write new API password to file: %w", err)
+		}
+		s.ApiServerConfig.Password = newPwd
+		logger.Info("Generated API server password", "path", keyFilePath)
+		logger.Info("-------------------------------------")
+		logger.Info("Your VIIPER API server password is:")
+		logger.Info("-------------------------------------")
+		logger.Info(newPwd)
+		logger.Info("-------------------------------------")
+		logger.Info("You can change this password at any time by editing the file")
+	}
+
 	usbSrv := usb.New(s.UsbServerConfig, logger, rawLogger)
 
 	usbErrCh := make(chan error, 1)

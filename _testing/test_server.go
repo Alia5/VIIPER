@@ -17,10 +17,9 @@ type MockServer struct {
 	UsbServer *usb.Server
 }
 
-func NewTestServer(t *testing.T) *MockServer {
+func NewTestServerWithConfig(t *testing.T, cfg *config.CLI) *MockServer {
 	t.Helper()
 
-	cfg := TestServerConfig(t)
 	logger := slog.Default()
 
 	usbServer := usb.New(cfg.Server.UsbServerConfig, logger, nil)
@@ -50,6 +49,13 @@ func NewTestServer(t *testing.T) *MockServer {
 			logger,
 		),
 	}
+}
+
+func NewTestServer(t *testing.T) *MockServer {
+	t.Helper()
+
+	cfg := TestServerConfig(t)
+	return NewTestServerWithConfig(t, cfg)
 }
 
 func TestServerConfig(t *testing.T) *config.CLI {

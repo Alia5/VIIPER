@@ -10,6 +10,7 @@ import (
 	"github.com/Alia5/VIIPER/apitypes"
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/internal/server/api"
+	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
 	usbs "github.com/Alia5/VIIPER/internal/server/usb"
 )
 
@@ -18,33 +19,33 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 	return func(req *api.Request, res *api.Response, logger *slog.Logger) error {
 		idStr, ok := req.Params["id"]
 		if !ok {
-			return api.ErrBadRequest("missing id parameter")
+			return apierror.ErrBadRequest("missing id parameter")
 		}
 		busID, err := strconv.ParseUint(idStr, 10, 32)
 		if err != nil {
-			return api.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
+			return apierror.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
 		}
 		b := s.GetBus(uint32(busID))
 		if b == nil {
-			return api.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
+			return apierror.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
 		}
 		if req.Payload == "" {
-			return api.ErrBadRequest("missing payload")
+			return apierror.ErrBadRequest("missing payload")
 		}
 		var deviceCreateReq apitypes.DeviceCreateRequest
 		err = json.Unmarshal([]byte(req.Payload), &deviceCreateReq)
 		if err != nil {
-			return api.ErrBadRequest(fmt.Sprintf("invalid JSON payload: %v", err))
+			return apierror.ErrBadRequest(fmt.Sprintf("invalid JSON payload: %v", err))
 		}
 		if deviceCreateReq.Type == nil {
-			return api.ErrBadRequest("missing device type")
+			return apierror.ErrBadRequest("missing device type")
 		}
 
 		name := strings.ToLower(*deviceCreateReq.Type)
 
 		reg := api.GetRegistration(name)
 		if reg == nil {
-			return api.ErrBadRequest(fmt.Sprintf("unknown device type: %s", name))
+			return apierror.ErrBadRequest(fmt.Sprintf("unknown device type: %s", name))
 		}
 
 		opts := device.CreateOptions{
@@ -55,12 +56,12 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 		dev := reg.CreateDevice(&opts)
 		devCtx, err := b.Add(dev)
 		if err != nil {
-			return api.ErrInternal(fmt.Sprintf("failed to add device to bus: %v", err))
+			return apierror.ErrInternal(fmt.Sprintf("failed to add device to bus: %v", err))
 		}
 
 		exportMeta := device.GetDeviceMeta(devCtx)
 		if exportMeta == nil {
-			return api.ErrInternal("failed to get device metadata from context")
+			return apierror.ErrInternal("failed to get device metadata from context")
 		}
 
 		connTimer := device.GetConnTimer(devCtx)
@@ -92,7 +93,7 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 			)
 			if err != nil {
 				logger.Error("failed to auto-attach localhost client", "error", err)
-				return api.ErrConflict(fmt.Sprintf(
+				return apierror.ErrConflict(fmt.Sprintf(
 					"Failed to auto-attach device: %v", err,
 				))
 			}
@@ -106,7 +107,7 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 			Type:  name,
 		})
 		if err != nil {
-			return api.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))
+			return apierror.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))
 		}
 
 		res.JSON = string(payload)

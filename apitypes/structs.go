@@ -17,15 +17,7 @@ type ApiError struct {
 	Detail string `json:"detail"`
 }
 
-type PingResponse struct {
-	Server  string `json:"server"`
-	Version string `json:"version"`
-}
-
-func (e *ApiError) Error() string {
-	if e == nil {
-		return "<nil>"
-	}
+func (e ApiError) Error() string {
 	if e.Status == 0 && e.Title == "" {
 		return "unknown error"
 	}
@@ -33,6 +25,13 @@ func (e *ApiError) Error() string {
 		return fmt.Sprintf("%s: %s", e.Title, e.Detail)
 	}
 	return fmt.Sprintf("%d %s: %s", e.Status, e.Title, e.Detail)
+}
+
+// --
+
+type PingResponse struct {
+	Server  string `json:"server"`
+	Version string `json:"version"`
 }
 
 type BusListResponse struct {

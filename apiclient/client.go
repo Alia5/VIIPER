@@ -19,6 +19,11 @@ type Client struct{ transport *Transport }
 // The addr parameter specifies the TCP address (host:port) of the VIIPER API server.
 func New(addr string) *Client { return &Client{transport: NewTransport(addr)} }
 
+// NewWithPassword constructs a client that authenticates with the given password.
+func NewWithPassword(addr, password string) *Client {
+	return &Client{transport: NewTransportWithPassword(addr, password)}
+}
+
 // NewWithConfig constructs a client with custom transport timeouts.
 func NewWithConfig(addr string, cfg *Config) *Client {
 	return &Client{transport: NewTransportWithConfig(addr, cfg)}

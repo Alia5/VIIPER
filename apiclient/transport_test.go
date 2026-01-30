@@ -1,13 +1,18 @@
 package apiclient_test
 
 import (
+	"bufio"
 	"encoding/json"
+	"errors"
+	"log/slog"
 	"net"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/Alia5/VIIPER/apiclient"
+	apitypes "github.com/Alia5/VIIPER/apitypes"
+	"github.com/Alia5/VIIPER/internal/server/api/auth"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -152,4 +157,112 @@ func TestTransportMultiLineResponse(t *testing.T) {
 	out, err := client.Do("echo", nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "{\n  \"a\": 1,\n  \"b\": 2\n}", out)
+}
+
+func TestEncryptedTransport(t *testing.T) {
+	type testCase struct {
+		name          string
+		password      string
+		serverHandler func(t *testing.T, conn net.Conn)
+		line          string
+		expectedErr   error
+	}
+
+	echoHandler := func(t *testing.T, conn net.Conn) {
+		defer conn.Close()
+		r := bufio.NewReader(conn)
+
+		key, err := auth.DeriveKey("test123")
+		assert.NoError(t, err)
+
+		clientNonce, serverNonce, err := auth.HandleAuthHandshake(r, conn, key, false)
+		if err != nil {
+			var apiErr apitypes.ApiError
+			if errors.As(err, &apiErr) {
+				b, err := json.Marshal(apiErr)
+				if err != nil {
+					slog.Error("failed to marshal api error", "error", err)
+					return
+				}
+				_, _ = conn.Write(append(b, '\n'))
+				return
+			}
+			return
+		}
+
+		sessionKey := auth.DeriveSessionKey(key, serverNonce, clientNonce)
+		secureConn, err := auth.WrapConn(conn, sessionKey)
+		assert.NoError(t, err)
+
+		rr := bufio.NewReader(secureConn)
+		line, err := rr.ReadString('\x00')
+		if err != nil {
+			return
+		}
+
+		_, err = secureConn.Write([]byte(line))
+		assert.NoError(t, err)
+	}
+
+	cases := []testCase{
+		{
+			name:          "success",
+			password:      "test123",
+			serverHandler: echoHandler,
+			line:          "echo hi",
+		},
+		{
+			name:          "wrong password",
+			password:      "wrongpass",
+			serverHandler: echoHandler,
+			expectedErr:   errors.New("401 Unauthorized: invalid password"),
+		},
+		{
+			name:     "bad handshake response",
+			password: "test123",
+			serverHandler: func(t *testing.T, conn net.Conn) {
+				defer conn.Close()
+				_, _ = conn.Write([]byte("NO\x00" + strings.Repeat("x", 32)))
+			},
+			expectedErr: errors.New(""),
+		},
+		{
+			name:     "server closes early",
+			password: "test123",
+			serverHandler: func(t *testing.T, conn net.Conn) {
+				_ = conn.Close()
+			},
+			expectedErr: errors.New(""),
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ln, err := net.Listen("tcp", "127.0.0.1:0")
+			assert.NoError(t, err)
+			defer ln.Close()
+
+			go func() {
+				conn, err := ln.Accept()
+				if err != nil {
+					return
+				}
+				tc.serverHandler(t, conn)
+			}()
+
+			client := apiclient.NewTransportWithPassword(ln.Addr().String(), tc.password)
+			path, payload, _ := strings.Cut(tc.line, " ")
+			out, err := client.Do(path, payload, nil)
+
+			if tc.expectedErr != nil {
+				assert.Error(t, err)
+				assert.ErrorContains(t, err, tc.expectedErr.Error())
+				return
+			}
+
+			assert.NoError(t, err)
+			resp := strings.TrimSuffix(out, "\x00")
+			assert.Equal(t, tc.line, resp)
+		})
+	}
 }
