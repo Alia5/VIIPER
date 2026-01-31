@@ -1,8 +1,10 @@
 ignore:
   - "examples/go/**/*"
-  - "**/_testing/**/*.go"
+  - "**/_testing/**/*"
   - "cmd/viiper/**/*"
-  - "docs"
+  - "docs/**/*"
+  - "tests/e2e/**/*"
+  - "internal/codegen/**/*"
 
 coverage:
   status:
