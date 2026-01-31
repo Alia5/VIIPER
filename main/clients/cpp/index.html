@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../c/">
+        <link rel="prev" href="../go/">
       
       
         <link rel="next" href="../csharp/">
@@ -852,34 +852,6 @@
     
   
     Go Client
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../c/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C Client Library
   
 
     
@@ -1976,6 +1948,11 @@
 <p>The C++ client library requires a JSON library to be provided by the user. You <strong>must</strong> define <code>VIIPER_JSON_INCLUDE</code>, <code>VIIPER_JSON_NAMESPACE</code>, and <code>VIIPER_JSON_TYPE</code> before including the client library headers.</p>
 <p><strong>Recommended</strong>: <a href="https://github.com/nlohmann/json">nlohmann/json</a> - a header-only JSON library that can be easily integrated.</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">OpenSSL Required</p>
+<p>The C++ client library requires OpenSSL for encrypted connections to VIIPER servers with authentication enabled.<br />
+Ensure OpenSSL is installed and linked in your project.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">License</p>
 <p>The C++ client library is licensed under the <strong>MIT License</strong>, providing maximum flexibility for integration into your projects.<br />
@@ -2241,23 +2218,27 @@ The VIIPER server automatically removes the device when the stream is closed aft
 <h2 id="examples">Examples</h2>
 <p>Full working examples are available in the repository:</p>
 <ul>
-<li><strong>Virtual Keyboard</strong>: <code>examples/cpp/virtual_keyboard.cpp</code></li>
-<li>Types "Hello!" every 5 seconds using generated maps</li>
 <li>
-<p>Displays LED feedback in console</p>
+<p><strong>Virtual Keyboard</strong>: <code>examples/cpp/virtual_keyboard.cpp</code></p>
+<ul>
+<li>Types "Hello!" every 5 seconds using generated maps</li>
+<li>Displays LED feedback in console</li>
+</ul>
 </li>
 <li>
 <p><strong>Virtual Mouse</strong>: <code>examples/cpp/virtual_mouse.cpp</code></p>
-</li>
+<ul>
 <li>Moves cursor in a circle pattern</li>
-<li>
-<p>Demonstrates button clicks</p>
+<li>Demonstrates button clicks</li>
+</ul>
 </li>
 <li>
 <p><strong>Virtual Xbox360 Controller</strong>: <code>examples/cpp/virtual_x360_pad.cpp</code></p>
-</li>
+<ul>
 <li>Cycles through buttons A, B, X, Y</li>
 <li>Handles rumble feedback</li>
+</ul>
+</li>
 </ul>
 <h3 id="building-examples">Building Examples</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nb">cd</span><span class="w"> </span>examples/cpp
@@ -2290,7 +2271,6 @@ The VIIPER server automatically removes the device when the stream is closed aft
 <h2 id="see-also">See Also</h2>
 <ul>
 <li><a href="../generator/">Generator Documentation</a>: How generated client libraries work</li>
-<li><a href="../c/">C Client Library Documentation</a>: Pure C alternative</li>
 <li><a href="../rust/">Rust Client Library Documentation</a>: Rust client library with sync/async support</li>
 <li><a href="../csharp/">C# Client Library Documentation</a>: .NET client library</li>
 <li><a href="../typescript/">TypeScript Client Library Documentation</a>: Node.js client library</li>

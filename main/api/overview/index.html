@@ -1147,34 +1147,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../clients/c/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C Client Library
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../clients/cpp/" class="md-nav__link">
         
   
@@ -1879,7 +1851,6 @@ For most use cases, you should use one of the provided client libraries rather t
 <ul>
 <li><a href="../../clients/go/">Go Client</a>: Reference implementation included in the repository</li>
 <li><a href="../../clients/generator/">Generator Documentation</a>: Information about code generation</li>
-<li><a href="../../clients/c/">C Client Library</a>: Generated C library with type-safe device streams</li>
 <li><a href="../../clients/cpp/">C++ Client Library</a>: Header-only C++20 library (requires external JSON parser)</li>
 <li><a href="../../clients/csharp/">C# Client Library</a>: Generated .NET library with async/await support</li>
 <li><a href="../../clients/typescript/">TypeScript Client Library</a>: Generated Node.js library with EventEmitter streams</li>
@@ -1892,8 +1863,10 @@ For most use cases, you should use one of the provided client libraries rather t
 If you ever worked with HTTP APIs before, you'll feel right at home.<br />
 The exception to this are the device-control and feedback streams, which are raw binary streams specific to each device type.</p>
 <ul>
-<li><strong>Transport</strong>: TCP</li>
+<li><strong>Transport</strong>: TCP with optional encryption (ChaCha20-Poly1305)</li>
 <li><strong>Default listen address</strong>: <code>:3242</code> (configurable via <code>--api.addr</code>)</li>
+<li><strong>Authentication</strong>: Required for remote connections, optional for localhost (password-based with HMAC validation)</li>
+<li><strong>Encryption</strong>: Automatic for authenticated connections (ChaCha20-Poly1305 with unique session keys)</li>
 <li><strong>Request format</strong>: a single ASCII/UTF‑8 line terminated by <code>\0</code></li>
 <li><strong>Routing</strong>: path followed by optional payload separated by whitespace<br />
   (e.g., <code>bus/list\0</code> or <code>bus/create 5\0</code>)</li>
@@ -1909,6 +1882,20 @@ The exception to this are the device-control and feedback streams, which are raw
 <div class="admonition warning">
 <p class="admonition-title">Connection timing and auto‑cleanup</p>
 <p>After you add a device with <code>bus/{id}/add</code>, you must connect to its streaming endpoint within the configured <code>DeviceHandlerConnectTimeout</code> (default: 5s). If no stream connection is established in time, the device is automatically removed. Likewise, when a stream disconnects, a reconnection timer with the same timeout starts; if the client doesn’t reconnect before it expires, the device is removed.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Authentication Required for Remote Connections</p>
+<p><strong>VIIPER requires authentication for all non-localhost connections.</strong>  </p>
+<ul>
+<li><strong>Localhost clients</strong> (<code>127.0.0.1</code>, <code>::1</code>, <code>localhost</code>): Authentication is <strong>optional</strong> (but supported) by default</li>
+<li><strong>Remote clients</strong>: Authentication is <strong>required</strong> and enforced</li>
+</ul>
+<p>On first start, VIIPER generates a random password
+and saves it to <code>&lt;USER_CONFIG_DIR&gt;/viiper.key.txt</code>.<br />
+Windows: <code>%APPDATA%\VIIPER\viiper.key.txt</code><br />
+Linux: <code>~/.config/viiper/viiper.key.txt</code></p>
+<p>Remote clients must provide this password to establish a connection.  </p>
+<p>See the <a href="../../cli/configuration/">Configuration</a> documentation for details on password management and the <code>--api.require-localhost-auth</code> option.</p>
 </div>
 <h2 id="endpoints">Endpoints</h2>
 <div class="admonition info">

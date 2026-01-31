@@ -1058,34 +1058,6 @@
   
   
     <li class="md-nav__item">
-      <a href="clients/c/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C Client Library
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="clients/cpp/" class="md-nav__link">
         
   
@@ -1687,17 +1659,29 @@ It's designed to be trivial to drive from any language that can open a TCP socke
 See <a href="api/overview/">Client Libraries Available</a>.</p>
 </div>
 <ul>
-<li>The TCP API uses a string-based request/response protocol terminated by null bytes (<code>\0</code>) for device and bus management.  </li>
+<li>The TCP API uses a string-based request/response protocol
+  terminated by null bytes (<code>\0</code>) for device and bus management.  <ul>
 <li>Requests have a "<em>path</em>" and optional payload (sometimes  JSON).<br />
-    eg. <code>bus/{id}/add {"type": "keyboard", "idVendor": "0x6969"}\0</code>  </li>
+eg. <code>bus/{id}/add {"type": "keyboard", "idVendor": "0x6969"}\0</code>  </li>
 <li>Responses are often JSON as well!</li>
-<li>Errors are reported using JSON objectes similar to <a href="https://datatracker.ietf.org/doc/html/rfc7807">RFC 7807 Problem Details</a><br />
+<li>Errors are reported using JSON objectes similar to</li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7807">RFC 7807 Problem Details</a><br />
  <sup>The use of JSON allows for future extenability without breaking compatibility ;)<sup></li>
+</ul>
+</li>
 <li>For controlling, or feeding, a device a long lived TCP stream is used, with a wire-protocol specific to each device type.<br />
   After an initial "<em>handshake</em>" (<code>bus/{busId}/{deviceId}\0</code>) a <em>device-specific <strong>binary protocol</strong></em> is used to send input reports and receive output reports (e.g., rumble commands).</li>
 </ul>
 <p>VIIPER takes care of all USBIP protocol details, so you can focus on implementing the device logic only.<br />
 On <code>localhost</code> VIIPER also automatically attached the USBIP client, so you don't have to worry about USBIP details at all.</p>
+<div class="admonition info">
+<p class="admonition-title">Security: Authentication &amp; Encryption</p>
+<p>VIIPER <strong>requires authentication for remote connections</strong>
+to prevent unauthorized device creation.<br />
+All authenticated connections use fast <strong>ChaCha20-Poly1305 encryption</strong>
+to protect against man-in-the-middle attacks.<br />
+Localhost connections are exempt from authentication by default for convenience.</p>
+</div>
 <p>See the <a href="api/overview">API documentation</a> for details</p>
 <hr />
 <h2 id="faq">❓ FAQ</h2>
@@ -1706,10 +1690,12 @@ On <code>localhost</code> VIIPER also automatically attached the USBIP client, s
 VIIPER uses it because it's already built into Linux and available for Windows, making virtual device emulation possible without writing custom kernel drivers yourself.</p>
 <h3 id="why-is-this-a-standalone-executable-that-i-have-to-interface-via-tcp-and-not-a-shared-object-library-in-itself">Why is this a standalone executable that I have to interface via TCP, and not a (shared-object) library in itself</h3>
 <ul>
-<li>Flexibility</li>
+<li>Flexibility<ul>
 <li>allows one to use VIIPER as a service on the same host as the USBIP-Client and use the feeder on a different, remote machine.</li>
 <li>allows for software written utilizing VIIPER to <strong>not be</strong> licensed under the terms of the GPLv3</li>
 <li><strong><em>future versions</em></strong>: Users can enhance VIIPER with device plugins, sharing a common wire-protocol, which can be dynamically incorporated.</li>
+</ul>
+</li>
 <li><strong>That said</strong>, there <strong>will be</strong> a <em>libVIIPER</em>  that you can link against, eleminating multi-process and potential firewall issues.<br />
   Note that this <strong>will require</strong> your application to be licensed under the terms of the GPLv3 (or comptible license)</li>
 </ul>

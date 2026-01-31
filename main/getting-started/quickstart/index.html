@@ -1124,34 +1124,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../clients/c/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C Client Library
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../clients/cpp/" class="md-nav__link">
         
   
@@ -1786,6 +1758,19 @@
 <li><strong>USBIP Server</strong> on port <code>3241</code> (standard USBIP protocol)</li>
 <li><strong>VIIPER API Server</strong> on port <code>3242</code> (management and device interactions)</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Authentication for Remote Connections</p>
+<p>On first start, VIIPER generates a random password
+and saves it to <code>&lt;USER_CONFIG_DIR&gt;/viiper.key.txt</code>.<br />
+Windows: <code>%APPDATA%\VIIPER\viiper.key.txt</code><br />
+Linux: <code>~/.config/viiper/viiper.key.txt</code></p>
+<ul>
+<li><strong>Localhost clients</strong> (<code>127.0.0.1</code>, <code>::1</code>): Authentication is <strong>optional</strong> (but supported)</li>
+<li><strong>Remote clients</strong>: Authentication is <strong>required</strong> - provide the password using your client library</li>
+</ul>
+<p>All authenticated connections use <strong>ChaCha20-Poly1305 encryption</strong> to protect against man-in-the-middle attacks.</p>
+<p>You can change the password at any time by editing <code>viiper.key.txt</code>.</p>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">Auto-attach Feature</p>
 <p>By default, VIIPER automatically attaches newly created devices to the local machine. You can disable this with <code>--api.auto-attach-local-client=false</code>.<br />
@@ -1802,10 +1787,9 @@
 <p>VIIPER provides multiple ways to interact with the API.<br />
 Choose the method that works best for you.</p>
 <h3 id="option-1-using-client-libraries-recommended">Option 1: Using Client Libraries (Recommended)</h3>
-<p>Client libraries are (at time of writing) available for C, C++, C#, Go, Rust, and TypeScript. They handle the protocol details automatically, providing type-safe interfaces and device-specific helpers.</p>
+<p>Client libraries are (at time of writing) available for C++, C#, Go, Rust, and TypeScript. They handle the protocol details automatically, providing type-safe interfaces and device-specific helpers.</p>
 <p>For complete client library documentation and code examples, see:</p>
 <ul>
-<li><a href="../../clients/c/">C Client Library Documentation</a></li>
 <li><a href="../../clients/cpp/">C++ Client Library Documentation</a></li>
 <li><a href="../../clients/csharp/">C# Client Library Documentation</a></li>
 <li><a href="../../clients/typescript/">TypeScript Client Library Documentation</a></li>
@@ -1921,7 +1905,7 @@ See: <a href="../../api/overview/">API Reference</a> for complete documentation.
 <h2 id="next-steps">➡️ Next Steps</h2>
 <p>Now that you have a working setup:</p>
 <ol>
-<li><strong>Explore Examples</strong>: Check the <code>examples/</code> directory for complete working programs in C, C#, Go, and TypeScript</li>
+<li><strong>Explore Examples</strong>: Check the <code>examples/</code> directory for complete working programs in C#, Go, Rust, TypeScript, and C++</li>
 <li><strong>Read API Documentation</strong>: Learn about all available <a href="../../api/overview/">API commands</a></li>
 <li><strong>Choose a Client Library</strong>: Pick a <a href="../../clients/generator/">client library</a> for your preferred language</li>
 <li><strong>Review Device Specs</strong>: Understand device-specific protocols in <a href="../../devices/keyboard/">Devices</a></li>

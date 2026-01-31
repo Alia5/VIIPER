@@ -872,34 +872,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../c/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C Client Library
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../cpp/" class="md-nav__link">
         
   
@@ -1730,9 +1702,8 @@
 </div>
 <h2 id="running-the-generator">Running the Generator</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>all<span class="w">        </span><span class="c1"># Generate all client libraries</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>c<span class="w">          </span><span class="c1"># Generate C client library only</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp<span class="w">     </span><span class="c1"># Generate C# client library only</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript<span class="w"> </span><span class="c1"># Generate TypeScript client library only</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>csharp<span class="w">     </span><span class="c1"># Generate C# client library only</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/viiper<span class="w"> </span>codegen<span class="w"> </span>--lang<span class="o">=</span>typescript<span class="w"> </span><span class="c1"># Generate TypeScript client library only</span>
 </code></pre></div>
 <p><strong>Output directory</strong>: <code>clients/</code> (relative to repository root)</p>
 <h2 id="comment-tag-system">Comment Tag System</h2>
@@ -1759,7 +1730,7 @@
 <p>The generator automatically exports all constants and map literals from <code>/device/*/const.go</code> for each device type.<br />
 No special tags are required. Exported Go constants and maps are emitted with language-appropriate representations:</p>
 <ul>
-<li><strong>Constants</strong>: Grouped into enums (C#/TS) or <code>#define</code> macros (C) based on common prefixes</li>
+<li><strong>Constants</strong>: Grouped into enums or language-appropriate constants based on common prefixes</li>
 <li><strong>Maps</strong>: Converted to Dictionary/Map/lookup functions with helper methods</li>
 </ul>
 <h2 id="code-generation-flow">Code Generation Flow</h2>
@@ -1792,7 +1763,6 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <h2 id="struct-packing">Struct Packing</h2>
 <p>For wire compatibility, all device I/O structs are tightly packed (no padding).</p>
 <ul>
-<li><strong>C:</strong> <code>#pragma pack(push, 1)</code> / <code>#pragma pack(pop)</code></li>
 <li><strong>C#:</strong> <code>[StructLayout(LayoutKind.Sequential, Pack = 1)]</code></li>
 <li><strong>TypeScript:</strong> Manual byte-level encoding/decoding</li>
 </ul>
@@ -1804,72 +1774,53 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nx">KeyBitmap</span><span class="w"> </span><span class="p">[</span><span class="mi">32</span><span class="p">]</span><span class="kt">uint8</span><span class="w">  </span><span class="c1">// Internal: 256-bit NKR bitmap</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
 </code></pre></div>
-<p><strong>Emitted C struct:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">#pragma pack(push, 1)</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">modifiers</span><span class="p">;</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">keys</span><span class="p">;</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">keys_count</span><span class="p">;</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span><span class="w"> </span><span class="n">viiper_keyboard_input_t</span><span class="p">;</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="cp">#pragma pack(pop)</span>
-</code></pre></div>
 <h2 id="example-constant-and-map-export">Example: Constant and Map Export</h2>
 <p><strong>Go source (<code>/device/keyboard/const.go</code>):</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nx">ModLeftCtrl</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="mh">0x01</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nx">ModLeftShift</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x02</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nx">KeyA</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x04</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nx">KeyB</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x05</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="c1">// ...</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">)</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="kd">var</span><span class="w"> </span><span class="nx">CharToKey</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">byte</span><span class="p">]</span><span class="kt">byte</span><span class="p">{</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="sc">&#39;a&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyA</span><span class="p">,</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="sc">&#39;b&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyB</span><span class="p">,</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="sc">&#39;\n&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyEnter</span><span class="p">,</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="c1">// ...</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="p">}</span>
-</code></pre></div>
-<p><strong>Emitted C header (<code>viiper_keyboard.h</code>):</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cp">#define VIIPER_KEYBOARD_MOD_LEFT_CTRL 0x1</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="cp">#define VIIPER_KEYBOARD_MOD_LEFT_SHIFT 0x2</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="cp">#define VIIPER_KEYBOARD_KEY_A 0x4</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="cp">#define VIIPER_KEYBOARD_KEY_B 0x5</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1">// Map lookup function</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">viiper_keyboard_char_to_key_lookup</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out_value</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nx">ModLeftCtrl</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="mh">0x01</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nx">ModLeftShift</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x02</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nx">KeyA</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x04</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nx">KeyB</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x05</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">)</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="kd">var</span><span class="w"> </span><span class="nx">CharToKey</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">byte</span><span class="p">]</span><span class="kt">byte</span><span class="p">{</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="sc">&#39;a&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyA</span><span class="p">,</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="sc">&#39;b&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyB</span><span class="p">,</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="sc">&#39;\n&#39;</span><span class="p">:</span><span class="w"> </span><span class="nx">KeyEnter</span><span class="p">,</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Emitted C# (<code>KeyboardConstants.cs</code>):</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">public</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">Mod</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kt">uint</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="p">{</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">LeftCtrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="n">LeftShift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x02</span><span class="p">,</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="c1">// ...</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">}</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="k">public</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">Key</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kt">uint</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="p">{</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x04</span><span class="p">,</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="n">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x05</span><span class="p">,</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="c1">// ...</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="p">}</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="k">public</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">CharToKey</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="p">{</span>
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="k">private</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="n">Dictionary</span><span class="o">&lt;</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="o">&gt;</span><span class="w"> </span><span class="n">_map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">()</span>
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">A</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">B</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">Enter</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">        </span><span class="c1">// ...</span>
-<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">    </span><span class="p">};</span>
-<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>
-<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">TryGetValue</span><span class="p">(</span><span class="kt">byte</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">Key</span><span class="w"> </span><span class="k">value</span><span class="p">)</span>
-<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">_map</span><span class="p">.</span><span class="n">TryGetValue</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="k">value</span><span class="p">);</span>
-<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">public</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">Mod</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kt">uint</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">LeftCtrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="n">LeftShift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x02</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">}</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="k">public</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">Key</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kt">uint</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">{</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x04</span><span class="p">,</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="n">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x05</span><span class="p">,</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">}</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="k">public</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">CharToKey</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="p">{</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span><span class="k">private</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="n">Dictionary</span><span class="o">&lt;</span><span class="kt">byte</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="o">&gt;</span><span class="w"> </span><span class="n">_map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">()</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">A</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">B</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Key</span><span class="p">.</span><span class="n">Enter</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">        </span><span class="c1">// ...</span>
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">    </span><span class="p">};</span>
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">TryGetValue</span><span class="p">(</span><span class="kt">byte</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="n">Key</span><span class="w"> </span><span class="k">value</span><span class="p">)</span>
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">_map</span><span class="p">.</span><span class="n">TryGetValue</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="k">value</span><span class="p">);</span>
+<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="regeneration-triggers">Regeneration Triggers</h2>
 <p>Run codegen when any of these change:</p>
@@ -1883,14 +1834,12 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 </ul>
 <h2 id="language-specific-notes">Language-Specific Notes</h2>
 <ul>
-<li><strong>C</strong>: <code>#define</code> macros for constants; switch-based lookup functions for maps; manual memory management for variable-length fields; builds with CMake.  </li>
 <li><strong>C#</strong>: Enums for constant groups; <code>Dictionary&lt;K,V&gt;</code> with static helper methods for maps; <code>ViiperDevice</code> class with <code>OnOutput</code> event; async/await for management API; struct packing via attributes.  </li>
 <li><strong>TypeScript</strong>: Enums for constant groups; <code>Record&lt;K, V&gt;</code> objects with <code>Get</code>/<code>Has</code> helper functions for maps; manual byte encoding via <code>BinaryWriter</code>/<code>BinaryReader</code>; <code>ViiperDevice</code> class with EventEmitter for output; <code>addDeviceAndConnect</code> convenience method; builds with <code>tsc</code>.  </li>
 </ul>
 <h2 id="further-reading">Further Reading</h2>
 <ul>
 <li><a href="../go/">Go Client Documentation</a>: Go reference client usage</li>
-<li><a href="../c/">C Client Library Documentation</a>: C-specific usage, build, and examples</li>
 <li><a href="../csharp/">C# Client Library Documentation</a>: C#-specific usage, async patterns, and map helpers</li>
 <li><a href="../typescript/">TypeScript Client Library Documentation</a>: TypeScript-specific usage, EventEmitter patterns, and examples</li>
 </ul>

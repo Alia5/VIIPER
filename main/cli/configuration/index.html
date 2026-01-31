@@ -848,6 +848,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#authentication-and-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication and Security
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication and Security">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#localhost-exemption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Localhost Exemption
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote-connections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote Connections
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuration-examples" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1010,34 +1049,6 @@
     
   
     Go Client
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../clients/c/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    C Client Library
   
 
     
@@ -1513,6 +1524,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#authentication-and-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication and Security
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication and Security">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#localhost-exemption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Localhost Exemption
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote-connections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote Connections
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuration-examples" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1654,6 +1704,12 @@
 <td>Auto-attach exported devices to local usbip client</td>
 </tr>
 <tr>
+<td><code>VIIPER_API_REQUIRE_LOCALHOST_AUTH</code></td>
+<td><code>--api.require-localhost-auth</code></td>
+<td><code>false</code></td>
+<td>Require authentication even for localhost connections</td>
+</tr>
+<tr>
 <td><code>VIIPER_CONNECTION_TIMEOUT</code></td>
 <td><code>--connection-timeout</code></td>
 <td><code>30s</code></td>
@@ -1710,6 +1766,27 @@ Generate a starter file (default configuration) with:</p>
 <li>Platform config directory (see above): server.(json|yaml|yml|toml), proxy.(json|yaml|yml|toml), config.(json|yaml|yml|toml)</li>
 <li>Linux system-wide: /etc/viiper/server.(json|yaml|yml|toml), /etc/viiper/proxy.(json|yaml|yml|toml), /etc/viiper/config.(json|yaml|yml|toml)</li>
 </ol>
+<h2 id="authentication-and-security">Authentication and Security</h2>
+<p>VIIPER requires authentication for remote (non-localhost) connections
+to prevent unauthorized device creation.  </p>
+<p>The password file is <em>intentionally</em> separated from the main configuration</p>
+<p><strong>Password File:</strong> <code>viiper.key.txt</code>  </p>
+<ul>
+<li><strong>Location:</strong>  <ul>
+<li><strong>Windows:</strong> <code>%APPDATA%\viiper\</code>  </li>
+<li><strong>Linux/macOS:</strong> <code>~/.config/viiper/</code>  </li>
+</ul>
+</li>
+<li><strong>Auto-generation:</strong> If the file doesn't exist,<br />
+VIIPER generates a random 16-character password on first start and displays it in the console</li>
+<li><strong>Custom passwords:</strong> You can edit <code>viiper.key.txt</code> and replace it with any password of any length</li>
+<li><strong>Encryption:</strong> All authenticated connections use fast ChaCha20-Poly1305 encryption with unique session keys</li>
+</ul>
+<h3 id="localhost-exemption">Localhost Exemption</h3>
+<p>By default, clients connecting from <code>localhost</code>, <code>127.0.0.1</code>, or <code>::1</code> do NOT require authentication (they can optionally provide it).<br />
+To require authentication even for localhost connections, use <code>--api.require-localhost-auth=true</code>.</p>
+<h3 id="remote-connections">Remote Connections</h3>
+<p>All remote clients MUST authenticate using the password from <code>viiper.key.txt</code>.</p>
 <h2 id="configuration-examples">Configuration Examples</h2>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Config files</label><label for="__tabbed_1_2">Environment Variables</label></div>
 <div class="tabbed-content">
