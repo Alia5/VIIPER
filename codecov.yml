@@ -12,5 +12,3 @@ coverage:
       default:
         informational: true
 
-assume:
-  utf_8: true
