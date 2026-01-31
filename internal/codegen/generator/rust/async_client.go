@@ -26,6 +26,20 @@ pub enum AsyncStreamWrapper {
     Encrypted(crate::auth::AsyncEncryptedStream),
 }
 
+/// Read-half wrapper that can be either plain or encrypted
+#[cfg(feature = "async")]
+pub enum AsyncReadWrapper {
+    Plain(tokio::net::tcp::OwnedReadHalf),
+    Encrypted(crate::auth::AsyncEncryptedRead),
+}
+
+/// Write-half wrapper that can be either plain or encrypted
+#[cfg(feature = "async")]
+pub enum AsyncWriteWrapper {
+    Plain(tokio::net::tcp::OwnedWriteHalf),
+    Encrypted(crate::auth::AsyncEncryptedWrite),
+}
+
 #[cfg(feature = "async")]
 impl AsyncRead for AsyncStreamWrapper {
     fn poll_read(
@@ -36,6 +50,20 @@ impl AsyncRead for AsyncStreamWrapper {
         match &mut *self {
             AsyncStreamWrapper::Plain(s) => std::pin::Pin::new(s).poll_read(cx, buf),
             AsyncStreamWrapper::Encrypted(s) => std::pin::Pin::new(s).poll_read(cx, buf),
+        }
+    }
+}
+
+#[cfg(feature = "async")]
+impl AsyncRead for AsyncReadWrapper {
+    fn poll_read(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> std::task::Poll<std::io::Result<()>> {
+        match &mut *self {
+            AsyncReadWrapper::Plain(s) => std::pin::Pin::new(s).poll_read(cx, buf),
+            AsyncReadWrapper::Encrypted(s) => std::pin::Pin::new(s).poll_read(cx, buf),
         }
     }
 }
@@ -70,6 +98,40 @@ impl AsyncWrite for AsyncStreamWrapper {
         match &mut *self {
             AsyncStreamWrapper::Plain(s) => std::pin::Pin::new(s).poll_shutdown(cx),
             AsyncStreamWrapper::Encrypted(s) => std::pin::Pin::new(s).poll_shutdown(cx),
+        }
+    }
+}
+
+#[cfg(feature = "async")]
+impl AsyncWrite for AsyncWriteWrapper {
+    fn poll_write(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &[u8],
+    ) -> std::task::Poll<Result<usize, std::io::Error>> {
+        match &mut *self {
+            AsyncWriteWrapper::Plain(s) => std::pin::Pin::new(s).poll_write(cx, buf),
+            AsyncWriteWrapper::Encrypted(s) => std::pin::Pin::new(s).poll_write(cx, buf),
+        }
+    }
+    
+    fn poll_flush(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), std::io::Error>> {
+        match &mut *self {
+            AsyncWriteWrapper::Plain(s) => std::pin::Pin::new(s).poll_flush(cx),
+            AsyncWriteWrapper::Encrypted(s) => std::pin::Pin::new(s).poll_flush(cx),
+        }
+    }
+    
+    fn poll_shutdown(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), std::io::Error>> {
+        match &mut *self {
+            AsyncWriteWrapper::Plain(s) => std::pin::Pin::new(s).poll_shutdown(cx),
+            AsyncWriteWrapper::Encrypted(s) => std::pin::Pin::new(s).poll_shutdown(cx),
         }
     }
 }
@@ -149,7 +211,8 @@ impl AsyncViiperClient {
 /// An async connected device stream for bidirectional communication.
 #[cfg(feature = "async")]
 pub struct AsyncDeviceStream {
-    stream: std::sync::Arc<tokio::sync::Mutex<AsyncStreamWrapper>>,
+    read_stream: std::sync::Arc<tokio::sync::Mutex<AsyncReadWrapper>>,
+    write_stream: std::sync::Arc<tokio::sync::Mutex<AsyncWriteWrapper>>,
     cancel_token: Option<tokio_util::sync::CancellationToken>,
     disconnect_callback: std::sync::Mutex<Option<Box<dyn FnOnce() + Send + 'static>>>,
 }
@@ -160,17 +223,21 @@ impl AsyncDeviceStream {
         let tcp_stream = TcpStream::connect(addr).await?;
 		tcp_stream.set_nodelay(true)?;
 		
-		let mut stream = if let Some(pwd) = password {
-		    AsyncStreamWrapper::Encrypted(crate::auth::perform_handshake_async(tcp_stream, pwd).await?)
-		} else {
-		    AsyncStreamWrapper::Plain(tcp_stream)
-		};
-		
-		let handshake = format!("bus/{}/{}\0", bus_id, dev_id);
-        stream.write_all(handshake.as_bytes()).await?;
+        let (read_stream, mut write_stream) = if let Some(pwd) = password {
+            let encrypted = crate::auth::perform_handshake_async(tcp_stream, pwd).await?;
+            let (read_half, write_half) = encrypted.into_split();
+            (AsyncReadWrapper::Encrypted(read_half), AsyncWriteWrapper::Encrypted(write_half))
+        } else {
+            let (read_half, write_half) = tcp_stream.into_split();
+            (AsyncReadWrapper::Plain(read_half), AsyncWriteWrapper::Plain(write_half))
+        };
+        
+        let handshake = format!("bus/{}/{}\0", bus_id, dev_id);
+        write_stream.write_all(handshake.as_bytes()).await?;
         
         Ok(Self { 
-            stream: std::sync::Arc::new(tokio::sync::Mutex::new(stream)),
+            read_stream: std::sync::Arc::new(tokio::sync::Mutex::new(read_stream)),
+            write_stream: std::sync::Arc::new(tokio::sync::Mutex::new(write_stream)),
             cancel_token: None,
             disconnect_callback: std::sync::Mutex::new(None),
         })
@@ -182,7 +249,7 @@ impl AsyncDeviceStream {
         input: &T,
     ) -> Result<(), ViiperError> {
         let bytes = input.to_bytes();
-        let mut stream = self.stream.lock().await;
+        let mut stream = self.write_stream.lock().await;
         stream.write_all(&bytes).await?;
         Ok(())
     }
@@ -198,7 +265,7 @@ impl AsyncDeviceStream {
         timeout: std::time::Duration,
     ) -> Result<(), ViiperError> {
         let bytes = input.to_bytes();
-        let mut stream = self.stream.lock().await;
+        let mut stream = self.write_stream.lock().await;
         tokio::time::timeout(timeout, stream.write_all(&bytes))
             .await
             .map_err(|_| ViiperError::Timeout)?
@@ -206,19 +273,19 @@ impl AsyncDeviceStream {
     }
 
     /// Register a callback to receive device output asynchronously.
-    /// The callback receives a shared reference to the stream and must read the exact number of bytes expected.
+    /// The callback receives a shared reference to the read half and must read the exact number of bytes expected.
     /// The callback will be invoked repeatedly on a tokio task until it returns an error.
     /// Only one callback can be registered at a time.
     pub fn on_output<F, Fut>(&mut self, callback: F) -> Result<(), ViiperError>
     where
-        F: Fn(std::sync::Arc<tokio::sync::Mutex<AsyncStreamWrapper>>) -> Fut + Send + 'static,
+        F: Fn(std::sync::Arc<tokio::sync::Mutex<AsyncReadWrapper>>) -> Fut + Send + 'static,
         Fut: std::future::Future<Output = std::io::Result<()>> + Send + 'static,
     {
         if self.cancel_token.is_some() {
             return Err(ViiperError::UnexpectedResponse("Output callback already registered".into()));
         }
 
-        let stream = self.stream.clone();
+        let stream = self.read_stream.clone();
         let cancel_token = tokio_util::sync::CancellationToken::new();
         let cancel_clone = cancel_token.clone();
 		let Ok(mut guard) = self.disconnect_callback.lock() else {
@@ -260,20 +327,20 @@ impl AsyncDeviceStream {
 
     /// Send raw bytes to the device.
     pub async fn send_raw(&self, data: &[u8]) -> Result<(), ViiperError> {
-        let mut stream = self.stream.lock().await;
+        let mut stream = self.write_stream.lock().await;
         stream.write_all(data).await?;
         Ok(())
     }
 
     /// Read raw bytes from the device.
     pub async fn read_raw(&self, buf: &mut [u8]) -> Result<usize, ViiperError> {
-        let mut stream = self.stream.lock().await;
+        let mut stream = self.read_stream.lock().await;
         stream.read(buf).await.map_err(Into::into)
     }
 
     /// Read exact number of bytes from the device.
     pub async fn read_exact(&self, buf: &mut [u8]) -> Result<(), ViiperError> {
-        let mut stream = self.stream.lock().await;
+        let mut stream = self.read_stream.lock().await;
         stream.read_exact(buf).await?;
         Ok(())
     }

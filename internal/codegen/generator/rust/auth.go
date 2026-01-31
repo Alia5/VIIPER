@@ -95,7 +95,7 @@ pub fn perform_handshake(mut stream: TcpStream, password: &str) -> Result<Encryp
     
     let session_key = derive_session_key(&key, server_nonce, &client_nonce);
     
-    Ok(EncryptedStream::new(stream, session_key))
+    Ok(EncryptedStream::new(stream, session_key)?)
 }
 
 /// Perform authentication handshake with VIIPER server (asynchronous)
@@ -142,56 +142,74 @@ pub async fn perform_handshake_async(mut stream: AsyncTcpStream, password: &str)
 }
 
 /// Encrypted stream wrapper using ChaCha20-Poly1305 (synchronous)
+/// Read and write paths are independently locked to avoid blocking writes
+/// while a read thread is waiting for output.
 pub struct EncryptedStream {
-    inner: std::sync::Arc<std::sync::Mutex<EncryptedStreamInner>>,
+    read: std::sync::Arc<std::sync::Mutex<EncryptedReadState>>,
+    write: std::sync::Arc<std::sync::Mutex<EncryptedWriteState>>,
 }
 
-struct EncryptedStreamInner {
+struct EncryptedReadState {
     stream: TcpStream,
     cipher: ChaCha20Poly1305,
-    send_counter: u64,
     recv_buffer: Vec<u8>,
 }
 
+struct EncryptedWriteState {
+    stream: TcpStream,
+    cipher: ChaCha20Poly1305,
+    send_counter: u64,
+}
+
 impl EncryptedStream {
-    fn new(inner: TcpStream, session_key: [u8; 32]) -> Self {
-        let cipher = ChaCha20Poly1305::new(&session_key.into());
-        Self {
-            inner: std::sync::Arc::new(std::sync::Mutex::new(EncryptedStreamInner {
-                stream: inner,
-                cipher,
-                send_counter: 0,
+    fn new(inner: TcpStream, session_key: [u8; 32]) -> Result<Self, ViiperError> {
+        let read_stream = inner.try_clone()?;
+        let read_cipher = ChaCha20Poly1305::new(&session_key.into());
+        let write_cipher = ChaCha20Poly1305::new(&session_key.into());
+        Ok(Self {
+            read: std::sync::Arc::new(std::sync::Mutex::new(EncryptedReadState {
+                stream: read_stream,
+                cipher: read_cipher,
                 recv_buffer: Vec::new(),
             })),
-        }
+            write: std::sync::Arc::new(std::sync::Mutex::new(EncryptedWriteState {
+                stream: inner,
+                cipher: write_cipher,
+                send_counter: 0,
+            })),
+        })
     }
     
     pub fn set_nodelay(&self, nodelay: bool) -> std::io::Result<()> {
-        let inner = self.inner.lock().unwrap();
-        inner.stream.set_nodelay(nodelay)
+        let read = self.read.lock().unwrap();
+        let write = self.write.lock().unwrap();
+        read.stream.set_nodelay(nodelay)?;
+        write.stream.set_nodelay(nodelay)
     }
     
     pub fn try_clone(&self) -> std::io::Result<Self> {
         Ok(Self {
-            inner: std::sync::Arc::clone(&self.inner),
+            read: std::sync::Arc::clone(&self.read),
+            write: std::sync::Arc::clone(&self.write),
         })
     }
     
     pub fn shutdown(&self, how: std::net::Shutdown) -> std::io::Result<()> {
-        let inner = self.inner.lock().unwrap();
-        inner.stream.shutdown(how)
+        let read = self.read.lock().unwrap();
+        let write = self.write.lock().unwrap();
+        let _ = read.stream.shutdown(how);
+        write.stream.shutdown(how)
     }
 }
 
 impl Read for EncryptedStream {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-        let mut inner = self.inner.lock().unwrap();
+        let mut inner = self.read.lock().unwrap();
         
         if inner.recv_buffer.is_empty() {
             let mut first_byte = [0u8; 1];
             let n = inner.stream.read(&mut first_byte)?;
             if n == 0 {
-                // Normal EOF
                 return Ok(0);
             }
             
@@ -225,7 +243,7 @@ impl Read for EncryptedStream {
 
 impl Write for EncryptedStream {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        let mut inner = self.inner.lock().unwrap();
+        let mut inner = self.write.lock().unwrap();
         
         let mut nonce_bytes = [0u8; 12];
         nonce_bytes[4..].copy_from_slice(&inner.send_counter.to_be_bytes());
@@ -245,7 +263,7 @@ impl Write for EncryptedStream {
     }
     
     fn flush(&mut self) -> std::io::Result<()> {
-        let mut inner = self.inner.lock().unwrap();
+        let mut inner = self.write.lock().unwrap();
         inner.stream.flush()
     }
 }
@@ -253,11 +271,23 @@ impl Write for EncryptedStream {
 /// Encrypted stream wrapper using ChaCha20-Poly1305 (asynchronous)
 #[cfg(feature = "async")]
 pub struct AsyncEncryptedStream {
-    inner: AsyncTcpStream,
+    read: AsyncEncryptedRead,
+    write: AsyncEncryptedWrite,
+}
+
+#[cfg(feature = "async")]
+pub struct AsyncEncryptedRead {
+    inner: tokio::net::tcp::OwnedReadHalf,
     cipher: ChaCha20Poly1305,
-    send_counter: u64,
     recv_buffer: Vec<u8>,
     read_state: ReadState,
+}
+
+#[cfg(feature = "async")]
+pub struct AsyncEncryptedWrite {
+    inner: tokio::net::tcp::OwnedWriteHalf,
+    cipher: ChaCha20Poly1305,
+    send_counter: u64,
 }
 
 #[cfg(feature = "async")]
@@ -270,27 +300,31 @@ enum ReadState {
 #[cfg(feature = "async")]
 impl AsyncEncryptedStream {
     fn new(inner: AsyncTcpStream, session_key: [u8; 32]) -> Self {
-        let cipher = ChaCha20Poly1305::new(&session_key.into());
+        let (read_half, write_half) = inner.into_split();
+        let read_cipher = ChaCha20Poly1305::new(&session_key.into());
+        let write_cipher = ChaCha20Poly1305::new(&session_key.into());
         Self {
-            inner,
-            cipher,
-            send_counter: 0,
-            recv_buffer: Vec::new(),
-            read_state: ReadState::ReadingLength { buf: [0; 4], pos: 0 },
+            read: AsyncEncryptedRead {
+                inner: read_half,
+                cipher: read_cipher,
+                recv_buffer: Vec::new(),
+                read_state: ReadState::ReadingLength { buf: [0; 4], pos: 0 },
+            },
+            write: AsyncEncryptedWrite {
+                inner: write_half,
+                cipher: write_cipher,
+                send_counter: 0,
+            },
         }
     }
     
-    pub fn set_nodelay(&self, nodelay: bool) -> std::io::Result<()> {
-        self.inner.set_nodelay(nodelay)
-    }
-    
-    pub fn into_split(self) -> (tokio::net::tcp::OwnedReadHalf, tokio::net::tcp::OwnedWriteHalf) {
-        self.inner.into_split()
+    pub fn into_split(self) -> (AsyncEncryptedRead, AsyncEncryptedWrite) {
+        (self.read, self.write)
     }
 }
 
 #[cfg(feature = "async")]
-impl AsyncRead for AsyncEncryptedStream {
+impl AsyncRead for AsyncEncryptedRead {
     fn poll_read(
         mut self: Pin<&mut Self>,
         cx: &mut Context<'_>,
@@ -410,7 +444,7 @@ impl AsyncRead for AsyncEncryptedStream {
 }
 
 #[cfg(feature = "async")]
-impl AsyncWrite for AsyncEncryptedStream {
+impl AsyncWrite for AsyncEncryptedWrite {
     fn poll_write(
         mut self: Pin<&mut Self>,
         cx: &mut Context<'_>,
@@ -446,6 +480,42 @@ impl AsyncWrite for AsyncEncryptedStream {
     
     fn poll_shutdown(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), std::io::Error>> {
         Pin::new(&mut self.inner).poll_shutdown(cx)
+    }
+}
+
+#[cfg(feature = "async")]
+impl AsyncRead for AsyncEncryptedStream {
+    fn poll_read(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut ReadBuf<'_>,
+    ) -> Poll<std::io::Result<()>> {
+        Pin::new(&mut self.read).poll_read(cx, buf)
+    }
+}
+
+#[cfg(feature = "async")]
+impl AsyncWrite for AsyncEncryptedStream {
+    fn poll_write(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &[u8],
+    ) -> Poll<Result<usize, std::io::Error>> {
+        Pin::new(&mut self.write).poll_write(cx, buf)
+    }
+
+    fn poll_flush(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+    ) -> Poll<Result<(), std::io::Error>> {
+        Pin::new(&mut self.write).poll_flush(cx)
+    }
+
+    fn poll_shutdown(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+    ) -> Poll<Result<(), std::io::Error>> {
+        Pin::new(&mut self.write).poll_shutdown(cx)
     }
 }
 `
