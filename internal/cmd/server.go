@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"path"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -42,11 +42,11 @@ func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger
 
 	logger.Info("Starting VIIPER USB-IP server", "addr", s.UsbServerConfig.Addr)
 
-	keyFileDir, err := configpaths.DefaultConfigDir()
+	keyFileDir, err := configpaths.KeyFileDir()
 	if err != nil {
 		return fmt.Errorf("failed to resolve key file path: %w", err)
 	}
-	keyFilePath := path.Join(keyFileDir, keyFileName)
+	keyFilePath := filepath.Join(keyFileDir, keyFileName)
 	if pwd, err := os.ReadFile(keyFilePath); err == nil {
 		s.ApiServerConfig.Password = strings.TrimSpace(string(pwd))
 	} else {

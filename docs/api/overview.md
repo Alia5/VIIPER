@@ -103,7 +103,8 @@ The exception to this are the device-control and feedback streams, which are raw
     On first start, VIIPER generates a random password
     and saves it to `<USER_CONFIG_DIR>/viiper.key.txt`.  
     Windows: `%APPDATA%\VIIPER\viiper.key.txt`  
-    Linux: `~/.config/viiper/viiper.key.txt`
+    Linux (user): `~/.config/github.com/Alia5/viiper/viiper.key.txt`  
+    Linux (root/systemd): `/etc/viiper/viiper.key.txt`
 
     Remote clients must provide this password to establish a connection.  
 
