@@ -18,3 +18,22 @@ const (
 	ButtonX         = 0x4000
 	ButtonY         = 0x8000
 )
+
+const {
+	SubtypeGamepad                         = 1
+    SubtypeWheel                           = 2
+    SubtypeArcadeStick                     = 3
+    SubtypeFlightStick                     = 4
+    SubtypeDancePad                        = 5
+    SubtypeGuitar                          = 6
+    SubtypeGuitarAlternate                 = 7
+    SubtypeDrums                           = 8
+    SubtypeStageKit                        = 9
+    SubtypeGuitarBass                      = 11
+    SubtypeProKeys                         = 15
+    SubtypeArcadePad                       = 19
+    SubtypeTurntable                       = 23
+    SubtypeProGuitar                       = 25
+    SubtypeDisneyInfinityAndLegoDimensions = 33
+    SubtypeSkylanders                      = 36
+}
