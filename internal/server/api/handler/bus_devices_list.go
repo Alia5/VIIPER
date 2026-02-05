@@ -35,11 +35,12 @@ func BusDevicesList(s *usb.Server) api.HandlerFunc {
 		for _, m := range metas {
 			dtype := inferDeviceType(m.Dev)
 			out = append(out, apitypes.Device{
-				BusID: m.Meta.BusId,
-				DevId: fmt.Sprintf("%d", m.Meta.DevId),
-				Vid:   fmt.Sprintf("0x%04x", m.Dev.GetDescriptor().Device.IDVendor),
-				Pid:   fmt.Sprintf("0x%04x", m.Dev.GetDescriptor().Device.IDProduct),
-				Type:  dtype,
+				BusID:          m.Meta.BusId,
+				DevId:          fmt.Sprintf("%d", m.Meta.DevId),
+				Vid:            fmt.Sprintf("0x%04x", m.Dev.GetDescriptor().Device.IDVendor),
+				Pid:            fmt.Sprintf("0x%04x", m.Dev.GetDescriptor().Device.IDProduct),
+				Type:           dtype,
+				DeviceSpecific: m.Dev.GetDeviceSpecificArgs(),
 			})
 		}
 		payload, err := json.Marshal(apitypes.DevicesListResponse{Devices: out})

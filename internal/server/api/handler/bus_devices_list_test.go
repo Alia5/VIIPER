@@ -54,7 +54,7 @@ func TestBusDevicesList(t *testing.T) {
 				}
 			},
 			pathParams:       map[string]string{"id": "60009"},
-			expectedResponse: `{"devices":[{"busId":60009,"devId":"1","deviceSpecific":null,"vid":"0x045e","pid":"0x028e","type":"xbox360"}]}`,
+			expectedResponse: `{"devices":[{"busId":60009,"devId":"1","deviceSpecific":{"subType": 1},"vid":"0x045e","pid":"0x028e","type":"xbox360"}]}`,
 		},
 		{
 			name: "list devices with multiple additions",
@@ -82,7 +82,7 @@ func TestBusDevicesList(t *testing.T) {
 				}
 			},
 			pathParams:       map[string]string{"id": "60010"},
-			expectedResponse: `{"devices":[{"busId":60010,"devId":"1","deviceSpecific":null,"vid":"0x045e","pid":"0x028e","type":"xbox360"},{"busId":60010,"devId":"2","deviceSpecific":null,"vid":"0x045e","pid":"0x028e","type":"xbox360"}]}`,
+			expectedResponse: `{"devices":[{"busId":60010,"devId":"1","deviceSpecific":{"subType": 1},"vid":"0x045e","pid":"0x028e","type":"xbox360"},{"busId":60010,"devId":"2","deviceSpecific":{"subType": 1},"vid":"0x045e","pid":"0x028e","type":"xbox360"}]}`,
 		},
 		{
 			name:             "list devices on non-existing bus",
