@@ -51,6 +51,7 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 		opts := device.CreateOptions{
 			IdVendor:  deviceCreateReq.IdVendor,
 			IdProduct: deviceCreateReq.IdProduct,
+			SubType:   deviceCreateReq.SubType,
 		}
 
 		dev := reg.CreateDevice(&opts)

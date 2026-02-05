@@ -111,6 +111,7 @@ func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string,
 		Type:      &devType,
 		IdVendor:  o.IdVendor,
 		IdProduct: o.IdProduct,
+		SubType:   o.SubType,
 	}
 	payloadBytes, err := json.Marshal(req)
 	if err != nil {

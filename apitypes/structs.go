@@ -67,6 +67,7 @@ type DeviceCreateRequest struct {
 	Type      *string `json:"type"`
 	IdVendor  *uint16 `json:"idVendor,omitempty"`
 	IdProduct *uint16 `json:"idProduct,omitempty"`
+	SubType   *uint8  `json:"subType,omitempty"`
 }
 
 // UnmarshalJSON implements custom unmarshaling to accept both uint16 and hex string formats
@@ -77,6 +78,7 @@ func (d *DeviceCreateRequest) UnmarshalJSON(data []byte) error {
 		Type      *string `json:"type"`
 		IdVendor  any     `json:"idVendor,omitempty"`
 		IdProduct any     `json:"idProduct,omitempty"`
+		SubType   any     `json:"subType,omitempty"`
 	}
 
 	if err := json.Unmarshal(data, &raw); err != nil {
@@ -99,6 +101,14 @@ func (d *DeviceCreateRequest) UnmarshalJSON(data []byte) error {
 			return fmt.Errorf("idProduct: %w", err)
 		}
 		d.IdProduct = &val
+	}
+
+	if raw.SubType != nil {
+		val, err := parseUint8OrHex(raw.SubType)
+		if err != nil {
+			return fmt.Errorf("idProduct: %w", err)
+		}
+		d.SubType = &val
 	}
 
 	return nil
@@ -128,6 +138,35 @@ func parseUint16OrHex(v any) (uint16, error) {
 			return 0, fmt.Errorf("invalid hex/numeric string %q: %w", val, err)
 		}
 		return uint16(parsed), nil
+	default:
+		return 0, fmt.Errorf("expected number or hex string, got %T", v)
+	}
+}
+
+// parseUint8OrHex accepts either a JSON number or a hex string like "0x12"
+func parseUint8OrHex(v any) (uint8, error) {
+	switch val := v.(type) {
+	case float64:
+		if val < 0 || val > 255 {
+			return 0, fmt.Errorf("value %v out of uint8 range", val)
+		}
+		return uint8(val), nil
+	case string:
+		s := strings.TrimSpace(val)
+		base := 10
+		if strings.HasPrefix(strings.ToLower(s), "0x") {
+			s = s[2:]
+			base = 16
+		} else if len(s) > 0 {
+			if strings.ContainsAny(s, "abcdefABCDEF") {
+				base = 16
+			}
+		}
+		parsed, err := strconv.ParseUint(s, base, 8)
+		if err != nil {
+			return 0, fmt.Errorf("invalid hex/numeric string %q: %w", val, err)
+		}
+		return uint8(parsed), nil
 	default:
 		return 0, fmt.Errorf("expected number or hex string, got %T", v)
 	}
