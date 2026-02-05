@@ -56,7 +56,7 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 
 		dev, err := reg.CreateDevice(&opts)
 		if err != nil {
-			return apierror.ErrInternal(fmt.Sprintf("failed to create device: %v", err))
+			return apierror.ErrBadRequest(fmt.Sprintf("failed to create device: %v", err))
 		}
 		devCtx, err := b.Add(dev)
 		if err != nil {

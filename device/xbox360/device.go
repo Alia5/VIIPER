@@ -40,11 +40,11 @@ func New(o *device.CreateOptions) (*Xbox360, error) {
 			data, err := json.Marshal(o.DeviceSpecific)
 			var args Xbox360CreateOptions
 			if err != nil {
-				return nil, fmt.Errorf("marshal device create request: %w", err)
+				return nil, fmt.Errorf("invalid JSON payload: %w", err)
 			}
 			err = json.Unmarshal(data, &args)
 			if err != nil {
-				return nil, fmt.Errorf("marshal device create request: %w", err)
+				return nil, fmt.Errorf("invalid JSON payload: %w", err)
 			}
 			if args.SubType != nil {
 				d.descriptor.Interfaces[0].ClassDescriptors[0].Payload[2] = *args.SubType
