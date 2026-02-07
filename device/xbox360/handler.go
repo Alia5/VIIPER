@@ -40,7 +40,7 @@ func (r *handler) StreamHandler() api.StreamHandlerFunc {
 			}
 		})
 
-		buf := make([]byte, 14)
+		buf := make([]byte, 20)
 		for {
 			if _, err := io.ReadFull(conn, buf); err != nil {
 				if err == io.EOF {
