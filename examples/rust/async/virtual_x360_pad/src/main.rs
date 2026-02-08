@@ -58,6 +58,7 @@ async fn main() {
         r#type: Some("xbox360".to_string()),
         id_vendor: None,
         id_product: None,
+        device_specific: None,
     }).await {
         Ok(d) => d,
         Err(e) => {
@@ -124,6 +125,7 @@ async fn main() {
             ly: (20000.0 * 0.7071) as i16,
             rx: 0,
             ry: 0,
+            reserved: [0; 6],
         };
         
         if let Err(e) = stream.send(&state).await {

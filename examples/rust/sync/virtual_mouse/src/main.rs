@@ -58,6 +58,7 @@ fn main() {
             r#type: Some("mouse".to_string()),
             id_vendor: None,
             id_product: None,
+            device_specific: None,
         },
     ) {
         Ok(d) => d,

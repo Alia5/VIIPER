@@ -1,6 +1,6 @@
+use std::net::ToSocketAddrs;
 use std::thread;
 use std::time::Duration;
-use std::net::ToSocketAddrs;
 use viiper_client::{devices::xbox360::*, ViiperClient};
 
 fn main() {
@@ -58,6 +58,7 @@ fn main() {
             r#type: Some("xbox360".to_string()),
             id_vendor: None,
             id_product: None,
+            device_specific: None,
         },
     ) {
         Ok(d) => d,
@@ -127,6 +128,7 @@ fn main() {
             ly: (20000.0 * 0.7071) as i16,
             rx: 0,
             ry: 0,
+            reserved: [0; 6],
         };
 
         if let Err(e) = stream.send(&state) {

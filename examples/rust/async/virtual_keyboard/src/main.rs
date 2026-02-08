@@ -58,6 +58,7 @@ async fn main() {
         r#type: Some("keyboard".to_string()),
         id_vendor: None,
         id_product: None,
+        device_specific: None,
     }).await {
         Ok(d) => d,
         Err(e) => {
