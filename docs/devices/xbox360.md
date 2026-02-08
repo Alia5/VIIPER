@@ -51,12 +51,13 @@ The device stream is a bidirectional, raw TCP connection with fixed-size packets
 
 ### Input State
 
-- 14-byte packets, little-endian layout:
+- 20-byte packets, little-endian layout:
   - Buttons: uint32 (4 bytes, bitfield)
   - Triggers: LT, RT: uint8, uint8 (2 bytes)  
     0-255 (0=not pressed, 255=fully pressed)
   - Sticks: LX, LY, RX, RY: int16 each (8 bytes)  
     0 is center, -32768 is min, 32767 is max
+  - Reserved: there are 6 reserved bytes at the end of the report. For most subtypes, these will be zeroed, but a few subtypes do put data here.
 
 ### Rumble Feedback
 
