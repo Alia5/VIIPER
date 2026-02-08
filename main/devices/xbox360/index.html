@@ -1141,6 +1141,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Client Library Support">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subtypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Subtypes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1382,6 +1399,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Client Library Support">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subtypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Subtypes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1462,30 +1496,107 @@ operating systems and games understand out of the box.</p>
 <p>The wire protocol is abstracted by client libraries.<br />
 The <strong>Go client</strong> includes built-in types (<code>/device/xbox360</code>),
 and <strong>generated client libraries</strong> provide equivalent structures
-with proper packing.  </p>
+with proper packing.</p>
 <p>You don't need to manually construct packets, just use the provided types
-and send/receive them via the device control and feedback stream.  </p>
+and send/receive them via the device control and feedback stream.</p>
+<p>You can optionally specify a sub type if you wish to emulate a different type of controller.
+This is done by specifying it as part of the device options.</p>
+<p>For example:</p>
+<ul>
+<li><code>{"type":"xbox360", "deviceSpecific": {"subType": 7}}</code></li>
+</ul>
+<h3 id="subtypes">Subtypes</h3>
+<table>
+<thead>
+<tr>
+<th>Subtype</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gamepad</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Wheel</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Arcade Stick</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Flight Stick</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Dance Pad</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Guitar</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Guitar Alternate</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Drums</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Rock Band Stage Kit</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Guitar Bass</td>
+<td>11</td>
+</tr>
+<tr>
+<td>Rock Band Pro Keys</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Arcade Pad</td>
+<td>19</td>
+</tr>
+<tr>
+<td>Turntable</td>
+<td>23</td>
+</tr>
+<tr>
+<td>Rock Band Pro Guitar</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Disney Infinity or Lego Dimensions Portal</td>
+<td>33</td>
+</tr>
+<tr>
+<td>Skylanders Portal</td>
+<td>36</td>
+</tr>
+</tbody>
+</table>
 <p>See: <a href="../../api/overview/">API Reference</a></p>
 <h2 id="raw-streaming-protocol">(RAW) Streaming protocol</h2>
 <p>The device stream is a bidirectional, raw TCP connection with fixed-size packets.</p>
 <h3 id="input-state">Input State</h3>
 <ul>
-<li>14-byte packets, little-endian layout:  <ul>
-<li>Buttons: uint32 (4 bytes, bitfield)  </li>
+<li>14-byte packets, little-endian layout:</li>
+<li>Buttons: uint32 (4 bytes, bitfield)</li>
 <li>Triggers: LT, RT: uint8, uint8 (2 bytes)<br />
-  0-255 (0=not pressed, 255=fully pressed)</li>
+    0-255 (0=not pressed, 255=fully pressed)</li>
 <li>Sticks: LX, LY, RX, RY: int16 each (8 bytes)<br />
-  0 is center, -32768 is min, 32767 is max</li>
-</ul>
-</li>
+    0 is center, -32768 is min, 32767 is max</li>
 </ul>
 <h3 id="rumble-feedback">Rumble Feedback</h3>
 <ul>
-<li>2-byte packets:  <ul>
+<li>2-byte packets:</li>
 <li>LeftMotor: uint8, RightMotor: uint8<br />
-  0-255 intensity values</li>
-</ul>
-</li>
+    0-255 intensity values</li>
 </ul>
 <p>See <code>/device/xbox360/inputstate.go</code> for details.</p>
 <h3 id="button-constants">Button constants</h3>
