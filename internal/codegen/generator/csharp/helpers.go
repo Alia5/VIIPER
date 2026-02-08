@@ -1,6 +1,8 @@
 package csharp
 
 import (
+	"strings"
+
 	"github.com/Alia5/VIIPER/internal/codegen/common"
 )
 
@@ -14,6 +16,9 @@ func toCamelCase(s string) string {
 
 func goTypeToCSharp(goType string) string {
 	base, _, _ := common.NormalizeGoType(goType)
+	if base == "any" || base == "interface{}" {
+		return "object"
+	}
 
 	switch base {
 	case "uint8":
@@ -45,6 +50,22 @@ func goTypeToCSharp(goType string) string {
 	default:
 		return toPascalCase(base)
 	}
+}
+
+func parseGoMapType(typeStr string) (keyType string, valueType string, ok bool) {
+	if !strings.HasPrefix(typeStr, "map[") {
+		return "", "", false
+	}
+	closeIdx := strings.Index(typeStr, "]")
+	if closeIdx < 0 {
+		return "", "", false
+	}
+	keyType = typeStr[len("map["):closeIdx]
+	valueType = typeStr[closeIdx+1:]
+	if keyType == "" || valueType == "" {
+		return "", "", false
+	}
+	return keyType, valueType, true
 }
 
 func writeFileHeader() string { return common.FileHeader("//", "C#") }

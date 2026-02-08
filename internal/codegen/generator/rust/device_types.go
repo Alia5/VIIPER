@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -45,16 +46,27 @@ pub struct {{.StructName}} {
 impl DeviceOutput for {{.StructName}} {
     fn from_bytes(buf: &[u8]) -> Result<Self, crate::error::ViiperError> {
         let mut offset = 0;
-{{range .Fields}}{{if .IsArray}}        // Read array (size determined by remaining bytes)
-        let elem_size = std::mem::size_of::<{{.ElementType}}>();
-        let mut {{.RustName}} = Vec::new();
-        while offset + elem_size <= buf.len() {
-            let bytes = &buf[offset..offset + elem_size];
-            let value = {{.ElementType}}::from_le_bytes(bytes.try_into().unwrap());
-            {{.RustName}}.push(value);
-            offset += elem_size;
-        }
-{{else}}        if offset + std::mem::size_of::<{{.RustType}}>() > buf.len() {
+{{range .Fields}}{{if .IsArray}}{{if gt .FixedLen 0}}        if offset + (std::mem::size_of::<{{.ElementType}}>() * {{.FixedLen}}) > buf.len() {
+			return Err(crate::error::ViiperError::UnexpectedResponse(
+				"buffer too short".into()
+			));
+		}
+		let mut {{.RustName}} = [{{.ElementType}}::default(); {{.FixedLen}}];
+		for i in 0..{{.FixedLen}} {
+			let bytes = &buf[offset..offset + std::mem::size_of::<{{.ElementType}}>()];
+			{{.RustName}}[i] = {{.ElementType}}::from_le_bytes(bytes.try_into().unwrap());
+			offset += std::mem::size_of::<{{.ElementType}}>();
+		}
+{{else}}
+		let elem_size = std::mem::size_of::<{{.ElementType}}>();
+		let mut {{.RustName}} = Vec::new();
+		while offset + elem_size <= buf.len() {
+			let bytes = &buf[offset..offset + elem_size];
+			let value = {{.ElementType}}::from_le_bytes(bytes.try_into().unwrap());
+			{{.RustName}}.push(value);
+			offset += elem_size;
+		}
+{{end}}{{else}}        if offset + std::mem::size_of::<{{.RustType}}>() > buf.len() {
             return Err(crate::error::ViiperError::UnexpectedResponse(
                 "buffer too short".into()
             ));
@@ -80,6 +92,7 @@ type rustWireField struct {
 	ElementType string
 	IsArray     bool
 	CountName   string
+	FixedLen    int
 }
 
 type deviceTypeData struct {
@@ -124,23 +137,31 @@ func generateDeviceWireStruct(outputPath, deviceName, className string, tag *sca
 		rustName := common.ToSnakeCase(field.Name)
 		wireType := field.Type
 		baseType := wireType
-
-		isArray := isWireArray(field.Spec)
+		countToken := ""
+		isArray := strings.Contains(wireType, "*")
+		fixedLen := 0
 		var countName string
 		var elemType string
 
 		if isArray {
-			countName = extractArrayCount(field.Spec)
 			idx := strings.Index(wireType, "*")
-			if idx > 0 {
-				baseType = wireType[:idx]
-			}
+			baseType = wireType[:idx]
+			countToken = wireType[idx+1:]
 			elemType = wireTypeToRust(baseType)
+			if n, err := strconv.Atoi(countToken); err == nil {
+				fixedLen = n
+			} else {
+				countName = countToken
+			}
 		}
 
 		rustType := wireTypeToRust(baseType)
 		if isArray {
-			rustType = fmt.Sprintf("Vec<%s>", elemType)
+			if fixedLen > 0 {
+				rustType = fmt.Sprintf("[%s; %d]", elemType, fixedLen)
+			} else {
+				rustType = fmt.Sprintf("Vec<%s>", elemType)
+			}
 		}
 
 		fields = append(fields, rustWireField{
@@ -150,6 +171,7 @@ func generateDeviceWireStruct(outputPath, deviceName, className string, tag *sca
 			ElementType: elemType,
 			IsArray:     isArray,
 			CountName:   countName,
+			FixedLen:    fixedLen,
 		})
 	}
 

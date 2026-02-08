@@ -29,7 +29,8 @@ func TestDeviceStreamHandler_Dispatch(t *testing.T) {
 	bus, err := virtualbus.NewWithBusId(90001)
 	require.NoError(t, err)
 	require.NoError(t, srv.AddBus(bus))
-	dev := keyboard.New(nil)
+	dev, err := keyboard.New(nil)
+	require.NoError(t, err)
 	devCtx, err := bus.Add(dev)
 	require.NoError(t, err)
 
@@ -55,7 +56,7 @@ func TestDeviceStreamHandler_Dispatch(t *testing.T) {
 
 	handlerCalled := make(chan bool, 1)
 	testReg := th.CreateMockRegistration(t, "keyboard",
-		func(o *device.CreateOptions) pusb.Device { return keyboard.New(o) },
+		func(o *device.CreateOptions) (pusb.Device, error) { return keyboard.New(o) },
 		func(conn net.Conn, d *pusb.Device, l *slog.Logger) error {
 			handlerCalled <- true
 			return nil
@@ -91,7 +92,8 @@ func TestAPIServer_StreamRoute_DispatchE2E(t *testing.T) {
 	bus, err := virtualbus.NewWithBusId(70001)
 	require.NoError(t, err)
 	require.NoError(t, srv.AddBus(bus))
-	dev := keyboard.New(nil)
+	dev, err := keyboard.New(nil)
+	require.NoError(t, err)
 	devCtx, err := bus.Add(dev)
 	require.NoError(t, err)
 	meta := device.GetDeviceMeta(devCtx)
@@ -110,7 +112,7 @@ func TestAPIServer_StreamRoute_DispatchE2E(t *testing.T) {
 
 	handlerCalled := make(chan struct{}, 1)
 	testReg := th.CreateMockRegistration(t, "keyboard",
-		func(o *device.CreateOptions) pusb.Device { return keyboard.New(o) },
+		func(o *device.CreateOptions) (pusb.Device, error) { return keyboard.New(o) },
 		func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error {
 			handlerCalled <- struct{}{}
 			return nil

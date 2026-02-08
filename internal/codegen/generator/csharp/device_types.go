@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -61,31 +62,25 @@ func generateWireClass(outputPath, device, className string, tag *scanner.WireTa
 		Device    string
 		ClassName string
 		Fields    []wireField
-		HasArray  bool
-		ArrayInfo *arrayFieldInfo
 	}{
 		Device:    device,
 		ClassName: className,
 	}
 
 	for _, field := range tag.Fields {
-		wf := wireField{
-			Name:   toPascalCase(field.Name),
-			GoType: field.Type,
-			CSType: mapGoTypeToCSharp(field.Type),
-		}
-
-		if strings.Contains(field.Spec, "*") {
-			parts := strings.Split(field.Spec, "*")
-			if len(parts) == 2 {
-				data.HasArray = true
-				data.ArrayInfo = &arrayFieldInfo{
-					FieldName:      wf.Name,
-					CountFieldName: toPascalCase(parts[1]),
-					ElementType:    wf.CSType,
-				}
-				wf.IsArray = true
+		wf := wireField{Name: toPascalCase(field.Name)}
+		if idx := strings.Index(field.Type, "*"); idx >= 0 {
+			wf.IsArray = true
+			baseType := field.Type[:idx]
+			wf.CSType = mapGoTypeToCSharp(baseType)
+			countToken := field.Type[idx+1:]
+			if n, err := strconv.Atoi(countToken); err == nil {
+				wf.FixedLen = n
+			} else {
+				wf.CountFieldName = toPascalCase(countToken)
 			}
+		} else {
+			wf.CSType = mapGoTypeToCSharp(field.Type)
 		}
 
 		data.Fields = append(data.Fields, wf)
@@ -105,16 +100,11 @@ func generateWireClass(outputPath, device, className string, tag *scanner.WireTa
 }
 
 type wireField struct {
-	Name    string
-	GoType  string
-	CSType  string
-	IsArray bool
-}
-
-type arrayFieldInfo struct {
-	FieldName      string
+	Name           string
+	CSType         string
+	IsArray        bool
 	CountFieldName string
-	ElementType    string
+	FixedLen       int
 }
 
 func mapGoTypeToCSharp(goType string) string {
@@ -173,19 +163,20 @@ namespace Viiper.Client.Devices.{{.Device}};
 /// </summary>
 public class {{.Device}}{{.ClassName}} : IBinarySerializable
 {
-{{range .Fields}}    public required {{.CSType}}{{if .IsArray}}[]{{end}} {{.Name}} { get; set; }
-{{end}}
+{{range .Fields}}{{if and .IsArray (gt .FixedLen 0)}}    public {{.CSType}}[] {{.Name}} { get; set; } = new {{.CSType}}[{{.FixedLen}}];
+{{else}}    public required {{.CSType}}{{if .IsArray}}[]{{end}} {{.Name}} { get; set; }
+{{end}}{{end}}
     public void Write(BinaryWriter writer)
     {
-{{if .HasArray}}        // Write fixed fields
-{{range .Fields}}{{if not .IsArray}}        writer.Write({{.Name}});
-{{end}}{{end}}
-        // Write variable-length array
-        for (int i = 0; i < {{.ArrayInfo.CountFieldName}}; i++)
-        {
-            writer.Write({{.ArrayInfo.FieldName}}[i]);
-        }
-{{else}}{{range .Fields}}        writer.Write({{.Name}});
+{{range .Fields}}{{if .IsArray}}{{if gt .FixedLen 0}}        for (int i = 0; i < {{.FixedLen}}; i++)
+		{
+			writer.Write(({{.Name}} != null && i < {{.Name}}.Length) ? {{.Name}}[i] : default({{.CSType}}));
+		}
+{{else}}        for (int i = 0; i < {{.CountFieldName}}; i++)
+		{
+			writer.Write({{.Name}}[i]);
+		}
+{{end}}{{else}}        writer.Write({{.Name}});
 {{end}}{{end}}    }
 
     /// <summary>
@@ -193,25 +184,23 @@ public class {{.Device}}{{.ClassName}} : IBinarySerializable
     /// </summary>
     public static {{.Device}}{{.ClassName}} Read(BinaryReader reader)
     {
-{{if .HasArray}}        // Read fixed fields
-{{range .Fields}}{{if not .IsArray}}        var {{toCamel .Name}} = reader.Read{{readerMethod .CSType}}();
-{{end}}{{end}}
-        // Read variable-length array
-        var {{toCamel .ArrayInfo.FieldName}} = new {{.ArrayInfo.ElementType}}[{{toCamel .ArrayInfo.CountFieldName}}];
-        for (int i = 0; i < {{toCamel .ArrayInfo.CountFieldName}}; i++)
-        {
-            {{toCamel .ArrayInfo.FieldName}}[i] = reader.Read{{readerMethod .ArrayInfo.ElementType}}();
-        }
-        
-        return new {{.Device}}{{.ClassName}}
-        {
-{{range .Fields}}{{if not .IsArray}}            {{.Name}} = {{toCamel .Name}},
-{{end}}{{end}}            {{.ArrayInfo.FieldName}} = {{toCamel .ArrayInfo.FieldName}}
-        };
-{{else}}        return new {{.Device}}{{.ClassName}}
-        {
-{{range .Fields}}            {{.Name}} = reader.Read{{readerMethod .CSType}}(),
-{{end}}        };
-{{end}}    }
+	{{range .Fields}}{{if .IsArray}}{{if gt .FixedLen 0}}        var {{toCamel .Name}} = new {{.CSType}}[{{.FixedLen}}];
+		for (int i = 0; i < {{.FixedLen}}; i++)
+		{
+		    {{toCamel .Name}}[i] = reader.Read{{readerMethod .CSType}}();
+		}
+	{{else}}        var {{toCamel .Name}} = new {{.CSType}}[{{toCamel .CountFieldName}}];
+		for (int i = 0; i < {{toCamel .CountFieldName}}; i++)
+		{
+		    {{toCamel .Name}}[i] = reader.Read{{readerMethod .CSType}}();
+		}
+	{{end}}{{else}}        var {{toCamel .Name}} = reader.Read{{readerMethod .CSType}}();
+	{{end}}{{end}}
+
+		return new {{.Device}}{{.ClassName}}
+		{
+	{{range .Fields}}            {{.Name}} = {{toCamel .Name}},
+	{{end}}        };
+	    }
 }
 `

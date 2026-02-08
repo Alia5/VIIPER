@@ -7,15 +7,33 @@ import (
 
 // InputState represents the controller state used to build a report.
 // Values are more or less XInput's C API
-// viiper:wire xbox360 c2s buttons:u32 lt:u8 rt:u8 lx:i16 ly:i16 rx:i16 ry:i16
+// viiper:wire xbox360 c2s buttons:u32 lt:u8 rt:u8 lx:i16 ly:i16 rx:i16 ry:i16 reserved:u8*6
 type InputState struct {
 	// Button bitfield (lower 16 bits used typically), higher bits reserved
 	Buttons uint32
 	// Triggers: 0-255
 	LT, RT uint8
 	// Sticks: signed 16-bit little endian values
-	LX, LY int16
-	RX, RY int16
+	LX, LY   int16
+	RX, RY   int16
+	Reserved [6]byte
+}
+
+// viiper:wire xbox360guitarherodrums c2s buttons:u32 _:u8 _:u8 greenVelocity:u8 redVelocity:u8 yellowVelocity:u8 blueVelocity:u8 orangeVelocity:u8 kickVelocity:u8 midiPacket:u8*6
+type GuitarHeroDrumsInputState struct {
+	// Button bitfield (lower 16 bits used typically), higher bits reserved
+	Buttons uint32
+	_, _    uint8
+
+	// Drum pad velocities, unsigned 7 bit, based on MIDI
+	GreenVelocity  uint8
+	RedVelocity    uint8
+	YellowVelocity uint8
+	BlueVelocity   uint8
+	OrangeVelocity uint8
+	KickVelocity   uint8
+	// MIDI packet, used for unrecognised midi notes received by the drums
+	MidiPacket [6]byte
 }
 
 // BuildReport encodes an InputState into the 20-byte Xbox 360 wired USB input report.
@@ -43,13 +61,13 @@ func (x *InputState) BuildReport() []byte {
 	binary.LittleEndian.PutUint16(b[8:10], uint16(x.LY))
 	binary.LittleEndian.PutUint16(b[10:12], uint16(x.RX))
 	binary.LittleEndian.PutUint16(b[12:14], uint16(x.RY))
-	// Remaining bytes (14-19) are left zeroed
+	copy(b[14:19], x.Reserved[:])
 	return b
 }
 
-// MarshalBinary encodes InputState to 14 bytes.
+// MarshalBinary encodes InputState to 20 bytes.
 func (x *InputState) MarshalBinary() ([]byte, error) {
-	b := make([]byte, 14)
+	b := make([]byte, 20)
 	binary.LittleEndian.PutUint32(b[0:4], x.Buttons)
 	b[4] = x.LT
 	b[5] = x.RT
@@ -57,12 +75,13 @@ func (x *InputState) MarshalBinary() ([]byte, error) {
 	binary.LittleEndian.PutUint16(b[8:10], uint16(x.LY))
 	binary.LittleEndian.PutUint16(b[10:12], uint16(x.RX))
 	binary.LittleEndian.PutUint16(b[12:14], uint16(x.RY))
+	copy(b[14:19], x.Reserved[:])
 	return b, nil
 }
 
-// UnmarshalBinary decodes 14 bytes into InputState.
+// UnmarshalBinary decodes 20 bytes into InputState.
 func (x *InputState) UnmarshalBinary(data []byte) error {
-	if len(data) < 14 {
+	if len(data) < 20 {
 		return io.ErrUnexpectedEOF
 	}
 	x.Buttons = binary.LittleEndian.Uint32(data[0:4])
@@ -72,6 +91,7 @@ func (x *InputState) UnmarshalBinary(data []byte) error {
 	x.LY = int16(binary.LittleEndian.Uint16(data[8:10]))
 	x.RX = int16(binary.LittleEndian.Uint16(data[10:12]))
 	x.RY = int16(binary.LittleEndian.Uint16(data[12:14]))
+	copy(x.Reserved[:], data[14:19])
 	return nil
 }
 

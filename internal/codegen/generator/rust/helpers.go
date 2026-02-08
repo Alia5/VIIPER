@@ -10,6 +10,9 @@ import (
 
 func goTypeToRust(goType string) string {
 	base, isSlice, isPointer := common.NormalizeGoType(goType)
+	if base == "any" || base == "interface{}" {
+		return "serde_json::Value"
+	}
 
 	var rustType string
 	switch base {
@@ -49,6 +52,22 @@ func goTypeToRust(goType string) string {
 	}
 
 	return rustType
+}
+
+func parseGoMapType(typeStr string) (keyType string, valueType string, ok bool) {
+	if !strings.HasPrefix(typeStr, "map[") {
+		return "", "", false
+	}
+	closeIdx := strings.Index(typeStr, "]")
+	if closeIdx < 0 {
+		return "", "", false
+	}
+	keyType = typeStr[len("map["):closeIdx]
+	valueType = typeStr[closeIdx+1:]
+	if keyType == "" || valueType == "" {
+		return "", "", false
+	}
+	return keyType, valueType, true
 }
 
 func wireTypeToRust(wireType string) string {

@@ -35,16 +35,26 @@ struct {{pascalcase .Name}};
 // {{.Name}}
 struct {{pascalcase .Name}} {
 {{- range .Fields}}
-    {{cpptype .Type}} {{camelcase .Name}};
+        {{fieldcpptype .}} {{camelcase .Name}};
 {{- end}}
 
     static {{pascalcase .Name}} from_json(const json_type& j) {
         {{pascalcase .Name}} result;
 {{- range .Fields}}
-{{- if .Optional}}
-        result.{{camelcase .Name}} = detail::get_optional_field<{{cpptype .Type | unwrapOptional}}>(j, "{{.JSONName}}");
+{{- if and .Optional (eq .TypeKind "map")}}
+        if (j.contains("{{.JSONName}}") && !j["{{.JSONName}}"].is_null()) {
+            result.{{camelcase .Name}} = j["{{.JSONName}}"];
+        } else {
+            result.{{camelcase .Name}} = std::nullopt;
+        }
+{{- else if .Optional}}
+        result.{{camelcase .Name}} = detail::get_optional_field<{{fieldcpptype . | unwrapOptional}}>(j, "{{.JSONName}}");
 {{- else if eq .TypeKind "slice"}}
         result.{{camelcase .Name}} = detail::get_array<{{cpptype .Type | sliceElementType}}>(j, "{{.JSONName}}");
+{{- else if eq .TypeKind "map"}}
+        if (j.contains("{{.JSONName}}")) {
+            result.{{camelcase .Name}} = j["{{.JSONName}}"];
+        }
 {{- else if isCustomType .Type}}
         if (j.contains("{{.JSONName}}")) {
             result.{{camelcase .Name}} = {{cpptype .Type}}::from_json(j["{{.JSONName}}"]);

@@ -22,7 +22,7 @@ type DualShock4 struct {
 	usbPacketCounter   uint32
 }
 
-func New(o *device.CreateOptions) *DualShock4 {
+func New(o *device.CreateOptions) (*DualShock4, error) {
 	d := &DualShock4{
 		descriptor: defaultDescriptor,
 	}
@@ -58,7 +58,7 @@ func New(o *device.CreateOptions) *DualShock4 {
 		AccelZ:       DefaultAccelZRaw,
 	}
 
-	return d
+	return d, nil
 }
 
 func (d *DualShock4) SetOutputCallback(f func(OutputState)) {
@@ -172,6 +172,10 @@ func (d *DualShock4) HandleControl(bmRequestType, bRequest uint8, wValue, _ /* w
 
 func (d *DualShock4) GetDescriptor() *usb.Descriptor {
 	return &d.descriptor
+}
+
+func (x *DualShock4) GetDeviceSpecificArgs() map[string]any {
+	return map[string]any{}
 }
 
 func (d *DualShock4) buildUSBInputReport(s InputState) []byte {

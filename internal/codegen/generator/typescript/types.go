@@ -57,6 +57,15 @@ func fieldTypeToTS(field interface{}) string {
 	typeStr := v.FieldByName("Type").String()
 	typeKind := v.FieldByName("TypeKind").String()
 
+	if typeKind == "map" || strings.HasPrefix(typeStr, "map[") {
+		k, val, ok := parseGoMapType(typeStr)
+		if ok {
+			_ = k
+			return "Record<string, " + goTypeToTS(val) + ">"
+		}
+		return "Record<string, unknown>"
+	}
+
 	if typeKind == "slice" || strings.HasPrefix(typeStr, "[]") {
 		elem := strings.TrimPrefix(typeStr, "[]")
 		return goTypeToTS(elem) + "[]"

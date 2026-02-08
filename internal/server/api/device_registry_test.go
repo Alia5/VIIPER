@@ -23,6 +23,9 @@ func (m *mockDevice) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
 func (m *mockDevice) GetDescriptor() *usb.Descriptor {
 	return &usb.Descriptor{}
 }
+func (m *mockDevice) GetDeviceSpecificArgs() map[string]any {
+	return map[string]any{}
+}
 
 func TestDeviceRegistry(t *testing.T) {
 
@@ -77,7 +80,7 @@ func TestDeviceRegistry(t *testing.T) {
 			reg := th.CreateMockRegistration(
 				t,
 				tt.expectedDevice,
-				func(o *device.CreateOptions) usb.Device { return &mockDevice{name: tt.expectedDevice} },
+				func(o *device.CreateOptions) (usb.Device, error) { return &mockDevice{name: tt.expectedDevice}, nil },
 				mockHandler,
 			)
 
@@ -89,7 +92,8 @@ func TestDeviceRegistry(t *testing.T) {
 			if tt.shouldFind {
 				assert.NotNil(t, retrieved, "expected to find registered device")
 				if retrieved != nil {
-					dev := retrieved.CreateDevice(nil)
+					dev, err := retrieved.CreateDevice(nil)
+					assert.NoError(t, err)
 					mockDev, ok := dev.(*mockDevice)
 					assert.True(t, ok, "expected mockDevice type")
 					if ok {
@@ -152,7 +156,7 @@ func TestGetStreamHandler(t *testing.T) {
 			reg := th.CreateMockRegistration(
 				t,
 				tt.registerName,
-				func(o *device.CreateOptions) usb.Device { return &mockDevice{name: tt.registerName} },
+				func(o *device.CreateOptions) (usb.Device, error) { return &mockDevice{name: tt.registerName}, nil },
 				mockHandler,
 			)
 

@@ -12,7 +12,8 @@ import (
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
 )
 
-const dtoTemplate = `{{writeFileHeader}}using System.Text.Json.Serialization;
+const dtoTemplate = `{{writeFileHeader}}using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Viiper.Client.Types;
 
@@ -71,6 +72,19 @@ func fieldTypeToCSharp(field interface{}) string {
 	v := reflect.ValueOf(field)
 	typeStr := v.FieldByName("Type").String()
 	typeKind := v.FieldByName("TypeKind").String()
+
+	if typeKind == "map" || strings.HasPrefix(typeStr, "map[") {
+		keyType, valueType, ok := parseGoMapType(typeStr)
+		if !ok {
+			return "Dictionary<string, object>"
+		}
+		_ = keyType
+		csVal := goTypeToCSharp(valueType)
+		if valueType == "any" || valueType == "interface{}" {
+			csVal = "object?"
+		}
+		return "Dictionary<string, " + csVal + ">"
+	}
 
 	if typeKind == "slice" || strings.HasPrefix(typeStr, "[]") {
 		elemType := strings.TrimPrefix(typeStr, "[]")

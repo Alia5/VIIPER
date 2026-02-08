@@ -46,7 +46,8 @@ func TestAPIServer_StreamHandlerError_ClosesConn(t *testing.T) {
 	bus, err := virtualbus.NewWithBusId(70002)
 	require.NoError(t, err)
 	require.NoError(t, usbSrv.AddBus(bus))
-	dev := xbox360.New(nil)
+	dev, err := xbox360.New(nil)
+	require.NoError(t, err)
 	_, err = bus.Add(dev)
 	require.NoError(t, err)
 
@@ -60,7 +61,7 @@ func TestAPIServer_StreamHandlerError_ClosesConn(t *testing.T) {
 
 	sentinel := fmt.Errorf("boom")
 	mr := th.CreateMockRegistration(t, "xbox360_error_stream",
-		func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+		func(o *device.CreateOptions) (pusb.Device, error) { return xbox360.New(o) },
 		func(conn net.Conn, d *pusb.Device, l *slog.Logger) error { return sentinel },
 	)
 

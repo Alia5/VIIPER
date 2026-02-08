@@ -17,7 +17,7 @@ func init() {
 
 type handler struct{}
 
-func (h *handler) CreateDevice(o *device.CreateOptions) usb.Device { return New(o) }
+func (h *handler) CreateDevice(o *device.CreateOptions) (usb.Device, error) { return New(o) }
 
 func (r *handler) StreamHandler() api.StreamHandlerFunc {
 	return func(conn net.Conn, devPtr *usb.Device, logger *slog.Logger) error {

@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"text/template"
 
 	"github.com/Alia5/VIIPER/internal/codegen/common"
@@ -18,9 +20,11 @@ const deviceHeaderTemplate = `{{.Header}}
 #include "../error.hpp"
 #include <cstdint>
 #include <vector>
+{{- if or .HasMaps .HasFixedWireArrays}}
+#include <array>
+{{- end}}
 {{- if .HasMaps}}
 #include <string_view>
-#include <array>
 #include <algorithm>
 #include <optional>
 #include <unordered_map>
@@ -90,7 +94,11 @@ constexpr std::uint64_t {{$mapName}}_{{$entry.Key}} = {{formatValue $entry.Value
 struct Input {
 {{- range $fields}}
 {{- if isArrayType .Type}}
-    std::vector<{{cpptype (baseType .Type)}}> {{camelcase .Name}};
+{{- if isFixedArrayType .Type}}
+	std::array<{{cpptype (baseType .Type)}}, {{fixedArrayLen .Type}}> {{camelcase .Name}}{};
+{{- else}}
+	std::vector<{{cpptype (baseType .Type)}}> {{camelcase .Name}};
+{{- end}}
 {{- else if not (isCountField $fields .Name)}}
     {{cpptype .Type}} {{camelcase .Name}} = 0;
 {{- end}}
@@ -100,10 +108,42 @@ struct Input {
         std::vector<std::uint8_t> buf;
 {{- range $fields}}
 {{- if isArrayType .Type}}
-        buf.push_back(static_cast<std::uint8_t>({{camelcase .Name}}.size()));
-        for (const auto& v : {{camelcase .Name}}) {
-            buf.push_back(static_cast<std::uint8_t>(v));
-        }
+	{{- $abt := baseType .Type}}
+	{{- if isFixedArrayType .Type}}
+		for (std::size_t i = 0; i < static_cast<std::size_t>({{fixedArrayLen .Type}}); i++) {
+		    const auto v = {{camelcase .Name}}[i];
+	{{- if eq $abt "u8"}}
+		    buf.push_back(static_cast<std::uint8_t>(v));
+	{{- else if eq $abt "i8"}}
+		    buf.push_back(static_cast<std::uint8_t>(static_cast<std::int8_t>(v)));
+	{{- else if or (eq $abt "u16") (eq $abt "i16")}}
+		    buf.push_back(static_cast<std::uint8_t>(v & 0xFF));
+		    buf.push_back(static_cast<std::uint8_t>((v >> 8) & 0xFF));
+	{{- else if or (eq $abt "u32") (eq $abt "i32")}}
+		    buf.push_back(static_cast<std::uint8_t>(v & 0xFF));
+		    buf.push_back(static_cast<std::uint8_t>((v >> 8) & 0xFF));
+		    buf.push_back(static_cast<std::uint8_t>((v >> 16) & 0xFF));
+		    buf.push_back(static_cast<std::uint8_t>((v >> 24) & 0xFF));
+	{{- end}}
+		}
+	{{- else}}
+		buf.push_back(static_cast<std::uint8_t>({{camelcase .Name}}.size()));
+		for (const auto& v : {{camelcase .Name}}) {
+	{{- if eq $abt "u8"}}
+		    buf.push_back(static_cast<std::uint8_t>(v));
+	{{- else if eq $abt "i8"}}
+		    buf.push_back(static_cast<std::uint8_t>(static_cast<std::int8_t>(v)));
+	{{- else if or (eq $abt "u16") (eq $abt "i16")}}
+		    buf.push_back(static_cast<std::uint8_t>(v & 0xFF));
+		    buf.push_back(static_cast<std::uint8_t>((v >> 8) & 0xFF));
+	{{- else if or (eq $abt "u32") (eq $abt "i32")}}
+		    buf.push_back(static_cast<std::uint8_t>(v & 0xFF));
+		    buf.push_back(static_cast<std::uint8_t>((v >> 8) & 0xFF));
+		    buf.push_back(static_cast<std::uint8_t>((v >> 16) & 0xFF));
+		    buf.push_back(static_cast<std::uint8_t>((v >> 24) & 0xFF));
+	{{- end}}
+		}
+	{{- end}}
 {{- else if not (isCountField $fields .Name)}}
 {{- $bt := .Type}}
 {{- if eq $bt "u8"}}
@@ -218,24 +258,40 @@ func generateDeviceHeader(logger *slog.Logger, devicesDir, deviceName string, md
 		}
 	}
 
+	hasFixedWireArrays := false
+	if md.WireTags != nil {
+		if c2sTag := md.WireTags.GetTag(deviceName, "c2s"); c2sTag != nil {
+			for _, f := range c2sTag.Fields {
+				if idx := strings.Index(f.Type, "*"); idx >= 0 {
+					if _, err := strconv.Atoi(f.Type[idx+1:]); err == nil {
+						hasFixedWireArrays = true
+						break
+					}
+				}
+			}
+		}
+	}
+
 	data := struct {
-		Header     string
-		DeviceName string
-		Constants  []scanner.ConstantInfo
-		Maps       []scanner.MapInfo
-		HasInput   bool
-		HasOutput  bool
-		HasMaps    bool
-		OutputSize int
+		Header             string
+		DeviceName         string
+		Constants          []scanner.ConstantInfo
+		Maps               []scanner.MapInfo
+		HasInput           bool
+		HasOutput          bool
+		HasMaps            bool
+		HasFixedWireArrays bool
+		OutputSize         int
 	}{
-		Header:     writeFileHeader(),
-		DeviceName: deviceName,
-		Constants:  devicePkg.Constants,
-		Maps:       devicePkg.Maps,
-		HasInput:   hasInput,
-		HasOutput:  hasOutput,
-		HasMaps:    hasMaps,
-		OutputSize: outputSize,
+		Header:             writeFileHeader(),
+		DeviceName:         deviceName,
+		Constants:          devicePkg.Constants,
+		Maps:               devicePkg.Maps,
+		HasInput:           hasInput,
+		HasOutput:          hasOutput,
+		HasMaps:            hasMaps,
+		HasFixedWireArrays: hasFixedWireArrays,
+		OutputSize:         outputSize,
 	}
 
 	if err := tmpl.Execute(f, data); err != nil {

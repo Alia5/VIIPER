@@ -108,9 +108,10 @@ func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string,
 		o = &device.CreateOptions{}
 	}
 	req := apitypes.DeviceCreateRequest{
-		Type:      &devType,
-		IdVendor:  o.IdVendor,
-		IdProduct: o.IdProduct,
+		Type:           &devType,
+		IdVendor:       o.IdVendor,
+		IdProduct:      o.IdProduct,
+		DeviceSpecific: o.DeviceSpecific,
 	}
 	payloadBytes, err := json.Marshal(req)
 	if err != nil {

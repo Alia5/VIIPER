@@ -2,6 +2,7 @@ package cpp
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -19,6 +20,7 @@ func tplFuncs(md *meta.Metadata) template.FuncMap {
 		"upper":                strings.ToUpper,
 		"lower":                strings.ToLower,
 		"cpptype":              cppType,
+		"fieldcpptype":         fieldCppType,
 		"unwrapOptional":       func(t string) string { return strings.TrimSuffix(strings.TrimPrefix(t, "std::optional<"), ">") },
 		"sliceElementType": func(t string) string {
 			return strings.TrimSuffix(strings.TrimPrefix(t, "std::vector<"), ">")
@@ -27,7 +29,26 @@ func tplFuncs(md *meta.Metadata) template.FuncMap {
 		"hasWireTag":   func(device, dir string) bool { return common.HasWireTag(md, device, dir) },
 		"wireFields":   func(device, dir string) []scanner.WireField { return common.GetWireFields(md, device, dir) },
 		"isArrayType":  func(t string) bool { return strings.Contains(t, "*") },
-		"baseType":     func(t string) string { return strings.Split(t, "*")[0] },
+		"isFixedArrayType": func(t string) bool {
+			idx := strings.Index(t, "*")
+			if idx < 0 {
+				return false
+			}
+			_, err := strconv.Atoi(t[idx+1:])
+			return err == nil
+		},
+		"fixedArrayLen": func(t string) int {
+			idx := strings.Index(t, "*")
+			if idx < 0 {
+				return 0
+			}
+			n, err := strconv.Atoi(t[idx+1:])
+			if err != nil {
+				return 0
+			}
+			return n
+		},
+		"baseType": func(t string) string { return strings.Split(t, "*")[0] },
 		"arrayCountField": func(t string) string {
 			parts := strings.Split(t, "*")
 			if len(parts) == 2 {
@@ -60,8 +81,21 @@ func tplFuncs(md *meta.Metadata) template.FuncMap {
 	}
 }
 
+func fieldCppType(field scanner.FieldInfo) string {
+	t := cppType(field.Type)
+	if field.Optional {
+		if !strings.HasPrefix(t, "std::optional<") {
+			t = "std::optional<" + t + ">"
+		}
+	}
+	return t
+}
+
 func cppType(goType string) string {
 	base, isSlice, isPointer := common.NormalizeGoType(goType)
+	if strings.HasPrefix(base, "map[") {
+		return "json_type"
+	}
 
 	cppBase := goBaseToCpp(base)
 	if isSlice {
@@ -163,6 +197,9 @@ func hasCharLiteralKeys(entries map[string]interface{}) bool {
 
 func isCustomType(goType string) bool {
 	base, _, _ := common.NormalizeGoType(goType)
+	if strings.HasPrefix(base, "map[") {
+		return false
+	}
 	switch base {
 	case "uint8", "byte", "uint16", "uint32", "uint64",
 		"int8", "int16", "int32", "int64", "int",

@@ -204,6 +204,9 @@ The exception to this are the device-control and feedback streams, which are raw
           "vid": "0x045e",
           "pid": "0x028e",
           "type": "xbox360"
+          "deviceSpecific": {
+            "subType": 1
+          }
         }
       ]
     }
@@ -219,13 +222,15 @@ The exception to this are the device-control and feedback streams, which are raw
     {
       "type": "<deviceType>",
       "idVendor": <optional_vid>,
-      "idProduct": <optional_pid>
+      "idProduct": <optional_pid>,
+      "deviceSpecific": <optional device specific args>
     }
     ```
     
     **Examples:**
     - `{"type":"xbox360"}`
     - `{"type":"keyboard","idVendor":1234,"idProduct":5678}`
+    - `{"type":"xbox360", "deviceSpecific": {"subType": 7}}`
     
     **Response:**
     ```json
@@ -234,7 +239,10 @@ The exception to this are the device-control and feedback streams, which are raw
       "devId": "1",
       "vid": "0x045e",
       "pid": "0x028e",
-      "type": "xbox360"
+      "type": "xbox360",
+      "deviceSpecific": {
+        "subType":7
+      }
     }
     ```
     

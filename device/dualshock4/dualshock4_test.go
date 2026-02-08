@@ -343,7 +343,10 @@ func TestInputReports(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			dev := dualshock4.New(nil)
+			dev, err := dualshock4.New(nil)
+			if !assert.NoError(t, err) {
+				return
+			}
 			dev.UpdateInputState(&tc.inputState)
 			built := dev.HandleTransfer(4, usbip.DirIn, nil)
 			bb := append([]byte(nil), built...)

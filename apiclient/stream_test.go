@@ -155,7 +155,7 @@ func TestDeviceStream_Operations(t *testing.T) {
 			r := apiSrv.Router()
 			if tt.customRegistration {
 				testReg := htesting.CreateMockRegistration(t, "xbox360",
-					func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+					func(o *device.CreateOptions) (pusb.Device, error) { return xbox360.New(o) },
 					func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error {
 						<-time.After(50 * time.Millisecond)
 						return nil

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -38,11 +39,23 @@ func generateDeviceTypes(logger *slog.Logger, deviceDir string, deviceName strin
 
 type tsWireField struct {
 	Name      string
-	GoType    string
+	WireType  string
+	BaseType  string
 	Writer    string
 	Reader    string
 	IsArray   bool
 	CountName string
+	FixedLen  int
+}
+
+func splitWireType(wireType string) (baseType string, countToken string, isArray bool) {
+	idx := strings.Index(wireType, "*")
+	if idx < 0 {
+		return wireType, "", false
+	}
+	baseType = wireType[:idx]
+	countToken = wireType[idx+1:]
+	return baseType, countToken, true
 }
 
 func writerFor(goType string) string {
@@ -101,19 +114,22 @@ func generateWireClassTS(outputPath, device, className string, tag *scanner.Wire
 		Device    string
 		ClassName string
 		Fields    []tsWireField
-		HasArray  bool
-		ArrayInfo *tsWireField
 	}{Device: device, ClassName: className}
 	for _, field := range tag.Fields {
-		wf := tsWireField{Name: common.ToPascalCase(field.Name), GoType: field.Type, Writer: writerFor(field.Type), Reader: readerFor(field.Type)}
-		if strings.Contains(field.Spec, "*") {
-			parts := strings.Split(field.Spec, "*")
-			if len(parts) == 2 {
-				data.HasArray = true
-				wf.IsArray = true
-				wf.CountName = common.ToPascalCase(parts[1])
-				copy := wf
-				data.ArrayInfo = &copy
+		baseType, countToken, isArray := splitWireType(field.Type)
+		wf := tsWireField{
+			Name:     common.ToPascalCase(field.Name),
+			WireType: field.Type,
+			BaseType: baseType,
+			Writer:   writerFor(baseType),
+			Reader:   readerFor(baseType),
+			IsArray:  isArray,
+		}
+		if isArray {
+			if n, err := strconv.Atoi(countToken); err == nil {
+				wf.FixedLen = n
+			} else {
+				wf.CountName = common.ToPascalCase(countToken)
 			}
 		}
 		data.Fields = append(data.Fields, wf)
@@ -139,34 +155,39 @@ import { BinaryWriter, BinaryReader } from '../../utils/binary';
 import type { IBinarySerializable } from '../../ViiperDevice';
 
 export class {{.Device}}{{.ClassName}} implements IBinarySerializable {
-{{range .Fields}}  {{.Name}}!: {{if or (eq .GoType "u64") (eq .GoType "i64")}}bigint{{else}}number{{end}}{{if .IsArray}}[]{{end}};
+{{range .Fields}}  {{.Name}}!: {{if or (eq .BaseType "u64") (eq .BaseType "i64")}}bigint{{else}}number{{end}}{{if .IsArray}}[]{{end}};
 {{end}}
   constructor(init: Partial<{{.Device}}{{.ClassName}}> = {}) {
     Object.assign(this, init);
   }
   write(writer: BinaryWriter): void {
-{{if .HasArray}}    // Write fixed-size fields
-{{range .Fields}}{{if not .IsArray}}    writer.{{.Writer}}(this.{{.Name}} as any);
-{{end}}{{end}}    // Write variable-length array
-    for (let i = 0; i < (this.{{.ArrayInfo.CountName}} as number); i++) {
-      writer.{{.ArrayInfo.Writer}}((this.{{.ArrayInfo.Name}} as any[])[i]);
-    }
-{{else}}{{range .Fields}}    writer.{{.Writer}}(this.{{.Name}} as any);
+{{range .Fields}}{{if .IsArray}}{{if gt .FixedLen 0}}
+		{
+			const arr = (this.{{.Name}} ?? []) as any[];
+			for (let i = 0; i < {{.FixedLen}}; i++) {
+				writer.{{.Writer}}((arr[i] ?? 0) as any);
+			}
+		}
+{{else}}
+		for (let i = 0; i < Number((this.{{.CountName}} as any)); i++) {
+			writer.{{.Writer}}((this.{{.Name}} as any[])[i]);
+		}
+{{end}}{{else}}    writer.{{.Writer}}(this.{{.Name}} as any);
 {{end}}{{end}}  }
   static read(reader: BinaryReader): {{.Device}}{{.ClassName}} {
-{{if .HasArray}}    // Read fixed-size fields
-{{range .Fields}}{{if not .IsArray}}    const {{.Name | toCamelTS}} = reader.{{.Reader}}();
-{{end}}{{end}}    const {{.ArrayInfo.Name | toCamelTS}}: any[] = new Array(Number({{.ArrayInfo.CountName | toCamelTS}}));
-    for (let i = 0; i < Number({{.ArrayInfo.CountName | toCamelTS}}); i++) {
-      {{.ArrayInfo.Name | toCamelTS}}[i] = reader.{{.ArrayInfo.Reader}}();
-    }
-    return new {{.Device}}{{.ClassName}}({
-{{range .Fields}}{{if not .IsArray}}      {{.Name}}: {{.Name | toCamelTS}},
-{{end}}{{end}}      {{.ArrayInfo.Name}}: {{.ArrayInfo.Name | toCamelTS}},
-    });
-{{else}}    return new {{.Device}}{{.ClassName}}({
-{{range .Fields}}      {{.Name}}: reader.{{.Reader}}(),
+{{range .Fields}}{{if .IsArray}}{{if gt .FixedLen 0}}    const {{.Name | toCamelTS}}: any[] = new Array({{.FixedLen}});
+		for (let i = 0; i < {{.FixedLen}}; i++) {
+			{{.Name | toCamelTS}}[i] = reader.{{.Reader}}();
+		}
+{{else}}    const {{.Name | toCamelTS}}: any[] = new Array(Number({{.CountName | toCamelTS}}));
+		for (let i = 0; i < Number({{.CountName | toCamelTS}}); i++) {
+			{{.Name | toCamelTS}}[i] = reader.{{.Reader}}();
+		}
+{{end}}{{else}}    const {{.Name | toCamelTS}} = reader.{{.Reader}}();
+{{end}}{{end}}
+		return new {{.Device}}{{.ClassName}}({
+{{range .Fields}}      {{.Name}}: {{.Name | toCamelTS}},
 {{end}}    });
-{{end}}  }
+	}
 }
 `

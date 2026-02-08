@@ -2,6 +2,7 @@ package common
 
 import (
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/Alia5/VIIPER/internal/codegen/meta"
@@ -34,11 +35,17 @@ func CalculateOutputSize(tag *scanner.WireTag) int {
 
 	total := 0
 	for _, field := range tag.Fields {
-		baseType := field.Type
-		if strings.Contains(baseType, "*") {
+		wireType := field.Type
+		if idx := strings.Index(wireType, "*"); idx >= 0 {
+			baseType := wireType[:idx]
+			countToken := wireType[idx+1:]
+			if n, err := strconv.Atoi(countToken); err == nil {
+				total += WireTypeSize(baseType) * n
+				continue
+			}
 			return 0
 		}
-		total += WireTypeSize(baseType)
+		total += WireTypeSize(wireType)
 	}
 
 	return total

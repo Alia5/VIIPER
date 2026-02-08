@@ -8,6 +8,7 @@ type Device interface {
 	// For IN transfers, return the payload to send; for OUT, consume 'out' and return nil.
 	HandleTransfer(ep uint32, dir uint32, out []byte) []byte
 	GetDescriptor() *Descriptor
+	GetDeviceSpecificArgs() map[string]any
 }
 
 // ControlDevice is an optional interface for devices that need to handle

@@ -77,6 +77,7 @@ viiper-client = { path = "../../clients/rust" }
                 r#type: Some("keyboard".to_string()),
                 id_vendor: None,
                 id_product: None,
+                device_specific: None,
             },
         ).expect("Failed to add device");
 
@@ -133,6 +134,7 @@ viiper-client = { path = "../../clients/rust" }
                 r#type: Some("keyboard".to_string()),
                 id_vendor: None,
                 id_product: None,
+                device_specific: None,
             },
         ).await.expect("Failed to add device");
 

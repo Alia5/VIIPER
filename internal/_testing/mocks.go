@@ -12,10 +12,10 @@ type mockRegistration struct {
 	deviceName  string
 	handlerFunc api.StreamHandlerFunc
 
-	createFunc func(o *device.CreateOptions) usb.Device
+	createFunc func(o *device.CreateOptions) (usb.Device, error)
 }
 
-func (m *mockRegistration) CreateDevice(o *device.CreateOptions) usb.Device {
+func (m *mockRegistration) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
 	return m.createFunc(o)
 }
 
@@ -26,7 +26,7 @@ func (m *mockRegistration) StreamHandler() api.StreamHandlerFunc {
 func CreateMockRegistration(
 	t *testing.T,
 	name string,
-	cf func(o *device.CreateOptions) usb.Device,
+	cf func(o *device.CreateOptions) (usb.Device, error),
 	h api.StreamHandlerFunc,
 ) api.DeviceRegistration {
 	return &mockRegistration{

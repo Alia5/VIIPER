@@ -21,7 +21,7 @@ type Mouse struct {
 }
 
 // New returns a new Mouse device.
-func New(o *device.CreateOptions) *Mouse {
+func New(o *device.CreateOptions) (*Mouse, error) {
 	d := &Mouse{
 		descriptor: defaultDescriptor,
 	}
@@ -33,7 +33,7 @@ func New(o *device.CreateOptions) *Mouse {
 			d.descriptor.Device.IDProduct = *o.IdProduct
 		}
 	}
-	return d
+	return d, nil
 }
 
 // UpdateInputState updates the device's current input state (thread-safe).
@@ -178,4 +178,8 @@ var defaultDescriptor = usb.Descriptor{
 
 func (m *Mouse) GetDescriptor() *usb.Descriptor {
 	return &m.descriptor
+}
+
+func (x *Mouse) GetDeviceSpecificArgs() map[string]any {
+	return map[string]any{}
 }

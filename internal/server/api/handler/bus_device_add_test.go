@@ -44,7 +44,37 @@ func TestBusDeviceAdd(t *testing.T) {
 			},
 			pathParams:       map[string]string{"id": "80001"},
 			payload:          `{"type": "xbox360"}`,
-			expectedResponse: `{"busId":80001, "devId": "1", "vid":"0x045e", "pid":"0x028e", "type":"xbox360"}`,
+			expectedResponse: `{"busId":80001, "devId": "1", "deviceSpecific": {"subType": 1}, "vid":"0x045e", "pid":"0x028e", "type":"xbox360"}`,
+		},
+		{
+			name: "add device to existing bus with device specific args",
+			setup: func(t *testing.T, s *usb.Server, as *api.Server) {
+				b, err := virtualbus.NewWithBusId(80001)
+				if err != nil {
+					t.Fatalf("create bus failed: %v", err)
+				}
+				if err := s.AddBus(b); err != nil {
+					t.Fatalf("add bus failed: %v", err)
+				}
+			},
+			pathParams:       map[string]string{"id": "80001"},
+			payload:          `{"type": "xbox360", "deviceSpecific":{"subType": 7}}`,
+			expectedResponse: `{"busId":80001, "devId": "1", "deviceSpecific": {"subType": 7}, "vid":"0x045e", "pid":"0x028e", "type":"xbox360"}`,
+		},
+		{
+			name: "invalid device specific args",
+			setup: func(t *testing.T, s *usb.Server, as *api.Server) {
+				b, err := virtualbus.NewWithBusId(80001)
+				if err != nil {
+					t.Fatalf("create bus failed: %v", err)
+				}
+				if err := s.AddBus(b); err != nil {
+					t.Fatalf("add bus failed: %v", err)
+				}
+			},
+			pathParams:       map[string]string{"id": "80001"},
+			payload:          `{"type": "xbox360", "deviceSpecific":{"subType": "a"}}`,
+			expectedResponse: `{"detail":"failed to create device: invalid JSON payload: json: cannot unmarshal string into Go struct field Xbox360CreateOptions.subType of type uint8", "status":400, "title":"Bad Request"}`,
 		},
 		{
 			name:             "add device to non-existing bus",
@@ -100,7 +130,11 @@ func TestBusDeviceAdd(t *testing.T) {
 				if err := s.AddBus(b); err != nil {
 					t.Fatalf("add bus failed: %v", err)
 				}
-				if _, err := b.Add(xbox360.New(nil)); err != nil {
+				dev, err := xbox360.New(nil)
+				if err != nil {
+					t.Fatalf("create device failed: %v", err)
+				}
+				if _, err := b.Add(dev); err != nil {
 					t.Fatalf("add device failed: %v", err)
 				}
 				if err := b.RemoveDeviceByID("1"); err != nil {
@@ -109,7 +143,7 @@ func TestBusDeviceAdd(t *testing.T) {
 			},
 			pathParams:       map[string]string{"id": "80005"},
 			payload:          `{"type": "xbox360"}`,
-			expectedResponse: `{"busId":80005, "devId": "1", "vid":"0x045e", "pid":"0x028e", "type":"xbox360"}`,
+			expectedResponse: `{"busId":80005, "devId": "1", "deviceSpecific": {"subType":1}, "vid":"0x045e", "pid":"0x028e", "type":"xbox360"}`,
 		},
 		{
 			name: "autoattach fails returns error",
@@ -191,7 +225,7 @@ func TestBusDeviceAdd_NoConnection_TimeoutCleanup(t *testing.T) {
 	defer apiSrv.Close()
 
 	testReg := th.CreateMockRegistration(t, "xbox360",
-		func(o *device.CreateOptions) pusb.Device { return xbox360.New(o) },
+		func(o *device.CreateOptions) (pusb.Device, error) { return xbox360.New(o) },
 		func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error { return nil },
 	)
 

@@ -22,7 +22,7 @@ type Keyboard struct {
 }
 
 // New returns a new Keyboard device.
-func New(o *device.CreateOptions) *Keyboard {
+func New(o *device.CreateOptions) (*Keyboard, error) {
 	d := &Keyboard{
 		descriptor: defaultDescriptor,
 	}
@@ -34,7 +34,7 @@ func New(o *device.CreateOptions) *Keyboard {
 			d.descriptor.Device.IDProduct = *o.IdProduct
 		}
 	}
-	return d
+	return d, nil
 }
 
 // SetLEDCallback sets a callback that will be invoked when LED state changes.
@@ -215,4 +215,8 @@ var defaultDescriptor = usb.Descriptor{
 
 func (k *Keyboard) GetDescriptor() *usb.Descriptor {
 	return &k.descriptor
+}
+
+func (x *Keyboard) GetDeviceSpecificArgs() map[string]any {
+	return map[string]any{}
 }

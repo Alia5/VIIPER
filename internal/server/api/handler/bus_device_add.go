@@ -49,11 +49,15 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 		}
 
 		opts := device.CreateOptions{
-			IdVendor:  deviceCreateReq.IdVendor,
-			IdProduct: deviceCreateReq.IdProduct,
+			IdVendor:       deviceCreateReq.IdVendor,
+			IdProduct:      deviceCreateReq.IdProduct,
+			DeviceSpecific: deviceCreateReq.DeviceSpecific,
 		}
 
-		dev := reg.CreateDevice(&opts)
+		dev, err := reg.CreateDevice(&opts)
+		if err != nil {
+			return apierror.ErrBadRequest(fmt.Sprintf("failed to create device: %v", err))
+		}
 		devCtx, err := b.Add(dev)
 		if err != nil {
 			return apierror.ErrInternal(fmt.Sprintf("failed to add device to bus: %v", err))
@@ -100,11 +104,12 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 		}
 
 		payload, err := json.Marshal(apitypes.Device{
-			BusID: uint32(busID),
-			DevId: fmt.Sprintf("%d", exportMeta.DevId),
-			Vid:   fmt.Sprintf("0x%04x", dev.GetDescriptor().Device.IDVendor),
-			Pid:   fmt.Sprintf("0x%04x", dev.GetDescriptor().Device.IDProduct),
-			Type:  name,
+			BusID:          uint32(busID),
+			DevId:          fmt.Sprintf("%d", exportMeta.DevId),
+			Vid:            fmt.Sprintf("0x%04x", dev.GetDescriptor().Device.IDVendor),
+			Pid:            fmt.Sprintf("0x%04x", dev.GetDescriptor().Device.IDProduct),
+			Type:           name,
+			DeviceSpecific: dev.GetDeviceSpecificArgs(),
 		})
 		if err != nil {
 			return apierror.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))

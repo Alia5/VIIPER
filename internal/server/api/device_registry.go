@@ -11,7 +11,7 @@ import (
 // and stream handler registration.
 type DeviceRegistration interface {
 	// CreateDevice returns a new device instance of this type.
-	CreateDevice(o *device.CreateOptions) usb.Device
+	CreateDevice(o *device.CreateOptions) (usb.Device, error)
 	// StreamHandler returns the handler function for long-lived connections.
 	StreamHandler() StreamHandlerFunc
 }

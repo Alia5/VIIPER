@@ -2,6 +2,8 @@
 package xbox360
 
 import (
+	"encoding/json"
+	"fmt"
 	"sync"
 	"sync/atomic"
 
@@ -18,10 +20,14 @@ type Xbox360 struct {
 	descriptor usb.Descriptor
 }
 
+type Xbox360CreateOptions struct {
+	SubType *uint8 `json:"subType"`
+}
+
 // New returns a new Xbox360 device.
-func New(o *device.CreateOptions) *Xbox360 {
+func New(o *device.CreateOptions) (*Xbox360, error) {
 	d := &Xbox360{
-		descriptor: defaultDescriptor,
+		descriptor: MakeDescriptor(),
 	}
 	if o != nil {
 		if o.IdVendor != nil {
@@ -30,8 +36,22 @@ func New(o *device.CreateOptions) *Xbox360 {
 		if o.IdProduct != nil {
 			d.descriptor.Device.IDProduct = *o.IdProduct
 		}
+		if o.DeviceSpecific != nil {
+			data, err := json.Marshal(o.DeviceSpecific)
+			var args Xbox360CreateOptions
+			if err != nil {
+				return nil, fmt.Errorf("invalid JSON payload: %w", err)
+			}
+			err = json.Unmarshal(data, &args)
+			if err != nil {
+				return nil, fmt.Errorf("invalid JSON payload: %w", err)
+			}
+			if args.SubType != nil {
+				d.descriptor.Interfaces[0].ClassDescriptors[0].Payload[2] = *args.SubType
+			}
+		}
 	}
-	return d
+	return d, nil
 }
 
 // SetRumbleCallback sets a callback that will be invoked when rumble commands arrive.
@@ -83,120 +103,125 @@ func (x *Xbox360) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
 	return nil
 }
 
-// Static descriptor/config for Xbox360, for registration with the bus.
-var defaultDescriptor = usb.Descriptor{
-	Device: usb.DeviceDescriptor{
-		BcdUSB:             0x0200,
-		BDeviceClass:       0xff,
-		BDeviceSubClass:    0xff,
-		BDeviceProtocol:    0xff,
-		BMaxPacketSize0:    0x08,
-		IDVendor:           0x045e,
-		IDProduct:          0x028e,
-		BcdDevice:          0x0114,
-		IManufacturer:      0x01,
-		IProduct:           0x02,
-		ISerialNumber:      0x03,
-		BNumConfigurations: 0x01,
-		Speed:              2, // Full speed
-	},
-	Interfaces: []usb.InterfaceConfig{
-		// Interface 0: ff/5d/01 with 2 interrupt endpoints
-		{
-			Descriptor: usb.InterfaceDescriptor{
-				BInterfaceNumber:   0x00,
-				BAlternateSetting:  0x00,
-				BNumEndpoints:      0x02,
-				BInterfaceClass:    0xff,
-				BInterfaceSubClass: 0x5d,
-				BInterfaceProtocol: 0x01,
-				IInterface:         0x00,
-			},
-			ClassDescriptors: []usb.ClassSpecificDescriptor{
-				{
-					DescriptorType: 0x21,
-					Payload:        usb.Data{0x00, 0x01, 0x01, 0x25, 0x81, 0x14, 0x00, 0x00, 0x00, 0x00, 0x13, 0x01, 0x08, 0x00, 0x00},
+func MakeDescriptor() usb.Descriptor {
+	return usb.Descriptor{
+		Device: usb.DeviceDescriptor{
+			BcdUSB:             0x0200,
+			BDeviceClass:       0xff,
+			BDeviceSubClass:    0xff,
+			BDeviceProtocol:    0xff,
+			BMaxPacketSize0:    0x08,
+			IDVendor:           0x045e,
+			IDProduct:          0x028e,
+			BcdDevice:          0x0114,
+			IManufacturer:      0x01,
+			IProduct:           0x02,
+			ISerialNumber:      0x03,
+			BNumConfigurations: 0x01,
+			Speed:              2, // Full speed
+		},
+		Interfaces: []usb.InterfaceConfig{
+			// Interface 0: ff/5d/01 with 2 interrupt endpoints
+			{
+				Descriptor: usb.InterfaceDescriptor{
+					BInterfaceNumber:   0x00,
+					BAlternateSetting:  0x00,
+					BNumEndpoints:      0x02,
+					BInterfaceClass:    0xff,
+					BInterfaceSubClass: 0x5d,
+					BInterfaceProtocol: 0x01,
+					IInterface:         0x00,
+				},
+				ClassDescriptors: []usb.ClassSpecificDescriptor{
+					{
+						DescriptorType: 0x21,
+						Payload:        usb.Data{0x00, 0x01, 0x01, 0x25, 0x81, 0x14, 0x00, 0x00, 0x00, 0x00, 0x13, 0x01, 0x08, 0x00, 0x00},
+					},
+				},
+				Endpoints: []usb.EndpointDescriptor{
+					{BEndpointAddress: 0x81, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x04},
+					{BEndpointAddress: 0x01, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x08},
 				},
 			},
-			Endpoints: []usb.EndpointDescriptor{
-				{BEndpointAddress: 0x81, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x04},
-				{BEndpointAddress: 0x01, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x08},
-			},
-		},
-		// Interface 1: ff/5d/03 with 4 interrupt endpoints
-		{
-			Descriptor: usb.InterfaceDescriptor{
-				BInterfaceNumber:   0x01,
-				BAlternateSetting:  0x00,
-				BNumEndpoints:      0x04,
-				BInterfaceClass:    0xff,
-				BInterfaceSubClass: 0x5d,
-				BInterfaceProtocol: 0x03,
-				IInterface:         0x00,
-			},
-			ClassDescriptors: []usb.ClassSpecificDescriptor{
-				{
-					DescriptorType: 0x21,
-					Payload:        usb.Data{0x00, 0x01, 0x01, 0x01, 0x82, 0x40, 0x01, 0x02, 0x20, 0x16, 0x83, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			// Interface 1: ff/5d/03 with 4 interrupt endpoints
+			{
+				Descriptor: usb.InterfaceDescriptor{
+					BInterfaceNumber:   0x01,
+					BAlternateSetting:  0x00,
+					BNumEndpoints:      0x04,
+					BInterfaceClass:    0xff,
+					BInterfaceSubClass: 0x5d,
+					BInterfaceProtocol: 0x03,
+					IInterface:         0x00,
+				},
+				ClassDescriptors: []usb.ClassSpecificDescriptor{
+					{
+						DescriptorType: 0x21,
+						Payload:        usb.Data{0x00, 0x01, 0x01, 0x01, 0x82, 0x40, 0x01, 0x02, 0x20, 0x16, 0x83, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					},
+				},
+				Endpoints: []usb.EndpointDescriptor{
+					{BEndpointAddress: 0x82, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x02},
+					{BEndpointAddress: 0x02, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x04},
+					{BEndpointAddress: 0x83, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x40},
+					{BEndpointAddress: 0x03, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x10},
 				},
 			},
-			Endpoints: []usb.EndpointDescriptor{
-				{BEndpointAddress: 0x82, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x02},
-				{BEndpointAddress: 0x02, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x04},
-				{BEndpointAddress: 0x83, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x40},
-				{BEndpointAddress: 0x03, BMAttributes: 0x03, WMaxPacketSize: 0x0020, BInterval: 0x10},
-			},
-		},
-		// Interface 2: ff/5d/02 with 1 interrupt endpoint
-		{
-			Descriptor: usb.InterfaceDescriptor{
-				BInterfaceNumber:   0x02,
-				BAlternateSetting:  0x00,
-				BNumEndpoints:      0x01,
-				BInterfaceClass:    0xff,
-				BInterfaceSubClass: 0x5d,
-				BInterfaceProtocol: 0x02,
-				IInterface:         0x00,
-			},
-			ClassDescriptors: []usb.ClassSpecificDescriptor{
-				{
-					DescriptorType: 0x21,
-					Payload:        usb.Data{0x00, 0x01, 0x01, 0x22, 0x84, 0x07, 0x00},
+			// Interface 2: ff/5d/02 with 1 interrupt endpoint
+			{
+				Descriptor: usb.InterfaceDescriptor{
+					BInterfaceNumber:   0x02,
+					BAlternateSetting:  0x00,
+					BNumEndpoints:      0x01,
+					BInterfaceClass:    0xff,
+					BInterfaceSubClass: 0x5d,
+					BInterfaceProtocol: 0x02,
+					IInterface:         0x00,
+				},
+				ClassDescriptors: []usb.ClassSpecificDescriptor{
+					{
+						DescriptorType: 0x21,
+						Payload:        usb.Data{0x00, 0x01, 0x01, 0x22, 0x84, 0x07, 0x00},
+					},
+				},
+				Endpoints: []usb.EndpointDescriptor{
+					{
+						BEndpointAddress: 0x84,
+						BMAttributes:     0x03,
+						WMaxPacketSize:   0x0020,
+						BInterval:        0x10,
+					},
 				},
 			},
-			Endpoints: []usb.EndpointDescriptor{
-				{
-					BEndpointAddress: 0x84,
-					BMAttributes:     0x03,
-					WMaxPacketSize:   0x0020,
-					BInterval:        0x10,
+			// Interface 3: ff/fd/13 with vendor-specific descriptor
+			{
+				Descriptor: usb.InterfaceDescriptor{
+					BInterfaceNumber:   0x03,
+					BAlternateSetting:  0x00,
+					BNumEndpoints:      0x00,
+					BInterfaceClass:    0xff,
+					BInterfaceSubClass: 0xfd,
+					BInterfaceProtocol: 0x13,
+					IInterface:         0x04,
+				},
+				ClassDescriptors: []usb.ClassSpecificDescriptor{
+					{DescriptorType: 0x41, Payload: usb.Data{0x00, 0x01, 0x01, 0x03}},
 				},
 			},
 		},
-		// Interface 3: ff/fd/13 with vendor-specific descriptor
-		{
-			Descriptor: usb.InterfaceDescriptor{
-				BInterfaceNumber:   0x03,
-				BAlternateSetting:  0x00,
-				BNumEndpoints:      0x00,
-				BInterfaceClass:    0xff,
-				BInterfaceSubClass: 0xfd,
-				BInterfaceProtocol: 0x13,
-				IInterface:         0x04,
-			},
-			ClassDescriptors: []usb.ClassSpecificDescriptor{
-				{DescriptorType: 0x41, Payload: usb.Data{0x00, 0x01, 0x01, 0x03}},
-			},
+		Strings: map[uint8]string{
+			0: "\x04\x09", // LangID: en-US (0x0409)
+			1: "©Microsoft Corporation",
+			2: "VIIPER Controller", //"Controller",
+			3: "296013F",
 		},
-	},
-	Strings: map[uint8]string{
-		0: "\x04\x09", // LangID: en-US (0x0409)
-		1: "©Microsoft Corporation",
-		2: "VIIPER Controller", //"Controller",
-		3: "296013F",
-	},
+	}
 }
 
 func (x *Xbox360) GetDescriptor() *usb.Descriptor {
 	return &x.descriptor
+}
+
+func (x *Xbox360) GetDeviceSpecificArgs() map[string]any {
+	return map[string]any{"subType": x.descriptor.Interfaces[0].ClassDescriptors[0].Payload[2]}
 }
