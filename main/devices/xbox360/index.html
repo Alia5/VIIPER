@@ -1585,12 +1585,13 @@ This is done by specifying it as part of the device options.</p>
 <p>The device stream is a bidirectional, raw TCP connection with fixed-size packets.</p>
 <h3 id="input-state">Input State</h3>
 <ul>
-<li>14-byte packets, little-endian layout:</li>
+<li>20-byte packets, little-endian layout:</li>
 <li>Buttons: uint32 (4 bytes, bitfield)</li>
 <li>Triggers: LT, RT: uint8, uint8 (2 bytes)<br />
     0-255 (0=not pressed, 255=fully pressed)</li>
 <li>Sticks: LX, LY, RX, RY: int16 each (8 bytes)<br />
     0 is center, -32768 is min, 32767 is max</li>
+<li>Reserved: there are 6 reserved bytes at the end of the report. For most subtypes, these will be zeroed, but a few subtypes do put data here.</li>
 </ul>
 <h3 id="rumble-feedback">Rumble Feedback</h3>
 <ul>
