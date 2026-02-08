@@ -101,7 +101,7 @@ func generateWireClass(outputPath, device, className string, tag *scanner.WireTa
 
 type wireField struct {
 	Name           string
-	CSType          string
+	CSType         string
 	IsArray        bool
 	CountFieldName string
 	FixedLen       int

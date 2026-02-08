@@ -273,25 +273,25 @@ func generateDeviceHeader(logger *slog.Logger, devicesDir, deviceName string, md
 	}
 
 	data := struct {
-		Header     string
-		DeviceName string
-		Constants  []scanner.ConstantInfo
-		Maps       []scanner.MapInfo
-		HasInput   bool
-		HasOutput  bool
-		HasMaps    bool
+		Header             string
+		DeviceName         string
+		Constants          []scanner.ConstantInfo
+		Maps               []scanner.MapInfo
+		HasInput           bool
+		HasOutput          bool
+		HasMaps            bool
 		HasFixedWireArrays bool
-		OutputSize int
+		OutputSize         int
 	}{
-		Header:     writeFileHeader(),
-		DeviceName: deviceName,
-		Constants:  devicePkg.Constants,
-		Maps:       devicePkg.Maps,
-		HasInput:   hasInput,
-		HasOutput:  hasOutput,
-		HasMaps:    hasMaps,
+		Header:             writeFileHeader(),
+		DeviceName:         deviceName,
+		Constants:          devicePkg.Constants,
+		Maps:               devicePkg.Maps,
+		HasInput:           hasInput,
+		HasOutput:          hasOutput,
+		HasMaps:            hasMaps,
 		HasFixedWireArrays: hasFixedWireArrays,
-		OutputSize: outputSize,
+		OutputSize:         outputSize,
 	}
 
 	if err := tmpl.Execute(f, data); err != nil {

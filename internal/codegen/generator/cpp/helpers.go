@@ -48,7 +48,7 @@ func tplFuncs(md *meta.Metadata) template.FuncMap {
 			}
 			return n
 		},
-		"baseType":     func(t string) string { return strings.Split(t, "*")[0] },
+		"baseType": func(t string) string { return strings.Split(t, "*")[0] },
 		"arrayCountField": func(t string) string {
 			parts := strings.Split(t, "*")
 			if len(parts) == 2 {
