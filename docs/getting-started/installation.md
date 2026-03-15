@@ -224,7 +224,7 @@ Building from source is only necessary if you need to modify VIIPER or target an
 
 ### Prerequisites
 
-- [Go](https://go.dev/) 1.25 or newer
+- [Go](https://go.dev/) 1.26 or newer
 - USBIP installed
 - (Optional) [Make](https://www.gnu.org/software/make/)
   - Linux/macOS: Usually pre-installed

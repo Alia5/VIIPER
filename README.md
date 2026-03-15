@@ -103,7 +103,7 @@ See the [API documentation](./docs/api) for details
 
 ### 🧰 Prerequisites
 
-- [Go](https://go.dev/) 1.25 or newer
+- [Go](https://go.dev/) 1.26 or newer
 - USBIP installed
 - (Optional) [Make](https://www.gnu.org/software/make/)
     - Linux/macOS: Usually pre-installed
