@@ -69,7 +69,7 @@ for commit_hash in "${COMMITS[@]}"; do
     fi
   fi
   if [ -n "$changelog_type" ]; then
-    body_content=$(echo "$commit_body" | awk 'BEGIN{IGNORECASE=1} !/changelog[(: ]/ && NF')
+    body_content=$(echo "$commit_body" | awk 'BEGIN{IGNORECASE=1} !/changelog[(: ]/ && !/^[[:space:]]*co-authored-by:[[:space:]]*/ && NF')
     entry="- $commit_msg"
     if [ -n "$body_content" ]; then
       entry=$(printf "%s\n%s" "$entry" "$(echo "$body_content" | sed 's/^/  /')")
