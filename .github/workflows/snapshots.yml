@@ -116,5 +116,27 @@ jobs:
                       ⚠️ These are the latest development builds and may contain bugs or unfinished features.
 
                       ${{ needs.generate-changelog.outputs.changelog }}
+
+                      ---
+
+                      ## Install / Update
+
+                      <details>
+                      <summary><b>Windows (PowerShell)</b></summary>
+
+                      ```powershell
+                      irm https://alia5.github.io/VIIPER/main/install.ps1 | iex
+                      ```
+                      Installs / updates to `%LOCALAPPDATA%\VIIPER\viiper.exe`
+                      </details>
+
+                      <details>
+                      <summary><b>Linux</b></summary>
+
+                      ```bash
+                      curl -fsSL https://alia5.github.io/VIIPER/main/install.sh | sh
+                      ```
+                      Installs / updates to `/usr/local/bin/viiper`
+                      </details>
                   files: |
                       ./release_files/*

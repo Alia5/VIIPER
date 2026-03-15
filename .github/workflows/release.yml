@@ -220,6 +220,28 @@ jobs:
                   name: "VIIPER ${{ steps.build_info.outputs.version }}"
                   body: |
                       ${{ needs.generate-changelog.outputs.changelog }}
+
+                      ---
+
+                      ## Install / Update
+
+                      <details>
+                      <summary><b>Windows (PowerShell)</b></summary>
+
+                      ```powershell
+                      irm https://alia5.github.io/VIIPER/stable/install.ps1 | iex
+                      ```
+                      Installs / updates to `%LOCALAPPDATA%\VIIPER\viiper.exe`
+                      </details>
+
+                      <details>
+                      <summary><b>Linux</b></summary>
+
+                      ```bash
+                      curl -fsSL https://alia5.github.io/VIIPER/stable/install.sh | sh
+                      ```
+                      Installs / updates to `/usr/local/bin/viiper`
+                      </details>
                   files: release_files/*
                   prerelease: false
                   draft: true

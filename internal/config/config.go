@@ -5,6 +5,14 @@ import (
 	"github.com/Alia5/VIIPER/internal/cmd"
 )
 
+type UpdateNotify string
+
+const (
+	UpdateNotifyNone       UpdateNotify = "none"
+	UpdateNotifyStable     UpdateNotify = "stable"
+	UpdateNotifyPrerelease UpdateNotify = "prerelease"
+)
+
 type Log struct {
 	Level   string `help:"Log level: trace, debug, info, warn, error" default:"info" env:"VIIPER_LOG_LEVEL"`
 	File    string `help:"Log file path (default: none; logs only to console)" env:"VIIPER_LOG_FILE"`
@@ -14,8 +22,9 @@ type Log struct {
 // CLI is the root command structure for Kong CLI parsing.
 type CLI struct {
 	// Global
-	ConfigPath string `help:"Path to configuration file (json|yaml|toml)" name:"config" env:"VIIPER_CONFIG"`
-	Log        `embed:"" prefix:"log."`
+	ConfigPath   string       `help:"Path to configuration file (json|yaml|toml)" name:"config" env:"VIIPER_CONFIG"`
+	UpdateNotify UpdateNotify `help:"Update notification level: none, stable, prerelease" default:"stable" env:"VIIPER_UPDATE_NOTIFY"`
+	Log          `embed:"" prefix:"log."`
 
 	Server cmd.Server `cmd:"" help:"Start the VIIPER USB-IP server"`
 	Proxy  cmd.Proxy  `cmd:"" help:"Start the VIIPER USB-IP proxy"`
