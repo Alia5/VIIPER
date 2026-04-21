@@ -1,31 +1,28 @@
 module github.com/Alia5/VIIPER
 
-go 1.26
+go 1.26.2
 
 require (
-	github.com/alecthomas/kong v1.13.0
+	github.com/alecthomas/kong v1.15.0
 	github.com/alecthomas/kong-toml v0.4.0
 	github.com/alecthomas/kong-yaml v0.2.0
+	github.com/ncruces/zenity v0.10.14
 	github.com/pelletier/go-toml v1.9.5
-	github.com/stretchr/testify v1.9.0
-	golang.org/x/crypto v0.47.0
-	golang.org/x/sys v0.40.0
-	golang.org/x/term v0.39.0
+	github.com/stretchr/testify v1.11.1
+	golang.org/x/crypto v0.50.0
+	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
+	golang.org/x/sys v0.43.0
+	golang.org/x/term v0.42.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/Zyko0/go-sdl3 v0.0.0-20260125144524-02de3d449cb1 // indirect
-	github.com/Zyko0/purego-gen v0.0.0-20250727121216-3bcd331a1e0c // indirect
 	github.com/akavel/rsrc v0.10.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dchest/jsmin v0.0.0-20220218165748-59f39799265f // indirect
-	github.com/ebitengine/purego v0.9.0-alpha.2.0.20250124174847-29f0104e3c2b // indirect
-	github.com/josephspurrier/goversioninfo v1.4.1 // indirect
+	github.com/dchest/jsmin v1.0.0 // indirect
+	github.com/josephspurrier/goversioninfo v1.5.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/ncruces/zenity v0.10.14 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/randall77/makefat v0.0.0-20210315173500-7ddd0e42c844 // indirect
-	golang.org/x/exp v0.0.0-20260112195511-716be5621a96 // indirect
-	golang.org/x/image v0.34.0 // indirect
+	github.com/randall77/makefat v0.0.0-20260406194835-1b91746796b7 // indirect
+	golang.org/x/image v0.39.0 // indirect
 )
