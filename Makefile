@@ -57,6 +57,7 @@ help: ## Show this help message
 	@echo.
 	@echo Build Targets:
 	@echo   build                Build VIIPER for current platform
+	@echo   libVIIPER            Build libVIIPER shared library (DLL on Windows, SO on Linux)
 	@echo   clean                Remove build artifacts
 	@echo   test                 Run tests
 	@echo   test-coverage        Run tests with coverage
@@ -150,6 +151,25 @@ ifeq ($(OS),Windows_NT)
 	@$(MAKE) generate-versioninfo
 endif
 	cd $(SRC_DIR) && go build $(BUILD_FLAGS) -o $(DIST_DIR)/$(BINARY_NAME)$(EXE_EXT) $(MAIN_PKG)
+
+############################################################
+# libVIIPER shared library
+############################################################
+
+LIBVIIPER_DIST_DIR := dist/libVIIPER
+
+.PHONY: libVIIPER
+libVIIPER:
+ifeq ($(OS),Windows_NT)
+	@if not exist $(LIBVIIPER_DIST_DIR) mkdir $(LIBVIIPER_DIST_DIR)
+	set CGO_ENABLED=1 && go build -buildmode=c-shared -o $(LIBVIIPER_DIST_DIR)/libVIIPER.dll ./lib/viiper
+	cd $(LIBVIIPER_DIST_DIR) && gendef libVIIPER.dll
+	go run ./lib/viiper/postbuild
+else
+	@mkdir -p $(LIBVIIPER_DIST_DIR)
+	CGO_ENABLED=1 go build -buildmode=c-shared -o $(LIBVIIPER_DIST_DIR)/libVIIPER.so ./lib/viiper
+	go run ./lib/viiper/postbuild
+endif
 
 .PHONY: clean
 clean: clean-versioninfo ## Remove build artifacts

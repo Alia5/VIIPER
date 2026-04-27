@@ -14,7 +14,6 @@ import (
 )
 
 // BusCreate returns a handler that creates a new bus.
-// Error logging is centralized in the API server; this handler only returns errors.
 func BusCreate(s *usb.Server) api.HandlerFunc {
 	return func(req *api.Request, res *api.Response, logger *slog.Logger) error {
 		if req.Payload != "" {
