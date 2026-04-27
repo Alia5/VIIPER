@@ -3,6 +3,7 @@ package steamdeck
 const (
 	ValveUSBVID = 0x28DE
 	JupiterPID  = 0x1205
+	TritonPID   = 0x1301
 )
 
 // (ApiCLient) Stream frame sizes.

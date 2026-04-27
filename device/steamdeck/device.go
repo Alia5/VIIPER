@@ -539,3 +539,7 @@ var defaultDescriptor = usb.Descriptor{
 func (s *SteamDeck) GetDescriptor() *usb.Descriptor {
 	return &s.descriptor
 }
+
+func (s *SteamDeck) GetDeviceSpecificArgs() map[string]any {
+	return map[string]any{}
+}
