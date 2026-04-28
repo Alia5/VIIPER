@@ -101,7 +101,8 @@ func NewUSBServer(config *C.USBServerConfig, outHandle *C.USBServerHandle, logCa
 			deviceHandles: make(map[uint32][]deviceHandle),
 		}))
 		return true
-	case <-errChan:
+	case err := <-errChan:
+		logger.Error("NewUSBServer: ListenAndServe failed", "error", err)
 		return false
 	}
 }
