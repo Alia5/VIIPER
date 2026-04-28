@@ -32,14 +32,12 @@ jobs:
         shell: bash
         run: |
           chmod +x .github/scripts/generate-changelog.sh
-          # Determine output file
           OUTFILE=changelog_output.md
           if [[ "${{ inputs.mode }}" == "release" ]]; then
             .github/scripts/generate-changelog.sh "$OUTFILE" "${{ inputs.tag_name }}"
           else
             .github/scripts/generate-changelog.sh "$OUTFILE"
           fi
-          # Set output for workflow
           echo "changelog<<CHANGELOG_EOF" >> $GITHUB_OUTPUT
           cat "$OUTFILE" >> $GITHUB_OUTPUT
           echo "CHANGELOG_EOF" >> $GITHUB_OUTPUT
