@@ -31,22 +31,25 @@ These virtual devices are indistinguishable from real hardware to the operating 
    (USBIP still requires a kernel driver, but this is generic and device _emulation_ code still lives in Userspace)
 - Users need USBIP installed once (built into Linux, usbip-win2 for Windows), after that VIIPER can run without additional dependencies or system-wide installation.  
 
-VIIPER _currently_ comes in a single flavor:
+VIIPER comes in two distinct flavors:
 
 - a self-contained, (no dependencies) portable, standalone executable.  
   providing a lightweight TCP based API for feeder application development.  
-- There will eventually be a library version (libVIIPER) that you can link against directly from your application.  
-For more information, see [FAQ](#why-is-this-a-standalone-executable-that-i-have-to-interface-via-tcp-and-not-a-shared-object-library-in-itself)  
+
+- libVIIPER, a single shared library that allows you to emulate devices using USBIP directly from within your application.  
+  See Examples for C and C# [here](./examples/libVIIPER)  
+
+For why you should pick one over the other see the [FAQ](#why-choose-the-the-standalone-executable-and-interfacing-via-tcp-over-and-the-shared-object-libviiper-library)
 
 Beyond device emulation, VIIPER can proxy real USB devices for traffic inspection and reverse engineering.
 
 **Emulatable devices:**
 
-   -  Xbox 360 controller emulation; see [Devices › Xbox 360 Controller](docs/devices/xbox360.md)
-   -  HID Keyboard with N-key rollover and LED feedback; see [Devices › Keyboard](docs/devices/keyboard.md)
-   -  HID Mouse with 5 buttons and horizontal/vertical wheel; see [Devices › Mouse](docs/devices/mouse.md)
-   -  PS4 controller emulation; see [Devices › DualShock 4 Controller](docs/devices/dualshock4.md)
-   - 🔜 Future plugin system allows for more device types (other gamepads, specialized HID)
+- Xbox 360 controller emulation; see [Devices › Xbox 360 Controller](docs/devices/xbox360.md)
+- HID Keyboard with N-key rollover and LED feedback; see [Devices › Keyboard](docs/devices/keyboard.md)
+- HID Mouse with 5 buttons and horizontal/vertical wheel; see [Devices › Mouse](docs/devices/mouse.md)
+- PS4 controller emulation; see [Devices › DualShock 4 Controller](docs/devices/dualshock4.md)
+- 🔜 Future plugin system allows for more device types (other gamepads, specialized HID)
 
 ## 🔌 Requirements
 
@@ -68,11 +71,11 @@ Beyond device emulation, VIIPER can proxy real USB devices for traffic inspectio
 
 ## 🥫 Feeder application development
 
-VIIPER _currently_ comes in a single flavor:
+You have two options for developing feeder applications that control the virtual devices created by VIIPER:
 
-- a standalone executable that exposes an API over TCP.
-- There will eventually be a library version (libVIIPER) that you can link against directly from your application.  
-For more information, see [FAQ](#why-is-this-a-standalone-executable-that-i-have-to-interface-via-tcp-and-not-a-shared-object-library-in-itself)  
+- Use the standalone VIIPER server and interface via the exposed TCP-API (prefferably using one of the available client libraries)
+- Integrate libVIIPER directly into you application.  
+  See [Examples](examples/libVIIPER) for examples in either C or C#.
 
 ### 🔌 API
 
@@ -143,14 +146,12 @@ See the [issues page](https://github.com/Alia5/VIIPER/issues) for bugs and featu
 USBIP is a protocol that allows USB devices to be shared over a network.  
 VIIPER uses it because it's already built into Linux and available for Windows, making virtual device emulation possible without writing custom kernel drivers yourself.
 
-### Why is this a standalone executable that I have to interface via TCP, and not a (shared-object) library in itself
+### Why choose the the standalone executable and interfacing via TCP over, and the (shared-object) libVIIPER library
 
 - Flexibility
     - allows one to use VIIPER as a service on the same host as the USBIP-Client and use the feeder on a different, remote machine.
     - allows for software written utilizing VIIPER to **not be** licensed under the terms of the GPLv3
     - **_future versions_**: Users can enhance VIIPER with device plugins, sharing a common wire-protocol, which can be dynamically incorporated.
-- **That said**, there **will be** a _libVIIPER_  that you can link against, eleminating multi-process and potential firewall issues.  
-  Note that this **will require** your application to be licensed under the terms of the GPLv3 (or comptible license)
 
 ### Can I use VIIPER for gaming?
 
