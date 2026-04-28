@@ -17,6 +17,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api/auth"
 	"github.com/Alia5/VIIPER/internal/server/api/handler"
 	"github.com/Alia5/VIIPER/internal/server/usb"
+	"github.com/Alia5/VIIPER/internal/tray"
 	"github.com/Alia5/VIIPER/internal/util"
 )
 
@@ -36,6 +37,10 @@ func (s *Server) Run(logger *slog.Logger, rawLogger log.RawLogger) error {
 }
 
 func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger log.RawLogger) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go tray.Run(cancel)
+
 	s.UsbServerConfig.ConnectionTimeout = s.ConnectionTimeout
 	s.ApiServerConfig.ConnectionTimeout = s.ConnectionTimeout
 	s.UsbServerConfig.BusCleanupTimeout = s.ApiServerConfig.DeviceHandlerConnectTimeout

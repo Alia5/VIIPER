@@ -3,6 +3,7 @@ module github.com/Alia5/VIIPER
 go 1.26.2
 
 require (
+	fyne.io/systray v1.12.0
 	github.com/alecthomas/kong v1.15.0
 	github.com/alecthomas/kong-toml v0.4.0
 	github.com/alecthomas/kong-yaml v0.2.0
@@ -20,6 +21,7 @@ require (
 	github.com/akavel/rsrc v0.10.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dchest/jsmin v1.0.0 // indirect
+	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/josephspurrier/goversioninfo v1.5.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
