@@ -45,6 +45,8 @@ BUILD_FLAGS := -trimpath -ldflags "$(LDFLAGS)"
 # Windows resource embedding
 VERSIONINFO_JSON := versioninfo.json
 RESOURCE_SYSO := cmd/viiper/resource.syso
+LIBVIIPER_VERSIONINFO_JSON := lib/viiper/versioninfo.json
+LIBVIIPER_RESOURCE_SYSO := lib/viiper/resource.syso
 
 .PHONY: all
 all: test build
@@ -143,7 +145,9 @@ endif
 .PHONY: clean-versioninfo
 clean-versioninfo: ## Remove generated Windows version info resource
 	-@$(RM_FILE) $(RESOURCE_SYSO) 2>$(NULL_DEVICE)
+	-@$(RM_FILE) $(LIBVIIPER_RESOURCE_SYSO) 2>$(NULL_DEVICE)
 	-@$(RM_FILE) versioninfo.tmp.json 2>$(NULL_DEVICE)
+	-@$(RM_FILE) libviiper.versioninfo.tmp.json 2>$(NULL_DEVICE)
 
 .PHONY: build
 build: ## Build for current platform
@@ -162,6 +166,10 @@ LIBVIIPER_DIST_DIR := dist/libVIIPER
 libVIIPER:
 ifeq ($(OS),Windows_NT)
 	@if not exist $(LIBVIIPER_DIST_DIR) mkdir $(LIBVIIPER_DIST_DIR)
+	@go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
+	@powershell -NoProfile -NonInteractive -File scripts/inject-version.ps1 "$(VERSION)" "$(LIBVIIPER_VERSIONINFO_JSON)" "libviiper.versioninfo.tmp.json"
+	@cd $(SRC_DIR) && goversioninfo -64 -o $(LIBVIIPER_RESOURCE_SYSO) libviiper.versioninfo.tmp.json
+	@del libviiper.versioninfo.tmp.json
 	set CGO_ENABLED=1 && go build -buildmode=c-shared -o $(LIBVIIPER_DIST_DIR)/libVIIPER.dll ./lib/viiper
 	cd $(LIBVIIPER_DIST_DIR) && gendef libVIIPER.dll
 	go run ./lib/viiper/postbuild
