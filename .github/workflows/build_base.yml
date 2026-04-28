@@ -20,12 +20,12 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                   fetch-depth: 0
 
             - name: Set up Go
-              uses: actions/setup-go@v5
+              uses: actions/setup-go@v6
               with:
                   go-version: stable
                   cache: true
@@ -50,7 +50,7 @@ jobs:
               run: go test -count=1 -v -coverpkg="./..." -coverprofile="coverage.txt" ./...
 
             - name: Upload coverage to Codecov
-              uses: codecov/codecov-action@v5
+              uses: codecov/codecov-action@v6
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   directory: .
@@ -70,12 +70,12 @@ jobs:
                     - { goos: windows, goarch: arm64, ext: ".exe" }
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                   fetch-depth: 0
 
             - name: Set up Go
-              uses: actions/setup-go@v5
+              uses: actions/setup-go@v6
               with:
                   go-version: 1.26
                   cache: true
@@ -145,8 +145,130 @@ jobs:
 
             - name: Upload artifact
               if: ${{ inputs.upload_artifacts }}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: VIIPER-${{ matrix.target.goos }}-${{ matrix.target.goarch }}${{ inputs.artifact_suffix }}
                   path: dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}${{ matrix.target.ext }}
+                  if-no-files-found: error
+
+    libviiper-linux:
+        name: Build libVIIPER (linux/amd64)
+        runs-on: ubuntu-latest
+        needs: test
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Go
+              uses: actions/setup-go@v6
+              with:
+                  go-version: 1.26
+                  cache: true
+                  cache-dependency-path: |
+                      go.sum
+
+            - name: Build
+              env:
+                  CGO_ENABLED: 1
+              run: |
+                  mkdir -p dist/libVIIPER
+                  go build -buildmode=c-shared -trimpath -o dist/libVIIPER/libVIIPER.so ./lib/viiper
+                  go run ./lib/viiper/postbuild
+
+            - name: Package
+              run: cd dist/libVIIPER && zip libVIIPER-linux-amd64.zip libVIIPER.so libVIIPER.h
+
+            - name: Upload artifact
+              if: ${{ inputs.upload_artifacts }}
+              uses: actions/upload-artifact@v7
+              with:
+                  name: libVIIPER-linux-amd64${{ inputs.artifact_suffix }}
+                  path: dist/libVIIPER/libVIIPER-linux-amd64.zip
+                  if-no-files-found: error
+
+    libviiper-windows:
+        name: Build libVIIPER (windows/amd64)
+        runs-on: ubuntu-latest
+        needs: test
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Go
+              uses: actions/setup-go@v6
+              with:
+                  go-version: 1.26
+                  cache: true
+                  cache-dependency-path: |
+                      go.sum
+
+            - name: Install mingw cross-compiler
+              run: sudo apt-get install -y gcc-mingw-w64-x86-64 mingw-w64-tools
+
+            - name: Generate Windows version info
+              run: |
+                  VERSION=$(git describe --tags --match "v[0-9]*.[0-9]*.[0-9]*" --always || echo "v0.0.0-dev")
+                  git fetch --tags --force || true
+                  if ! echo "$VERSION" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+'; then
+                    VERSION="v0.0.0-dev"
+                  fi
+                  go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
+
+                  VER_STRIPPED=${VERSION#v}
+                  IFS='.-' read -ra PARTS <<< "$VER_STRIPPED"
+                  MAJOR=${PARTS[0]:-0}
+                  MINOR=${PARTS[1]:-0}
+                  PATCH=${PARTS[2]:-0}
+                  BUILD=0
+                  if [ ${#PARTS[@]} -gt 3 ]; then
+                    BUILD_STR="${PARTS[3]}"
+                    if [[ "$BUILD_STR" =~ ^[0-9]+$ ]]; then
+                      BUILD=$BUILD_STR
+                    fi
+                  fi
+                  if ! [[ "$MAJOR" =~ ^[0-9]+$ && "$MINOR" =~ ^[0-9]+$ && "$PATCH" =~ ^[0-9]+$ && "$BUILD" =~ ^[0-9]+$ ]]; then
+                    MAJOR=0; MINOR=0; PATCH=0; BUILD=0;
+                  fi
+
+                  jq --arg major "$MAJOR" --arg minor "$MINOR" --arg patch "$PATCH" --arg build "$BUILD" \
+                     --arg verStr "$MAJOR.$MINOR.$PATCH.$BUILD" --arg prodVer "$VER_STRIPPED" \
+                     '.FixedFileInfo.FileVersion.Major = ($major | tonumber) |
+                      .FixedFileInfo.FileVersion.Minor = ($minor | tonumber) |
+                      .FixedFileInfo.FileVersion.Patch = ($patch | tonumber) |
+                      .FixedFileInfo.FileVersion.Build = ($build | tonumber) |
+                      .FixedFileInfo.ProductVersion.Major = ($major | tonumber) |
+                      .FixedFileInfo.ProductVersion.Minor = ($minor | tonumber) |
+                      .FixedFileInfo.ProductVersion.Patch = ($patch | tonumber) |
+                      .FixedFileInfo.ProductVersion.Build = ($build | tonumber) |
+                      .StringFileInfo.FileVersion = $verStr |
+                      .StringFileInfo.ProductVersion = $prodVer' \
+                     lib/viiper/versioninfo.json > libviiper.versioninfo.tmp.json
+
+                  goversioninfo -64 -o lib/viiper/resource.syso libviiper.versioninfo.tmp.json
+
+            - name: Build
+              env:
+                  CGO_ENABLED: 1
+                  GOOS: windows
+                  GOARCH: amd64
+                  CC: x86_64-w64-mingw32-gcc
+              run: |
+                  mkdir -p dist/libVIIPER
+                  go build -buildmode=c-shared -trimpath -o dist/libVIIPER/libVIIPER.dll ./lib/viiper
+                  cd dist/libVIIPER && gendef libVIIPER.dll && cd ../..
+                  GOOS= GOARCH= CGO_ENABLED=0 CC= go run ./lib/viiper/postbuild
+
+            - name: Package
+              run: cd dist/libVIIPER && zip libVIIPER-windows-amd64.zip libVIIPER.dll libVIIPER.def libVIIPER.h
+
+            - name: Upload artifact
+              if: ${{ inputs.upload_artifacts }}
+              uses: actions/upload-artifact@v7
+              with:
+                  name: libVIIPER-windows-amd64${{ inputs.artifact_suffix }}
+                  path: dist/libVIIPER/libVIIPER-windows-amd64.zip
                   if-no-files-found: error

@@ -30,10 +30,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Set up Go
-              uses: actions/setup-go@v5
+              uses: actions/setup-go@v6
               with:
                   go-version: stable
                   cache: true
@@ -52,7 +52,7 @@ jobs:
                   fi
 
             - name: Upload generated clients
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: generated-clients
                   path: clients/
@@ -64,16 +64,16 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Download generated clients
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                   name: generated-clients
                   path: clients/
 
             - name: Set up Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                   node-version: "24"
                   cache: "npm"
@@ -106,7 +106,7 @@ jobs:
 
             - name: Upload TypeScript Client Library tarball
               if: ${{ inputs.upload_artifacts }}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: typescript-client-library${{ inputs.artifact_suffix }}
                   path: clients/typescript/viiperclient-typescript-client-library${{ inputs.artifact_suffix }}.tgz
@@ -118,16 +118,16 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Download generated clients
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                   name: generated-clients
                   path: clients/
 
             - name: Set up .NET SDK
-              uses: actions/setup-dotnet@v4
+              uses: actions/setup-dotnet@v5
               with:
                   dotnet-version: "8.0.x"
 
@@ -142,7 +142,7 @@ jobs:
 
             - name: Upload C# Client Library nupkg
               if: ${{ inputs.upload_artifacts }}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: csharp-client-library-nupkg${{ inputs.artifact_suffix }}
                   path: artifacts/nuget/*.nupkg
@@ -154,16 +154,16 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Download generated clients
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                   name: generated-clients
                   path: clients/
 
             - name: Set up CMake
-              uses: jwlawson/actions-setup-cmake@v2
+              uses: jwlawson/actions-setup-cmake@v2.2.0
               with:
                   cmake-version: "3.26.x"
 
@@ -185,7 +185,7 @@ jobs:
 
             - name: Upload C++ Client Library headers
               if: ${{ inputs.upload_artifacts }}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: cpp-client-library-headers${{ inputs.artifact_suffix }}
                   path: cpp-client-library-headers${{ inputs.artifact_suffix }}.zip
@@ -197,10 +197,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Download generated clients
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                   name: generated-clients
                   path: clients/
@@ -234,7 +234,7 @@ jobs:
 
             - name: Upload Rust Client Library crate
               if: ${{ inputs.upload_artifacts }}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: rust-client-library${{ inputs.artifact_suffix }}
                   path: clients/rust/target/package/viiper-client-rust-client-library${{ inputs.artifact_suffix }}.crate
