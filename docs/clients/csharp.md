@@ -7,7 +7,7 @@ The C# client library features:
 - **Async/await support**: Full async API with cancellation token support
 - **Type-safe**: Generated classes with enums, structs, and helper maps
 - **Event-driven**: `OnOutput` event for device feedback (LEDs, rumble)
-- **Modern .NET**: Targets .NET 8.0 with nullable reference types
+- **Modern .NET**: Targets .NET 10.0 with nullable reference types
 - **Zero external dependencies**: Uses only built-in .NET libraries
 
 !!! note "License"

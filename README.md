@@ -39,7 +39,7 @@ VIIPER comes in two distinct flavors:
 - libVIIPER, a single shared library that allows you to emulate devices using USBIP directly from within your application.  
   See Examples for C and C# [here](./examples/libVIIPER)  
 
-For why you should pick one over the other see the [FAQ](#why-choose-the-the-standalone-executable-and-interfacing-via-tcp-over-and-the-shared-object-libviiper-library)
+For why you should pick one over the other see the [FAQ](#why-choose-the-standalone-executable-and-interfacing-via-tcp-over-the-shared-object-libviiper-library)
 
 Beyond device emulation, VIIPER can proxy real USB devices for traffic inspection and reverse engineering.
 
@@ -73,8 +73,8 @@ Beyond device emulation, VIIPER can proxy real USB devices for traffic inspectio
 
 You have two options for developing feeder applications that control the virtual devices created by VIIPER:
 
-- Use the standalone VIIPER server and interface via the exposed TCP-API (prefferably using one of the available client libraries)
-- Integrate libVIIPER directly into you application.  
+- Use the standalone VIIPER server and interface via the exposed TCP-API (preferably using one of the available client libraries)
+- Integrate libVIIPER directly into your application.  
   See [Examples](examples/libVIIPER) for examples in either C or C#.
 
 ### 🔌 API
