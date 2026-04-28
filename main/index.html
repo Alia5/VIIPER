@@ -1840,6 +1840,8 @@
 <br /></p>
 <h1 id="viiper">VIIPER 🐍</h1>
 <p><strong>Virtual</strong> <strong>I</strong>nput over <strong>IP</strong> <strong>E</strong>mulato<strong>R</strong></p>
+<p>A <strong>cross-platform virtual USB input framework</strong> for creating virtual USB input devices (game controllers, keyboards, mice and more)
+that are indistinguishable from real hardware to the operating system and applications.</p>
 <h2 id="quick-links">Quick Links</h2>
 <ul>
 <li><a href="getting-started/installation/">Installation (VIIPER Server)</a>  <ul>
@@ -1851,21 +1853,33 @@
 <li><a href="https://github.com/Alia5/VIIPER">GitHub Repository</a></li>
 </ul>
 <h2 id="what-is-viiper">What is VIIPER?</h2>
-<p>VIIPER lets developers create virtual USB input devices (like game controllers, keyboards, and mice) that can be controlled programmatically (even over a network!) (using USBIP under the hood).<br />
-These virtual devices are indistinguishable from real hardware to the operating system and applications, enabling seamless integration for testing, automation, and remote control scenarios.</p>
+<p>VIIPER lets developers create and programmatically control virtual USB input devices (using USBIP under the hood),
+enabling seamless integration for gaming, automation, testing and remote control scenarios.</p>
+<p>These virtual devices are indistinguishable from real hardware to the operating system and applications.</p>
 <ul>
+<li>Runs on Linux and Windows.  </li>
+<li><em>(Optional)</em> network support built in: control devices over a network with lower overhead than raw USBIP alone.  </li>
 <li>VIIPER abstracts away all USB / USBIP details.  </li>
-<li>Device emulation happens in userspace code instead of kernel drivers, so no kernel programming is required to add new device types.  </li>
-<li>Users need USBIP installed once (built into Linux, usbip-win2 for Windows), after that VIIPER can run without additional dependencies or system-wide installation.  </li>
+<li>VIIPER is portable and runs entirely in userspace.  <ul>
+<li>Utilizes a generic USBIP kernel mode driver<br />
+  (built into Linux; on Windows <a href="https://github.com/vadimgrn/usbip-win2">usbip-win2</a> provides a signed kernel mode driver)<br />
+  New device types never require touching kernel code.  </li>
+</ul>
+</li>
+<li>After installing USBIP once, VIIPER can run without additional dependencies or system-wide installation.  </li>
 </ul>
 <p>VIIPER comes in two distinct flavors:</p>
 <ul>
 <li><strong>VIIPER server</strong><br />
-a self-contained, (no dependencies) portable, standalone executable.<br />
-  providing a lightweight TCP based API for feeder application development.</li>
+  a self-contained, (no dependencies, statically linked) portable, standalone executable  <ul>
+<li>exposing a lightweight TCP-API</li>
+<li>control devices from any language or machine on the network  </li>
+</ul>
+</li>
 <li><strong>libVIIPER</strong><br />
-a single shared library that allows you to emulate devices using USBIP directly from within your application.<br />
-  See <a href="libviiper/overview/">libVIIPER documentation</a> for details and examples.  </li>
+  a single shared library to embed device emulation directly into your application<br />
+  See Examples for C and C# <a href="./examples/libVIIPER">here</a><br />
+  or the <a href="libviiper/overview/">libVIIPER documentation</a> for details and examples.  </li>
 </ul>
 <p>For why you should pick one over the other see the <a href="#why-choose-the-the-standalone-executable-and-interfacing-via-tcp-over-and-the-shared-object-libviiper-library">FAQ</a></p>
 <p>Beyond device emulation, VIIPER can proxy real USB devices for traffic inspection and reverse engineering.</p>
@@ -1925,12 +1939,18 @@ VIIPER uses it because it's already built into Linux and available for Windows, 
 </li>
 </ul>
 <h3 id="can-i-use-viiper-for-gaming">Can I use VIIPER for gaming?</h3>
-<p>Yes! VIIPER can create virtual controllers (currently only Xbox360) that appear as real hardware to games and applications.
-This works with Steam, native Windows games, and any other application supporting controllers.</p>
+<p>Yes! VIIPER can create virtual input devices that appear as real hardware to games and applications.</p>
+<p>This works with Steam, native Windows games and any other application that supports the emulated device types.</p>
 <h3 id="how-is-viiper-different-from-other-controller-emulators">How is VIIPER different from other controller emulators?</h3>
-<p>Most controller emulators require custom kernel drivers for each device type.<br />
-VIIPER uses USBIP to handle the USB protocol layer, allowing device emulation in userspace without kernel drivers.<br />
-This makes VIIPER portable, easier to extend, and simpler to bundle with applications.</p>
+<p>Many controller emulation approaches require writing a custom kernel driver for every device type you want to support.<br />
+VIIPER uses USBIP to handle the USB protocol layer, so device emulation code lives entirely in userspace.  </p>
+<p>USBIP itself does require a kernel driver.<br />
+On Linux, the USBIP driver is built into the kernel.<br />
+On Windows, <a href="https://github.com/vadimgrn/usbip-win2">usbip-win2</a> provides a signed kernel mode driver.<br />
+That driver is generic and does not need to know anything about specific device types.<br />
+All device-type logic stays in userspace.  </p>
+<p>This makes VIIPER portable, easier to extend and simpler to bundle with applications.<br />
+Adding a new device type never requires touching kernel code.</p>
 <h3 id="can-i-add-support-for-other-device-types">Can I add support for other device types?</h3>
 <p>Yes! VIIPER's architecture is designed to be extensible.<br />
 In the future there will be a plugin system to load and expose device types dynamically.</p>
