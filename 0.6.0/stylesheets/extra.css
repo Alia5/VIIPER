@@ -1,0 +1,39 @@
+/* Custom Material theme colors */
+
+/* Light mode - primary: #1e709b, accent: #104264 */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #1e709b;
+  --md-primary-fg-color--light: #4a94ba;
+  --md-primary-fg-color--dark: #155a7d;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #f5f5f5;
+  
+  --md-accent-fg-color: #104264;
+  --md-accent-fg-color--transparent: rgba(16, 66, 100, 0.1);
+  --md-accent-bg-color: #ffffff;
+  --md-accent-bg-color--light: #f5f5f5;
+}
+
+/* Dark mode - primary: #1e709b, accent: #34c2d7 */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #1e709b;
+  --md-primary-fg-color--light: #4a94ba;
+  --md-primary-fg-color--dark: #1976a5;
+  --md-primary-bg-color: #f8f8f8;
+  --md-primary-bg-color--light: #ffffff;
+  
+  --md-accent-fg-color: #34c2d7;
+  --md-accent-fg-color--transparent: rgba(52, 194, 215, 0.1);
+  --md-accent-bg-color: #0d1117;
+  --md-accent-bg-color--light: #161b22;
+  
+  /* Main background colors */
+  --md-default-bg-color: #1d2025;
+  --md-default-bg-color--light: #161b22;
+  --md-default-bg-color--lighter: #21262d;
+  --md-default-bg-color--lightest: #30363d;
+  
+  /* Code block backgrounds */
+  --md-code-bg-color: #161b22;
+  --md-code-hl-color: rgba(52, 194, 215, 0.15);
+}
