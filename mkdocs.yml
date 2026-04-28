@@ -8,32 +8,32 @@ theme:
   name: material
   logo: viiper.svg
   palette:
-    # Light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: custom
-      accent: custom
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    # Dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: custom
-      accent: custom
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+  # Light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: custom
+    accent: custom
+    toggle:
+      icon: material/brightness-7
+      name: Switch to dark mode
+  # Dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: custom
+    accent: custom
+    toggle:
+      icon: material/brightness-4
+      name: Switch to light mode
   features:
-    - navigation.instant
-    - navigation.tracking
-    - navigation.tabs
-    - navigation.sections
-    - navigation.expand
-    - navigation.top
-    - search.suggest
-    - search.highlight
-    - content.code.copy
+  - navigation.instant
+  - navigation.tracking
+  - navigation.tabs
+  - navigation.sections
+  - navigation.expand
+  - navigation.top
+  - search.suggest
+  - search.highlight
+  - content.code.copy
 
 extra:
   version:
@@ -41,43 +41,49 @@ extra:
     default: stable
 
 extra_css:
-  - stylesheets/extra.css
+- stylesheets/extra.css
 
 markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
-  - admonition
-  - pymdownx.details
-  - attr_list
-  - md_in_html
-  - tables
+- pymdownx.highlight:
+    anchor_linenums: true
+- pymdownx.superfences
+- pymdownx.tabbed:
+    alternate_style: true
+- admonition
+- pymdownx.details
+- attr_list
+- md_in_html
+- tables
 
 nav:
-  - Home: index.md
-  - Getting Started:
-    - Installation: getting-started/installation.md
-    - Quick Start: getting-started/quickstart.md
-  - CLI Reference:
-    - Overview: cli/overview.md
-    - Server Command: cli/server.md
-    - Proxy Command: cli/proxy.md
-    - Code Generation: cli/codegen.md
-    - Configuration: cli/configuration.md
-  - API & Clients:
-    - API Overview: api/overview.md
-    - Go Client: clients/go.md
-    - C++ Client Library: clients/cpp.md
-    - C# Client Library: clients/csharp.md
-    - Rust Client Library: clients/rust.md
-    - TypeScript Client Library: clients/typescript.md
-    - Generator Documentation: clients/generator.md
-  - Devices:
-    - Xbox 360 Controller: devices/xbox360.md
-    - DualShock 4 Controller: devices/dualshock4.md
-    - Keyboard: devices/keyboard.md
-    - Mouse: devices/mouse.md
-  - Community & Support: misc/support.md
-  - Changelog: changelog/
+- Home: index.md
+- Getting Started:
+  - Installation: getting-started/installation.md
+  - Quick Start: getting-started/quickstart.md
+- CLI Reference:
+  - Overview: cli/overview.md
+  - Server Command: cli/server.md
+  - Proxy Command: cli/proxy.md
+  - Code Generation: cli/codegen.md
+  - Configuration: cli/configuration.md
+- API & Clients:
+  - API Overview: api/overview.md
+  - Go Client: clients/go.md
+  - C++ Client Library: clients/cpp.md
+  - C# Client Library: clients/csharp.md
+  - Rust Client Library: clients/rust.md
+  - TypeScript Client Library: clients/typescript.md
+  - Generator Documentation: clients/generator.md
+- libVIIPER:
+  - Overview: libviiper/overview.md
+  - Xbox 360 Controller: devices/xbox360.md
+  - DualShock 4: devices/dualshock4.md
+  - Keyboard: devices/keyboard.md
+  - Mouse: devices/mouse.md
+- Devices:
+  - Xbox 360 Controller: devices/xbox360.md
+  - DualShock 4 Controller: devices/dualshock4.md
+  - Keyboard: devices/keyboard.md
+  - Mouse: devices/mouse.md
+- Community & Support: misc/support.md
+- Changelog: changelog/

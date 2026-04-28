@@ -1,16 +1,19 @@
 # Installation
 
-VIIPER _currently_ comes in a single flavor:
+VIIPER comes in two distinct flavors:
 
-- a standalone executable that exposes an API over TCP.
-- There will eventually be a shared-library version (libVIIPER) that you can link against directly from your application.  
-For more information, see [FAQ](https://github.com/Alia5/VIIPER#why-is-this-a-standalone-executable-that-i-have-to-interface-via-tcp-and-not-a-shared-object-library-in-itself)
+- **VIIPER Server** 
+A self-contained, portable, standalone executable providing a lightweight TCP-based API for feeder application development. All client libraries are MIT licensed.
+- **libVIIPER**  
+ a single shared library that lets you emulate devices using USBIP directly from within your application. Requires your application to be GPL-3.0 licensed.
+
+Regardless of the flavour you choose, VIIPER requires USBIP.
 
 ## Requirements
 
 ### USBIP
 
-VIIPER relies on USBIP.  
+VIIPER relies on USBIP.
 You must have a USBIP-Client implementation available on your system to use VIIPER's virtual devices.
 
 === "Windows"
@@ -20,11 +23,11 @@ You must have a USBIP-Client implementation available on your system to use VIIP
     **Install and done 😉**
 
     !!! warning "USBIP-Win2 security issue"
-        The releases of usbip-win2 **currently** (at the time of writing) install the publicly available test signing CA as a _trusted root CA_ on your system.  
+        The releases of usbip-win2 **currently** (at the time of writing) install the publicly available test signing CA as a _trusted root CA_ on your system.
         You can safely remove this CA after installation using `certmgr.msc` (run as admin) and removing the "USBIP" from the "Trusted Root Certification Authorities" -> "Certificates" list.
 
-        **Alternativly**, you can download and istall the **latest pre-release** driver manually from the
-        [OSSign repository](https://github.com/OSSign/vadimgrn--usbip-win2/releases), which has this issue fixed already.  
+        **Alternatively**, you can download and install the **latest pre-release** driver manually from the
+        [OSSign repository](https://github.com/OSSign/vadimgrn--usbip-win2/releases), which has this issue fixed already.
         _Note_ that the installer does not work, only the driver `.cat,.inf,.sys` files.
 
 === "Linux"
@@ -50,7 +53,7 @@ You must have a USBIP-Client implementation available on your system to use VIIP
     !!! info "USBIP Client Requirement"
         USBIP requires the `vhci-hcd` (Virtual Host Controller Interface) kernel module on Linux for client operations. This includes VIIPER's auto-attach feature and manual device attachment.
 
-    Most Linux distributions include this module but don't load it automatically.
+    Most Linux distributions include this module but do not load it automatically.
 
     #### One-Time Setup
 
@@ -71,178 +74,125 @@ You must have a USBIP-Client implementation available on your system to use VIIP
 
     #### Verification
 
-    Check if the module is loaded:
-
     ```bash
     lsmod | grep vhci_hcd
     ```
 
-## Installing VIIPER
+---
 
-VIIPER does not require system-wide installation.  
-The `viiper` executable is completely self-contained (and fully portable without any dependencies, except USBIP) and can be:
+=== "VIIPER Server"
 
-- Placed in any directory
-- Shipped alongside your application
-- Run directly without installation
-- Bundled with your application's distribution
+    A standalone executable that exposes an API over TCP.
 
-This makes VIIPER ideal for embedding in applications or distributing as part of a software package.
+    ## Installing VIIPER
 
-!!! warning "Daemon/Service Conflicts"
-    If VIIPER is already running as a system service or daemon on the target machine, be aware of potential port conflicts. Applications should:
-    - Check if VIIPER is already running before starting their own instance  
-      - use the `ping` API endpoint to check for VIIPER presence and version  
-    - Connect to the existing VIIPER instance (if accessible)
-    - Use a custom port via `--api.addr` flag to run a separate instance
+    VIIPER does not require system-wide installation.
+    The `viiper` executable is completely self-contained (fully portable, no dependencies except USBIP) and can be:
 
-!!! info "Linux Permissions"
-    On Linux, attaching devices via USBIP requires root permissions.  
-    You can run VIIPER with `sudo`, or configure appropriate udev rules to allow non-root users to attach devices.
+    - Placed in any directory
+    - Shipped alongside your application
+    - Run directly without installation
+    - Bundled with your application's distribution
 
-### Pre-built Binaries
+    !!! warning "Daemon/Service Conflicts"
+        If VIIPER is already running as a system service or daemon on the target machine, be aware of potential port conflicts. Applications should:
+        - Check if VIIPER is already running before starting their own instance
+          - Use the `ping` API endpoint to check for VIIPER presence and version
+        - Connect to the existing VIIPER instance (if accessible)
+        - Use a custom port via `--api.addr` flag to run a separate instance
 
-Download the latest release from the [GitHub Releases](https://github.com/Alia5/VIIPER/releases) page. Pre-built binaries are available for:
+    !!! info "Linux Permissions"
+        On Linux, attaching devices via USBIP requires root permissions.
+        You can run VIIPER with `sudo`, or configure appropriate udev rules to allow non-root users to attach devices.
 
-- Windows (x64, ARM64)
-- Linux (x64, ARM64)
+    ### Pre-built Binaries
 
-### Automated Install Script
+    Download the latest release from the [GitHub Releases](https://github.com/Alia5/VIIPER/releases) page. Pre-built binaries are available for:
 
-Regardless of portability, it can be convenient to have VIIPER start automatically on system boot, especially if end users want to use your application through a network or you want to enable that possibility.  
+    - Windows (x64, ARM64)
+    - Linux (x64, ARM64)
 
-The following scripts will download a VIIPER release, install it to a system location, and configure it to start automatically on boot.  
+    ### Automated Install Script
 
-!!! info "For Application Developers"
-    The installation scripts are intended for **end-users** setting up a permanent VIIPER service on their system.  
-  
-    If you're developing an application that uses VIIPER, I **strongly** encourage you to **not** install a permanent VIIPER service on your users machines. 
-    
-    Instead, bundle the (no dependencies, portable) VIIPER binary with your application and start/stop the server directly from your application as needed.  
-    You may need to check for existing VIIPER instances or use a custom port via `--api.addr` to avoid conflicts.   
+    The following scripts will download a VIIPER release, install it to a system location and configure it to start automatically on boot.
 
-!!! info "USBIP installed by scripts"
-    The install scripts install and configure USBIP for you:
+    !!! info "For Application Developers"
+        The installation scripts are intended for **end-users** setting up a permanent VIIPER service on their system.
 
-    - **Windows:** installs the usbip-win2 driver (admin prompt) and prompts for a reboot when drivers were added.
-    - **Linux:** installs USBIP via the distro package manager (when available), loads `vhci_hcd`, and configures it to autoload.
+        If you are developing an application that uses VIIPER, I **strongly** encourage you to **not** install a permanent VIIPER service on your users' machines.
 
-    If the automated USBIP setup fails, follow the [USBIP guide](usbip.md) to finish manually.
+        Instead, bundle the (no dependencies, portable) VIIPER binary with your application and start/stop the server directly from your application as needed.
+        You may need to check for existing VIIPER instances or use a custom port via `--api.addr` to avoid conflicts.
 
-=== "Windows"
+    !!! info "USBIP installed by scripts"
+        The install scripts install and configure USBIP for you:
 
-    ```powershell
-    irm https://alia5.github.io/VIIPER/stable/install.ps1 | iex
-    ```
+        - **Windows:** installs the usbip-win2 driver (admin prompt) and prompts for a reboot when drivers were added.
+        - **Linux:** installs USBIP via the distro package manager (when available), loads `vhci_hcd` and configures it to autoload.
 
-    Installs to: `%LOCALAPPDATA%\VIIPER\viiper.exe`
+        If the automated USBIP setup fails, follow the [USBIP guide](usbip.md) to finish manually.
 
-    The scripts will:
+    === "Windows"
 
-    1. Download the specified VIIPER binary version
-    2. Install it to the system location
-    3. Install and configure USBIP (driver on Windows; packages/modules on Linux)
-    4. Configure automatic startup (Registry RunKey on Windows, systemd service on Linux)
-    5. Start/restart the VIIPER service
+        ```powershell
+        irm https://alia5.github.io/VIIPER/stable/install.ps1 | iex
+        ```
 
-=== "Linux"
+        Installs to: `%LOCALAPPDATA%\VIIPER\viiper.exe`
+
+        The scripts will:
+
+        1. Download the specified VIIPER binary version
+        2. Install it to the system location
+        3. Install and configure USBIP (driver on Windows; packages/modules on Linux)
+        4. Configure automatic startup (Registry RunKey on Windows, systemd service on Linux)
+        5. Start/restart the VIIPER service
+
+    === "Linux"
+
+        ```bash
+        curl -fsSL https://alia5.github.io/VIIPER/stable/install.sh | sh
+        ```
+
+        Installs to: `/usr/local/bin/viiper`
+
+        The scripts will:
+
+        1. Download the specified VIIPER binary version
+        2. Install it to the system location
+        3. Attempt to install and configure USBIP
+        4. Load the `vhci_hcd` kernel module and configure it to autoload on boot
+        5. Configure and run a systemd service
+
+=== "libVIIPER"
+
+    libVIIPER is a shared library (`libVIIPER.dll` on Windows, `libVIIPER.so` on Linux) that you link against directly from your application, eliminating the need for a separate VIIPER server process.
+
+    !!! warning "License"
+        Linking against libVIIPER requires your application to be licensed under the **GPL-3.0** (or a compatible license).
+        If you cannot comply with the GPL-3.0, use the standalone executable and the [TCP API](../api/overview.md) instead. All client libraries are **MIT licensed**.
+
+    ## Pre-built Binaries
+
+    Download the latest `libVIIPER` release artifact from the [GitHub Releases](https://github.com/Alia5/VIIPER/releases) page.
+    The archive contains:
+
+    - `libVIIPER.dll` / `libVIIPER.so`: the shared library
+    - `libVIIPER.h`: the C header
+    - `libVIIPER.def`: Windows import definition (for generating `.lib`/`.dll.a` import libraries)
+
+    ## Building from Source
 
     ```bash
-    curl -fsSL https://alia5.github.io/VIIPER/stable/install.sh | sh
+    git clone https://github.com/Alia5/VIIPER.git
+    cd VIIPER
+    make libVIIPER
     ```
 
-    Installs to: `/usr/local/bin/viiper`
+    The output will be in `dist/libVIIPER/`.
 
-    The scripts will:
+    !!! info "CGO Required"
+        Building libVIIPER requires CGO (`CGO_ENABLED=1`) and a C compiler (GCC / MSVC / Clang) in `PATH`.
+        On Windows, [mingw-w64](https://www.mingw-w64.org/) or MSVC is required.
 
-    1. Download the specified VIIPER binary version
-    2. Install it to the system location
-    3. Attempt to install and configure USBIP 
-    4. Load the `vhci_hcd` kernel module and configure it to autoload on boot
-    5. Configure and run a systemd service
-
-**Version-Specific Installation:**
-
-The install scripts are version-aware based on where you download them from:
-
-- **Latest stable release:**  
-  `curl -fsSL https://alia5.github.io/VIIPER/stable/install.sh | sh`
-
-- **Specific version (e.g., v0.2.2):**  
-  `curl -fsSL https://alia5.github.io/VIIPER/0.2.2/install.sh | sh`
-
-- **Latest _pre_-release (development snapshot):**  
-  `curl -fsSL https://alia5.github.io/VIIPER/main/install.sh | sh`
-
-## System Startup Configuration
-
-The `install` and `uninstall` commands configure automatic startup for the VIIPER binary.
-
-!!! info "What These Commands Do"
-    These commands **do not copy or move** the VIIPER binary. They configure your system to automatically run the binary from its **current location** when the system boots.
-
-    Make sure the binary is in a permanent location before running `viiper install`!
-
-### `viiper install`
-
-Configures VIIPER to start automatically on system boot:
-
-```bash
-viiper install
-```
-
-- **Windows**:  
-  - Adds entry to Registry RunKey: `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run\VIIPER`
-  - Value: `"<current-exe-path>" server`
-  - Kills any previous autorun instances
-  - Starts the server
-
-- **Linux**:  
-  - Creates systemd service: `/etc/systemd/system/viiper.service`
-  - Service ExecStart points to current binary path
-  - Enables and starts the service
-
-### `viiper uninstall`
-
-Removes VIIPER from system startup and stops any running instance:
-
-```bash
-viiper uninstall
-```
-
-- **Windows**:  
-  - Removes Registry RunKey entry
-  - Kills any running autorun instances
-
-- **Linux**:  
-  - Stops and disables the systemd service
-  - Removes `/etc/systemd/system/viiper.service`
-
-## Building from Source
-
-Building from source is only necessary if you need to modify VIIPER or target an unsupported platform.
-
-### Prerequisites
-
-- [Go](https://go.dev/) 1.26 or newer
-- USBIP installed
-- (Optional) [Make](https://www.gnu.org/software/make/)
-  - Linux/macOS: Usually pre-installed
-  - Windows: `winget install ezwinports.make`
-
-### Build Steps
-
-```bash
-git clone https://github.com/Alia5/VIIPER.git
-cd VIIPER
-make build
-```
-
-The compiled binary will be in `dist/viiper` (or `dist/viiper.exe` on Windows).
-
-**Additional build targets:**
-
-```bash
-make help          # Show all available make targets
-make test          # Run tests
-```
+    See [libVIIPER documentation](../libviiper/overview.md) for integration guides and examples.
