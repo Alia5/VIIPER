@@ -108,72 +108,64 @@ try {
 
     Write-Host ""
     Write-Host "Checking USBIP drivers..." -ForegroundColor Cyan
-    
-    $driverInstalled = Get-PnpDevice -Class USB -ErrorAction SilentlyContinue | 
-    Where-Object { $_.FriendlyName -like '*usbip*' }
-    
-    $needsReboot = $false
-    
-    if (-not $driverInstalled) {
-        Write-Host "USBIP drivers not found. Installing..." -ForegroundColor Yellow
-        Write-Host "This requires administrator privileges." -ForegroundColor Yellow
-        
-        $driverUrl = "https://github.com/OSSign/vadimgrn--usbip-win2/releases/download/0.9.7.5-preview"
-        $driverFiles = @(
-            "usbip2_filter.cat",
-            "usbip2_filter.inf",
-            "usbip2_filter.sys",
-            "usbip2_ude.cat",
-            "usbip2_ude.inf",
-            "usbip2_ude.sys"
-        )
-        
-        $driverDir = Join-Path $tempDir "usbip_drivers"
-        New-Item -ItemType Directory -Path $driverDir -Force | Out-Null
-        
-        foreach ($file in $driverFiles) {
-            Write-Host "  Downloading $file..." -ForegroundColor Cyan
-            $fileUrl = "$driverUrl/$file"
-            $filePath = Join-Path $driverDir $file
-            try {
-                Invoke-WebRequest -Uri $fileUrl -OutFile $filePath -ErrorAction Stop
-            }
-            catch {
-                Write-Host "  Warning: Failed to download $file - $($_.Exception.Message)" -ForegroundColor Yellow
-            }
+
+    $usbipTargetVersion = [Version]"0.9.7.7"
+    $usbipInstalledVersion = $null
+
+    $usbipEntry = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
+        Where-Object { $_.DisplayName -eq 'USBip' } |
+        Select-Object -First 1
+    if (-not $usbipEntry) {
+        $usbipEntry = Get-ItemProperty "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
+            Where-Object { $_.DisplayName -eq 'USBip' } |
+            Select-Object -First 1
+    }
+    if ($usbipEntry) {
+        try { $usbipInstalledVersion = [Version]$usbipEntry.DisplayVersion } catch { }
+    }
+
+    if (-not $usbipInstalledVersion) {
+        $driverPath = Join-Path $env:SystemRoot "System32\drivers\usbip2_ude.sys"
+        if (Test-Path $driverPath) {
+            try { $usbipInstalledVersion = [Version](Get-Item $driverPath).VersionInfo.FileVersion } catch { }
         }
-        
-        $filterInf = Join-Path $driverDir "usbip2_filter.inf"
-        $udeInf = Join-Path $driverDir "usbip2_ude.inf"
-        
-        if ((Test-Path $filterInf) -and (Test-Path $udeInf)) {
-            Write-Host "Installing USBIP drivers (UAC prompt will appear)..." -ForegroundColor Yellow
-            
-            $installScript = @"
-Set-Location '$driverDir'
-pnputil.exe /add-driver usbip2_filter.inf /install
-pnputil.exe /add-driver usbip2_ude.inf /install
-"@
-            
-            try {
-                Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile", "-Command", $installScript -Wait
-                Write-Host "USBIP drivers installed successfully" -ForegroundColor Green
-                $needsReboot = $true
-            }
-            catch {
-                Write-Host "Warning: Failed to install USBIP drivers - $($_.Exception.Message)" -ForegroundColor Yellow
-                Write-Host "You may need to install usbip-win2 manually from:" -ForegroundColor Yellow
-                Write-Host "  https://github.com/OSSign/vadimgrn--usbip-win2/releases" -ForegroundColor Yellow
-            }
+    }
+
+    $needsReboot = $false
+    $needsUsbipInstall = $true
+
+    if ($usbipInstalledVersion) {
+        if ($usbipInstalledVersion -ge $usbipTargetVersion) {
+            Write-Host "USBIP drivers already up to date (installed: $usbipInstalledVersion)" -ForegroundColor Green
+            $needsUsbipInstall = $false
         }
         else {
-            Write-Host "Warning: Could not download all required driver files" -ForegroundColor Yellow
-            Write-Host "Please install usbip-win2 manually from:" -ForegroundColor Yellow
-            Write-Host "  https://github.com/OSSign/vadimgrn--usbip-win2/releases" -ForegroundColor Yellow
+            Write-Host "USBIP drivers outdated (installed: $usbipInstalledVersion, required: $usbipTargetVersion). Updating..." -ForegroundColor Yellow
         }
     }
     else {
-        Write-Host "USBIP drivers already installed" -ForegroundColor Green
+        Write-Host "USBIP drivers not found. Installing..." -ForegroundColor Yellow
+    }
+
+    if ($needsUsbipInstall) {
+        Write-Host "This requires administrator privileges." -ForegroundColor Yellow
+
+        $usbipInstallerUrl = "https://github.com/vadimgrn/usbip-win2/releases/download/v.0.9.7.7/USBip-0.9.7.7-x64.exe"
+        $usbipInstaller = Join-Path $tempDir "USBip-setup.exe"
+
+        try {
+            Write-Host "  Downloading usbip-win2 installer..." -ForegroundColor Cyan
+            Invoke-WebRequest -Uri $usbipInstallerUrl -OutFile $usbipInstaller -ErrorAction Stop
+            Write-Host "Installing USBIP drivers (UAC prompt will appear)..." -ForegroundColor Yellow
+            Start-Process -FilePath $usbipInstaller -ArgumentList "/S" -Verb RunAs -Wait
+            Write-Host "USBIP drivers installed/updated successfully" -ForegroundColor Green
+            $needsReboot = $true
+        }
+        catch {
+            Write-Host "Warning: Failed to install USBIP drivers - $($_.Exception.Message)" -ForegroundColor Yellow
+            Write-Host "You may need to install usbip-win2 manually from:" -ForegroundColor Yellow
+            Write-Host "  https://github.com/vadimgrn/usbip-win2/releases" -ForegroundColor Yellow
+        }
     }
 
     if (-not $isUpdate) {

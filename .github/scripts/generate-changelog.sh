@@ -84,9 +84,7 @@ for commit_hash in "${COMMITS[@]}"; do
   fi
 done
 
-# Write changelog
 {
-  echo "## Changelog for $VERSION_TITLE"
   echo ""
   echo "$CONTEXT_MSG"
   echo ""
