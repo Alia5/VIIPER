@@ -113,11 +113,11 @@ try {
     $usbipInstalledVersion = $null
 
     $usbipEntry = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
-        Where-Object { $_.DisplayName -eq 'USBip' } |
+        Where-Object { $_.DisplayName -like 'USBip version*' } |
         Select-Object -First 1
     if (-not $usbipEntry) {
         $usbipEntry = Get-ItemProperty "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
-            Where-Object { $_.DisplayName -eq 'USBip' } |
+            Where-Object { $_.DisplayName -like 'USBip version*' } |
             Select-Object -First 1
     }
     if ($usbipEntry) {
