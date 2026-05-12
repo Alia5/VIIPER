@@ -730,6 +730,9 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 	wIndex := binary.LittleEndian.Uint16(setup[4:6])
 	wLength := binary.LittleEndian.Uint16(setup[6:8])
 
+	if breq == usbReqGetStatus {
+		return []byte{0x00, 0x00}
+	}
 	if breq == usbReqSetAddress && bm == usbReqTypeStandardToDevice {
 		return nil
 	}
