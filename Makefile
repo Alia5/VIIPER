@@ -165,7 +165,7 @@ LIBVIIPER_DIST_DIR := dist/libVIIPER
 .PHONY: libVIIPER
 libVIIPER:
 ifeq ($(OS),Windows_NT)
-	@if not exist $(LIBVIIPER_DIST_DIR) mkdir $(LIBVIIPER_DIST_DIR)
+	@if not exist "$(LIBVIIPER_DIST_DIR)" mkdir "$(LIBVIIPER_DIST_DIR)"
 	@go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
 	@powershell -NoProfile -NonInteractive -File scripts/inject-version.ps1 "$(VERSION)" "$(LIBVIIPER_VERSIONINFO_JSON)" "libviiper.versioninfo.tmp.json"
 	@cd $(SRC_DIR) && goversioninfo -64 -o $(LIBVIIPER_RESOURCE_SYSO) libviiper.versioninfo.tmp.json
