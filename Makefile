@@ -170,7 +170,7 @@ ifeq ($(OS),Windows_NT)
 	@powershell -NoProfile -NonInteractive -File scripts/inject-version.ps1 "$(VERSION)" "$(LIBVIIPER_VERSIONINFO_JSON)" "libviiper.versioninfo.tmp.json"
 	@cd $(SRC_DIR) && goversioninfo -64 -o $(LIBVIIPER_RESOURCE_SYSO) libviiper.versioninfo.tmp.json
 	@del libviiper.versioninfo.tmp.json
-	set CGO_ENABLED=1 && go build -buildmode=c-shared -o $(LIBVIIPER_DIST_DIR)/libVIIPER.dll ./lib/viiper
+	set CGO_ENABLED=1 && go build -buildmode=c-shared -ldflags="-s -w" -o $(LIBVIIPER_DIST_DIR)/libVIIPER.dll ./lib/viiper
 	cd $(LIBVIIPER_DIST_DIR) && gendef libVIIPER.dll
 	go run ./lib/viiper/postbuild
 else
