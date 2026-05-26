@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"unicode/utf16"
 
 	"github.com/Alia5/VIIPER/usb/hid"
 )
@@ -15,6 +16,7 @@ const (
 	ConfigDescType    = 0x02
 	InterfaceDescType = 0x04
 	EndpointDescType  = 0x05
+	IADDescType       = 0x0B
 	HIDDescType       = 0x21
 	ReportDescType    = 0x22
 )
@@ -23,6 +25,7 @@ const (
 const (
 	DeviceDescLen    = 18
 	ConfigDescLen    = 9
+	IADDescLen       = 8
 	InterfaceDescLen = 9
 	EndpointDescLen  = 7
 	HIDDescLen       = 9
@@ -32,9 +35,147 @@ type Data []uint8
 
 // Descriptor holds all static descriptor/config data for a device.
 type Descriptor struct {
-	Device     DeviceDescriptor
-	Interfaces []InterfaceConfig
-	Strings    map[uint8]string
+	Device        DeviceDescriptor
+	Configuration ConfigurationDescriptor
+	MicrosoftOS10 *MicrosoftOS10Descriptor
+	Associations  []InterfaceAssociationDescriptor
+	Interfaces    []InterfaceConfig
+	Strings       map[uint8]string
+}
+
+// MicrosoftOS10Descriptor enables the Microsoft OS 1.0 descriptor probe used by
+// Windows to bind vendor-specific interfaces to inbox drivers such as WinUSB.
+type MicrosoftOS10Descriptor struct {
+	VendorCode          uint8
+	InterfaceNumber     uint8
+	CompatibleID        string
+	SubCompatibleID     string
+	DeviceInterfaceGUID string
+}
+
+func (d MicrosoftOS10Descriptor) StringDescriptor() []byte {
+	return []byte{
+		0x12, 0x03,
+		'M', 0x00,
+		'S', 0x00,
+		'F', 0x00,
+		'T', 0x00,
+		'1', 0x00,
+		'0', 0x00,
+		'0', 0x00,
+		d.EffectiveVendorCode(), 0x00,
+	}
+}
+
+func (d MicrosoftOS10Descriptor) EffectiveVendorCode() uint8 {
+	if d.VendorCode == 0 {
+		return 0x20
+	}
+	return d.VendorCode
+}
+
+func (d MicrosoftOS10Descriptor) ControlResponse(wValue, wIndex uint16) ([]byte, bool) {
+	switch {
+	case wIndex == 0x0004:
+		return d.CompatibleIDDescriptor(), true
+	case wIndex == 0x0005 || wValue == 0x0005:
+		return d.ExtendedPropertiesDescriptor(), true
+	default:
+		return nil, false
+	}
+}
+
+func (d MicrosoftOS10Descriptor) CompatibleIDDescriptor() []byte {
+	out := make([]byte, 40)
+	binary.LittleEndian.PutUint32(out[0:4], uint32(len(out)))
+	binary.LittleEndian.PutUint16(out[4:6], 0x0100)
+	binary.LittleEndian.PutUint16(out[6:8], 0x0004)
+	out[8] = 0x01
+	out[16] = d.InterfaceNumber
+	copyFixedASCII(out[18:26], d.CompatibleID)
+	copyFixedASCII(out[26:34], d.SubCompatibleID)
+	return out
+}
+
+func (d MicrosoftOS10Descriptor) ExtendedPropertiesDescriptor() []byte {
+	if d.DeviceInterfaceGUID == "" {
+		out := make([]byte, 10)
+		binary.LittleEndian.PutUint32(out[0:4], uint32(len(out)))
+		binary.LittleEndian.PutUint16(out[4:6], 0x0100)
+		binary.LittleEndian.PutUint16(out[6:8], 0x0005)
+		return out
+	}
+
+	name := utf16leString("DeviceInterfaceGUID")
+	data := utf16leString(d.DeviceInterfaceGUID)
+
+	sectionLen := 4 + 4 + 2 + len(name) + 4 + len(data)
+	out := make([]byte, 10+sectionLen)
+	binary.LittleEndian.PutUint32(out[0:4], uint32(len(out)))
+	binary.LittleEndian.PutUint16(out[4:6], 0x0100)
+	binary.LittleEndian.PutUint16(out[6:8], 0x0005)
+	binary.LittleEndian.PutUint16(out[8:10], 0x0001)
+
+	off := 10
+	binary.LittleEndian.PutUint32(out[off:off+4], uint32(sectionLen))
+	off += 4
+	binary.LittleEndian.PutUint32(out[off:off+4], 0x00000001) // REG_SZ
+	off += 4
+	binary.LittleEndian.PutUint16(out[off:off+2], uint16(len(name)))
+	off += 2
+	copy(out[off:off+len(name)], name)
+	off += len(name)
+	binary.LittleEndian.PutUint32(out[off:off+4], uint32(len(data)))
+	off += 4
+	copy(out[off:], data)
+	return out
+}
+
+func copyFixedASCII(dst []byte, s string) {
+	for i := range dst {
+		dst[i] = 0
+	}
+	copy(dst, []byte(s))
+}
+
+func utf16leString(s string) []byte {
+	units := utf16.Encode([]rune(s + "\x00"))
+	out := make([]byte, len(units)*2)
+	for i, u := range units {
+		binary.LittleEndian.PutUint16(out[i*2:i*2+2], u)
+	}
+	return out
+}
+
+// NumInterfaces returns the number of distinct interface numbers in the active
+// configuration. Alternate settings share the same interface number and only
+// count once in the USB configuration descriptor header.
+func (d Descriptor) NumInterfaces() uint8 {
+	seen := map[uint8]struct{}{}
+	for _, iface := range d.Interfaces {
+		seen[iface.Descriptor.BInterfaceNumber] = struct{}{}
+	}
+	return uint8(len(seen))
+}
+
+// Interface returns the first matching interface descriptor for an interface
+// number, preferring alternate setting zero when available.
+func (d Descriptor) Interface(number uint8) (InterfaceConfig, bool) {
+	var found InterfaceConfig
+	ok := false
+	for _, iface := range d.Interfaces {
+		if iface.Descriptor.BInterfaceNumber != number {
+			continue
+		}
+		if iface.Descriptor.BAlternateSetting == 0 {
+			return iface, true
+		}
+		if !ok {
+			found = iface
+			ok = true
+		}
+	}
+	return found, ok
 }
 
 // InterfaceConfig holds all descriptors for a single interface for bus management.
@@ -122,6 +263,37 @@ type ConfigHeader struct {
 	BMaxPower           uint8
 }
 
+// ConfigurationDescriptor contains the non-derived fields from the USB
+// configuration descriptor. Zero values keep the server defaults.
+type ConfigurationDescriptor struct {
+	BConfigurationValue uint8
+	IConfiguration      uint8
+	BMAttributes        uint8
+	BMaxPower           uint8
+}
+
+// InterfaceAssociationDescriptor describes a USB Interface Association
+// Descriptor (IAD), used by composite devices to group related interfaces.
+type InterfaceAssociationDescriptor struct {
+	BFirstInterface   uint8
+	BInterfaceCount   uint8
+	BFunctionClass    uint8
+	BFunctionSubClass uint8
+	BFunctionProtocol uint8
+	IFunction         uint8
+}
+
+func (i InterfaceAssociationDescriptor) Write(b *bytes.Buffer) {
+	b.WriteByte(IADDescLen)
+	b.WriteByte(IADDescType)
+	b.WriteByte(i.BFirstInterface)
+	b.WriteByte(i.BInterfaceCount)
+	b.WriteByte(i.BFunctionClass)
+	b.WriteByte(i.BFunctionSubClass)
+	b.WriteByte(i.BFunctionProtocol)
+	b.WriteByte(i.IFunction)
+}
+
 func (h ConfigHeader) Write(b *bytes.Buffer) {
 	b.WriteByte(ConfigDescLen)
 	b.WriteByte(ConfigDescType)
@@ -164,6 +336,10 @@ type EndpointDescriptor struct {
 	BMAttributes     uint8
 	WMaxPacketSize   uint16 // LE
 	BInterval        uint8
+
+	// ClassDescriptors are optional endpoint-level class-specific descriptors
+	// emitted immediately after this endpoint descriptor.
+	ClassDescriptors []ClassSpecificDescriptor
 }
 
 func (e EndpointDescriptor) Write(b *bytes.Buffer) {

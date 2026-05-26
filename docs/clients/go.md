@@ -203,6 +203,7 @@ Full working examples are available in the repository:
 - **Virtual Mouse**: `examples/go/virtual_mouse/main.go`
 - **Virtual Keyboard**: `examples/go/virtual_keyboard/main.go`
 - **Virtual Xbox360 Controller**: `examples/go/virtual_x360_pad/main.go`
+- **Virtual Switch 2 Pro Controller**: `examples/go/virtual_ns2pro/main.go`
 - More examples are always being added!
 
 ## See Also

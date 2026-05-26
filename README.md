@@ -59,6 +59,7 @@ Beyond device emulation, VIIPER can proxy real USB devices for traffic inspectio
 - HID Keyboard with N-key rollover and LED feedback; see [Devices › Keyboard](docs/devices/keyboard.md)
 - HID Mouse with 5 buttons and horizontal/vertical wheel; see [Devices › Mouse](docs/devices/mouse.md)
 - PS4 controller emulation; see [Devices › DualShock 4 Controller](docs/devices/dualshock4.md)
+- Nintendo Switch 2 Pro Controller emulation; see [Devices › Switch 2 Pro Controller](docs/devices/ns2pro.md)
 - 🔜 Future plugin system allows for more device types (other gamepads, specialized HID)
 
 ## 🔌 Requirements

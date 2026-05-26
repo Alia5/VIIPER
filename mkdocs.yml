@@ -83,6 +83,7 @@ nav:
 - Devices:
   - Xbox 360 Controller: devices/xbox360.md
   - DualShock 4 Controller: devices/dualshock4.md
+  - Switch 2 Pro Controller: devices/ns2pro.md
   - Keyboard: devices/keyboard.md
   - Mouse: devices/mouse.md
 - Community & Support: misc/support.md

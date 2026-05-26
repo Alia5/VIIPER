@@ -456,10 +456,10 @@ func (s *Server) handleDevList(conn net.Conn) error {
 			BDeviceProtocol:     desc.Device.BDeviceProtocol,
 			BConfigurationValue: usbConfigValueDefault,
 			BNumConfigurations:  desc.Device.BNumConfigurations,
-			BNumInterfaces:      uint8(len(desc.Interfaces)),
+			BNumInterfaces:      desc.NumInterfaces(),
 		}
 
-		for _, iface := range desc.Interfaces {
+		for _, iface := range descriptorListInterfaces(desc) {
 			exp.Interfaces = append(exp.Interfaces, usbip.InterfaceDesc{
 				Class:    iface.Descriptor.BInterfaceClass,
 				SubClass: iface.Descriptor.BInterfaceSubClass,
@@ -512,9 +512,9 @@ func (s *Server) handleImport(conn net.Conn) (usb.Device, error) {
 		BDeviceProtocol:     chosenDesc.Device.BDeviceProtocol,
 		BConfigurationValue: usbConfigValueDefault,
 		BNumConfigurations:  chosenDesc.Device.BNumConfigurations,
-		BNumInterfaces:      uint8(len(chosenDesc.Interfaces)),
+		BNumInterfaces:      chosenDesc.NumInterfaces(),
 	}
-	for _, iface := range chosenDesc.Interfaces {
+	for _, iface := range descriptorListInterfaces(chosenDesc) {
 		exp.Interfaces = append(exp.Interfaces, usbip.InterfaceDesc{
 			Class:    iface.Descriptor.BInterfaceClass,
 			SubClass: iface.Descriptor.BInterfaceSubClass,
@@ -762,7 +762,9 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 		case usbDescTypeConfiguration:
 			data = s.buildConfigDescriptor(desc)
 		case usbDescTypeString:
-			if s, ok := desc.Strings[dindex]; ok {
+			if dindex == 0xEE && desc.MicrosoftOS10 != nil {
+				data = desc.MicrosoftOS10.StringDescriptor()
+			} else if s, ok := desc.Strings[dindex]; ok {
 				data = usb.EncodeStringDescriptor(s)
 			}
 		}
@@ -774,12 +776,23 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 		}
 		return data
 	}
+
+	if desc.MicrosoftOS10 != nil &&
+		breq == desc.MicrosoftOS10.EffectiveVendorCode() &&
+		(bm == 0xC0 || bm == 0xC1) {
+		if data, ok := desc.MicrosoftOS10.ControlResponse(wValue, wIndex); ok {
+			if int(wLength) < len(data) {
+				return data[:wLength]
+			}
+			return data
+		}
+	}
+
 	if breq == usbReqGetDescriptor && bm == usbReqTypeStandardToInterface {
 		dtype := uint8(wValue >> 8)
 		iface := uint8(wIndex & 0xff)
 		var data []byte
-		if int(iface) < len(desc.Interfaces) {
-			ifaceConf := desc.Interfaces[iface]
+		if ifaceConf, ok := desc.Interface(iface); ok {
 			if ifaceConf.HID != nil {
 				switch dtype {
 				case usbDescTypeHID:
@@ -854,16 +867,33 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 
 func (s *Server) buildConfigDescriptor(desc *usb.Descriptor) []byte {
 	var b bytes.Buffer
+	configValue := desc.Configuration.BConfigurationValue
+	if configValue == 0 {
+		configValue = usbConfigValueDefault
+	}
+	attrs := desc.Configuration.BMAttributes
+	if attrs == 0 {
+		attrs = usbConfigAttrBusPowered
+	}
+	maxPower := desc.Configuration.BMaxPower
+	if maxPower == 0 {
+		maxPower = usbConfigMaxPower100mA
+	}
 	h := usb.ConfigHeader{
 		WTotalLength:        0, // to be patched
-		BNumInterfaces:      uint8(len(desc.Interfaces)),
-		BConfigurationValue: usbConfigValueDefault,
-		IConfiguration:      0,
-		BMAttributes:        usbConfigAttrBusPowered,
-		BMaxPower:           usbConfigMaxPower100mA,
+		BNumInterfaces:      desc.NumInterfaces(),
+		BConfigurationValue: configValue,
+		IConfiguration:      desc.Configuration.IConfiguration,
+		BMAttributes:        attrs,
+		BMaxPower:           maxPower,
 	}
 	h.Write(&b)
 	for _, iface := range desc.Interfaces {
+		for _, iad := range desc.Associations {
+			if iad.BFirstInterface == iface.Descriptor.BInterfaceNumber && iface.Descriptor.BAlternateSetting == 0 {
+				iad.Write(&b)
+			}
+		}
 		iface.Descriptor.Write(&b)
 		if iface.HID != nil {
 			hd, err := iface.HID.DescriptorBytes()
@@ -879,10 +909,35 @@ func (s *Server) buildConfigDescriptor(desc *usb.Descriptor) []byte {
 		}
 		for _, ep := range iface.Endpoints {
 			ep.Write(&b)
+			for _, cd := range ep.ClassDescriptors {
+				b.Write([]byte(cd.Bytes()))
+			}
 		}
 	}
 
 	data := b.Bytes()
 	binary.LittleEndian.PutUint16(data[2:4], uint16(len(data)))
 	return data
+}
+
+func descriptorListInterfaces(desc *usb.Descriptor) []usb.InterfaceConfig {
+	out := make([]usb.InterfaceConfig, 0, desc.NumInterfaces())
+	seen := map[uint8]struct{}{}
+	for _, iface := range desc.Interfaces {
+		n := iface.Descriptor.BInterfaceNumber
+		if _, ok := seen[n]; ok || iface.Descriptor.BAlternateSetting != 0 {
+			continue
+		}
+		seen[n] = struct{}{}
+		out = append(out, iface)
+	}
+	for _, iface := range desc.Interfaces {
+		n := iface.Descriptor.BInterfaceNumber
+		if _, ok := seen[n]; ok {
+			continue
+		}
+		seen[n] = struct{}{}
+		out = append(out, iface)
+	}
+	return out
 }
