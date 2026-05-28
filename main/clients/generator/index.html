@@ -1958,7 +1958,7 @@ No special tags are required. Exported Go constants and maps are emitted with la
 <p><strong>Scan Phase:</strong>  </p>
 <ol>
 <li>Parse API routes from <code>internal/server/api/*.go</code>  </li>
-<li>Reflect response DTOs from <code>/apitypes/*.go</code>  </li>
+<li>Reflect response DTOs from <code>/viipertypes/*.go</code>  </li>
 <li>Find device types via <code>RegisterDevice()</code> calls  </li>
 <li>Parse <code>viiper:wire</code> comments for packet layouts  </li>
 <li>Extract all exported constants and map literals from <code>/device/*/const.go</code> (automatic)</li>
@@ -2046,7 +2046,7 @@ Optional formatting with <code>clang-format</code>, <code>dotnet format</code>, 
 <h2 id="regeneration-triggers">Regeneration Triggers</h2>
 <p>Run codegen when any of these change:</p>
 <ul>
-<li><code>/apitypes/*.go</code>: API response structures</li>
+<li><code>/viipertypes/*.go</code>: API response structures</li>
 <li><code>/device/*/inputstate.go</code>: Wire tag annotations</li>
 <li><code>/device/*/const.go</code>: Exported constants and map literals</li>
 <li><code>internal/server/api/*.go</code>: Route registrations</li>
