@@ -33,19 +33,20 @@ case "$ARCH" in
 		;;
 esac
 
-BINARY_NAME="viiper-linux-${ARCH}"
-DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${BINARY_NAME}"
+ARCHIVE_NAME="viiper-linux-${ARCH}.tar.gz"
+DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${ARCHIVE_NAME}"
 
 echo "Downloading from: $DOWNLOAD_URL"
 TEMP_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR" EXIT
 
 cd "$TEMP_DIR"
-if ! curl -fsSL -o viiper "$DOWNLOAD_URL"; then
-	echo "Error: Could not download VIIPER binary"
+if ! curl -fsSL -o release.tar.gz "$DOWNLOAD_URL"; then
+	echo "Error: Could not download VIIPER archive"
 	exit 1
 fi
 
+tar -xzf release.tar.gz
 chmod +x viiper
 
 NEW_VERSION=$(./viiper --help -p | grep -Eo 'Version: [^ ]+' | head -1 | cut -d' ' -f2)
