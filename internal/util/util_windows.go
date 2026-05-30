@@ -5,7 +5,6 @@ package util
 import (
 	"log/slog"
 	"os"
-	"strings"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -15,6 +14,7 @@ var (
 	kernel32             = windows.NewLazySystemDLL("kernel32.dll")
 	user32               = windows.NewLazySystemDLL("user32.dll")
 	procGetConsoleWindow = kernel32.NewProc("GetConsoleWindow")
+	procGetConsoleProcs  = kernel32.NewProc("GetConsoleProcessList")
 	procShowWindow       = user32.NewProc("ShowWindow")
 	procFreeConsole      = kernel32.NewProc("FreeConsole")
 )
@@ -23,20 +23,16 @@ func IsRunFromGUI() bool {
 	hwnd, _, _ := procGetConsoleWindow.Call()
 	hasConsole := hwnd != 0
 
-	parentName := getParentProcessName()
-	isCliParent := isCliProcess(parentName)
-
-	slog.Debug("Parent Process Info", "parentName", parentName, "hasConsole", hasConsole, "isCliParent", isCliParent)
-
 	if !hasConsole {
 		return true
 	}
 
-	if isCliParent {
-		return false
-	}
+	parentPID := getParentProcessID()
+	parentAttached := isPIDAttachedToCurrentConsole(parentPID)
 
-	return strings.EqualFold(parentName, "explorer.exe")
+	slog.Debug("Console launch detection", "hasConsole", hasConsole, "parentPID", parentPID, "parentAttached", parentAttached)
+
+	return !parentAttached
 }
 
 func HideConsoleWindow() {
@@ -50,68 +46,61 @@ func HideConsoleWindow() {
 	_, _, _ = procFreeConsole.Call()
 }
 
-func getParentProcessName() string {
+func getParentProcessID() uint32 {
 	snapshot, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
 	if err != nil {
-		return ""
+		return 0
 	}
-	defer windows.CloseHandle(snapshot) // nolint
+	defer windows.CloseHandle(snapshot) // nolint:errcheck
 
 	var pe windows.ProcessEntry32
 	pe.Size = uint32(unsafe.Sizeof(pe))
 
 	currentPID := uint32(os.Getpid())
-	var parentPID uint32
 
 	if err := windows.Process32First(snapshot, &pe); err != nil {
-		return ""
+		return 0
 	}
 
 	for {
 		if pe.ProcessID == currentPID {
-			parentPID = pe.ParentProcessID
-			break
+			return pe.ParentProcessID
 		}
 		if err := windows.Process32Next(snapshot, &pe); err != nil {
-			return ""
+			return 0
 		}
 	}
-
-	if parentPID == 0 {
-		return ""
-	}
-
-	if err := windows.Process32First(snapshot, &pe); err != nil {
-		return ""
-	}
-
-	for {
-		if pe.ProcessID == parentPID {
-			return windows.UTF16ToString(pe.ExeFile[:])
-		}
-		if err := windows.Process32Next(snapshot, &pe); err != nil {
-			break
-		}
-	}
-
-	return ""
 }
 
-func isCliProcess(name string) bool {
-	cliProcesses := []string{
-		"cmd.exe",
-		"powershell.exe",
-		"pwsh.exe",
-		"wt.exe",
-		"conhost.exe",
-		"windowsterminal.exe",
+func isPIDAttachedToCurrentConsole(pid uint32) bool {
+	if pid == 0 {
+		return false
 	}
 
-	nameLower := strings.ToLower(name)
-	for _, cli := range cliProcesses {
-		if nameLower == cli {
-			return true
+	buf := make([]uint32, 8)
+
+	for {
+		count, _, _ := procGetConsoleProcs.Call(
+			uintptr(unsafe.Pointer(&buf[0])),
+			uintptr(len(buf)),
+		)
+
+		if count == 0 {
+			return false
 		}
+
+		needed := int(count)
+		if needed > len(buf) {
+			buf = make([]uint32, needed)
+			continue
+		}
+
+		for _, consolePID := range buf[:needed] {
+			if consolePID == pid {
+				return true
+			}
+		}
+
+		return false
 	}
-	return false
 }
