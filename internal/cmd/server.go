@@ -39,7 +39,7 @@ func (s *Server) Run(logger *slog.Logger, rawLogger log.RawLogger) error {
 func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger log.RawLogger) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	go tray.Run(cancel)
+	tray.Run(ctx, cancel)
 
 	s.USBServerConfig.ConnectionTimeout = s.ConnectionTimeout
 	s.APIServerConfig.ConnectionTimeout = s.ConnectionTimeout

@@ -12,8 +12,8 @@
             "program": "${workspaceFolder}/cmd/viiper",
             "env": {
                 "VIIPER_LOG_LEVEL": "debug",
-                "VIIPER_LOG_FILE": "logs/viiper.log",
-                "VIIPER_LOG_RAW_FILE": "logs/viiper_raw.log",
+                // "VIIPER_LOG_FILE": "logs/viiper.log",
+                // "VIIPER_LOG_RAW_FILE": "logs/viiper_raw.log",
             },
             "args": [
                 "server"

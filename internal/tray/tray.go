@@ -2,4 +2,6 @@
 
 package tray
 
-func Run(shutdown func()) {}
+import "context"
+
+func Run(ctx context.Context, shutdown func()) {}

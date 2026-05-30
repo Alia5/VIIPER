@@ -3,11 +3,13 @@
 package tray
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
 
 	"fyne.io/systray"
@@ -22,8 +24,10 @@ const (
 	runValueKey = "VIIPER"
 )
 
-func Run(shutdown func()) {
-	systray.Run(func() {
+func Run(ctx context.Context, shutdown func()) {
+	go systray.Run(func() {
+		runtime.LockOSThread()
+
 		systray.SetIcon(trayIcon)
 		systray.SetTooltip("VIIPER")
 
@@ -43,6 +47,8 @@ func Run(shutdown func()) {
 		go func() {
 			for {
 				select {
+				case <-ctx.Done():
+					return
 				case <-autoStartItem.ClickedCh:
 					if toggleAutoStart() {
 						autoStartItem.Check()
@@ -56,6 +62,7 @@ func Run(shutdown func()) {
 				}
 			}
 		}()
+
 	}, func() {})
 }
 
