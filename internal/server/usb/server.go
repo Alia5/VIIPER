@@ -691,6 +691,11 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 				return fmt.Errorf("write RET_SUBMIT payload: %w", err)
 			}
 		}
+		if bw != nil && ep == 0 {
+			if err := bw.Flush(); err != nil {
+				return fmt.Errorf("flush EP0 response: %w", err)
+			}
+		}
 		_ = xferFlags
 		_ = devid
 	}
@@ -778,8 +783,9 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 	}
 
 	if desc.MicrosoftOS10 != nil &&
-		breq == desc.MicrosoftOS10.EffectiveVendorCode() &&
-		(bm == 0xC0 || bm == 0xC1) {
+		(bm == 0xC0 || bm == 0xC1) &&
+		(breq == desc.MicrosoftOS10.EffectiveVendorCode() ||
+			wIndex == 0x0004 || wIndex == 0x0005) {
 		if data, ok := desc.MicrosoftOS10.ControlResponse(wValue, wIndex); ok {
 			if int(wLength) < len(data) {
 				return data[:wLength]
