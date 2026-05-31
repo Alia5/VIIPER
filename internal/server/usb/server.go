@@ -137,6 +137,26 @@ const (
 	usbReqTypeStandardToDevice    = 0x00
 	usbReqTypeStandardToInterface = 0x81
 	usbReqTypeStandardFromDevice  = 0x80
+	usbReqTypeMask                = 0x60
+	usbReqTypeClass               = 0x20
+
+	// USB interface classes
+	usbInterfaceClassHID = 0x03
+
+	// HID class requests (bRequest)
+	hidReqGetReport   = 0x01
+	hidReqGetIdle     = 0x02
+	hidReqGetProtocol = 0x03
+	hidReqSetReport   = 0x09
+	hidReqSetIdle     = 0x0A
+	hidReqSetProtocol = 0x0B
+
+	// HID class request types (bmRequestType)
+	hidReqTypeIn  = 0xA1
+	hidReqTypeOut = 0x21
+
+	// wIndex low-byte interface selector mask.
+	usbIfaceIndexMask = 0x00FF
 
 	// USB configuration values
 	usbConfigValueDefault   = 1
@@ -708,6 +728,7 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 		return dev.HandleTransfer(ep, dir, out)
 	}
 	if len(setup) != 8 {
+		s.logger.Debug("EP0 submit with invalid setup size", "setupLen", len(setup), "setup", setup)
 		return nil
 	}
 	bm := setup[0]
@@ -805,6 +826,27 @@ func (s *Server) processSubmit(dev usb.Device, ep uint32, dir uint32, setup []by
 			}
 			return resp
 		}
+	}
+
+	if iface := int(wIndex & usbIfaceIndexMask); iface >= 0 && iface < len(desc.Interfaces) {
+		if desc.Interfaces[iface].Descriptor.BInterfaceClass == usbInterfaceClassHID {
+			switch {
+			case bm == hidReqTypeIn && breq == hidReqGetIdle:
+				return []byte{0x00}
+			case bm == hidReqTypeOut && breq == hidReqSetIdle:
+				return nil
+			case bm == hidReqTypeIn && breq == hidReqGetProtocol:
+				return []byte{0x01}
+			case bm == hidReqTypeOut && breq == hidReqSetProtocol:
+				return nil
+			case (bm == hidReqTypeIn || bm == hidReqTypeOut) && (breq == hidReqGetReport || breq == hidReqSetReport):
+				return nil
+			}
+		}
+	}
+
+	if (bm & usbReqTypeMask) != usbReqTypeClass {
+		s.logger.Debug("EP0 control unhandled", "bmRequestType", bm, "bRequest", breq, "wValue", wValue, "wIndex", wIndex, "wLength", wLength)
 	}
 
 	return nil
