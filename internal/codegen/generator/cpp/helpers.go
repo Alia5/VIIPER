@@ -93,6 +93,15 @@ func fieldCppType(field scanner.FieldInfo) string {
 
 func cppType(goType string) string {
 	base, isSlice, isPointer := common.NormalizeGoType(goType)
+	if base == "time.Time" {
+		if isSlice {
+			return "std::vector<std::string>"
+		}
+		if isPointer {
+			return "std::optional<std::string>"
+		}
+		return "std::string"
+	}
 	if strings.HasPrefix(base, "map[") {
 		return "json_type"
 	}
@@ -204,7 +213,7 @@ func isCustomType(goType string) bool {
 	case "uint8", "byte", "uint16", "uint32", "uint64",
 		"int8", "int16", "int32", "int64", "int",
 		"float32", "float64", "bool", "string",
-		"u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64":
+		"u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64", "time.Time":
 		return false
 	default:
 		return true

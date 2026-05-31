@@ -74,11 +74,10 @@ func fieldTypeToCSharp(field interface{}) string {
 	typeKind := v.FieldByName("TypeKind").String()
 
 	if typeKind == "map" || strings.HasPrefix(typeStr, "map[") {
-		keyType, valueType, ok := parseGoMapType(typeStr)
+		valueType, ok := parseGoMapType(typeStr)
 		if !ok {
 			return "Dictionary<string, object>"
 		}
-		_ = keyType
 		csVal := goTypeToCSharp(valueType)
 		if valueType == "any" || valueType == "interface{}" {
 			csVal = "object?"

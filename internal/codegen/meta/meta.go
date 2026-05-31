@@ -8,6 +8,7 @@ type Metadata struct {
 	Routes         []scanner.RouteInfo
 	DTOs           []scanner.DTOSchema
 	DevicePackages map[string]*scanner.DeviceConstants // device name -> constants/maps
+	DeviceStructs  map[string][]scanner.DTOSchema      // device name -> JSON-tagged structs for deviceSpecific helpers
 	WireTags       *scanner.WireTags                   // parsed viiper:wire comments
 	CTypeNames     map[string]string                   // DTO name -> C typedef name (e.g., "Device" -> "device_info")
 }

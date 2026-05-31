@@ -86,6 +86,7 @@ func (g *Generator) ScanAll() (*meta.Metadata, error) {
 
 	md := &meta.Metadata{
 		DevicePackages: make(map[string]*scanner.DeviceConstants),
+		DeviceStructs:  make(map[string][]scanner.DTOSchema),
 		CTypeNames:     make(map[string]string),
 	}
 
@@ -137,10 +138,19 @@ func (g *Generator) ScanAll() (*meta.Metadata, error) {
 		}
 
 		md.DevicePackages[deviceName] = deviceConsts
+
+		deviceStructs, err := scanner.ScanDeviceStructs(devicePath)
+		if err != nil {
+			g.logger.Warn("Failed to scan device structs", "device", deviceName, "error", err)
+		} else {
+			md.DeviceStructs[deviceName] = deviceStructs
+		}
+
 		g.logger.Info("Scanned device package",
 			"device", deviceName,
 			"constants", len(deviceConsts.Constants),
-			"maps", len(deviceConsts.Maps))
+			"maps", len(deviceConsts.Maps),
+			"json_structs", len(md.DeviceStructs[deviceName]))
 	}
 
 	g.logger.Debug("Scanning viiper:wire tags")

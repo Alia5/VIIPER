@@ -72,6 +72,10 @@ func Generate(logger *slog.Logger, outputDir string, md *meta.Metadata) error {
 			return err
 		}
 
+		if err := generateDeviceSpecific(logger, deviceDir, deviceName, md); err != nil {
+			return err
+		}
+
 		if err := generateDeviceModFile(logger, deviceDir, deviceName, md); err != nil {
 			return err
 		}
@@ -157,6 +161,7 @@ func generateDeviceModFile(logger *slog.Logger, deviceDir string, deviceName str
 	hasOutput := md.WireTags != nil && md.WireTags.GetTag(deviceName, "s2c") != nil
 	hasConstants := md.DevicePackages[deviceName] != nil &&
 		(len(md.DevicePackages[deviceName].Constants) > 0 || len(md.DevicePackages[deviceName].Maps) > 0)
+	hasDeviceSpecific := len(md.DeviceStructs[deviceName]) > 0
 
 	if hasInput {
 		content += "pub mod input;\n"
@@ -169,6 +174,10 @@ func generateDeviceModFile(logger *slog.Logger, deviceDir string, deviceName str
 	if hasConstants {
 		content += "pub mod constants;\n"
 		content += "pub use constants::*;\n\n"
+	}
+	if hasDeviceSpecific {
+		content += "pub mod meta;\n"
+		content += "pub use meta::*;\n\n"
 	}
 
 	if err := os.WriteFile(outputFile, []byte(content), 0644); err != nil {
