@@ -49,9 +49,15 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 		}
 
 		opts := device.CreateOptions{
-			IDVendor:       deviceCreateReq.IDVendor,
-			IDProduct:      deviceCreateReq.IDProduct,
-			DeviceSpecific: deviceCreateReq.DeviceSpecific,
+			IDVendor:  deviceCreateReq.IDVendor,
+			IDProduct: deviceCreateReq.IDProduct,
+		}
+		if deviceCreateReq.DeviceSpecific != nil {
+			b, err := json.Marshal(deviceCreateReq.DeviceSpecific)
+			if err != nil {
+				return apierror.ErrBadRequest(fmt.Sprintf("invalid deviceSpecific JSON: %v", err))
+			}
+			opts.DeviceSpecific = string(b)
 		}
 
 		dev, err := reg.CreateDevice(&opts)

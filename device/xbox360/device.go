@@ -36,13 +36,9 @@ func New(o *device.CreateOptions) (*Xbox360, error) {
 		if o.IDProduct != nil {
 			d.descriptor.Device.IDProduct = *o.IDProduct
 		}
-		if o.DeviceSpecific != nil {
-			data, err := json.Marshal(o.DeviceSpecific)
+		if o.DeviceSpecific != "" {
 			var args Xbox360CreateOptions
-			if err != nil {
-				return nil, fmt.Errorf("invalid JSON payload: %w", err)
-			}
-			err = json.Unmarshal(data, &args)
+			err := json.Unmarshal([]byte(o.DeviceSpecific), &args)
 			if err != nil {
 				return nil, fmt.Errorf("invalid JSON payload: %w", err)
 			}

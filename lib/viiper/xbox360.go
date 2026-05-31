@@ -104,12 +104,7 @@ func CreateXbox360Device(
 		if err != nil {
 			return false
 		}
-		var deviceSpecific map[string]any
-		err = json.Unmarshal(str, &deviceSpecific)
-		if err != nil {
-			return false
-		}
-		opts.DeviceSpecific = deviceSpecific
+		opts.DeviceSpecific = string(str)
 	}
 	d, err := xbox360.New(opts)
 	if err != nil {

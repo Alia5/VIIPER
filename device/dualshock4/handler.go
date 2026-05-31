@@ -26,10 +26,10 @@ func (h *handler) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
 	}
 
 	metaState := MetaState{}
-	if len(o.DeviceSpecific) == 0 {
-		o.DeviceSpecific = map[string]any{}
-	} else {
-		metaState.UpdateFromMap(o.DeviceSpecific)
+	if o.DeviceSpecific != "" {
+		if err := json.Unmarshal([]byte(o.DeviceSpecific), &metaState); err != nil {
+			return nil, fmt.Errorf("invalid device specific JSON: %w", err)
+		}
 	}
 	serial := DefaultSerialString
 	if metaState.SerialNumber != "" {
@@ -47,7 +47,11 @@ func (h *handler) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
 	}
 	metaState.SerialNumber = serial
 	serials[serial] = struct{}{}
-	o.DeviceSpecific = metaState.ToMap()
+	b, err := json.Marshal(metaState)
+	if err != nil {
+		return nil, fmt.Errorf("marshal meta state: %w", err)
+	}
+	o.DeviceSpecific = string(b)
 	return New(o)
 }
 

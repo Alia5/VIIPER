@@ -107,11 +107,18 @@ func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string,
 	if o == nil {
 		o = &device.CreateOptions{}
 	}
+	var deviceSpecific map[string]any
+	if o.DeviceSpecific != "" {
+		err := json.Unmarshal([]byte(o.DeviceSpecific), &deviceSpecific)
+		if err != nil {
+			return nil, fmt.Errorf("invalid CreateOptions.DeviceSpecific JSON: %w", err)
+		}
+	}
 	req := viipertypes.DeviceCreateRequest{
 		Type:           &devType,
 		IDVendor:       o.IDVendor,
 		IDProduct:      o.IDProduct,
-		DeviceSpecific: o.DeviceSpecific,
+		DeviceSpecific: deviceSpecific,
 	}
 	payloadBytes, err := json.Marshal(req)
 	if err != nil {

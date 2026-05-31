@@ -39,8 +39,30 @@ func New(o *device.CreateOptions) (*DualShock4, error) {
 		TemperatureCelsius: DefaultTemperature,
 		BatteryVoltage:     DefaultVoltage,
 	}
-	if o != nil && o.DeviceSpecific != nil {
-		metaState.UpdateFromMap(o.DeviceSpecific)
+	if o != nil && o.DeviceSpecific != "" {
+		var newMeta MetaState
+		err := json.Unmarshal([]byte(o.DeviceSpecific), &newMeta)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON payload: %w", err)
+		}
+		if newMeta.SerialNumber != "" {
+			metaState.SerialNumber = newMeta.SerialNumber
+		}
+		if newMeta.Board != "" {
+			metaState.Board = newMeta.Board
+		}
+		if !newMeta.BuildTime.IsZero() {
+			metaState.BuildTime = newMeta.BuildTime
+		}
+		if newMeta.BatteryStatus != 0 {
+			metaState.BatteryStatus = newMeta.BatteryStatus
+		}
+		if newMeta.TemperatureCelsius != 0 {
+			metaState.TemperatureCelsius = newMeta.TemperatureCelsius
+		}
+		if newMeta.BatteryVoltage != 0 {
+			metaState.BatteryVoltage = newMeta.BatteryVoltage
+		}
 	}
 
 	d := &DualShock4{
@@ -54,12 +76,8 @@ func New(o *device.CreateOptions) (*DualShock4, error) {
 		if o.IDProduct != nil {
 			d.descriptor.Device.IDProduct = *o.IDProduct
 		}
-		if o.DeviceSpecific != nil {
-			if s, ok := o.DeviceSpecific["serial"].(string); ok &&
-				len(s) <= 16 {
-				serial := fmt.Sprintf("%016s", s)
-				d.metaState.SerialNumber = serial
-			}
+		if len(d.metaState.SerialNumber) > 0 && len(d.metaState.SerialNumber) <= 16 {
+			d.metaState.SerialNumber = fmt.Sprintf("%016s", d.metaState.SerialNumber)
 		}
 	}
 
