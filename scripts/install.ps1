@@ -191,6 +191,9 @@ try {
     else {
         Write-Host "VIIPER server is now running and will start automatically on boot."
     }
+
+    taskkill.exe /IM "viiper.exe" /F > $null 2>&1
+    Start-Process -WindowStyle Hidden  "$installPath" -ArgumentList "server"
     
     if ($needsReboot) {
         Write-Host ""
