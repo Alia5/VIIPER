@@ -45,7 +45,7 @@ func (d *NS2Pro) handleFlashCommand(seq, sub uint8, out []byte) {
 	copy(resp[0:8], commandHeader(0x02, seq, sub))
 	resp[8] = 0x40
 	binary.LittleEndian.PutUint32(resp[12:16], address)
-	copy(resp[16:], minimalFlashBlock(address))
+	copy(resp[16:], d.minimalFlashBlock(address))
 	d.enqueueResponse(resp)
 }
 

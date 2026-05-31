@@ -1,10 +1,14 @@
 package ns2pro
 
-func minimalFlashBlock(address uint32) []byte {
+func (d *NS2Pro) minimalFlashBlock(address uint32) []byte {
 	block := make([]byte, 0x40)
 	switch address {
 	case 0x13000:
-		copy(block[2:], []byte(DefaultSerial))
+		serial := d.serialNumber()
+		if serial == "" {
+			serial = DefaultSerial
+		}
+		copy(block[2:], []byte(serial))
 	case 0x13080, 0x130C0:
 		encodeStickCalibration(block[0x28:], StickCenter, StickCenter, 2047, 2047, 2048, 2048)
 	case 0x13040, 0x13100, 0x1FC040, 0x1FC080:

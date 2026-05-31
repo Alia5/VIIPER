@@ -214,6 +214,26 @@ func TestBulkCommands(t *testing.T) {
 	assert.Equal(t, "VIIPER-NS2PRO-00", string(flash[2:18]))
 }
 
+func TestFlashSerialUsesMetaStateSerial(t *testing.T) {
+	dev, err := New(nil)
+	require.NoError(t, err)
+
+	dev.SetMetaState(MetaState{
+		SerialNumber:  "CUSTOM-NS2PRO-AB",
+		BatteryLevel:  BatteryMax,
+		ExternalPower: true,
+		BatteryVolts:  DefaultBatteryVolts,
+	})
+
+	dev.HandleTransfer(2, usbip.DirOut, flashReadCommand(0x13000))
+	resp := dev.HandleTransfer(2, usbip.DirIn, nil)
+	require.Len(t, resp, 0x50)
+
+	flash := resp[16:]
+	require.Len(t, flash, 64)
+	assert.Equal(t, "CUSTOM-NS2PRO-AB", string(flash[2:18]))
+}
+
 func TestSDLUSBInitializationSequence(t *testing.T) {
 	dev, err := New(nil)
 	require.NoError(t, err)
