@@ -34,8 +34,24 @@ type NS2Pro struct {
 func New(o *device.CreateOptions) (*NS2Pro, error) {
 	metaState := defaultMetaState()
 	if o != nil && o.DeviceSpecific != "" {
-		if err := json.Unmarshal([]byte(o.DeviceSpecific), metaState); err != nil {
+		var newMeta MetaState
+		if err := json.Unmarshal([]byte(o.DeviceSpecific), &newMeta); err != nil {
 			return nil, fmt.Errorf("invalid device specific JSON: %w", err)
+		}
+		if newMeta.SerialNumber != "" {
+			metaState.SerialNumber = newMeta.SerialNumber
+		}
+		if newMeta.BatteryLevel != 0 {
+			metaState.BatteryLevel = newMeta.BatteryLevel
+		}
+		if newMeta.Charging {
+			metaState.Charging = true
+		}
+		if newMeta.ExternalPower {
+			metaState.ExternalPower = true
+		}
+		if newMeta.BatteryVolts != 0 {
+			metaState.BatteryVolts = newMeta.BatteryVolts
 		}
 	}
 
