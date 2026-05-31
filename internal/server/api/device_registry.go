@@ -7,24 +7,25 @@ import (
 	"github.com/Alia5/VIIPER/usb"
 )
 
-// DeviceRegistration describes a device type, providing both device creation
+// DeviceHandler describes a device type, providing both device creation
 // and stream handler registration.
-type DeviceRegistration interface {
+type DeviceHandler interface {
 	// CreateDevice returns a new device instance of this type.
 	CreateDevice(o *device.CreateOptions) (usb.Device, error)
 	// StreamHandler returns the handler function for long-lived connections.
 	StreamHandler() StreamHandlerFunc
+	UpdateMetaState(meta string, dev *usb.Device) error
 }
 
 var (
-	deviceRegistry   = make(map[string]DeviceRegistration)
+	deviceRegistry   = make(map[string]DeviceHandler)
 	deviceRegistryMu sync.RWMutex
 )
 
 // RegisterDevice registers a device type for dynamic creation and handler dispatch.
 // This should be called from device package init() functions.
 // The name is case-insensitive and will be lowercased.
-func RegisterDevice(name string, reg DeviceRegistration) {
+func RegisterDevice(name string, reg DeviceHandler) {
 	deviceRegistryMu.Lock()
 	defer deviceRegistryMu.Unlock()
 	deviceRegistry[toLower(name)] = reg
@@ -32,7 +33,7 @@ func RegisterDevice(name string, reg DeviceRegistration) {
 
 // GetRegistration retrieves a registered device handler by name for device creation.
 // Returns nil if not found. Name lookup is case-insensitive.
-func GetRegistration(name string) DeviceRegistration {
+func GetRegistration(name string) DeviceHandler {
 	deviceRegistryMu.RLock()
 	defer deviceRegistryMu.RUnlock()
 	return deviceRegistry[toLower(name)]

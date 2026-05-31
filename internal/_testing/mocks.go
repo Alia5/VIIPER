@@ -23,12 +23,16 @@ func (m *mockRegistration) StreamHandler() api.StreamHandlerFunc {
 	return m.handlerFunc
 }
 
+func (m *mockRegistration) UpdateMetaState(meta string, dev *usb.Device) error {
+	return nil
+}
+
 func CreateMockRegistration(
 	t *testing.T,
 	name string,
 	cf func(o *device.CreateOptions) (usb.Device, error),
 	h api.StreamHandlerFunc,
-) api.DeviceRegistration {
+) api.DeviceHandler {
 	return &mockRegistration{
 		deviceName:  name,
 		handlerFunc: h,
