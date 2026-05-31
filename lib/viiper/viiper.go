@@ -15,6 +15,13 @@ import (
 
 func main() {}
 
+func goStringOrEmpty(p *C.char) string {
+	if p == nil {
+		return ""
+	}
+	return C.GoString(p)
+}
+
 type deviceHandle cgo.Handle
 
 type usbServerHandleWrapper struct {
