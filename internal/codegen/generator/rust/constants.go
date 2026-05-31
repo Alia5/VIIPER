@@ -91,7 +91,7 @@ func generateConstants(logger *slog.Logger, deviceDir string, deviceName string,
 		if !common.IsIntegerConst(c.Value, c.Type) {
 			continue
 		}
-		rustType := goTypeToRust(c.Type)
+		rustType := constGoTypeToRust(c.Type)
 		value := formatConstValue(c.Value, c.Type)
 		constants = append(constants, rustConstant{
 			Name:     c.Name,
@@ -163,6 +163,14 @@ func generateConstants(logger *slog.Logger, deviceDir string, deviceName string,
 
 	logger.Info("Generated device constants", "file", outputPath)
 	return nil
+}
+
+func constGoTypeToRust(goType string) string {
+	base, _, _ := common.NormalizeGoType(goType)
+	if base == "string" {
+		return "&'static str"
+	}
+	return goTypeToRust(goType)
 }
 
 func formatConstValue(val interface{}, goType string) string {

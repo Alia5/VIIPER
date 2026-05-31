@@ -173,14 +173,55 @@ struct Input {
 
 struct Output {
 {{- range $fields}}
+{{- if isArrayType .Type}}
+{{- if isFixedArrayType .Type}}
+	std::array<{{cpptype (baseType .Type)}}, {{fixedArrayLen .Type}}> {{camelcase .Name}}{};
+{{- else}}
+	std::vector<{{cpptype (baseType .Type)}}> {{camelcase .Name}};
+{{- end}}
+{{- else}}
     {{cpptype .Type}} {{camelcase .Name}} = 0;
+{{- end}}
 {{- end}}
 
     static Result<Output> from_bytes(const std::uint8_t* data, std::size_t len) {
         Output result;
         std::size_t offset = 0;
 {{- range $fields}}
-{{- if eq .Type "u8"}}
+{{- if isArrayType .Type}}
+{{- if isFixedArrayType .Type}}
+{{- $bt := baseType .Type}}
+	for (std::size_t i = 0; i < static_cast<std::size_t>({{fixedArrayLen .Type}}); i++) {
+{{- if eq $bt "u8"}}
+	    if (offset >= len) return Error("buffer too short");
+	    result.{{camelcase .Name}}[i] = data[offset++];
+{{- else if eq $bt "i8"}}
+	    if (offset >= len) return Error("buffer too short");
+	    result.{{camelcase .Name}}[i] = static_cast<std::int8_t>(data[offset++]);
+{{- else if eq $bt "u16"}}
+	    if (offset + 2 > len) return Error("buffer too short");
+	    result.{{camelcase .Name}}[i] = data[offset] | (static_cast<std::uint16_t>(data[offset + 1]) << 8);
+	    offset += 2;
+{{- else if eq $bt "i16"}}
+	    if (offset + 2 > len) return Error("buffer too short");
+	    result.{{camelcase .Name}}[i] = static_cast<std::int16_t>(data[offset] | (static_cast<std::uint16_t>(data[offset + 1]) << 8));
+	    offset += 2;
+{{- else if eq $bt "u32"}}
+	    if (offset + 4 > len) return Error("buffer too short");
+	    result.{{camelcase .Name}}[i] = data[offset] | (static_cast<std::uint32_t>(data[offset + 1]) << 8) |
+					   (static_cast<std::uint32_t>(data[offset + 2]) << 16) | (static_cast<std::uint32_t>(data[offset + 3]) << 24);
+	    offset += 4;
+{{- else if eq $bt "i32"}}
+	    if (offset + 4 > len) return Error("buffer too short");
+	    result.{{camelcase .Name}}[i] = static_cast<std::int32_t>(data[offset] | (static_cast<std::uint32_t>(data[offset + 1]) << 8) |
+					   (static_cast<std::uint32_t>(data[offset + 2]) << 16) | (static_cast<std::uint32_t>(data[offset + 3]) << 24));
+	    offset += 4;
+{{- end}}
+	}
+{{- else}}
+	return Error("variable-length output arrays are not supported");
+{{- end}}
+{{- else if eq .Type "u8"}}
         if (offset >= len) return Error("buffer too short");
         result.{{camelcase .Name}} = data[offset++];
 {{- else if eq .Type "i8"}}
@@ -266,6 +307,18 @@ func generateDeviceHeader(logger *slog.Logger, devicesDir, deviceName string, md
 					if _, err := strconv.Atoi(f.Type[idx+1:]); err == nil {
 						hasFixedWireArrays = true
 						break
+					}
+				}
+			}
+		}
+		if !hasFixedWireArrays {
+			if s2cTag := md.WireTags.GetTag(deviceName, "s2c"); s2cTag != nil {
+				for _, f := range s2cTag.Fields {
+					if idx := strings.Index(f.Type, "*"); idx >= 0 {
+						if _, err := strconv.Atoi(f.Type[idx+1:]); err == nil {
+							hasFixedWireArrays = true
+							break
+						}
 					}
 				}
 			}

@@ -7,6 +7,8 @@ func IsIntegerConst(value interface{}, goType string) bool {
 	switch base {
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "byte":
 		return true
+	case "string", "bool", "char", "float32", "float64":
+		return false
 	}
 
 	switch v := value.(type) {

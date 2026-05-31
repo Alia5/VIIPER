@@ -25,6 +25,12 @@ type tsConstInfo struct {
 	Value string
 }
 
+type tsScalarConst struct {
+	Name  string
+	Type  string
+	Value string
+}
+
 type tsMapData struct {
 	Name      string
 	KeyType   string
@@ -50,10 +56,11 @@ func generateConstants(logger *slog.Logger, deviceDir string, deviceName string,
 	enums := groupConstants(deviceConsts.Constants)
 	maps := convertMaps(deviceConsts.Maps)
 	data := struct {
-		Device string
-		Enums  []tsEnumGroup
-		Maps   []tsMapData
-	}{Device: pascalDevice, Enums: enums, Maps: maps}
+		Device  string
+		Enums   []tsEnumGroup
+		Scalars []tsScalarConst
+		Maps    []tsMapData
+	}{Device: pascalDevice, Enums: enums, Scalars: extractScalarConstantsTS(deviceConsts.Constants), Maps: maps}
 	f, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("create file: %w", err)
@@ -72,6 +79,9 @@ func generateConstants(logger *slog.Logger, deviceDir string, deviceName string,
 func groupConstants(constants []scanner.ConstantInfo) []tsEnumGroup {
 	groups := map[string]*tsEnumGroup{}
 	for _, c := range constants {
+		if !common.IsIntegerConst(c.Value, c.Type) {
+			continue
+		}
 		prefix := common.ExtractPrefix(c.Name)
 		if prefix == "" {
 			continue
@@ -94,13 +104,35 @@ func groupConstants(constants []scanner.ConstantInfo) []tsEnumGroup {
 	return result
 }
 
+func extractScalarConstantsTS(constants []scanner.ConstantInfo) []tsScalarConst {
+	result := make([]tsScalarConst, 0)
+	for _, c := range constants {
+		if common.IsIntegerConst(c.Value, c.Type) {
+			continue
+		}
+		result = append(result, tsScalarConst{
+			Name:  c.Name,
+			Type:  goTypeToTS(c.Type),
+			Value: formatConstValueTS(c.Value),
+		})
+	}
+	sort.Slice(result, func(i, j int) bool { return result[i].Name < result[j].Name })
+	return result
+}
+
 func formatConstValueTS(v interface{}) string {
 	switch t := v.(type) {
 	case int64:
+		if t < 0 {
+			return fmt.Sprintf("%d", t)
+		}
 		return fmt.Sprintf("0x%X", t)
 	case uint64:
 		return fmt.Sprintf("0x%X", t)
 	case int:
+		if t < 0 {
+			return fmt.Sprintf("%d", t)
+		}
 		return fmt.Sprintf("0x%X", t)
 	case string:
 		return fmt.Sprintf("'%s'", t)
@@ -216,6 +248,10 @@ const constantsTemplateTS = `{{writeFileHeaderTS}}
 export enum {{.Name}} {
 {{range .Constants}}  {{.Name}} = {{.Value}},
 {{end}}}
+{{end}}
+
+{{range .Scalars}}
+export const {{.Name}}: {{.Type}} = {{.Value}};
 {{end}}
 
 {{range .Maps}}

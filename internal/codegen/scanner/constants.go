@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -13,17 +14,17 @@ import (
 
 // ConstantInfo represents a single constant definition
 type ConstantInfo struct {
-	Name  string      `json:"name"`
-	Value interface{} `json:"value"` // Can be int, string, etc.
-	Type  string      `json:"type"`  // e.g., "int", "uint8", "string"
+	Name  string `json:"name"`
+	Value any    `json:"value"` // Can be int, string, etc.
+	Type  string `json:"type"`  // e.g., "int", "uint8", "string"
 }
 
 // MapInfo represents a map variable with its entries
 type MapInfo struct {
-	Name      string                 `json:"name"`
-	KeyType   string                 `json:"keyType"`
-	ValueType string                 `json:"valueType"`
-	Entries   map[string]interface{} `json:"entries"` // Key as string, value as interface{}
+	Name      string         `json:"name"`
+	KeyType   string         `json:"keyType"`
+	ValueType string         `json:"valueType"`
+	Entries   map[string]any `json:"entries"` // Key as string, value as interface{}
 }
 
 // DeviceConstants holds all constants and maps for a device package
@@ -41,6 +42,7 @@ func ScanDeviceConstants(devicePkgPath string) (*DeviceConstants, error) {
 		Constants:  []ConstantInfo{},
 		Maps:       []MapInfo{},
 	}
+	constEnv := make(map[string]ConstantInfo)
 
 	entries, err := os.ReadDir(devicePkgPath)
 	if err != nil {
@@ -63,7 +65,7 @@ func ScanDeviceConstants(devicePkgPath string) (*DeviceConstants, error) {
 			if genDecl, ok := decl.(*ast.GenDecl); ok {
 				switch genDecl.Tok {
 				case token.CONST:
-					result.Constants = append(result.Constants, extractConstants(genDecl)...)
+					result.Constants = append(result.Constants, extractConstants(genDecl, constEnv)...)
 				case token.VAR:
 					maps := extractMaps(genDecl)
 					result.Maps = append(result.Maps, maps...)
@@ -88,8 +90,11 @@ func parseGoSource(fset *token.FileSet, filename string, src []byte) (*ast.File,
 	return parser.ParseFile(fset, filename, src, parser.ParseComments)
 }
 
-func extractConstants(genDecl *ast.GenDecl) []ConstantInfo {
+func extractConstants(genDecl *ast.GenDecl, env map[string]ConstantInfo) []ConstantInfo {
 	var constants []ConstantInfo
+	var previousValues []ast.Expr
+	previousType := ""
+	iotaValue := 0
 
 	for _, spec := range genDecl.Specs {
 		valueSpec, ok := spec.(*ast.ValueSpec)
@@ -97,33 +102,237 @@ func extractConstants(genDecl *ast.GenDecl) []ConstantInfo {
 			continue
 		}
 
-		var typeName string
+		currentType := previousType
+		if len(valueSpec.Values) > 0 {
+			currentType = ""
+		}
 		if valueSpec.Type != nil {
-			typeName = exprToString(valueSpec.Type)
+			currentType = exprToString(valueSpec.Type)
 		}
 
+		exprs := previousValues
+		if len(valueSpec.Values) > 0 {
+			exprs = valueSpec.Values
+			previousValues = valueSpec.Values
+			previousType = currentType
+		}
+
+		evaluator := constEvaluator{env: env, iotaValue: iotaValue}
+
 		for i, name := range valueSpec.Names {
-			if !name.IsExported() {
+			if len(exprs) == 0 {
 				continue
+			}
+			exprIndex := i
+			if exprIndex >= len(exprs) {
+				exprIndex = len(exprs) - 1
 			}
 
 			constInfo := ConstantInfo{
 				Name: name.Name,
-				Type: typeName,
+				Type: currentType,
 			}
-
-			if i < len(valueSpec.Values) {
-				constInfo.Value = extractValue(valueSpec.Values[i])
-				if typeName == "" {
-					constInfo.Type = inferType(constInfo.Value)
-				}
+			constInfo.Value = evaluator.eval(exprs[exprIndex])
+			if currentType == "" {
+				constInfo.Type = inferType(constInfo.Value)
 			}
+			env[name.Name] = constInfo
 
-			constants = append(constants, constInfo)
+			if name.IsExported() {
+				constants = append(constants, constInfo)
+			}
 		}
+
+		iotaValue++
 	}
 
 	return constants
+}
+
+type constEvaluator struct {
+	env       map[string]ConstantInfo
+	iotaValue int
+}
+
+func (e constEvaluator) eval(expr ast.Expr) interface{} {
+	switch v := expr.(type) {
+	case *ast.ParenExpr:
+		return e.eval(v.X)
+	case *ast.BasicLit:
+		switch v.Kind {
+		case token.INT:
+			if val, err := strconv.ParseInt(v.Value, 0, 64); err == nil {
+				return val
+			}
+			if val, err := strconv.ParseUint(v.Value, 0, 64); err == nil {
+				return val
+			}
+		case token.STRING:
+			return strings.Trim(v.Value, `"`)
+		case token.FLOAT:
+			if val, err := strconv.ParseFloat(v.Value, 64); err == nil {
+				return val
+			}
+		case token.CHAR:
+			if unquoted, err := strconv.Unquote(v.Value); err == nil {
+				return unquoted
+			}
+			return strings.Trim(v.Value, "'")
+		}
+	case *ast.Ident:
+		if v.Name == "iota" {
+			return int64(e.iotaValue)
+		}
+		if info, ok := e.env[v.Name]; ok {
+			return info.Value
+		}
+		return v.Name
+	case *ast.BinaryExpr:
+		left := e.eval(v.X)
+		right := e.eval(v.Y)
+		if result, ok := evalBinaryExpr(v.Op, left, right); ok {
+			return result
+		}
+		return fmt.Sprintf("%v %s %v", left, v.Op.String(), right)
+	case *ast.UnaryExpr:
+		value := e.eval(v.X)
+		if result, ok := evalUnaryExpr(v.Op, value); ok {
+			return result
+		}
+		return fmt.Sprintf("%s%v", v.Op.String(), value)
+	case *ast.SelectorExpr:
+		name := exprToString(v)
+		if info, ok := e.env[name]; ok {
+			return info.Value
+		}
+		return name
+	}
+	return nil
+}
+
+func evalBinaryExpr(op token.Token, left interface{}, right interface{}) (interface{}, bool) {
+	if ls, ok := left.(string); ok && op == token.ADD {
+		if rs, ok := right.(string); ok {
+			return ls + rs, true
+		}
+	}
+
+	lu, lok := toUint64(left)
+	ru, rok := toUint64(right)
+	if lok && rok {
+		switch op {
+		case token.SHL:
+			if ru < 64 {
+				return lu << ru, true
+			}
+		case token.SHR:
+			if ru < 64 {
+				return lu >> ru, true
+			}
+		case token.OR:
+			return lu | ru, true
+		case token.AND:
+			return lu & ru, true
+		case token.XOR:
+			return lu ^ ru, true
+		case token.ADD:
+			return lu + ru, true
+		case token.SUB:
+			if lu >= ru {
+				return lu - ru, true
+			}
+		case token.MUL:
+			return lu * ru, true
+		case token.QUO:
+			if ru != 0 {
+				return lu / ru, true
+			}
+		}
+	}
+
+	li, lok := toInt64(left)
+	ri, rok := toInt64(right)
+	if lok && rok {
+		switch op {
+		case token.ADD:
+			return li + ri, true
+		case token.SUB:
+			return li - ri, true
+		case token.MUL:
+			return li * ri, true
+		case token.QUO:
+			if ri != 0 {
+				return li / ri, true
+			}
+		}
+	}
+
+	return nil, false
+}
+
+func evalUnaryExpr(op token.Token, value interface{}) (interface{}, bool) {
+	if u, ok := toUint64(value); ok {
+		switch op {
+		case token.ADD:
+			return u, true
+		case token.XOR:
+			return ^u, true
+		}
+	}
+
+	if i, ok := toInt64(value); ok {
+		switch op {
+		case token.ADD:
+			return i, true
+		case token.SUB:
+			return -i, true
+		case token.XOR:
+			return ^i, true
+		}
+	}
+
+	return nil, false
+}
+
+func toUint64(value any) (uint64, bool) {
+	switch v := value.(type) {
+	case uint64:
+		return v, true
+	case int64:
+		if v < 0 {
+			return 0, false
+		}
+		return uint64(v), true
+	case int:
+		if v < 0 {
+			return 0, false
+		}
+		return uint64(v), true
+	case string:
+		if parsed, err := strconv.ParseUint(v, 0, 64); err == nil {
+			return parsed, true
+		}
+	}
+	return 0, false
+}
+
+func toInt64(value any) (int64, bool) {
+	switch v := value.(type) {
+	case int64:
+		return v, true
+	case uint64:
+		if v > uint64(math.MaxInt64) {
+			return 0, false
+		}
+		return int64(v), true
+	case int:
+		return int64(v), true
+	case string:
+		if parsed, err := strconv.ParseInt(v, 0, 64); err == nil {
+			return parsed, true
+		}
+	}
+	return 0, false
 }
 
 func extractMaps(genDecl *ast.GenDecl) []MapInfo {
@@ -200,85 +409,7 @@ func extractMapEntries(compositeLit *ast.CompositeLit) map[string]interface{} {
 }
 
 func extractValue(expr ast.Expr) interface{} {
-	switch e := expr.(type) {
-	case *ast.BasicLit:
-		switch e.Kind {
-		case token.INT:
-			if val, err := strconv.ParseInt(e.Value, 0, 64); err == nil {
-				return val
-			}
-			if val, err := strconv.ParseUint(e.Value, 0, 64); err == nil {
-				return val
-			}
-		case token.STRING:
-			return strings.Trim(e.Value, `"`)
-		case token.FLOAT:
-			if val, err := strconv.ParseFloat(e.Value, 64); err == nil {
-				return val
-			}
-		case token.CHAR:
-			if unquoted, err := strconv.Unquote(e.Value); err == nil {
-				return unquoted
-			}
-			return strings.Trim(e.Value, "'")
-		}
-	case *ast.Ident:
-		return e.Name
-	case *ast.BinaryExpr:
-		lx := extractValue(e.X)
-		ry := extractValue(e.Y)
-
-		toU64 := func(v interface{}) (uint64, bool) {
-			switch n := v.(type) {
-			case uint64:
-				return n, true
-			case int64:
-				if n < 0 {
-					return 0, false
-				}
-				return uint64(n), true
-			case int:
-				if n < 0 {
-					return 0, false
-				}
-				return uint64(n), true
-			default:
-				return 0, false
-			}
-		}
-
-		lu, lok := toU64(lx)
-		ru, rok := toU64(ry)
-		if lok && rok {
-			switch e.Op {
-			case token.SHL:
-				if ru < 64 {
-					return lu << ru
-				}
-			case token.SHR:
-				if ru < 64 {
-					return lu >> ru
-				}
-			case token.OR:
-				return lu | ru
-			case token.AND:
-				return lu & ru
-			case token.XOR:
-				return lu ^ ru
-			case token.ADD:
-				return lu + ru
-			case token.SUB:
-				if lu >= ru {
-					return lu - ru
-				}
-			}
-		}
-
-		return fmt.Sprintf("%v %s %v", lx, e.Op.String(), ry)
-	case *ast.UnaryExpr:
-		return fmt.Sprintf("%s%v", e.Op.String(), extractValue(e.X))
-	}
-	return nil
+	return constEvaluator{}.eval(expr)
 }
 
 func exprToString(expr ast.Expr) string {

@@ -54,3 +54,33 @@ func TestScanXbox360Constants(t *testing.T) {
 
 	t.Logf("Found %d constants", len(result.Constants))
 }
+
+func TestScanNs2ProConstants(t *testing.T) {
+	ns2proPath := filepath.Join("..", "..", "..", "device", "ns2pro")
+
+	result, err := ScanDeviceConstants(ns2proPath)
+	if err != nil {
+		t.Fatalf("Failed to scan ns2pro constants: %v", err)
+	}
+
+	constants := make(map[string]ConstantInfo, len(result.Constants))
+	for _, c := range result.Constants {
+		constants[c.Name] = c
+	}
+
+	if got := constants["ButtonB"].Value; got != uint64(1) {
+		t.Fatalf("expected ButtonB to equal 1, got %#v", got)
+	}
+	if got := constants["ButtonA"].Value; got != uint64(2) {
+		t.Fatalf("expected ButtonA to equal 2, got %#v", got)
+	}
+	if got := constants["ButtonHeadset"].Value; got != uint64(1<<21) {
+		t.Fatalf("expected ButtonHeadset to equal 1<<21, got %#v", got)
+	}
+	if got := constants["DefaultSerialEnding"].Value; got != "00" {
+		t.Fatalf("expected DefaultSerialEnding to equal 00, got %#v", got)
+	}
+	if got := constants["DefaultSerial"].Value; got != "VIIPER-NS2PRO-00" {
+		t.Fatalf("expected DefaultSerial to equal VIIPER-NS2PRO-00, got %#v", got)
+	}
+}
