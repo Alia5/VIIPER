@@ -113,6 +113,10 @@ func groupConstantsByPrefix(constants []scanner.ConstantInfo) []enumGroup {
 	groups := make(map[string]*enumGroup)
 
 	for _, c := range constants {
+		if !common.IsIntegerConst(c.Value, c.Type) {
+			continue
+		}
+
 		prefix := common.ExtractPrefix(c.Name)
 		if prefix == "" {
 			continue

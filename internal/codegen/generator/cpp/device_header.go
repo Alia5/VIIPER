@@ -272,6 +272,14 @@ func generateDeviceHeader(logger *slog.Logger, devicesDir, deviceName string, md
 		}
 	}
 
+	constants := make([]scanner.ConstantInfo, 0, len(devicePkg.Constants))
+	for _, c := range devicePkg.Constants {
+		if !common.IsIntegerConst(c.Value, c.Type) {
+			continue
+		}
+		constants = append(constants, c)
+	}
+
 	data := struct {
 		Header             string
 		DeviceName         string
@@ -285,7 +293,7 @@ func generateDeviceHeader(logger *slog.Logger, devicesDir, deviceName string, md
 	}{
 		Header:             writeFileHeader(),
 		DeviceName:         deviceName,
-		Constants:          devicePkg.Constants,
+		Constants:          constants,
 		Maps:               devicePkg.Maps,
 		HasInput:           hasInput,
 		HasOutput:          hasOutput,

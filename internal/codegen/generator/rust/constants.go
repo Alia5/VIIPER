@@ -88,6 +88,9 @@ func generateConstants(logger *slog.Logger, deviceDir string, deviceName string,
 	}
 
 	for _, c := range devicePkg.Constants {
+		if !common.IsIntegerConst(c.Value, c.Type) {
+			continue
+		}
 		rustType := goTypeToRust(c.Type)
 		value := formatConstValue(c.Value, c.Type)
 		constants = append(constants, rustConstant{
