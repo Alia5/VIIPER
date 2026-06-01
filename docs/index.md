@@ -47,6 +47,15 @@ For why you should pick one over the other see the [FAQ](#why-choose-the-the-sta
 
 Beyond device emulation, VIIPER can proxy real USB devices for traffic inspection and reverse engineering.
 
+## Emulatable devices
+
+- Xbox 360 controller emulation; see [Devices › Xbox 360 Controller](devices/xbox360.md)
+- HID Keyboard with N-key rollover and LED feedback; see [Devices › Keyboard](devices/keyboard.md)
+- HID Mouse with 5 buttons and horizontal/vertical wheel; see [Devices › Mouse](devices/mouse.md)
+- PS4 controller emulation; see [Devices › DualShock 4 Controller](devices/dualshock4.md)
+- PS5 DualSense controller emulation (including Edge variant); see [Devices › DualSense Controller](devices/dualsense.md)
+- Nintendo Switch 2 Pro Controller emulation; see [Devices › Switch 2 Pro Controller](devices/ns2pro.md)
+
 ---
 
 ## 🥫 Feeder application development
@@ -103,7 +112,8 @@ VIIPER uses it because it's already built into Linux and available for Windows, 
 - Flexibility
     - allows one to use VIIPER as a service on the same host as the USBIP-Client and use the feeder on a different, remote machine.
     - allows for software written utilizing VIIPER to **not be** licensed under the terms of the GPLv3
-    - **_future versions_**: Users can enhance VIIPER with device plugins, sharing a common wire-protocol, which can be dynamically incorporated.
+    - Allows users to idenpendently update VIIPER to receive updates and bugfixes  without affecting other components or having to recompile applications themselves.  
+       This also takes away maintenance burdens for feeder-application developers (likely you)
 
 ### Can I use VIIPER for gaming?
 
@@ -128,7 +138,6 @@ Adding a new device type never requires touching kernel code.
 ### Can I add support for other device types?
 
 Yes! VIIPER's architecture is designed to be extensible.  
-In the future there will be a plugin system to load and expose device types dynamically.
 
 ### What about the proxy mode?
 

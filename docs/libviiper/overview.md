@@ -102,6 +102,7 @@ Full working examples are in [`examples/libVIIPER/`](https://github.com/Alia5/VI
 
 - [Xbox 360 Controller](../devices/xbox360.md)
 - [DualShock 4](../devices/dualshock4.md)
+- [DualSense (and Edge)](../devices/dualsense.md)
 - [Keyboard](../devices/keyboard.md)
 - [Mouse](../devices/mouse.md)
 
