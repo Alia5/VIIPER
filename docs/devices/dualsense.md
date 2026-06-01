@@ -83,9 +83,9 @@ IMU (gyro + accelerometer), and touchpad finger coordinates.
     | Touchpad click | 0x00020000 |
     | Mic mute button | 0x00040000 |
     | Edge Variant only | --- |
-    | RFn button | 0x00080000 |
+    | RFn button | 0x00200000 |
     | LFn button | 0x00100000 |
-    | R4 back paddle | 0x00200000 |
+    | R4 back paddle | 0x00800000 |
     | L4 back paddle | 0x00400000 |
 
     ### D-Pad Constants

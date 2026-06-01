@@ -64,10 +64,10 @@ const (
 	ButtonTouchpad uint32 = 0x00020000
 	ButtonMicMute  uint32 = 0x00040000
 
-	ButtonEdgeRFn uint32 = 0x00080000
 	ButtonEdgeLFn uint32 = 0x00100000
-	ButtonEdgeR4  uint32 = 0x00200000
+	ButtonEdgeRFn uint32 = 0x00200000
 	ButtonEdgeL4  uint32 = 0x00400000
+	ButtonEdgeR4  uint32 = 0x00800000
 )
 
 const (

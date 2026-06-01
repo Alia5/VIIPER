@@ -23,9 +23,9 @@ typedef uintptr_t DSDeviceHandle;
 #define DS_BUTTON_PS        0x00010000u
 #define DS_BUTTON_TOUCHPAD  0x00020000u
 #define DS_BUTTON_MIC_MUTE  0x00040000u
-#define DS_BUTTON_RFN       0x00080000u
+#define DS_BUTTON_RFN       0x00200000u
 #define DS_BUTTON_LFN       0x00100000u
-#define DS_BUTTON_R4        0x00200000u
+#define DS_BUTTON_R4        0x00800000u
 #define DS_BUTTON_L4        0x00400000u
 
 #define DS_DPAD_UP     0x01u
