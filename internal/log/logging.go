@@ -157,9 +157,9 @@ func (h *colorHandler) Handle(_ context.Context, r slog.Record) error {
 	buf.WriteString(r.Message)
 
 	r.Attrs(func(a slog.Attr) bool {
-		buf.WriteString(" ")
+		buf.WriteString(" \033[90m")
 		buf.WriteString(a.Key)
-		buf.WriteString("=")
+		buf.WriteString("=\033[0m")
 		buf.WriteString(a.Value.String())
 		return true
 	})
