@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../xbox360/">
+        <link rel="prev" href="../dualshock4/">
       
       
-        <link rel="next" href="../dualsense/">
+        <link rel="next" href="../ns2pro/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>DualShock 4 - VIIPER Documentation</title>
+        <title>DualSense - VIIPER Documentation</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dualshock-4-controller" class="md-skip">
+        <a href="#dualsense-controller" class="md-skip">
           Skip to content
         </a>
       
@@ -117,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DualShock 4
+              DualSense
             
           </span>
         </div>
@@ -1143,6 +1143,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../dualshock4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DualShock 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1162,7 +1190,7 @@
   <span class="md-ellipsis">
     
   
-    DualShock 4
+    DualSense
   
 
     
@@ -1180,7 +1208,7 @@
   <span class="md-ellipsis">
     
   
-    DualShock 4
+    DualSense
   
 
     
@@ -1339,6 +1367,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#meta-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meta state
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#output-callback" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1353,34 +1392,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dualsense/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DualSense
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1538,6 +1549,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../dualshock4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DualShock 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1557,7 +1596,7 @@
   <span class="md-ellipsis">
     
   
-    DualShock 4
+    DualSense
   
 
     
@@ -1575,7 +1614,7 @@
   <span class="md-ellipsis">
     
   
-    DualShock 4
+    DualSense
   
 
     
@@ -1734,6 +1773,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#meta-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meta state
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#output-callback" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1748,34 +1798,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dualsense/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DualSense
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -2086,6 +2108,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#meta-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meta state
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#output-callback" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2116,52 +2149,61 @@
   
 
 
-<h1 id="dualshock-4-controller">DualShock 4 Controller</h1>
-<p>The DualShock 4 virtual gamepad emulates a complete PlayStation 4 Controller (V1)
-connected via USB.
-It supports sticks, triggers, D-pad, face/shoulder buttons, PS button,
-touchpad click, IMU (gyro + accelerometer), and touchpad finger coordinates.</p>
+<h1 id="dualsense-controller">DualSense Controller</h1>
+<p>The DualSense virtual gamepad emulates a complete PlayStation 5 DualSense
+controller connected via USB.
+The DualSense Edge variant is also supported and uses the same wire/state model.</p>
+<p>It supports sticks, triggers, D-pad, face/shoulder buttons, PS button,
+touchpad click, back paddles/function buttons (Edge variant), mic mute button,
+IMU (gyro + accelerometer), and touchpad finger coordinates.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">TCP API</label><label for="__tabbed_1_2">libVIIPER</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>Use <code>dualshock4</code> as the device type when adding a device via the API or client libraries.</p>
+<p>Use <code>dualsense</code> as the default device type when adding a device via the API
+or client libraries.</p>
+<p>Use <code>dualsenseedge</code> when you want the Edge variant.</p>
 <h2 id="client-library-support">Client Library Support</h2>
 <p>The wire protocol is abstracted by client libraries.
-The <strong>Go client</strong> includes built-in types (<code>/device/dualshock4</code>),
+The <strong>Go client</strong> includes built-in types (<code>/device/dualsense</code>),
 and <strong>generated client libraries</strong> provide equivalent structures
 with proper packing.</p>
 <p>You don't need to manually construct packets, just use the provided types
 and send/receive them via the device control and feedback stream.</p>
 <p>See: <a href="../../api/overview/">API Reference</a></p>
 <h2 id="raw-streaming-protocol">(RAW) Streaming protocol</h2>
-<p>The device stream is a bidirectional, raw TCP connection with fixed-size packets.</p>
+<p>The device stream is a bidirectional, raw TCP connection with fixed-size
+packets.</p>
 <h3 id="input-state">Input State</h3>
 <ul>
-<li>31-byte packets, little-endian layout:<ul>
+<li>33-byte packets, little-endian layout:<ul>
 <li>Sticks: StickLX, StickLY, StickRX, StickRY: int8 each (4 bytes)
   -128 to 127 per axis (-128=min, 0=center, 127=max)</li>
-<li>Buttons: uint16 (2 bytes, bitfield)</li>
+<li>Buttons: uint32 (4 bytes, bitfield)</li>
 <li>DPad: uint8 (1 byte, bitfield)</li>
 <li>Triggers: TriggerL2, TriggerR2: uint8, uint8 (2 bytes)
   0-255 (0=not pressed, 255=fully pressed)</li>
 <li>Touch1: Touch1X, Touch1Y: uint16 each, Touch1Active: bool (5 bytes)</li>
 <li>Touch2: Touch2X, Touch2Y: uint16 each, Touch2Active: bool (5 bytes)</li>
-<li>Gyroscope: GyroX, GyroY, GyroZ: int16 each (6 bytes, fixed-point deg/s)</li>
-<li>Accelerometer: AccelX, AccelY, AccelZ: int16 each (6 bytes, fixed-point m/s2)</li>
+<li>Gyroscope: GyroX, GyroY, GyroZ: int16 each (6 bytes, raw report
+  values)</li>
+<li>Accelerometer: AccelX, AccelY, AccelZ: int16 each
+  (6 bytes, raw report values)</li>
 </ul>
 </li>
 </ul>
-<p>See <code>/device/dualshock4/inputstate.go</code> for details.</p>
+<p>See <code>/device/dualsense/state.go</code> for details.</p>
 <h3 id="feedback-rumble-led">Feedback (Rumble &amp; LED)</h3>
 <ul>
-<li>7-byte packets:<ul>
-<li>RumbleSmall: uint8, RumbleLarge: uint8 (2 bytes), 0-255 intensity values</li>
-<li>LED Color: LedRed, LedGreen, LedBlue: uint8 each (3 bytes), 0-255 per channel</li>
-<li>LED Flash: FlashOn, FlashOff: uint8 each (2 bytes), units of 2.5ms per value</li>
+<li>6-byte packets:<ul>
+<li>RumbleSmall: uint8, RumbleLarge: uint8 (2 bytes), 0-255 intensity
+  values</li>
+<li>LED Color: LedRed, LedGreen, LedBlue: uint8 each (3 bytes), 0-255 per
+  channel</li>
+<li>PlayerLeds: uint8 (1 byte), host-controlled player indicator LED mask</li>
 </ul>
 </li>
 </ul>
-<p>See <code>/device/dualshock4/inputstate.go</code> for the <code>OutputState</code> wire definition.</p>
+<p>See <code>/device/dualsense/state.go</code> for the <code>OutputState</code> wire definition.</p>
 <h2 id="reference">Reference</h2>
 <h3 id="button-constants">Button Constants</h3>
 <table>
@@ -2174,59 +2216,83 @@ and send/receive them via the device control and feedback stream.</p>
 <tbody>
 <tr>
 <td>Square button</td>
-<td>0x0010</td>
+<td>0x00000010</td>
 </tr>
 <tr>
 <td>Cross (X) button</td>
-<td>0x0020</td>
+<td>0x00000020</td>
 </tr>
 <tr>
 <td>Circle button</td>
-<td>0x0040</td>
+<td>0x00000040</td>
 </tr>
 <tr>
 <td>Triangle button</td>
-<td>0x0080</td>
+<td>0x00000080</td>
 </tr>
 <tr>
 <td>L1 (Left bumper)</td>
-<td>0x0100</td>
+<td>0x00000100</td>
 </tr>
 <tr>
 <td>R1 (Right bumper)</td>
-<td>0x0200</td>
+<td>0x00000200</td>
 </tr>
 <tr>
 <td>L2 button</td>
-<td>0x0400</td>
+<td>0x00000400</td>
 </tr>
 <tr>
 <td>R2 button</td>
-<td>0x0800</td>
+<td>0x00000800</td>
 </tr>
 <tr>
-<td>Share button</td>
-<td>0x1000</td>
+<td>Create button</td>
+<td>0x00001000</td>
 </tr>
 <tr>
 <td>Options button</td>
-<td>0x2000</td>
+<td>0x00002000</td>
 </tr>
 <tr>
 <td>L3 (Left stick button)</td>
-<td>0x4000</td>
+<td>0x00004000</td>
 </tr>
 <tr>
 <td>R3 (Right stick button)</td>
-<td>0x8000</td>
+<td>0x00008000</td>
 </tr>
 <tr>
 <td>PS button</td>
-<td>0x0001</td>
+<td>0x00010000</td>
 </tr>
 <tr>
 <td>Touchpad click</td>
-<td>0x0002</td>
+<td>0x00020000</td>
+</tr>
+<tr>
+<td>Mic mute button</td>
+<td>0x00040000</td>
+</tr>
+<tr>
+<td>Edge Variant only</td>
+<td>---</td>
+</tr>
+<tr>
+<td>RFn button</td>
+<td>0x00080000</td>
+</tr>
+<tr>
+<td>LFn button</td>
+<td>0x00100000</td>
+</tr>
+<tr>
+<td>R4 back paddle</td>
+<td>0x00200000</td>
+</tr>
+<tr>
+<td>L4 back paddle</td>
+<td>0x00400000</td>
 </tr>
 </tbody>
 </table>
@@ -2260,19 +2326,19 @@ and send/receive them via the device control and feedback stream.</p>
 <h3 id="touchpad-coordinates">Touchpad Coordinates</h3>
 <p>Touch coordinates are sent as <code>Touch{1,2}X: uint16</code> and <code>Touch{1,2}Y: uint16</code>
 plus an explicit boolean <code>Touch{1,2}Active</code>.</p>
-<p>VIIPER clamps touch coordinates to the DS4 range:</p>
+<p>VIIPER clamps touch coordinates to the DualSense range:</p>
 <ul>
 <li>X: <strong>0..1920</strong></li>
-<li>Y: <strong>0..942</strong></li>
+<li>Y: <strong>0..1080</strong></li>
 </ul>
-<p>See <code>/device/dualshock4/const.go</code>.</p>
+<p>See <code>/device/dualsense/const.go</code>.</p>
 <h3 id="imu-gyro-accelerometer">IMU (Gyro + Accelerometer)</h3>
-<p>VIIPER uses fixed-point physical units for IMU values on the wire (stored as <code>int16</code>)
-to avoid float serialization differences across client languages.</p>
-<p>Constants (see <code>/device/dualshock4/const.go</code>):</p>
+<p>VIIPER exposes DualSense IMU values as raw report-space <code>int16</code> values,
+while helper conversions use fixed scale factors.</p>
+<p>Constants (see <code>/device/dualsense/const.go</code>):</p>
 <ul>
-<li><code>GyroCountsPerDps = 16</code></li>
-<li><code>AccelCountsPerMS2 = 512</code></li>
+<li><code>GyroCountsPerDps = 16.384</code></li>
+<li><code>AccelCountsPerMS2 = 835.07</code></li>
 </ul>
 <p>Gyro (degrees/second):</p>
 <div class="highlight"><pre><span></span><code>raw_gyro = round(gyro_dps * GyroCountsPerDps)
@@ -2282,14 +2348,9 @@ gyro_dps = raw_gyro / GyroCountsPerDps
 <div class="highlight"><pre><span></span><code>raw_accel = round(accel_ms2 * AccelCountsPerMS2)
 accel_ms2 = raw_accel / AccelCountsPerMS2
 </code></pre></div>
-<p>With the default scales:</p>
-<ul>
-<li>Gyro: resolution <code>0.0625 deg/s</code>, max approx <code>2048 deg/s</code></li>
-<li>Accelerometer: resolution approx <code>0.00195 m/s2</code>, max approx <code>64 m/s2</code></li>
-</ul>
-<p>On device creation, VIIPER initializes the accelerometer to a controller lying
-flat with gravity downwards (<code>AccelZ = -5023</code>, i.e. <code>round(-9.81 * 512)</code>).</p>
-<p>Helpers are in <code>/device/dualshock4/helpers.go</code>.</p>
+<p>On device creation, VIIPER initializes the accelerometer to a controller
+lying flat with gravity downwards (<code>AccelZ = -8192</code>, i.e. roughly -1g).</p>
+<p>Helpers are in <code>/device/dualsense/helpers.go</code>.</p>
 </div>
 <div class="tabbed-block">
 <h2 id="api">API</h2>
@@ -2302,19 +2363,23 @@ flat with gravity downwards (<code>AccelZ = -5023</code>, i.e. <code>round(-9.81
 </thead>
 <tbody>
 <tr>
-<td><code>CreateDS4Device(serverHandle, &amp;handle, busID, autoAttach, vid, pid)</code></td>
-<td>Create a virtual DualShock 4 controller</td>
+<td><code>CreateDualSenseDevice(...)</code></td>
+<td>Create a virtual DualSense device</td>
 </tr>
 <tr>
-<td><code>SetDS4DeviceState(handle, state)</code></td>
-<td>Push an input state to the device</td>
+<td><code>CreateDualSenseEdgeDevice(...)</code></td>
+<td>Create a virtual DualSense Edge</td>
 </tr>
 <tr>
-<td><code>SetDS4OutputCallback(handle, cb)</code></td>
-<td>Register a callback for rumble and LED output</td>
+<td><code>SetDualSenseDeviceState(handle, state)</code></td>
+<td>Push input state</td>
 </tr>
 <tr>
-<td><code>RemoveDS4Device(handle)</code></td>
+<td><code>SetDualSenseOutputCallback(handle, cb)</code></td>
+<td>Register output callback</td>
+</tr>
+<tr>
+<td><code>RemoveDualSenseDevice(handle)</code></td>
 <td>Remove the device</td>
 </tr>
 </tbody>
@@ -2325,7 +2390,7 @@ flat with gravity downwards (<code>AccelZ = -5023</code>, i.e. <code>round(-9.81
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="kt">int8_t</span><span class="w">   </span><span class="n">LY</span><span class="p">;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="kt">int8_t</span><span class="w">   </span><span class="n">RX</span><span class="p">;</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="kt">int8_t</span><span class="w">   </span><span class="n">RY</span><span class="p">;</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">Buttons</span><span class="p">;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">Buttons</span><span class="p">;</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">DPad</span><span class="p">;</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">L2</span><span class="p">;</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">R2</span><span class="p">;</span>
@@ -2341,22 +2406,35 @@ flat with gravity downwards (<code>AccelZ = -5023</code>, i.e. <code>round(-9.81
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="kt">int16_t</span><span class="w">  </span><span class="n">AccelX</span><span class="p">;</span>
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="kt">int16_t</span><span class="w">  </span><span class="n">AccelY</span><span class="p">;</span>
 <a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span><span class="kt">int16_t</span><span class="w">  </span><span class="n">AccelZ</span><span class="p">;</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="p">}</span><span class="w"> </span><span class="n">DS4DeviceState</span><span class="p">;</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="p">}</span><span class="w"> </span><span class="n">DSDeviceState</span><span class="p">;</span>
+</code></pre></div>
+<h2 id="meta-state">Meta state</h2>
+<p>Optional metadata can be provided during <code>CreateDualSenseDevice</code>
+and <code>CreateDualSenseEdgeDevice</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">SerialNumber</span><span class="p">;</span><span class="w">       </span><span class="c1">// NULL = use default</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">MACAddress</span><span class="p">;</span><span class="w">         </span><span class="c1">// NULL = use default</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">Board</span><span class="p">;</span><span class="w">              </span><span class="c1">// NULL = use default</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">     </span><span class="n">BatteryStatus</span><span class="p">;</span><span class="w">      </span><span class="c1">// 0 = use default</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="kt">double</span><span class="w">      </span><span class="n">TemperatureCelsius</span><span class="p">;</span><span class="w"> </span><span class="c1">// 0 = use default</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="kt">double</span><span class="w">      </span><span class="n">BatteryVoltage</span><span class="p">;</span><span class="w">     </span><span class="c1">// 0 = use default</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">ShellColor</span><span class="p">;</span><span class="w">         </span><span class="c1">// NULL = use default (e.g. &quot;00&quot;, &quot;Z1&quot;)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">}</span><span class="w"> </span><span class="n">DSMetaState</span><span class="p">;</span>
 </code></pre></div>
 <h2 id="output-callback">Output callback</h2>
 <p>Called when the host sends rumble or LED commands to the device.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">DS4OutputCallback</span><span class="p">)(</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">DS4DeviceHandle</span><span class="w"> </span><span class="n">handle</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">rumbleSmall</span><span class="p">,</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">rumbleLarge</span><span class="p">,</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ledRed</span><span class="p">,</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ledGreen</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ledBlue</span><span class="p">,</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">flashOn</span><span class="p">,</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">flashOff</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">DSOutputCallback</span><span class="p">)(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">DSDeviceHandle</span><span class="w"> </span><span class="n">handle</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">rumbleSmall</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">rumbleLarge</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ledRed</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ledGreen</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ledBlue</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">playerLeds</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">);</span>
 </code></pre></div>
-<p>Pass <code>NULL</code> to <code>SetDS4OutputCallback</code> to clear a previously registered callback.</p>
+<p>Pass <code>NULL</code> to <code>SetDualSenseOutputCallback</code> to clear
+a previously registered callback.</p>
 </div>
 </div>
 </div>

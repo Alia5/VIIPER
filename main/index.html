@@ -514,6 +514,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#emulatable-devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Emulatable devices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#feeder-application-development" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1363,6 +1374,34 @@
   
   
     <li class="md-nav__item">
+      <a href="devices/dualsense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DualSense
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="devices/keyboard/" class="md-nav__link">
         
   
@@ -1516,6 +1555,34 @@
     
   
     DualShock 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="devices/dualsense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DualSense
   
 
     
@@ -1723,6 +1790,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#emulatable-devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Emulatable devices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#feeder-application-development" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1911,6 +1989,15 @@ enabling seamless integration for gaming, automation, testing and remote control
 </ul>
 <p>For why you should pick one over the other see the <a href="#why-choose-the-the-standalone-executable-and-interfacing-via-tcp-over-and-the-shared-object-libviiper-library">FAQ</a></p>
 <p>Beyond device emulation, VIIPER can proxy real USB devices for traffic inspection and reverse engineering.</p>
+<h2 id="emulatable-devices">Emulatable devices</h2>
+<ul>
+<li>Xbox 360 controller emulation; see <a href="devices/xbox360/">Devices › Xbox 360 Controller</a></li>
+<li>HID Keyboard with N-key rollover and LED feedback; see <a href="devices/keyboard/">Devices › Keyboard</a></li>
+<li>HID Mouse with 5 buttons and horizontal/vertical wheel; see <a href="devices/mouse/">Devices › Mouse</a></li>
+<li>PS4 controller emulation; see <a href="devices/dualshock4/">Devices › DualShock 4 Controller</a></li>
+<li>PS5 DualSense controller emulation (including Edge variant); see <a href="devices/dualsense/">Devices › DualSense Controller</a></li>
+<li>Nintendo Switch 2 Pro Controller emulation; see <a href="devices/ns2pro/">Devices › Switch 2 Pro Controller</a></li>
+</ul>
 <hr />
 <h2 id="feeder-application-development">🥫 Feeder application development</h2>
 <p>You have two options for developing feeder applications that control the virtual devices created by VIIPER:</p>
@@ -1962,7 +2049,8 @@ VIIPER uses it because it's already built into Linux and available for Windows, 
 <li>Flexibility<ul>
 <li>allows one to use VIIPER as a service on the same host as the USBIP-Client and use the feeder on a different, remote machine.</li>
 <li>allows for software written utilizing VIIPER to <strong>not be</strong> licensed under the terms of the GPLv3</li>
-<li><strong><em>future versions</em></strong>: Users can enhance VIIPER with device plugins, sharing a common wire-protocol, which can be dynamically incorporated.</li>
+<li>Allows users to idenpendently update VIIPER to receive updates and bugfixes  without affecting other components or having to recompile applications themselves.<br />
+   This also takes away maintenance burdens for feeder-application developers (likely you)</li>
 </ul>
 </li>
 </ul>
@@ -1980,8 +2068,7 @@ All device-type logic stays in userspace.  </p>
 <p>This makes VIIPER portable, easier to extend and simpler to bundle with applications.<br />
 Adding a new device type never requires touching kernel code.</p>
 <h3 id="can-i-add-support-for-other-device-types">Can I add support for other device types?</h3>
-<p>Yes! VIIPER's architecture is designed to be extensible.<br />
-In the future there will be a plugin system to load and expose device types dynamically.</p>
+<p>Yes! VIIPER's architecture is designed to be extensible.  </p>
 <h3 id="what-about-the-proxy-mode">What about the proxy mode?</h3>
 <p>Proxy mode sits between a USBIP client and a USBIP server (like a Linux machine sharing real USB devices).<br />
 VIIPER intercepts and logs all USB traffic passing through, without handling the devices directly.<br />
