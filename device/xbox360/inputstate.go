@@ -19,6 +19,9 @@ type InputState struct {
 	Reserved [6]byte
 }
 
+// NewInputState returns an Xbox 360 input state in its neutral/resting state.
+func NewInputState() *InputState { return &InputState{} }
+
 // nolint
 // viiper:wire xbox360guitarherodrums c2s buttons:u32 _:u8 _:u8 greenVelocity:u8 redVelocity:u8 yellowVelocity:u8 blueVelocity:u8 orangeVelocity:u8 kickVelocity:u8 midiPacket:u8*6
 type GuitarHeroDrumsInputState struct {

@@ -26,6 +26,16 @@ type InputState struct {
 	AccelX, AccelY, AccelZ int16
 }
 
+// NewInputState returns a DualShock 4 input state in its neutral/resting state.
+func NewInputState() *InputState {
+	x, y, z := DefaultAccelRaw()
+	return &InputState{
+		AccelX: x,
+		AccelY: y,
+		AccelZ: z,
+	}
+}
+
 func (s *InputState) MarshalBinary() ([]byte, error) {
 	b := make([]byte, 31)
 	b[0] = uint8(s.LX)

@@ -12,6 +12,9 @@ type InputState struct {
 	KeyBitmap [32]uint8 // 256 bits for HID usage codes 0x00-0xFF
 }
 
+// NewInputState returns a keyboard input state in its neutral/resting state.
+func NewInputState() *InputState { return &InputState{} }
+
 // LEDState represents the state of keyboard LEDs controlled by the host.
 // viiper:wire keyboard s2c leds:u8
 type LEDState struct {

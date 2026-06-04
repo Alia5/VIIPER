@@ -33,6 +33,7 @@ func New(o *device.CreateOptions) (*Mouse, error) {
 			d.descriptor.Device.IDProduct = *o.IDProduct
 		}
 	}
+	d.inputState = NewInputState()
 	return d, nil
 }
 

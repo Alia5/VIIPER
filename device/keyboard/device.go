@@ -34,6 +34,7 @@ func New(o *device.CreateOptions) (*Keyboard, error) {
 			d.descriptor.Device.IDProduct = *o.IDProduct
 		}
 	}
+	d.inputState = NewInputState()
 	return d, nil
 }
 

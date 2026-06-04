@@ -86,11 +86,7 @@ func New(o *device.CreateOptions) (*DualShock4, error) {
 		"pid", d.descriptor.Device.IDProduct,
 		"interfaces", len(d.descriptor.Interfaces))
 
-	d.inputState = &InputState{
-		AccelX: DefaultAccelXRaw,
-		AccelY: DefaultAccelYRaw,
-		AccelZ: DefaultAccelZRaw,
-	}
+	d.inputState = NewInputState()
 
 	return d, nil
 }

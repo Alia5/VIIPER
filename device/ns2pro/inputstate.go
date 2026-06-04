@@ -17,7 +17,8 @@ type InputState struct {
 	GyroX, GyroY, GyroZ    int16
 }
 
-func defaultInputState() *InputState {
+// NewInputState returns an NS2 Pro input state in its neutral/resting state.
+func NewInputState() *InputState {
 	return &InputState{
 		LX: StickCenter,
 		LY: StickCenter,
@@ -25,6 +26,8 @@ func defaultInputState() *InputState {
 		RY: StickCenter,
 	}
 }
+
+func defaultInputState() *InputState { return NewInputState() }
 
 type MetaState struct {
 	SerialNumber  string `json:"serial_number"`

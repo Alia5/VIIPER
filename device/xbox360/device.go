@@ -47,6 +47,7 @@ func New(o *device.CreateOptions) (*Xbox360, error) {
 			}
 		}
 	}
+	d.inputState = NewInputState()
 	return d, nil
 }
 
