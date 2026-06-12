@@ -51,6 +51,7 @@ func TestBuildReport05(t *testing.T) {
 	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, featureCommand(0x02, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
 	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, featureCommand(0x04, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
 	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, selectReportCommand(ReportIDCommon))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, enableReportsCommand())
 
 	report := dev.HandleTransfer(context.Background(), 1, usbip.DirIn, nil)
 	require.Len(t, report, InputReportSize)
@@ -67,7 +68,7 @@ func TestBuildReport05(t *testing.T) {
 	assert.Equal(t, DefaultBatteryVolts, binary.LittleEndian.Uint16(report[0x20:0x22]))
 	assert.Equal(t, byte(0x34), report[0x22])
 	assert.Equal(t, byte(0x01), report[0x2A])
-	assert.Equal(t, uint32(4000), binary.LittleEndian.Uint32(report[0x2B:0x2F]))
+	ts1 := binary.LittleEndian.Uint32(report[0x2B:0x2F])
 	assert.Equal(t, uint16(state.AccelX), binary.LittleEndian.Uint16(report[0x31:0x33]))
 	assert.Equal(t, uint16(state.AccelY), binary.LittleEndian.Uint16(report[0x33:0x35]))
 	assert.Equal(t, uint16(state.AccelZ), binary.LittleEndian.Uint16(report[0x35:0x37]))
@@ -80,7 +81,7 @@ func TestBuildReport05(t *testing.T) {
 	next := dev.HandleTransfer(kCtx, 1, usbip.DirIn, nil)
 	require.Len(t, next, InputReportSize)
 	assert.Equal(t, uint32(2), binary.LittleEndian.Uint32(next[1:5]))
-	assert.Equal(t, uint32(8000), binary.LittleEndian.Uint32(next[0x2B:0x2F]))
+	assert.Greater(t, binary.LittleEndian.Uint32(next[0x2B:0x2F]), ts1)
 }
 
 func TestHIDReportDescriptorMatchesCapture(t *testing.T) {
@@ -173,6 +174,8 @@ func TestBuildReport09(t *testing.T) {
 	})
 	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, selectReportCommand(ReportIDPro))
 	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, enableReportsCommand())
+	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
 
 	report := dev.HandleTransfer(context.Background(), 1, usbip.DirIn, nil)
 	require.Len(t, report, InputReportSize)
@@ -200,6 +203,8 @@ func TestBulkCommands(t *testing.T) {
 	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
 
 	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, selectReportCommand(ReportIDCommon))
+	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, enableReportsCommand())
 	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
 	report := dev.HandleTransfer(context.Background(), 1, usbip.DirIn, nil)
 	require.Len(t, report, InputReportSize)
@@ -273,11 +278,12 @@ func TestSDLUSBInitializationSequence(t *testing.T) {
 		BatteryVolts:  DefaultBatteryVolts,
 	})
 	dev.UpdateInputState(InputState{})
+	time.Sleep(2 * time.Millisecond)
 	report := dev.HandleTransfer(context.Background(), 1, usbip.DirIn, nil)
 	require.Len(t, report, InputReportSize)
 	assert.Equal(t, byte(ReportIDCommon), report[0])
 	assert.Equal(t, uint32(1), binary.LittleEndian.Uint32(report[1:5]))
-	assert.Equal(t, uint32(4000), binary.LittleEndian.Uint32(report[0x2B:0x2F]))
+	assert.NotZero(t, binary.LittleEndian.Uint32(report[0x2B:0x2F]))
 }
 
 func TestRumbleOutput(t *testing.T) {
@@ -433,6 +439,7 @@ func TestStreamInputAndRumble(t *testing.T) {
 	assert.Equal(t, []byte{0x09, 0x04, 0x01, 0x00, 0x02, 0xFF, 0x00, 0x00, 0x06}, config[41:50])
 
 	require.NoError(t, usbipClient.Submit(imp.Conn, usbip.DirOut, 2, selectReportCommand(ReportIDPro), nil))
+	require.NoError(t, usbipClient.Submit(imp.Conn, usbip.DirOut, 2, enableReportsCommand(), nil))
 
 	state := InputState{
 		Buttons: ButtonA | ButtonHome | ButtonRight,
@@ -473,7 +480,11 @@ func featureCommand(sub, flags uint8) []byte {
 }
 
 func selectReportCommand(reportID uint8) []byte {
-	return []byte{0x03, 0x91, 0x00, 0x0A, 0x00, 0x04, 0x00, 0x00, reportID, 0x00, 0x00, 0x00}
+	return []byte{cmdUSB, 0x91, 0x00, subUSBSelectReport, 0x00, 0x04, 0x00, 0x00, reportID, 0x00, 0x00, 0x00}
+}
+
+func enableReportsCommand() []byte {
+	return []byte{cmdUSB, 0x91, 0x00, subUSBStartReports, 0x00, 0x08, 0x00, 0x00, 0x01, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 }
 
 func flashReadCommand(address uint32) []byte {

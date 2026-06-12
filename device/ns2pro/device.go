@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/usb"
@@ -15,6 +16,7 @@ import (
 
 type NS2Pro struct {
 	inputCh        chan struct{}
+	bulkCh         chan struct{}
 	stateMu        sync.Mutex
 	inputState     *InputState
 	metaState      *MetaState
@@ -30,7 +32,8 @@ type NS2Pro struct {
 	usbReportsEnabled bool
 	reportCounter32   uint32
 	reportCounter8    uint8
-	motionTimestamp   uint32
+	motionStart       time.Time
+	lastMotionTS      uint32
 	bulkInQueue       [][]byte
 }
 
@@ -62,11 +65,13 @@ func New(o *device.CreateOptions) (*NS2Pro, error) {
 	inputCh <- struct{}{}
 	d := &NS2Pro{
 		inputCh:        inputCh,
+		bulkCh:         make(chan struct{}, 1),
 		inputState:     defaultInputState(),
 		metaState:      metaState,
 		descriptor:     MakeDescriptor(),
 		activeReportID: ReportIDPro,
 		featureFlags:   FeatureButtons | FeatureSticks,
+		motionStart:    time.Now(),
 	}
 	serialEnding := DefaultSerialEnding
 	if len(metaState.SerialNumber) >= 2 {
@@ -127,17 +132,30 @@ func (d *NS2Pro) SetMetaState(meta MetaState) {
 func (d *NS2Pro) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out []byte) []byte {
 	switch {
 	case dir == usbip.DirIn && ep == 1:
-		select {
-		case <-ctx.Done():
-			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				return d.nextInputReport()
+		for {
+			select {
+			case <-ctx.Done():
+				if errors.Is(ctx.Err(), context.DeadlineExceeded) && d.reportsEnabled() {
+					return d.nextInputReport()
+				}
+				return nil
+			case <-d.inputCh:
+				if d.reportsEnabled() {
+					return d.nextInputReport()
+				}
 			}
-			return nil
-		case <-d.inputCh:
-			return d.nextInputReport()
 		}
 	case dir == usbip.DirIn && ep == 2:
-		return d.popBulkIn()
+		for {
+			if resp := d.popBulkIn(); resp != nil {
+				return resp
+			}
+			select {
+			case <-ctx.Done():
+				return nil
+			case <-d.bulkCh:
+			}
+		}
 	case dir == usbip.DirOut && ep == 1:
 		d.handleOutputReport(out)
 	case dir == usbip.DirOut && ep == 2:
@@ -147,35 +165,26 @@ func (d *NS2Pro) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out 
 }
 
 func (d *NS2Pro) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex uint16, wLength uint16, data []byte) ([]byte, bool) {
-	const (
-		hidGetReport = 0x01
-		hidSetReport = 0x09
-	)
-	const (
-		reportTypeInput  = 0x01
-		reportTypeOutput = 0x02
-	)
-
 	reportType := uint8(wValue >> 8)
 	reportID := uint8(wValue)
 
-	if bmRequestType == 0xA1 && bRequest == hidGetReport && reportType == reportTypeInput {
+	if bmRequestType == hidClassRequestIn && bRequest == hidGetReport && reportType == reportTypeInput {
 		switch reportID {
 		case ReportIDCommon, ReportIDPro, 0:
 			return d.inputReportForID(reportID), true
 		}
 	}
 
-	if bmRequestType == 0x21 && bRequest == hidSetReport && reportType == reportTypeOutput && reportID == ReportIDOutput {
+	if bmRequestType == hidClassRequestOut && bRequest == hidSetReport && reportType == reportTypeOutput && reportID == ReportIDOutput {
 		d.handleOutputReport(data)
 		return nil, true
 	}
 
 	if isAudioClassRequest(bmRequestType) {
 		switch bRequest {
-		case 0x01: // SET_CUR
+		case audioSetCur:
 			return nil, true
-		case 0x81, 0x82, 0x83, 0x84: // GET_CUR/MIN/MAX/RES
+		case audioGetCur, audioGetMin, audioGetMax, audioGetRes:
 			return make([]byte, wLength), true
 		}
 	}
@@ -184,13 +193,6 @@ func (d *NS2Pro) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex uin
 }
 
 func isAudioClassRequest(bmRequestType uint8) bool {
-	const (
-		requestTypeMask   = 0x60
-		requestClass      = 0x20
-		recipientMask     = 0x1F
-		recipientIface    = 0x01
-		recipientEndpoint = 0x02
-	)
 	return bmRequestType&requestTypeMask == requestClass &&
 		(bmRequestType&recipientMask == recipientIface || bmRequestType&recipientMask == recipientEndpoint)
 }
@@ -216,6 +218,12 @@ func (d *NS2Pro) GetDeviceSpecificArgs() map[string]any {
 	return out
 }
 
+func (d *NS2Pro) reportsEnabled() bool {
+	d.protoMu.Lock()
+	defer d.protoMu.Unlock()
+	return d.usbReportsEnabled
+}
+
 func (d *NS2Pro) nextInputReport() []byte {
 	d.protoMu.Lock()
 	reportID := d.activeReportID
@@ -238,10 +246,12 @@ func (d *NS2Pro) inputReportForID(reportID uint8) []byte {
 	switch reportID {
 	case ReportIDCommon:
 		d.reportCounter32++
+		var motionTS uint32
 		if features&FeatureIMU != 0 {
-			d.motionTimestamp += 4000
+			motionTS = uint32(time.Since(d.motionStart).Microseconds())
+			d.lastMotionTS = motionTS
 		}
-		report = st.buildCommonReport(d.reportCounter32, d.motionTimestamp, features, meta)
+		report = st.buildCommonReport(d.reportCounter32, motionTS, features, meta)
 	default:
 		d.reportCounter8++
 		report = st.buildProReport(d.reportCounter8, features, meta)
@@ -292,8 +302,12 @@ func (d *NS2Pro) emitOutput(feedback OutputState) {
 
 func (d *NS2Pro) enqueueResponse(resp []byte) {
 	d.protoMu.Lock()
-	defer d.protoMu.Unlock()
 	d.bulkInQueue = append(d.bulkInQueue, append([]byte(nil), resp...))
+	d.protoMu.Unlock()
+	select {
+	case d.bulkCh <- struct{}{}:
+	default:
+	}
 }
 
 func (d *NS2Pro) popBulkIn() []byte {

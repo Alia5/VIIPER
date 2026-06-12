@@ -11,13 +11,13 @@ func (d *NS2Pro) handleBulkOut(out []byte) {
 	sub := out[3]
 
 	switch cmd {
-	case 0x02:
+	case cmdFlash:
 		d.handleFlashCommand(seq, sub, out)
-	case 0x03:
+	case cmdUSB:
 		d.handleUSBCommand(seq, sub, out)
-	case 0x0C:
+	case cmdFeature:
 		d.handleFeatureCommand(seq, sub, out)
-	case 0x09:
+	case cmdPlayerLED:
 		d.handlePlayerLEDCommand(seq, sub, out)
 	default:
 		d.enqueueResponse(commandHeader(cmd, seq, sub))
@@ -25,25 +25,25 @@ func (d *NS2Pro) handleBulkOut(out []byte) {
 }
 
 func (d *NS2Pro) handlePlayerLEDCommand(seq, sub uint8, out []byte) {
-	if sub == 0x07 && len(out) >= 9 {
+	if sub == subPlayerLEDSet && len(out) >= 9 {
 		d.emitOutput(OutputState{
 			Flags:         OutputFlagLED,
 			PlayerLedMask: out[8],
 		})
 	}
-	d.enqueueResponse(commandHeader(0x09, seq, sub))
+	d.enqueueResponse(commandHeader(cmdPlayerLED, seq, sub))
 }
 
 func (d *NS2Pro) handleFlashCommand(seq, sub uint8, out []byte) {
-	if sub != 0x01 || len(out) < 16 {
-		d.enqueueResponse(commandHeader(0x02, seq, sub))
+	if sub != subFlashRead || len(out) < 16 {
+		d.enqueueResponse(commandHeader(cmdFlash, seq, sub))
 		return
 	}
 
 	address := binary.LittleEndian.Uint32(out[12:16])
-	resp := make([]byte, 0x50)
-	copy(resp[0:8], commandHeader(0x02, seq, sub))
-	resp[8] = 0x40
+	resp := make([]byte, 16+flashBlockSize)
+	copy(resp[0:8], commandHeader(cmdFlash, seq, sub))
+	resp[8] = flashBlockSize
 	binary.LittleEndian.PutUint32(resp[12:16], address)
 	copy(resp[16:], d.minimalFlashBlock(address))
 	d.enqueueResponse(resp)
@@ -51,24 +51,30 @@ func (d *NS2Pro) handleFlashCommand(seq, sub uint8, out []byte) {
 
 func (d *NS2Pro) handleUSBCommand(seq, sub uint8, out []byte) {
 	switch sub {
-	case 0x03:
+	case subUSBEnableReports:
 		if len(out) >= 9 {
+			d.protoMu.Lock()
 			d.usbReportsEnabled = out[8] != 0
+			d.protoMu.Unlock()
 		}
-		d.enqueueResponse(append(commandHeader(0x03, seq, sub), 0x01, 0x00, 0x00, 0x00))
-	case 0x0A:
+		d.enqueueResponse(append(commandHeader(cmdUSB, seq, sub), 0x01, 0x00, 0x00, 0x00))
+	case subUSBSelectReport:
 		if len(out) >= 9 {
 			switch out[8] {
 			case ReportIDCommon, ReportIDPro:
+				d.protoMu.Lock()
 				d.activeReportID = out[8]
+				d.protoMu.Unlock()
 			}
 		}
-		d.enqueueResponse(commandHeader(0x03, seq, sub))
-	case 0x0D:
+		d.enqueueResponse(commandHeader(cmdUSB, seq, sub))
+	case subUSBStartReports:
+		d.protoMu.Lock()
 		d.usbReportsEnabled = true
-		d.enqueueResponse(append(commandHeader(0x03, seq, sub), 0x01, 0x00, 0x00, 0x00))
+		d.protoMu.Unlock()
+		d.enqueueResponse(append(commandHeader(cmdUSB, seq, sub), 0x01, 0x00, 0x00, 0x00))
 	default:
-		d.enqueueResponse(commandHeader(0x03, seq, sub))
+		d.enqueueResponse(commandHeader(cmdUSB, seq, sub))
 	}
 }
 
@@ -79,28 +85,37 @@ func (d *NS2Pro) handleFeatureCommand(seq, sub uint8, out []byte) {
 	}
 
 	switch sub {
-	case 0x01:
+	case subFeatureInfo:
 		payload := make([]byte, 12)
 		copy(payload[4:], featureInfo(flags))
-		d.enqueueResponse(append(commandHeader(0x0C, seq, sub), payload...))
-	case 0x02:
+		d.enqueueResponse(append(commandHeader(cmdFeature, seq, sub), payload...))
+	case subFeatureSetMask:
+		d.protoMu.Lock()
 		d.featureMask = flags
-		d.enqueueResponse(append(commandHeader(0x0C, seq, sub), 0x00, 0x00, 0x00, 0x00))
-	case 0x03:
+		d.protoMu.Unlock()
+		d.enqueueResponse(append(commandHeader(cmdFeature, seq, sub), 0x00, 0x00, 0x00, 0x00))
+	case subFeatureReset:
+		d.protoMu.Lock()
 		d.featureMask = 0
 		d.featureFlags = 0
-		d.enqueueResponse(append(commandHeader(0x0C, seq, sub), 0x00, 0x00, 0x00, 0x00))
-	case 0x04:
+		d.protoMu.Unlock()
+		d.enqueueResponse(append(commandHeader(cmdFeature, seq, sub), 0x00, 0x00, 0x00, 0x00))
+	case subFeatureEnable:
+		d.protoMu.Lock()
 		d.featureFlags |= d.maskedFeatures(flags)
-		d.enqueueResponse(append(commandHeader(0x0C, seq, sub), 0x00, 0x00, 0x00, 0x00))
-	case 0x05:
+		d.protoMu.Unlock()
+		d.enqueueResponse(append(commandHeader(cmdFeature, seq, sub), 0x00, 0x00, 0x00, 0x00))
+	case subFeatureDisable:
+		d.protoMu.Lock()
 		d.featureFlags &^= d.maskedFeatures(flags)
-		d.enqueueResponse(append(commandHeader(0x0C, seq, sub), 0x00, 0x00, 0x00, 0x00))
+		d.protoMu.Unlock()
+		d.enqueueResponse(append(commandHeader(cmdFeature, seq, sub), 0x00, 0x00, 0x00, 0x00))
 	default:
-		d.enqueueResponse(append(commandHeader(0x0C, seq, sub), 0x00, 0x00, 0x00, 0x00))
+		d.enqueueResponse(append(commandHeader(cmdFeature, seq, sub), 0x00, 0x00, 0x00, 0x00))
 	}
 }
 
+// maskedFeatures must be called with protoMu held.
 func (d *NS2Pro) maskedFeatures(flags uint8) uint8 {
 	if d.featureMask == 0 {
 		return flags
