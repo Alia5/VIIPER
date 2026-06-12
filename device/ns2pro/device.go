@@ -2,7 +2,9 @@
 package ns2pro
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -12,6 +14,7 @@ import (
 )
 
 type NS2Pro struct {
+	inputCh        chan struct{}
 	stateMu        sync.Mutex
 	inputState     *InputState
 	metaState      *MetaState
@@ -55,7 +58,10 @@ func New(o *device.CreateOptions) (*NS2Pro, error) {
 		}
 	}
 
+	inputCh := make(chan struct{}, 1)
+	inputCh <- struct{}{}
 	d := &NS2Pro{
+		inputCh:        inputCh,
 		inputState:     defaultInputState(),
 		metaState:      metaState,
 		descriptor:     MakeDescriptor(),
@@ -97,8 +103,12 @@ func (d *NS2Pro) SetOutputCallback(f func(OutputState)) func() {
 
 func (d *NS2Pro) UpdateInputState(state InputState) {
 	d.stateMu.Lock()
-	defer d.stateMu.Unlock()
 	d.inputState = &state
+	d.stateMu.Unlock()
+	select {
+	case d.inputCh <- struct{}{}:
+	default:
+	}
 }
 
 func (d *NS2Pro) SetMetaState(meta MetaState) {
@@ -114,10 +124,18 @@ func (d *NS2Pro) SetMetaState(meta MetaState) {
 	}
 }
 
-func (d *NS2Pro) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
+func (d *NS2Pro) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out []byte) []byte {
 	switch {
 	case dir == usbip.DirIn && ep == 1:
-		return d.nextInputReport()
+		select {
+		case <-ctx.Done():
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				return d.nextInputReport()
+			}
+			return nil
+		case <-d.inputCh:
+			return d.nextInputReport()
+		}
 	case dir == usbip.DirIn && ep == 2:
 		return d.popBulkIn()
 	case dir == usbip.DirOut && ep == 1:

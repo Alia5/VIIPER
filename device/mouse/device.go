@@ -2,7 +2,7 @@
 package mouse
 
 import (
-	"sync"
+	"context"
 	"sync/atomic"
 
 	"github.com/Alia5/VIIPER/device"
@@ -15,8 +15,7 @@ import (
 // with vertical and horizontal wheels.
 type Mouse struct {
 	tick       uint64
-	inputState *InputState
-	stateMu    sync.Mutex
+	inputCh    chan InputState
 	descriptor usb.Descriptor
 }
 
@@ -33,38 +32,41 @@ func New(o *device.CreateOptions) (*Mouse, error) {
 			d.descriptor.Device.IDProduct = *o.IDProduct
 		}
 	}
-	d.inputState = NewInputState()
+	d.inputCh = make(chan InputState, 1)
+	d.inputCh <- *NewInputState()
 	return d, nil
 }
 
 // UpdateInputState updates the device's current input state (thread-safe).
 func (m *Mouse) UpdateInputState(state InputState) {
-	m.stateMu.Lock()
-	defer m.stateMu.Unlock()
-	m.inputState = &state
+	select {
+	case <-m.inputCh:
+	default:
+	}
+	m.inputCh <- state
 }
 
 // HandleTransfer implements interrupt IN for Mouse.
-func (m *Mouse) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
+func (m *Mouse) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out []byte) []byte {
 	if dir == usbip.DirIn {
 		switch ep {
 		case 1: // 0x81 - main input reports
 			atomic.AddUint64(&m.tick, 1)
-
-			m.stateMu.Lock()
-			var st InputState
-			if m.inputState != nil {
-				// Snapshot current state
-				st = *m.inputState
-				// Consume relative deltas so they are one-shot per poll cycle.
-				// Buttons persist until explicitly changed by the client.
-				m.inputState.DX = 0
-				m.inputState.DY = 0
-				m.inputState.Wheel = 0
-				m.inputState.Pan = 0
+			select {
+			case <-ctx.Done():
+				return nil
+			case st := <-m.inputCh:
+				// Re-queue a zero-delta state (buttons preserved) so the server's
+				// keepalive cache reflects no movement after delivering this event.
+				if st.DX != 0 || st.DY != 0 || st.Wheel != 0 || st.Pan != 0 {
+					zeroed := InputState{Buttons: st.Buttons}
+					select {
+					case m.inputCh <- zeroed:
+					default:
+					}
+				}
+				return st.BuildReport()
 			}
-			m.stateMu.Unlock()
-			return st.BuildReport()
 		default:
 			return nil
 		}

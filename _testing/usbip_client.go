@@ -322,25 +322,38 @@ func (c *TestUsbIpClient) ReadInputReportWithTimeout(conn net.Conn, timeout time
 }
 
 func (c *TestUsbIpClient) PollInputReport(conn net.Conn, want []byte, timeout time.Duration) ([]byte, error) {
+	wantAllZero := true
+	for _, b := range want {
+		if b != 0 {
+			wantAllZero = false
+			break
+		}
+	}
+	if wantAllZero {
+		return c.ReadInputReportWithTimeout(conn, timeout)
+	}
+
 	deadline := time.Now().Add(timeout)
 	var last []byte
 	for {
-		got, err := c.ReadInputReport(conn)
+		remaining := time.Until(deadline)
+		if remaining <= 0 {
+			return last, nil
+		}
+		got, err := c.ReadInputReportWithTimeout(conn, remaining)
 		if err != nil {
 			return nil, err
 		}
 		last = got
-		if len(got) == len(want) {
-			eq := true
-			for i := range want {
-				if want[i] != got[i] {
-					eq = false
-					break
-				}
+		allZero := true
+		for _, b := range got {
+			if b != 0 {
+				allZero = false
+				break
 			}
-			if eq {
-				return got, nil
-			}
+		}
+		if !allZero {
+			return got, nil
 		}
 		if time.Now().After(deadline) {
 			return last, nil

@@ -2,6 +2,7 @@
 package keyboard
 
 import (
+	"context"
 	"sync"
 	"sync/atomic"
 
@@ -14,7 +15,7 @@ import (
 // Keyboard implements the Device interface for a full HID keyboard with LED support.
 type Keyboard struct {
 	tick        uint64
-	inputState  *InputState
+	inputCh     chan InputState
 	stateMu     sync.Mutex
 	ledState    uint8
 	ledCallback func(LEDState)
@@ -34,7 +35,8 @@ func New(o *device.CreateOptions) (*Keyboard, error) {
 			d.descriptor.Device.IDProduct = *o.IDProduct
 		}
 	}
-	d.inputState = NewInputState()
+	d.inputCh = make(chan InputState, 1)
+	d.inputCh <- *NewInputState()
 	return d, nil
 }
 
@@ -58,25 +60,25 @@ func (k *Keyboard) GetLEDState() LEDState {
 
 // UpdateInputState updates the device's current input state (thread-safe).
 func (k *Keyboard) UpdateInputState(state InputState) {
-	k.stateMu.Lock()
-	defer k.stateMu.Unlock()
-	k.inputState = &state
+	select {
+	case <-k.inputCh:
+	default:
+	}
+	k.inputCh <- state
 }
 
 // HandleTransfer implements interrupt IN/OUT for Keyboard.
-func (k *Keyboard) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
+func (k *Keyboard) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out []byte) []byte {
 	if dir == usbip.DirIn {
 		switch ep {
 		case 1: // 0x81 - keyboard input reports
 			atomic.AddUint64(&k.tick, 1)
-
-			k.stateMu.Lock()
-			var st InputState
-			if k.inputState != nil {
-				st = *k.inputState
+			select {
+			case <-ctx.Done():
+				return nil
+			case st := <-k.inputCh:
+				return st.BuildReport()
 			}
-			k.stateMu.Unlock()
-			return st.BuildReport()
 		default:
 			return nil
 		}

@@ -359,7 +359,7 @@ func TestInputReports(t *testing.T) {
 				return
 			}
 			dev.UpdateInputState(&tc.inputState)
-			built := dev.HandleTransfer(4, usbip.DirIn, nil)
+			built := dev.HandleTransfer(context.Background(), 4, usbip.DirIn, nil)
 			bb := append([]byte(nil), built...)
 			exp := append([]byte(nil), tc.expectedReport...)
 			bb[7] &= 0x03

@@ -48,11 +48,11 @@ func TestBuildReport05(t *testing.T) {
 		BatteryVolts:  DefaultBatteryVolts,
 	})
 
-	dev.HandleTransfer(2, usbip.DirOut, featureCommand(0x02, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
-	dev.HandleTransfer(2, usbip.DirOut, featureCommand(0x04, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
-	dev.HandleTransfer(2, usbip.DirOut, selectReportCommand(ReportIDCommon))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, featureCommand(0x02, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, featureCommand(0x04, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, selectReportCommand(ReportIDCommon))
 
-	report := dev.HandleTransfer(1, usbip.DirIn, nil)
+	report := dev.HandleTransfer(context.Background(), 1, usbip.DirIn, nil)
 	require.Len(t, report, InputReportSize)
 	assert.Equal(t, byte(ReportIDCommon), report[0])
 	assert.Equal(t, uint32(1), binary.LittleEndian.Uint32(report[1:5]))
@@ -75,7 +75,9 @@ func TestBuildReport05(t *testing.T) {
 	assert.Equal(t, uint16(state.GyroY), binary.LittleEndian.Uint16(report[0x39:0x3B]))
 	assert.Equal(t, uint16(state.GyroZ), binary.LittleEndian.Uint16(report[0x3B:0x3D]))
 
-	next := dev.HandleTransfer(1, usbip.DirIn, nil)
+	kCtx, kCancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer kCancel()
+	next := dev.HandleTransfer(kCtx, 1, usbip.DirIn, nil)
 	require.Len(t, next, InputReportSize)
 	assert.Equal(t, uint32(2), binary.LittleEndian.Uint32(next[1:5]))
 	assert.Equal(t, uint32(8000), binary.LittleEndian.Uint32(next[0x2B:0x2F]))
@@ -169,10 +171,10 @@ func TestBuildReport09(t *testing.T) {
 		ExternalPower: true,
 		BatteryVolts:  DefaultBatteryVolts,
 	})
-	dev.HandleTransfer(2, usbip.DirOut, selectReportCommand(ReportIDPro))
-	assert.NotEmpty(t, dev.HandleTransfer(2, usbip.DirIn, nil))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, selectReportCommand(ReportIDPro))
+	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
 
-	report := dev.HandleTransfer(1, usbip.DirIn, nil)
+	report := dev.HandleTransfer(context.Background(), 1, usbip.DirIn, nil)
 	require.Len(t, report, InputReportSize)
 	assert.Equal(t, byte(ReportIDPro), report[0])
 	assert.Equal(t, byte(1), report[1])
@@ -192,19 +194,19 @@ func TestBulkCommands(t *testing.T) {
 	dev, err := New(nil)
 	require.NoError(t, err)
 
-	dev.HandleTransfer(2, usbip.DirOut, featureCommand(0x02, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
-	assert.NotEmpty(t, dev.HandleTransfer(2, usbip.DirIn, nil))
-	dev.HandleTransfer(2, usbip.DirOut, featureCommand(0x04, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
-	assert.NotEmpty(t, dev.HandleTransfer(2, usbip.DirIn, nil))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, featureCommand(0x02, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
+	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, featureCommand(0x04, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
+	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
 
-	dev.HandleTransfer(2, usbip.DirOut, selectReportCommand(ReportIDCommon))
-	assert.NotEmpty(t, dev.HandleTransfer(2, usbip.DirIn, nil))
-	report := dev.HandleTransfer(1, usbip.DirIn, nil)
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, selectReportCommand(ReportIDCommon))
+	assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil))
+	report := dev.HandleTransfer(context.Background(), 1, usbip.DirIn, nil)
 	require.Len(t, report, InputReportSize)
 	assert.Equal(t, byte(ReportIDCommon), report[0])
 
-	dev.HandleTransfer(2, usbip.DirOut, flashReadCommand(0x13000))
-	resp := dev.HandleTransfer(2, usbip.DirIn, nil)
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, flashReadCommand(0x13000))
+	resp := dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil)
 	require.Len(t, resp, 0x50)
 	assert.Equal(t, []byte{0x02, 0x01, 0x01, 0x01}, resp[0:4])
 	assert.Equal(t, byte(0x40), resp[8])
@@ -225,8 +227,8 @@ func TestFlashSerialUsesMetaStateSerial(t *testing.T) {
 		BatteryVolts:  DefaultBatteryVolts,
 	})
 
-	dev.HandleTransfer(2, usbip.DirOut, flashReadCommand(0x13000))
-	resp := dev.HandleTransfer(2, usbip.DirIn, nil)
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, flashReadCommand(0x13000))
+	resp := dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil)
 	require.Len(t, resp, 0x50)
 
 	flash := resp[16:]
@@ -239,8 +241,8 @@ func TestSDLUSBInitializationSequence(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, address := range []uint32{0x13000, 0x13040, 0x13080, 0x130C0, 0x13100, 0x1FC040, 0x1FC080} {
-		dev.HandleTransfer(2, usbip.DirOut, flashReadCommand(address))
-		resp := dev.HandleTransfer(2, usbip.DirIn, nil)
+		dev.HandleTransfer(context.Background(), 2, usbip.DirOut, flashReadCommand(address))
+		resp := dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil)
 		require.Len(t, resp, 0x50, "flash block %#x", address)
 		assert.Equal(t, []byte{0x02, 0x01, 0x01, 0x01}, resp[0:4])
 		assert.Equal(t, byte(0x40), resp[8])
@@ -260,8 +262,8 @@ func TestSDLUSBInitializationSequence(t *testing.T) {
 		{0x03, 0x91, 0x00, 0x0D, 0x00, 0x08, 0x00, 0x00, 0x01, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
 	}
 	for _, cmd := range initSequence {
-		dev.HandleTransfer(2, usbip.DirOut, cmd)
-		assert.NotEmpty(t, dev.HandleTransfer(2, usbip.DirIn, nil), "cmd %#x sub %#x", cmd[0], cmd[3])
+		dev.HandleTransfer(context.Background(), 2, usbip.DirOut, cmd)
+		assert.NotEmpty(t, dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil), "cmd %#x sub %#x", cmd[0], cmd[3])
 	}
 
 	dev.SetMetaState(MetaState{
@@ -271,7 +273,7 @@ func TestSDLUSBInitializationSequence(t *testing.T) {
 		BatteryVolts:  DefaultBatteryVolts,
 	})
 	dev.UpdateInputState(InputState{})
-	report := dev.HandleTransfer(1, usbip.DirIn, nil)
+	report := dev.HandleTransfer(context.Background(), 1, usbip.DirIn, nil)
 	require.Len(t, report, InputReportSize)
 	assert.Equal(t, byte(ReportIDCommon), report[0])
 	assert.Equal(t, uint32(1), binary.LittleEndian.Uint32(report[1:5]))
@@ -295,7 +297,7 @@ func TestRumbleOutput(t *testing.T) {
 		packet[1+i] = byte(i)
 		packet[17+i] = byte(0x80 + i)
 	}
-	dev.HandleTransfer(1, usbip.DirOut, packet)
+	dev.HandleTransfer(context.Background(), 1, usbip.DirOut, packet)
 
 	require.True(t, called)
 	assert.Equal(t, byte(OutputFlagRumble), got.Flags)
@@ -329,8 +331,8 @@ func TestPlayerLEDOutput(t *testing.T) {
 		called = true
 	})
 
-	dev.HandleTransfer(2, usbip.DirOut, []byte{0x09, 0x91, 0x12, 0x07, 0x00, 0x08, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00})
-	resp := dev.HandleTransfer(2, usbip.DirIn, nil)
+	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, []byte{0x09, 0x91, 0x12, 0x07, 0x00, 0x08, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00})
+	resp := dev.HandleTransfer(context.Background(), 2, usbip.DirIn, nil)
 
 	require.True(t, called)
 	assert.Equal(t, byte(OutputFlagLED), got.Flags)

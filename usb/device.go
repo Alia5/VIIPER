@@ -1,12 +1,15 @@
 package usb
 
+import "context"
+
 // Device is the minimal interface a device must implement.
 // It only handles non-EP0 (interrupt/bulk) transfers.
 type Device interface {
 	// HandleTransfer processes a non-EP0 transfer (interrupt/bulk).
 	// ep is the endpoint number (without direction). dir is usbip.DirIn or usbip.DirOut.
-	// For IN transfers, return the payload to send; for OUT, consume 'out' and return nil.
-	HandleTransfer(ep uint32, dir uint32, out []byte) []byte
+	// For IN transfers the implementation should block until data is available or ctx is
+	// cancelled, then return the payload. For OUT transfers, consume 'out' and return nil.
+	HandleTransfer(ctx context.Context, ep uint32, dir uint32, out []byte) []byte
 	GetDescriptor() *Descriptor
 	GetDeviceSpecificArgs() map[string]any
 }

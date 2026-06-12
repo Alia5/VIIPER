@@ -2,9 +2,9 @@
 package xbox360
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"sync"
 	"sync/atomic"
 
 	"github.com/Alia5/VIIPER/device"
@@ -14,8 +14,7 @@ import (
 
 type Xbox360 struct {
 	tick       uint64
-	inputState *InputState
-	stateMu    sync.Mutex
+	inputCh    chan InputState
 	rumbleFunc func(XRumbleState)
 	descriptor usb.Descriptor
 }
@@ -47,7 +46,8 @@ func New(o *device.CreateOptions) (*Xbox360, error) {
 			}
 		}
 	}
-	d.inputState = NewInputState()
+	d.inputCh = make(chan InputState, 1)
+	d.inputCh <- *NewInputState()
 	return d, nil
 }
 
@@ -58,25 +58,25 @@ func (x *Xbox360) SetRumbleCallback(f func(XRumbleState)) {
 
 // UpdateInputState updates the device's current input state (thread-safe).
 func (x *Xbox360) UpdateInputState(state InputState) {
-	x.stateMu.Lock()
-	defer x.stateMu.Unlock()
-	x.inputState = &state
+	select {
+	case <-x.inputCh:
+	default:
+	}
+	x.inputCh <- state
 }
 
 // HandleTransfer implements interrupt IN/OUT for Xbox360.
-func (x *Xbox360) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
+func (x *Xbox360) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out []byte) []byte {
 	if dir == usbip.DirIn {
 		switch ep {
 		case 1: // 0x81 - main input reports
 			atomic.AddUint64(&x.tick, 1)
-
-			x.stateMu.Lock()
-			var st InputState
-			if x.inputState != nil {
-				st = *x.inputState
+			select {
+			case <-ctx.Done():
+				return nil
+			case st := <-x.inputCh:
+				return st.BuildReport()
 			}
-			x.stateMu.Unlock()
-			return st.BuildReport()
 		default:
 			return nil
 		}

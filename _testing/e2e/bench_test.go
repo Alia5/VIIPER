@@ -164,9 +164,8 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 
 	s := cmd.Server{
 		USBServerConfig: usb.ServerConfig{
-			Addr:                    ":3244",
-			BusCleanupTimeout:       1 * time.Second,
-			WriteBatchFlushInterval: 0,
+			Addr:              ":3244",
+			BusCleanupTimeout: 1 * time.Second,
 		},
 		APIServerConfig: api.ServerConfig{
 			Addr:                        ":3245",

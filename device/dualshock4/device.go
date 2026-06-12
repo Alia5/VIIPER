@@ -1,8 +1,10 @@
 package dualshock4
 
 import (
+	"context"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
@@ -15,6 +17,7 @@ import (
 )
 
 type DualShock4 struct {
+	inputCh    chan *InputState
 	inputState *InputState
 	metaState  *MetaState
 
@@ -87,6 +90,8 @@ func New(o *device.CreateOptions) (*DualShock4, error) {
 		"interfaces", len(d.descriptor.Interfaces))
 
 	d.inputState = NewInputState()
+	d.inputCh = make(chan *InputState, 1)
+	d.inputCh <- d.inputState
 
 	return d, nil
 }
@@ -103,8 +108,13 @@ func (d *DualShock4) SetOutputCallback(f func(OutputState)) {
 
 func (d *DualShock4) UpdateInputState(state *InputState) {
 	d.mtx.Lock()
-	defer d.mtx.Unlock()
 	d.inputState = state
+	d.mtx.Unlock()
+	select {
+	case <-d.inputCh:
+	default:
+	}
+	d.inputCh <- state
 }
 
 func (d *DualShock4) GetDescriptor() *usb.Descriptor {
@@ -127,15 +137,26 @@ func (d *DualShock4) GetDeviceSpecificArgs() map[string]any {
 	return res
 }
 
-func (d *DualShock4) HandleTransfer(ep uint32, dir uint32, out []byte) []byte {
+func (d *DualShock4) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out []byte) []byte {
 	if dir == usbip.DirIn {
 		switch ep {
 		case 4:
-			d.mtx.Lock()
-			is := *d.inputState
-			ms := *d.metaState
-			d.mtx.Unlock()
-			return d.buildUSBInputReport(&is, &ms)
+			select {
+			case <-ctx.Done():
+				if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+					d.mtx.Lock()
+					is := d.inputState
+					ms := *d.metaState
+					d.mtx.Unlock()
+					return d.buildUSBInputReport(is, &ms)
+				}
+				return nil
+			case is := <-d.inputCh:
+				d.mtx.Lock()
+				ms := *d.metaState
+				d.mtx.Unlock()
+				return d.buildUSBInputReport(is, &ms)
+			}
 		default:
 			return nil
 		}
