@@ -206,6 +206,7 @@ jobs:
                   if (Test-Path "C:\Program Files\LLVM-MinGW\bin") {
                     "C:\Program Files\LLVM-MinGW\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
                   }
+                  exit 0
 
             - name: Build
               shell: bash
