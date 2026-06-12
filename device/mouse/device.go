@@ -37,7 +37,6 @@ func New(o *device.CreateOptions) (*Mouse, error) {
 	return d, nil
 }
 
-// UpdateInputState updates the device's current input state (thread-safe).
 func (m *Mouse) UpdateInputState(state InputState) {
 	select {
 	case <-m.inputCh:
@@ -46,7 +45,6 @@ func (m *Mouse) UpdateInputState(state InputState) {
 	m.inputCh <- state
 }
 
-// HandleTransfer implements interrupt IN for Mouse.
 func (m *Mouse) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out []byte) []byte {
 	if dir == usbip.DirIn {
 		switch ep {
@@ -56,8 +54,6 @@ func (m *Mouse) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out [
 			case <-ctx.Done():
 				return nil
 			case st := <-m.inputCh:
-				// Re-queue a zero-delta state (buttons preserved) so the server's
-				// keepalive cache reflects no movement after delivering this event.
 				if st.DX != 0 || st.DY != 0 || st.Wheel != 0 || st.Pan != 0 {
 					zeroed := InputState{Buttons: st.Buttons}
 					select {

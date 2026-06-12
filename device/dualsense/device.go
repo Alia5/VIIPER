@@ -10,7 +10,7 @@ import (
 	"math"
 	"net"
 	"sync"
-	"sync/atomic"
+	"time"
 
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/usb"
@@ -27,8 +27,8 @@ type DualSense struct {
 
 	subcommand [2]byte
 
-	seqCounter         uint8
-	usbReportTimestamp uint32
+	seqCounter    uint8
+	timestampBase time.Time
 
 	mtx sync.Mutex
 }
@@ -114,6 +114,7 @@ func new(o *device.CreateOptions, edge bool) (*DualSense, error) {
 	d.inputState = NewInputState()
 	d.inputCh = make(chan *InputState, 1)
 	d.inputCh <- d.inputState
+	d.timestampBase = time.Now()
 
 	return d, nil
 }
@@ -439,7 +440,7 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 	binary.LittleEndian.PutUint16(b[24:26], uint16(s.AccelY))
 	binary.LittleEndian.PutUint16(b[26:28], uint16(s.AccelZ))
 
-	ts := atomic.AddUint32(&d.usbReportTimestamp, 1)
+	ts := uint32(time.Since(d.timestampBase).Microseconds() * 3)
 	binary.LittleEndian.PutUint32(b[28:32], ts)
 
 	touch1 := uint8(0)

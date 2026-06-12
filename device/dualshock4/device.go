@@ -28,7 +28,7 @@ type DualShock4 struct {
 	telemetrySubcommand byte
 
 	usbPacketCounter uint32
-	lastUSBReportAt  time.Time
+	timestampBase    time.Time
 
 	mtx sync.Mutex
 }
@@ -92,6 +92,7 @@ func New(o *device.CreateOptions) (*DualShock4, error) {
 	d.inputState = NewInputState()
 	d.inputCh = make(chan *InputState, 1)
 	d.inputCh <- d.inputState
+	d.timestampBase = time.Now()
 
 	return d, nil
 }
@@ -511,18 +512,5 @@ func (d *DualShock4) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 }
 
 func (d *DualShock4) nextReportTimestamp() uint32 {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	now := time.Now()
-	if d.lastUSBReportAt.IsZero() {
-		d.lastUSBReportAt = now
-		return 188
-	}
-	elapsed := now.Sub(d.lastUSBReportAt).Nanoseconds()
-	d.lastUSBReportAt = now
-	ts := uint32(elapsed * 3 / 16000)
-	if ts == 0 {
-		ts = 1
-	}
-	return ts
+	return uint32(time.Since(d.timestampBase).Nanoseconds() * 3 / 16000)
 }
