@@ -18,8 +18,7 @@ import (
 
 	_ "github.com/Alia5/VIIPER/internal/registry" // Register all device handlers
 
-	"github.com/Zyko0/go-sdl3/bin/binsdl"
-	"github.com/Zyko0/go-sdl3/sdl"
+	"github.com/Alia5/VIIPER/_testing/e2e/sdl"
 )
 
 type TimeWhat int
@@ -151,13 +150,14 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 
 	b.SetParallelism(1)
 
-	defer binsdl.Load().Unload()
 	defer sdl.Quit()
-	sdl.Init(sdl.INIT_GAMEPAD)
+	if err := sdl.Init(sdl.InitFlagGamepad); err != nil {
+		b.Fatalf("SDL init failed: %v", err)
+	}
 
 	sdl.UpdateGamepads()
 	existingGamepads, _ := sdl.GetGamepads()
-	existingGamepadSet := make(map[sdl.JoystickID]bool)
+	existingGamepadSet := make(map[sdl.GamepadID]bool)
 	for _, id := range existingGamepads {
 		existingGamepadSet[id] = true
 	}
@@ -172,6 +172,9 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 			AutoAttachLocalClient:       true,
 			DeviceHandlerConnectTimeout: time.Second * 5,
 			Password:                    "testpassword1234",
+			PlatformOpts: api.PlatformOpts{
+				AutoAttachWindowsNative: true,
+			},
 		},
 		ConnectionTimeout: 5 * time.Second,
 	}
@@ -219,11 +222,11 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 		gIDs, _ := sdl.GetGamepads()
 		for _, id := range gIDs {
 			if !existingGamepadSet[id] {
-				gamepad, err = id.OpenGamepad()
+				gamepad, err = sdl.OpenGamepad(id)
 				if err != nil {
 					b.Fatalf("OpenGamepad failed: %v", err)
 				}
-				defer gamepad.Close() //nolint:errcheck
+				defer gamepad.Close()
 				break
 			}
 		}
@@ -246,7 +249,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 			default:
 			}
 			sdl.UpdateGamepads()
-			pressed := gamepad.Button(sdl.GAMEPAD_BUTTON_SOUTH)
+			pressed := gamepad.GetButton(sdl.GamepadButtonSouth)
 			if pressed != prevPadPressed {
 				padChann <- pressed
 				prevPadPressed = pressed

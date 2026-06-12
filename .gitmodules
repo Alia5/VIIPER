@@ -1,0 +1,4 @@
+[submodule "_testing/e2e/deps/SDL"]
+	path = _testing/e2e/deps/SDL
+	url = https://github.com/libsdl-org/SDL
+	branch = main

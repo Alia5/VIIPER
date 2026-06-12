@@ -6,13 +6,13 @@ It groups repeated cycles when `-count > 1` and uses the single press E2E measur
 
 ## Output
 
-| Column | Meaning |
-|--------|---------|
-| Benchmark | Name of the sub benchmark |
-| Count | Iterations performed (from Go bench output; affected by `-benchtime`) |
-| ns/op | Nanoseconds per operation (direct Go benchmark figure) |
-| % of Full | Relative to `E2E-InputDelay` (single press baseline) |
-| Client Share % | Portion attributed to the (go) client write phase (for E2E rows) |
+| Column          | Meaning                                                                                   |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| Benchmark       | Name of the sub benchmark                                                                 |
+| Count           | Iterations performed (from Go bench output; affected by `-benchtime`)                     |
+| ns/op           | Nanoseconds per operation (direct Go benchmark figure)                                    |
+| % of Full       | Relative to `E2E-InputDelay` (single press baseline)                                      |
+| Client Share %  | Portion attributed to the (go) client write phase (for E2E rows)                          |
 | Latency Share % | Remainder attributed to transport + virtual device/host stack + tight device polling loop |
 
 `E2E-PressAndRelease` includes both press and release cycles, so it is expected to be ~2× the single press and thus can exceed 100% in `% of Full`.
@@ -42,21 +42,21 @@ go run ./scripts/lat_bench.go -benchtime=1000x -count=1 -format markdown
 
 Results (Arch Linux / SteamDeck Kernel / Steam Deck LCD / Go 1.25+, 10k iterations):
 
-| Benchmark | Count | ns/op | % of Full | Client Share % | Latency Share % |
-|-----------|-------|-------|-----------|----------------|-----------------|
-| 1_Go-Client-Write | 10000 | 10668 | 11.98 | 100.00 | 0.00 |
-| 2_InputDelay-Without-Client | 10000 | 74154 | 83.25 | 0.00 | 100.00 |
-| 3_E2E-InputDelay | 10000 | 89078 | 100.00 | 11.98 | 88.02 |
-| 4_E2E-PressAndRelease | 10000 | 184870 | 207.54 | 11.54 | 88.46 |
+| Benchmark                   | Count | ns/op  | % of Full | Client Share % | Latency Share % |
+| --------------------------- | ----- | ------ | --------- | -------------- | --------------- |
+| 1_Go-Client-Write           | 10000 | 10668  | 11.98     | 100.00         | 0.00            |
+| 2_InputDelay-Without-Client | 10000 | 74154  | 83.25     | 0.00           | 100.00          |
+| 3_E2E-InputDelay            | 10000 | 89078  | 100.00    | 11.98          | 88.02           |
+| 4_E2E-PressAndRelease       | 10000 | 184870 | 207.54    | 11.54          | 88.46           |
 
 Example output (Windows / AMD Ryzen 9 3900X / Go 1.25+, 10k iterations):
 
-| Benchmark | Count | ns/op | % of Full | Client Share % | Latency Share % |
-|-----------|-------|-------|-----------|----------------|-----------------|
-| 1_Go-Client-Write | 10000 | 27933 | 16.60 | 100.00 | 0.00 |
-| 2_InputDelay-Without-Client | 10000 | 133724 | 79.45 | 0.00 | 100.00 |
-| 3_E2E-InputDelay | 10000 | 168307 | 100.00 | 16.60 | 83.40 |
-| 4_E2E-PressAndRelease | 10000 | 331439 | 196.93 | 16.86 | 83.14 |
+| Benchmark                   | Count | ns/op  | % of Full | Client Share % | Latency Share % |
+| --------------------------- | ----- | ------ | --------- | -------------- | --------------- |
+| 1_Go-Client-Write           | 10000 | 27933  | 16.60     | 100.00         | 0.00            |
+| 2_InputDelay-Without-Client | 10000 | 133724 | 79.45     | 0.00           | 100.00          |
+| 3_E2E-InputDelay            | 10000 | 168307 | 100.00    | 16.60          | 83.40           |
+| 4_E2E-PressAndRelease       | 10000 | 331439 | 196.93    | 16.86          | 83.14           |
 
 Variability across repeated measurement runs has been negligible.  
 Use a larger `-count` if you want to increase the number of runs.

@@ -9,7 +9,7 @@ type ServerConfig struct {
 	AutoAttachLocalClient       bool          `help:"Controls usbip-client on localhost to auto-attach devices added to the virtual bus" default:"true" env:"VIIPER_API_AUTO_ATTACH_LOCAL_CLIENT"`
 	RequireLocalHostAuth        bool          `help:"Require authentication for clients connecting from localhost" default:"false" env:"VIIPER_API_REQUIRE_LOCALHOST_AUTH"`
 	ConnectionTimeout           time.Duration `kong:"-"`
-	platformOpts                `embed:""`
+	PlatformOpts                `embed:""`
 	// password for api (remote) server auth (ALWAYS read from file)
 	Password string `kong:"-"`
 }
