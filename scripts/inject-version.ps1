@@ -5,15 +5,21 @@ param(
 )
 
 $ver = $Version.TrimStart('v')
-$parts = $ver -split '[.-]'
-$major = [int]$parts[0]
-$minor = if ($parts.Length -gt 1) { [int]$parts[1] } else { 0 }
-$patch = if ($parts.Length -gt 2) { [int]$parts[2] } else { 0 }
+$major = 0
+$minor = 0
+$patch = 0
 $build = 0
-if ($parts.Length -gt 3) {
-    $buildStr = $parts[3]
-    if ($buildStr -match '^\d+$') {
-        $build = [int]$buildStr
+
+if ($ver -match '^(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:[.-](\d+))?') {
+    $major = [int]$Matches[1]
+    if ($Matches[2]) {
+        $minor = [int]$Matches[2]
+    }
+    if ($Matches[3]) {
+        $patch = [int]$Matches[3]
+    }
+    if ($Matches[4]) {
+        $build = [int]$Matches[4]
     }
 }
 
