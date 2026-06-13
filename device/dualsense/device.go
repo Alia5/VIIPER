@@ -22,8 +22,9 @@ type DualSense struct {
 	inputState *InputState
 	metaState  *MetaState
 
-	outputFunc func(OutputState)
-	descriptor usb.Descriptor
+	outputFunc       func(OutputState)
+	descriptor       usb.Descriptor
+	extendedFeedback bool
 
 	subcommand [2]byte
 

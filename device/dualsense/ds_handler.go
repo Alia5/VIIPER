@@ -81,7 +81,12 @@ func (h *dshandler) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
 	}
 	o.DeviceSpecific = string(b)
 
-	return new(o, false)
+	dse, err := new(o, false)
+	if err != nil {
+		return nil, err
+	}
+	dse.extendedFeedback = h.extendedFeedback
+	return dse, nil
 }
 
 func (h *dshandler) StreamHandler() api.StreamHandlerFunc {
@@ -115,7 +120,7 @@ func (h *dshandler) StreamHandler() api.StreamHandlerFunc {
 		dse.SetOutputCallback(func(feedback OutputState) {
 			var data []byte
 			var err error
-			if h.extendedFeedback {
+			if h.extendedFeedback || dse.extendedFeedback {
 				data, err = feedback.MarshalExtendedBinary()
 			} else {
 				data, err = feedback.MarshalBinary()
