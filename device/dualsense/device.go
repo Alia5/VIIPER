@@ -186,11 +186,9 @@ func (d *DualSense) HandleTransfer(ctx context.Context, ep uint32, dir uint32, o
 		}
 	}
 
-	if dir == usbip.DirOut && ep == 3 {
-		if len(out) >= 48 && out[0] == ReportIDOutput {
-			if d.outputFunc != nil {
-				d.outputFunc(parseOutputReport(out))
-			}
+	if dir == usbip.DirOut && ep == EndpointOut {
+		if d.handleOutputReport(out) {
+			return nil
 		}
 	}
 
@@ -239,10 +237,8 @@ func (d *DualSense) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex,
 				return nil, true
 			case reportType == reportTypeFeature:
 				return nil, true
-			case reportType == reportTypeOutput && reportID == ReportIDOutput && len(data) >= 48:
-				if d.outputFunc != nil {
-					d.outputFunc(parseOutputReport(data))
-				}
+			case reportType == reportTypeOutput && reportID == ReportIDOutput:
+				d.handleOutputReport(data)
 				return nil, true
 			}
 		}
@@ -257,6 +253,38 @@ func (d *DualSense) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex,
 		"wLength", wLength,
 		"dataLen", len(data))
 
+	return nil, false
+}
+
+func (d *DualSense) handleOutputReport(out []byte) bool {
+	report, ok := normalizeOutputReport(out)
+	if !ok {
+		return false
+	}
+	if d.outputFunc != nil {
+		d.outputFunc(parseOutputReport(report))
+	}
+	return true
+}
+
+func normalizeOutputReport(out []byte) ([]byte, bool) {
+	if len(out) == 0 {
+		return nil, false
+	}
+	if out[0] == ReportIDOutput {
+		if len(out) < 5 {
+			return nil, false
+		}
+		return out, true
+	}
+	// Some HID SET_REPORT paths deliver the payload without the report ID byte.
+	// Add it back so the parser can use the same USB report offsets.
+	if len(out) >= 4 {
+		report := make([]byte, len(out)+1)
+		report[0] = ReportIDOutput
+		copy(report[1:], out)
+		return report, true
+	}
 	return nil, false
 }
 
