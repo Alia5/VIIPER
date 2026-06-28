@@ -33,6 +33,10 @@ typedef uintptr_t DS4DeviceHandle;
 #define DS4_DPAD_UP_LEFT   0x07u
 #define DS4_DPAD_NEUTRAL   0x08u
 
+#define DS4_OUTPUT_UPDATE_RUMBLE 0x01u
+#define DS4_OUTPUT_UPDATE_LED    0x02u
+#define DS4_OUTPUT_UPDATE_FLASH    0x04u
+
 typedef struct {
 	int8_t   LX;
 	int8_t   LY;
@@ -64,10 +68,10 @@ typedef struct {
 	double      BatteryVoltage;     // 0 = use default
 } DS4MetaState;
 
-typedef void (*DS4OutputCallback)(DS4DeviceHandle handle, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t flashOn, uint8_t flashOff);
+typedef void (*DS4OutputCallback)(DS4DeviceHandle handle,uint8_t updateFlags, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t flashOn, uint8_t flashOff);
 
-static void viiper_call_ds4_output(DS4OutputCallback fn, DS4DeviceHandle handle, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t flashOn, uint8_t flashOff) {
-	fn(handle, rumbleSmall, rumbleLarge, ledRed, ledGreen, ledBlue, flashOn, flashOff);
+static void viiper_call_ds4_output(DS4OutputCallback fn, DS4DeviceHandle handle,uint8_t updateFlags, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t flashOn, uint8_t flashOff) {
+	fn(handle, updateFlags, rumbleSmall, rumbleLarge, ledRed, ledGreen, ledBlue, flashOn, flashOff);
 }
 
 */
@@ -238,6 +242,7 @@ func SetDS4OutputCallback(handle C.DS4DeviceHandle, cb C.DS4OutputCallback) bool
 	}
 	ds4device.SetOutputCallback(func(out dualshock4.OutputState) {
 		C.viiper_call_ds4_output(cb, handle,
+			C.uint8_t(out.UpdateFlags),
 			C.uint8_t(out.RumbleSmall),
 			C.uint8_t(out.RumbleLarge),
 			C.uint8_t(out.LedRed),

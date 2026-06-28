@@ -262,6 +262,7 @@ var featureGetHandlers = map[byte]func(*DualShock4) []byte{
 
 func parseOutputReport(data []byte) OutputState {
 	return OutputState{
+		UpdateFlags: data[1],
 		RumbleSmall: data[4],
 		RumbleLarge: data[5],
 		LedRed:      data[6],

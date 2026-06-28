@@ -99,6 +99,7 @@ func (s *InputState) UnmarshalBinary(data []byte) error {
 // nolint
 // viiper:wire dualshock4 s2c rumbleSmall:u8 rumbleLarge:u8 ledRed:u8 ledGreen:u8 ledBlue:u8 flashOn:u8 flashOff:u8
 type OutputState struct {
+	UpdateFlags uint8 // (bit 0: rumble, bit 1: led, bit 2: flash)
 	RumbleSmall uint8 // (0-255)
 	RumbleLarge uint8 // (0-255)
 	LedRed      uint8 // (0-255)
@@ -110,6 +111,7 @@ type OutputState struct {
 
 func (f *OutputState) MarshalBinary() ([]byte, error) {
 	return []byte{
+		f.UpdateFlags,
 		f.RumbleSmall,
 		f.RumbleLarge,
 		f.LedRed,
@@ -121,16 +123,17 @@ func (f *OutputState) MarshalBinary() ([]byte, error) {
 }
 
 func (f *OutputState) UnmarshalBinary(data []byte) error {
-	if len(data) < 7 {
+	if len(data) < 8 {
 		return io.ErrUnexpectedEOF
 	}
-	f.RumbleSmall = data[0]
-	f.RumbleLarge = data[1]
-	f.LedRed = data[2]
-	f.LedGreen = data[3]
-	f.LedBlue = data[4]
-	f.FlashOn = data[5]
-	f.FlashOff = data[6]
+	f.UpdateFlags = data[0]
+	f.RumbleSmall = data[1]
+	f.RumbleLarge = data[2]
+	f.LedRed = data[3]
+	f.LedGreen = data[4]
+	f.LedBlue = data[5]
+	f.FlashOn = data[6]
+	f.FlashOff = data[7]
 	return nil
 }
 
