@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/Alia5/VIIPER/device"
@@ -21,7 +22,7 @@ type DeviceStream struct {
 	conn   net.Conn
 	BusID  uint32
 	DevID  string
-	closed bool
+	closed atomic.Bool
 
 	readCancel context.CancelFunc
 	readMu     sync.Mutex
@@ -97,7 +98,7 @@ func (c *Client) AddDeviceAndConnect(ctx context.Context, busID uint32, deviceTy
 
 // Write sends raw bytes to the device stream (client → device input).
 func (s *DeviceStream) Write(data []byte) (int, error) {
-	if s.closed {
+	if s.closed.Load() {
 		return 0, fmt.Errorf("stream closed")
 	}
 	return s.conn.Write(data)
@@ -106,7 +107,7 @@ func (s *DeviceStream) Write(data []byte) (int, error) {
 // WriteBinary marshals and sends a BinaryMarshaler to the device stream.
 // This is the preferred way to send device input (e.g., xbox360.InputState, keyboard.InputState).
 func (s *DeviceStream) WriteBinary(v encoding.BinaryMarshaler) error {
-	if s.closed {
+	if s.closed.Load() {
 		return fmt.Errorf("stream closed")
 	}
 	data, err := v.MarshalBinary()
@@ -120,7 +121,7 @@ func (s *DeviceStream) WriteBinary(v encoding.BinaryMarshaler) error {
 // Read receives raw bytes from the device stream (device → client feedback).
 // For event-driven reading, use StartReading() instead to avoid blocking/polling.
 func (s *DeviceStream) Read(buf []byte) (int, error) {
-	if s.closed {
+	if s.closed.Load() {
 		return 0, fmt.Errorf("stream closed")
 	}
 	return s.conn.Read(buf)
@@ -168,7 +169,7 @@ func (s *DeviceStream) StartReading(ctx context.Context, chSize int, decode func
 			default:
 			}
 
-			if s.closed {
+			if s.closed.Load() {
 				errCh <- io.EOF
 				return
 			}
@@ -203,10 +204,9 @@ func (s *DeviceStream) SetWriteDeadline(t time.Time) error {
 
 // Close closes the stream connection and stops any background reading.
 func (s *DeviceStream) Close() error {
-	if s.closed {
+	if !s.closed.CompareAndSwap(false, true) {
 		return nil
 	}
-	s.closed = true
 
 	s.readMu.Lock()
 	if s.readCancel != nil {
