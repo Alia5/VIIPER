@@ -790,10 +790,18 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 		// EP0 and OUT transfers never block and are handled in order.
 		respData := s.processSubmit(ctx, dev, ep, dir, setup, outPayload)
 		actualLen := uint32(len(respData))
+		respPayload := respData
 		if dir == usbip.DirOut {
+			// RET_SUBMIT carries a data payload only for IN transfers. The
+			// header already reports the OUT length, so appending the handler's
+			// buffer here puts bytes on the wire that the reply does not
+			// announce. usbip-win2 tolerates them; the Linux vhci_hcd client
+			// reads them as the start of the next PDU, logs "unknown pdu 0" and
+			// tears the device down.
 			actualLen = uint32(len(outPayload))
+			respPayload = nil
 		}
-		if err := writeRet(seq, actualLen, respData, ep == 0); err != nil {
+		if err := writeRet(seq, actualLen, respPayload, ep == 0); err != nil {
 			return err
 		}
 	}
