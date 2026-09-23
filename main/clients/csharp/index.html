@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -2223,13 +2223,13 @@ The core VIIPER server remains under its original license.</p>
 </code></pre></div>
 <p>Or add directly in your <code>.csproj</code> (stable only):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">&lt;ItemGroup&gt;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nt">&lt;PackageReference</span><span class="w"> </span><span class="na">Include=</span><span class="s">&quot;Viiper.Client&quot;</span><span class="w"> </span><span class="na">Version=</span><span class="s">&quot;*&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nt">&lt;PackageReference</span><span class="w"> </span><span class="na">Include=</span><span class="s">"Viiper.Client"</span><span class="w"> </span><span class="na">Version=</span><span class="s">"*"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">&lt;/ItemGroup&gt;</span>
 </code></pre></div>
 <h3 id="2-project-reference-for-local-development-against-source">2. Project Reference (For Local Development Against Source)</h3>
 <p>Use this when modifying the generator or contributing new device types:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">&lt;ItemGroup&gt;</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">&lt;ProjectReference</span><span class="w"> </span><span class="na">Include=</span><span class="s">&quot;..\..\clients\csharp\Viiper.Client\Viiper.Client.csproj&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">&lt;ProjectReference</span><span class="w"> </span><span class="na">Include=</span><span class="s">"..\..\clients\csharp\Viiper.Client\Viiper.Client.csproj"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nt">&lt;/ItemGroup&gt;</span>
 </code></pre></div>
 <h2 id="example">Example</h2>
@@ -2237,7 +2237,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">using</span><span class="w"> </span><span class="nn">Viiper.Client.Devices.Keyboard</span><span class="p">;</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1">// Create new Viiper client</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kt">var</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ViiperClient</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3242</span><span class="p">);</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kt">var</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ViiperClient</span><span class="p">(</span><span class="s">"localhost"</span><span class="p">,</span><span class="w"> </span><span class="mi">3242</span><span class="p">);</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1">// Find or create a bus</span>
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="kt">var</span><span class="w"> </span><span class="n">buses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">BusListAsync</span><span class="p">();</span>
@@ -2254,11 +2254,11 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="p">}</span>
 <a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
 <a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="c1">// Add device and connect</span>
-<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="kt">var</span><span class="w"> </span><span class="n">deviceReq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DeviceCreateRequest</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;keyboard&quot;</span><span class="w"> </span><span class="p">};</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="kt">var</span><span class="w"> </span><span class="n">deviceReq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DeviceCreateRequest</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"keyboard"</span><span class="w"> </span><span class="p">};</span>
 <a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="kt">var</span><span class="w"> </span><span class="n">deviceResp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">BusDeviceAddAsync</span><span class="p">(</span><span class="n">busId</span><span class="p">,</span><span class="w"> </span><span class="n">deviceReq</span><span class="p">);</span>
 <a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="kt">var</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">ConnectDeviceAsync</span><span class="p">(</span><span class="n">busId</span><span class="p">,</span><span class="w"> </span><span class="n">deviceResp</span><span class="p">.</span><span class="n">DevId</span><span class="p">);</span>
 <a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>
-<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&quot;Connected to device {deviceResp.BusID}-{deviceResp.DevId}&quot;</span><span class="p">);</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"Connected to device {deviceResp.BusID}-{deviceResp.DevId}"</span><span class="p">);</span>
 <a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>
 <a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="c1">// Send keyboard input</span>
 <a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="kt">var</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">KeyboardInput</span>
@@ -2275,7 +2275,7 @@ The core VIIPER server remains under its original license.</p>
 <h2 id="device-controlfeedback">Device Control/Feedback</h2>
 <h3 id="creating-a-device-controlfeedback-stream">Creating a Device + Control/Feedback Stream</h3>
 <p>The simplest way to add a device and connect:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">var</span><span class="w"> </span><span class="n">deviceReq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DeviceCreateRequest</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;xbox360&quot;</span><span class="w"> </span><span class="p">};</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">var</span><span class="w"> </span><span class="n">deviceReq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DeviceCreateRequest</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"xbox360"</span><span class="w"> </span><span class="p">};</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kt">var</span><span class="w"> </span><span class="n">deviceResp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">BusDeviceAddAsync</span><span class="p">(</span><span class="n">busId</span><span class="p">,</span><span class="w"> </span><span class="n">deviceReq</span><span class="p">);</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kt">var</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">ConnectDeviceAsync</span><span class="p">(</span><span class="n">busId</span><span class="p">,</span><span class="w"> </span><span class="n">deviceResp</span><span class="p">.</span><span class="n">DevId</span><span class="p">);</span>
 </code></pre></div>
@@ -2307,10 +2307,10 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="kt">byte</span><span class="w"> </span><span class="n">leds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
 <a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&quot;LEDs: &quot;</span><span class="w"> </span><span class="o">+</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">        </span><span class="s">$&quot;Num={(leds &amp; (byte)LED.NumLock) != 0} &quot;</span><span class="w"> </span><span class="o">+</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">        </span><span class="s">$&quot;Caps={(leds &amp; (byte)LED.CapsLock) != 0} &quot;</span><span class="w"> </span><span class="o">+</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">        </span><span class="s">$&quot;Scroll={(leds &amp; (byte)LED.ScrollLock) != 0}&quot;</span><span class="p">);</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"LEDs: "</span><span class="w"> </span><span class="o">+</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">        </span><span class="s">$"Num={(leds &amp; (byte)LED.NumLock) != 0} "</span><span class="w"> </span><span class="o">+</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">        </span><span class="s">$"Caps={(leds &amp; (byte)LED.CapsLock) != 0} "</span><span class="w"> </span><span class="o">+</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">        </span><span class="s">$"Scroll={(leds &amp; (byte)LED.ScrollLock) != 0}"</span><span class="p">);</span>
 <a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="p">};</span>
 </code></pre></div>
 <p>For Xbox360 rumble:</p>
@@ -2321,7 +2321,7 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="kt">byte</span><span class="w"> </span><span class="n">leftMotor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="kt">byte</span><span class="w"> </span><span class="n">rightMotor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&quot;Rumble: Left={leftMotor} Right={rightMotor}&quot;</span><span class="p">);</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"Rumble: Left={leftMotor} Right={rightMotor}"</span><span class="p">);</span>
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="p">};</span>
 </code></pre></div>
 <h3 id="closing-a-device">Closing a Device</h3>
@@ -2350,23 +2350,23 @@ The core VIIPER server remains under its original license.</p>
 <h3 id="helper-maps">Helper Maps</h3>
 <p>The client library generates useful lookup maps for working with keyboard input:</p>
 <p><strong>CharToKey Map</strong> - Convert ASCII characters to key codes:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">CharToKey</span><span class="p">.</span><span class="n">TryGetValue</span><span class="p">((</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;A&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">key</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">CharToKey</span><span class="p">.</span><span class="n">TryGetValue</span><span class="p">((</span><span class="kt">byte</span><span class="p">)</span><span class="sc">'A'</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="p">{</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&quot;&#39;A&#39; maps to {key}&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Key.A</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"'A' maps to {key}"</span><span class="p">);</span><span class="w">  </span><span class="c1">// Key.A</span>
 <a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>KeyName Map</strong> - Get human-readable key names:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">KeyName</span><span class="p">.</span><span class="n">TryGetValue</span><span class="p">((</span><span class="kt">byte</span><span class="p">)</span><span class="n">Key</span><span class="p">.</span><span class="n">F1</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">var</span><span class="w"> </span><span class="n">name</span><span class="p">))</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="p">{</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&quot;Key name: {name}&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// &quot;F1&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"Key name: {name}"</span><span class="p">);</span><span class="w">  </span><span class="c1">// "F1"</span>
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>ShiftChars Map</strong> - Check if a character requires shift:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">needsShift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ShiftChars</span><span class="p">.</span><span class="n">ContainsKey</span><span class="p">((</span><span class="kt">byte</span><span class="p">)</span><span class="sc">&#39;A&#39;</span><span class="p">);</span><span class="w">  </span><span class="c1">// true for uppercase</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">needsShift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ShiftChars</span><span class="p">.</span><span class="n">ContainsKey</span><span class="p">((</span><span class="kt">byte</span><span class="p">)</span><span class="sc">'A'</span><span class="p">);</span><span class="w">  </span><span class="c1">// true for uppercase</span>
 </code></pre></div>
 <h2 id="configuration-and-advanced-usage">Configuration and Advanced Usage</h2>
 <h3 id="custom-timeouts">Custom Timeouts</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kt">var</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ViiperClient</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3242</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kt">var</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ViiperClient</span><span class="p">(</span><span class="s">"localhost"</span><span class="p">,</span><span class="w"> </span><span class="mi">3242</span><span class="p">)</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="p">{</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="n">Timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">};</span>
@@ -2382,18 +2382,18 @@ The core VIIPER server remains under its original license.</p>
 <a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="p">}</span>
 <a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">OperationCanceledException</span><span class="p">)</span>
 <a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">{</span>
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&quot;Request timed out&quot;</span><span class="p">);</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Request timed out"</span><span class="p">);</span>
 <a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="error-handling">Error Handling</h3>
 <p>The server returns errors as JSON. The client throws exceptions:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">try</span>
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="p">{</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">BusCreateAsync</span><span class="p">(</span><span class="s">&quot;invalid-bus-id&quot;</span><span class="p">);</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">BusCreateAsync</span><span class="p">(</span><span class="s">"invalid-bus-id"</span><span class="p">);</span>
 <a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">}</span>
 <a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">ex</span><span class="p">)</span>
 <a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">{</span>
-<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&quot;Request failed: {ex.Message}&quot;</span><span class="p">);</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"Request failed: {ex.Message}"</span><span class="p">);</span>
 <a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="resource-management">Resource Management</h3>
@@ -2520,7 +2520,7 @@ The core VIIPER server remains under its original license.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

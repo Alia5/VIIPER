@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -2127,22 +2127,22 @@ To require authentication even for localhost connections, use <code>--api.requir
 <div class="tabbed-block">
 <p>Server:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">&quot;api&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">&quot;addr&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;:3242&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">&quot;device-handler-connect-timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5s&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">&quot;auto-attach-local-client&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">"api"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">"addr"</span><span class="p">:</span><span class="w"> </span><span class="s2">":3242"</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">"device-handler-connect-timeout"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5s"</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">"auto-attach-local-client"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">},</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="nt">&quot;usb&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nt">&quot;addr&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;:3241&quot;</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="nt">"usb"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nt">"addr"</span><span class="p">:</span><span class="w"> </span><span class="s2">":3241"</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">},</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nt">&quot;connection-timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;30s&quot;</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nt">"connection-timeout"</span><span class="p">:</span><span class="w"> </span><span class="s2">"30s"</span>
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">}</span>
 </code></pre></div>
 <p>Proxy:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">&quot;listen-addr&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;:3241&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nt">&quot;upstream-addr&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;127.0.0.1:3242&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nt">&quot;connection-timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;30s&quot;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">"listen-addr"</span><span class="p">:</span><span class="w"> </span><span class="s2">":3241"</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nt">"upstream-addr"</span><span class="p">:</span><span class="w"> </span><span class="s2">"127.0.0.1:3242"</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nt">"connection-timeout"</span><span class="p">:</span><span class="w"> </span><span class="s2">"30s"</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
 </code></pre></div>
 </div>
@@ -2169,10 +2169,10 @@ To require authentication even for localhost connections, use <code>--api.requir
 <a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
 <a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="na">User</span><span class="o">=</span><span class="s">viiper</span>
 <a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="na">Group</span><span class="o">=</span><span class="s">viiper</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="na">Environment</span><span class="o">=</span><span class="s">&quot;VIIPER_LOG_LEVEL=info&quot;</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="na">Environment</span><span class="o">=</span><span class="s">&quot;VIIPER_LOG_FILE=/var/log/viiper/viiper.log&quot;</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="na">Environment</span><span class="o">=</span><span class="s">&quot;VIIPER_USB_ADDR=:3241&quot;</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="na">Environment</span><span class="o">=</span><span class="s">&quot;VIIPER_API_ADDR=:3242&quot;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="na">Environment</span><span class="o">=</span><span class="s">"VIIPER_LOG_LEVEL=info"</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="na">Environment</span><span class="o">=</span><span class="s">"VIIPER_LOG_FILE=/var/log/viiper/viiper.log"</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="na">Environment</span><span class="o">=</span><span class="s">"VIIPER_USB_ADDR=:3241"</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="na">Environment</span><span class="o">=</span><span class="s">"VIIPER_API_ADDR=:3242"</span>
 <a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/local/bin/viiper server</span>
 <a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="na">Restart</span><span class="o">=</span><span class="s">on-failure</span>
 <a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="na">RestartSec</span><span class="o">=</span><span class="s">5s</span>
@@ -2251,7 +2251,7 @@ To require authentication even for localhost connections, use <code>--api.requir
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

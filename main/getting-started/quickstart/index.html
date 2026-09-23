@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -2135,15 +2135,15 @@ Choose the method that works best for you.</p>
 <p>For a minimal example, we'll be using TypeScript (as there are more Javascript devs than Insects on this planet), but you can checkout any of the examples provided in the <a href="../../api/overview.md">API Reference</a></p>
 <p>This minimal example creates a virtual Xbox 360 controller and sends an input state to press the "A" button, left bumper, half-press the left trigger, and push the left analog-stick to the right.  </p>
 <p>Error handling is omitted for brevity.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ViiperClient</span><span class="p">,</span><span class="w"> </span><span class="nx">ViiperDevice</span><span class="p">,</span><span class="w"> </span><span class="nx">Xbox360</span><span class="p">,</span><span class="w"> </span><span class="nx">Types</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;viiperclient&quot;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ViiperClient</span><span class="p">,</span><span class="w"> </span><span class="nx">ViiperDevice</span><span class="p">,</span><span class="w"> </span><span class="nx">Xbox360</span><span class="p">,</span><span class="w"> </span><span class="nx">Types</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"viiperclient"</span><span class="p">;</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Xbox360Input</span><span class="p">,</span><span class="w"> </span><span class="nx">Button</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Xbox360</span><span class="p">;</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ViiperClient</span><span class="p">(</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">3242</span><span class="p">);</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ViiperClient</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="w"> </span><span class="mf">3242</span><span class="p">);</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">bus_create_response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">buscreate</span><span class="p">();</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">device</span><span class="p">,</span><span class="w"> </span><span class="nx">response</span><span class="o">:</span><span class="w"> </span><span class="kt">addResp</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">addDeviceAndConnect</span><span class="p">(</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="nx">bus_create_response</span><span class="p">.</span><span class="nx">busId</span><span class="p">,</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;xbox360&quot;</span><span class="p">}</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">"xbox360"</span><span class="p">}</span>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">);</span>
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="nx">device</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">Xbox360Input</span><span class="p">({</span>
@@ -2166,15 +2166,15 @@ See: <a href="../../api/overview/">API Reference</a> for complete documentation.
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Create a bus</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/create\0&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Response: {&quot;busId&quot;:1}</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">"bus/create\0"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Response: {"busId":1}</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># Add a keyboard device</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;bus/1/add {&quot;type&quot;:&quot;keyboard&quot;}\0&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Response: {&quot;busId&quot;:1,&quot;devId&quot;:&quot;1&quot;,&quot;vid&quot;:&quot;0x2e8a&quot;,&quot;pid&quot;:&quot;0x0010&quot;,&quot;type&quot;:&quot;keyboard&quot;}</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'bus/1/add {"type":"keyboard"}\0'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Response: {"busId":1,"devId":"1","vid":"0x2e8a","pid":"0x0010","type":"keyboard"}</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># List devices on the bus</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;bus/1/list\0&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">"bus/1/list\0"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>localhost<span class="w"> </span><span class="m">3242</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Protocol Details</p>
@@ -2187,10 +2187,10 @@ See: <a href="../../api/overview/">API Reference</a> for complete documentation.
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">.</span> <span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">viiper-api</span><span class="p">.</span><span class="n">ps1</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c"># Create a bus</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nb">Invoke-ViiperAPI</span> <span class="s2">&quot;bus/create&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nb">Invoke-ViiperAPI</span> <span class="s2">"bus/create"</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c"># Add a device</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nb">Invoke-ViiperAPI</span> <span class="s1">&#39;bus/1/add {&quot;type&quot;:&quot;keyboard&quot;}&#39;</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nb">Invoke-ViiperAPI</span> <span class="s1">'bus/1/add {"type":"keyboard"}'</span>
 </code></pre></div>
 </div>
 </div>
@@ -2212,12 +2212,12 @@ See: <a href="../../api/overview/">API Reference</a> for complete documentation.
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># List available devices</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>usbip<span class="w"> </span>list<span class="w"> </span>--remote<span class="o">=</span>localhost<span class="w"> </span>--tcp-port<span class="o">=</span><span class="m">3241</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Attach device (use busid from API response, e.g., &quot;1-1&quot;)</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Attach device (use busid from API response, e.g., "1-1")</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>sudo<span class="w"> </span>usbip<span class="w"> </span>attach<span class="w"> </span>--remote<span class="o">=</span>localhost<span class="w"> </span>--tcp-port<span class="o">=</span><span class="m">3241</span><span class="w"> </span>--busid<span class="o">=</span><span class="m">1</span>-1
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="c1"># Verify attachment</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>lsusb<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;Raspberry Pi&quot;</span><span class="w">  </span><span class="c1"># For keyboard/mouse</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>lsusb<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;Microsoft&quot;</span><span class="w">     </span><span class="c1"># For Xbox 360 controller</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>lsusb<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"Raspberry Pi"</span><span class="w">  </span><span class="c1"># For keyboard/mouse</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>lsusb<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"Microsoft"</span><span class="w">     </span><span class="c1"># For Xbox 360 controller</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -2355,7 +2355,7 @@ See: <a href="../../api/overview/">API Reference</a> for complete documentation.
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
