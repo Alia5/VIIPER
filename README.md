@@ -117,7 +117,7 @@ See the [API documentation](./docs/api) for details
 
 ### 🧰 Prerequisites
 
-- [Go](https://go.dev/) 1.26 or newer
+- [Go](https://go.dev/) 1.27 or newer
 - USBIP installed
 - (Optional) [just](https://github.com/casey/just)
     - Windows: `winget install --id Casey.Just --exact`
@@ -191,7 +191,6 @@ Adding a new device type never requires touching kernel code.
 
 Yes! VIIPER's architecture is designed to be extensible.  
 Check the [xbox360 device implementation](./device/xbox360/) as a reference for creating new device types.  
-
 
 ### You mentioned proxying USBIP?
 
