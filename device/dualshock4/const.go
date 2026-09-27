@@ -28,6 +28,12 @@ const (
 )
 
 const (
+	UpdateFlagRumble   uint8 = 0x01
+	UpdateFlagLED      uint8 = 0x02
+	UpdateFlagLEDBlink uint8 = 0x04
+)
+
+const (
 	InputReportSize = 64
 )
 

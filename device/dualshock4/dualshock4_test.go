@@ -420,7 +420,7 @@ func TestFeedback(t *testing.T) {
 				FlashOn:     0x04,
 				FlashOff:    0x05,
 			},
-			outPacket: []byte{0x05, 0x03, 0x00, 0x00, 0x12, 0xFE, 0x01, 0x02, 0x03, 0x04, 0x05},
+			outPacket: []byte{0x05, 0x07, 0x00, 0x00, 0x12, 0xFE, 0x01, 0x02, 0x03, 0x04, 0x05},
 		},
 	}
 
@@ -471,7 +471,7 @@ func TestFeedback(t *testing.T) {
 			if !assert.NoError(t, usbipClient.Submit(imp.Conn, usbip.DirOut, 3, tc.outPacket, nil)) {
 				return
 			}
-			var buf [7]byte
+			var buf [8]byte
 			_ = stream.SetReadDeadline(time.Now().Add(750 * time.Millisecond))
 			_, err := io.ReadFull(stream, buf[:])
 			if !assert.NoError(t, err) {

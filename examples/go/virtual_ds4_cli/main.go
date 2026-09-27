@@ -102,7 +102,7 @@ func main() {
 	}()
 
 	feedbackCh, errCh := stream.StartReading(ctx, 10, func(r *bufio.Reader) (encoding.BinaryUnmarshaler, error) {
-		var b [7]byte
+		var b [8]byte
 		if _, err := io.ReadFull(r, b[:]); err != nil {
 			return nil, err
 		}
@@ -118,8 +118,8 @@ func main() {
 			select {
 			case feedback := <-feedbackCh:
 				f := feedback.(*dualshock4.OutputState)
-				fmt.Printf("[Output] Rumble: S=%d L=%d, LED: R=%d G=%d B=%d, Flash: On=%d Off=%d\n",
-					f.RumbleSmall, f.RumbleLarge, f.LedRed, f.LedGreen, f.LedBlue, f.FlashOn, f.FlashOff)
+				fmt.Printf("[Output] Flags=0x%02X, Rumble: S=%d L=%d, LED: R=%d G=%d B=%d, Flash: On=%d Off=%d\n",
+					f.UpdateFlags, f.RumbleSmall, f.RumbleLarge, f.LedRed, f.LedGreen, f.LedBlue, f.FlashOn, f.FlashOff)
 			case err := <-errCh:
 				if err != nil {
 					fmt.Printf("[Output read error] %v\n", err)

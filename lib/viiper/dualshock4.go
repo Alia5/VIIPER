@@ -223,7 +223,7 @@ func SetDS4DeviceState(handle C.DS4DeviceHandle, state C.DS4DeviceState) bool {
 
 // SetDS4OutputCallback sets a callback to be invoked when the host sends output (rumble/LED) commands to the device.
 // @param handle Handle to the DS4 device.
-// @param callback Callback receiving rumbleSmall, rumbleLarge, ledRed, ledGreen, ledBlue, flashOn, flashOff. Pass NULL to clear.
+// @param callback Callback receiving updateFlags, rumbleSmall, rumbleLarge, ledRed, ledGreen, ledBlue, flashOn, flashOff. Pass NULL to clear.
 //
 //export SetDS4OutputCallback
 func SetDS4OutputCallback(handle C.DS4DeviceHandle, cb C.DS4OutputCallback) bool {

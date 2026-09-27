@@ -64,14 +64,15 @@ device.OnOutput = async stream =>
 {
     var buf = new byte[Dualshock4.OutputSize];
     await stream.ReadAsync(buf, 0, buf.Length);
-    byte rumbleSmall = buf[0];
-    byte rumbleLarge = buf[1];
-    byte ledRed      = buf[2];
-    byte ledGreen    = buf[3];
-    byte ledBlue     = buf[4];
-    byte flashOn     = buf[5];
-    byte flashOff    = buf[6];
-    Console.WriteLine($"← Output: RumbleSmall={rumbleSmall}, RumbleLarge={rumbleLarge}, LED=#{ledRed:X2}{ledGreen:X2}{ledBlue:X2}, Flash={flashOn}/{flashOff}");
+    byte updateFlags = buf[0];
+    byte rumbleSmall = buf[1];
+    byte rumbleLarge = buf[2];
+    byte ledRed      = buf[3];
+    byte ledGreen    = buf[4];
+    byte ledBlue     = buf[5];
+    byte flashOn     = buf[6];
+    byte flashOff    = buf[7];
+    Console.WriteLine($"← Output: Flags=0x{updateFlags:X2}, RumbleSmall={rumbleSmall}, RumbleLarge={rumbleLarge}, LED=#{ledRed:X2}{ledGreen:X2}{ledBlue:X2}, Flash={flashOn}/{flashOff}");
 };
 
 // Handle disconnect

@@ -43,7 +43,11 @@ touchpad click, IMU (gyro + accelerometer), and touchpad finger coordinates.
 
     ### Feedback (Rumble & LED)
 
-    - 7-byte packets:
+    - 8-byte packets:
+        - UpdateFlags: uint8 (1 byte, bitfield of the valid fields)
+            - `UpdateFlagRumble`: 0x01
+            - `UpdateFlagLED`: 0x02
+            - `UpdateFlagLEDBlink`: 0x04
         - RumbleSmall: uint8, RumbleLarge: uint8 (2 bytes), 0-255 intensity values
         - LED Color: LedRed, LedGreen, LedBlue: uint8 each (3 bytes), 0-255 per channel
         - LED Flash: FlashOn, FlashOff: uint8 each (2 bytes), units of 2.5ms per value
@@ -167,6 +171,7 @@ touchpad click, IMU (gyro + accelerometer), and touchpad finger coordinates.
     ```c
     typedef void (*DS4OutputCallback)(
         DS4DeviceHandle handle,
+        uint8_t updateFlags,
         uint8_t rumbleSmall,
         uint8_t rumbleLarge,
         uint8_t ledRed,
