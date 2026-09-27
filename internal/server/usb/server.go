@@ -792,6 +792,7 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 		actualLen := uint32(len(respData))
 		if dir == usbip.DirOut {
 			actualLen = uint32(len(outPayload))
+			respData = nil
 		}
 		if err := writeRet(seq, actualLen, respData, ep == 0); err != nil {
 			return err
