@@ -2,5 +2,11 @@
     "go.toolsEnvVars": {
         "CGO_ENABLED": "1",
         "PATH": "${env:PATH};${workspaceFolder}/_testing/e2e/deps/SDL/build/Debug"
+    },
+    "cmake.sourceDirectory": "${workspaceFolder}/VIIPER/examples/cpp",
+    "python.useEnvironmentsExtension": false,
+    "files.exclude": {
+        "clients/**": true,
+        "examples/**": true,
     }
 }
