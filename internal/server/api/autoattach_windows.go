@@ -4,11 +4,11 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os/exec"
 	"strconv"
-	"strings"
 	"syscall"
 	"unsafe"
 
@@ -50,28 +50,67 @@ var deviceGUID = windows.GUID{
 }
 
 const (
+	busIDSize   = 32
 	niMaxHost   = 1025
 	niMaxServ   = 32
 	niMaxSerial = 16
 )
 
-// PLUGIN_HARDWARE structure from usbip-win2
-type attachIOCTL_97 struct { // nolint
-	Size       uint32
-	PortOutput int32
-	BusID      [32]byte
-	Service    [niMaxServ]byte
-	Host       [niMaxHost]byte
+type deviceLocation struct {
+	BusID   [busIDSize]byte
+	Service [niMaxServ]byte
+	Host    [niMaxHost]byte
 }
-type attachIOCTL_98Plus struct { // nolint
-	Size       uint32
-	PortOutput int32
-	BusID      [32]byte
-	Service    [niMaxServ]byte
-	Host       [niMaxHost]byte
-	Serial     [niMaxSerial]byte
-	WskEvents  bool
-	_          [3]byte
+
+type importedDeviceLocation[Hash any] struct {
+	PortOutput   int32
+	LocationHash Hash
+	deviceLocation
+}
+
+type tail_978 struct { // nolint
+	Serial [niMaxSerial]byte
+}
+
+type tail_980 struct { // nolint
+	Serial    [niMaxSerial]byte
+	WskEvents bool
+}
+
+type connectHardware[Hash, Tail any] struct {
+	Size uint32
+	importedDeviceLocation[Hash]
+	Tail Tail
+}
+
+type attachIOCTL_977 = connectHardware[struct{}, struct{}] // nolint
+type attachIOCTL_978 = connectHardware[struct{}, tail_978] // nolint
+type attachIOCTL_980 = connectHardware[struct{}, tail_980] // nolint
+type attachIOCTL_981 = connectHardware[uint32, tail_980]   // nolint
+
+type attachIOCTL interface {
+	connectHardware(vhci windows.Handle, loc deviceLocation) (portOutput int32, bytesReturned uint32, err error)
+}
+
+func (r *connectHardware[Hash, Tail]) connectHardware(vhci windows.Handle, loc deviceLocation) (int32, uint32, error) {
+	size := unsafe.Sizeof(*r)
+	if unsafe.Sizeof(r.Tail) == 0 {
+		size = unsafe.Offsetof(r.Tail)
+	}
+	r.Size = uint32(size)
+	r.deviceLocation = loc
+	var bytesReturned uint32
+	err := windows.DeviceIoControl(
+		vhci,
+		ioctlPluginHardware,
+		(*byte)(unsafe.Pointer(r)),
+		r.Size,
+		(*byte)(unsafe.Pointer(r)),
+		r.Size,
+		&bytesReturned,
+		nil,
+	)
+	return r.PortOutput, bytesReturned, err
 }
 
 const (
@@ -111,21 +150,20 @@ func attachViaIOCTL(_ context.Context, deviceExportMeta *usbip.ExportMeta, usbip
 
 	logger.Debug("Found usbip-win2 device", "path", devicePath)
 
-	var ioctlData attachIOCTL_98Plus
-	ioctlData.Size = uint32(unsafe.Sizeof(ioctlData))
+	var loc deviceLocation
 
 	busID := fmt.Sprintf("%d-%d", deviceExportMeta.BusID, deviceExportMeta.DevID)
-	if len(busID) >= len(ioctlData.BusID) {
+	if len(busID) >= len(loc.BusID) {
 		return fmt.Errorf("argumentValidation: bus ID too long: %s", busID)
 	}
-	copy(ioctlData.BusID[:], busID)
+	copy(loc.BusID[:], busID)
 
 	service := fmt.Sprintf("%d", usbipServerPort)
-	if len(service) >= len(ioctlData.Service) {
+	if len(service) >= len(loc.Service) {
 		return fmt.Errorf("argumentValidation: service string too long: %s", service)
 	}
-	copy(ioctlData.Service[:], service)
-	copy(ioctlData.Host[:], "localhost")
+	copy(loc.Service[:], service)
+	copy(loc.Host[:], "localhost")
 
 	devicePathUTF16, err := windows.UTF16PtrFromString(devicePath)
 	if err != nil {
@@ -148,65 +186,34 @@ func attachViaIOCTL(_ context.Context, deviceExportMeta *usbip.ExportMeta, usbip
 
 	logger.Debug("Opened device handle")
 
+	var portOutput int32
 	var bytesReturned uint32
-	err = windows.DeviceIoControl(
-		handle,
-		ioctlPluginHardware,
-		(*byte)(unsafe.Pointer(&ioctlData)),
-		uint32(unsafe.Sizeof(ioctlData)),
-		(*byte)(unsafe.Pointer(&ioctlData)),
-		uint32(unsafe.Sizeof(ioctlData)),
-		&bytesReturned,
-		nil,
-	)
-	if err != nil {
-		if strings.Contains(err.Error(), "supplied user buffer is not valid") {
-			logger.Info("User is running older version of USBIP-Win2: Falling back", "error", err)
-
-			ioctlData97 := attachIOCTL_97{}
-			ioctlData97.Size = uint32(unsafe.Sizeof(ioctlData97))
-
-			busID := fmt.Sprintf("%d-%d", deviceExportMeta.BusID, deviceExportMeta.DevID)
-			if len(busID) >= len(ioctlData97.BusID) {
-				return fmt.Errorf("argumentValidation: bus ID too long: %s", busID)
-			}
-			copy(ioctlData97.BusID[:], busID)
-
-			service := fmt.Sprintf("%d", usbipServerPort)
-			if len(service) >= len(ioctlData97.Service) {
-				return fmt.Errorf("argumentValidation: service string too long: %s", service)
-			}
-			copy(ioctlData97.Service[:], service)
-			copy(ioctlData97.Host[:], "localhost")
-			err = windows.DeviceIoControl(
-				handle,
-				ioctlPluginHardware,
-				(*byte)(unsafe.Pointer(&ioctlData97)),
-				uint32(unsafe.Sizeof(ioctlData97)),
-				(*byte)(unsafe.Pointer(&ioctlData97)),
-				uint32(unsafe.Sizeof(ioctlData97)),
-				&bytesReturned,
-				nil,
-			)
-			if err != nil {
-				return fmt.Errorf("IOControl: DeviceIoControl failed with attachIOCTL_97: %w", err)
-			}
-			ioctlData.PortOutput = ioctlData97.PortOutput
-		} else {
-			return fmt.Errorf("IOControl: DeviceIoControl failed: %w", err)
+	for _, req := range []attachIOCTL{
+		&attachIOCTL_981{},
+		&attachIOCTL_980{},
+		&attachIOCTL_978{},
+		&attachIOCTL_977{},
+	} {
+		portOutput, bytesReturned, err = req.connectHardware(handle, loc)
+		if !errors.Is(err, windows.ERROR_INVALID_USER_BUFFER) {
+			break
 		}
+		logger.Info("User is running older version of USBIP-Win2: Falling back", "error", err)
+	}
+	if err != nil {
+		return fmt.Errorf("IOControl: DeviceIoControl failed: %w", err)
 	}
 
-	logger.Debug("IOCTL completed", "bytesReturned", bytesReturned, "portOutput", ioctlData.PortOutput)
+	logger.Debug("IOCTL completed", "bytesReturned", bytesReturned, "portOutput", portOutput)
 
-	if ioctlData.PortOutput <= 0 {
-		return fmt.Errorf("ResponseValidation: invalid USB port returned: %d", ioctlData.PortOutput)
+	if portOutput <= 0 {
+		return fmt.Errorf("ResponseValidation: invalid USB port returned: %d", portOutput)
 	}
 
 	logger.Info("Successfully attached device via IOCTL",
 		"busID", deviceExportMeta.BusID,
 		"deviceID", deviceExportMeta.DevID,
-		"usbPort", ioctlData.PortOutput)
+		"usbPort", portOutput)
 
 	return nil
 }
