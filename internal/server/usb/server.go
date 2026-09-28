@@ -594,6 +594,11 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 		return fmt.Errorf("no device context available from bus")
 	}
 
+	stopUnblockRead := context.AfterFunc(ctx, func() {
+		_ = conn.SetReadDeadline(time.Now())
+	})
+	defer stopUnblockRead()
+
 	var writeMu sync.Mutex
 	var retOut bytes.Buffer
 	retOut.Grow(retSubmitHeaderSize)
@@ -681,6 +686,9 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 
 		var hdr [urbHdrSize]byte
 		if err := usbip.ReadExactly(conn, hdr[:]); err != nil {
+			if ctx.Err() != nil {
+				continue
+			}
 			return fmt.Errorf("read URB header: %w", err)
 		}
 		cmd := binary.BigEndian.Uint32(hdr[urbHdrOffsetCommand : urbHdrOffsetCommand+4])
