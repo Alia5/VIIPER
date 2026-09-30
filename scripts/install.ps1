@@ -52,6 +52,22 @@ try {
         catch { return $null }
     }
 
+    function Get-USBipUdeSys {
+        param (
+            [Parameter(Mandatory=$true)]
+            [string]$Path
+        )
+        try {
+            $testPath = Join-Path $Path "usbip2_ude.sys"
+            Write-Host $testPath
+            if (Test-Path $testPath) {
+                return $testPath
+            }
+        }
+        catch { }
+        return $null
+    }
+
     $tempArchive = Join-Path $tempDir "release.zip"
     Invoke-WebRequest -Uri $downloadUrl -OutFile $tempArchive -ErrorAction Stop
 
@@ -117,11 +133,11 @@ try {
     $usbipInstalledVersion = $null
 
     $usbipEntry = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
-    Where-Object { $_.DisplayName -like 'USBip version*' } |
+    Where-Object { $_.DisplayName -like 'USBip *' } |
     Select-Object -First 1
     if (-not $usbipEntry) {
         $usbipEntry = Get-ItemProperty "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
-        Where-Object { $_.DisplayName -like 'USBip version*' } |
+        Where-Object { $_.DisplayName -like 'USBip *' } |
         Select-Object -First 1
     }
     if ($usbipEntry) {
@@ -129,10 +145,15 @@ try {
     }
 
     if (-not $usbipInstalledVersion) {
-        $driverPath = Join-Path $env:SystemRoot "System32\drivers\usbip2_ude.sys"
-        if (Test-Path $driverPath) {
-            try { $usbipInstalledVersion = [Version](Get-Item $driverPath).VersionInfo.FileVersion } catch { }
+        $testPath = Join-Path $env:SystemRoot "System32\drivers\"
+        $driverPath = Get-USBipUdeSys -Path $testPath
+        if (!$driverPath) {
+            $driverStorePath = Join-Path $env:SystemRoot "System32\DriverStore"
+            $searchPath = Get-ChildItem -Path "$driverStorePath" -Filter "usbip2_ude.inf_*" -Recurse -Directory -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+            $driverPath = Get-USBipUdeSys -Path $searchPath.FullName
         }
+        try { $usbipInstalledVersion = [Version](Get-Item $driverPath).VersionInfo.FileVersion } catch { }
     }
 
     $needsReboot = $false
