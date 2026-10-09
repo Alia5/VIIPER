@@ -5,14 +5,14 @@ go 1.27.2
 require (
 	fyne.io/systray v1.12.2
 	github.com/alecthomas/kong v1.16.1
-	github.com/alecthomas/kong-toml v0.4.0
+	github.com/alecthomas/kong-toml v0.4.1
 	github.com/alecthomas/kong-yaml v0.2.0
 	github.com/ncruces/zenity v0.10.15
 	github.com/pelletier/go-toml v1.9.5
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/crypto v0.57.0
 	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba
-	golang.org/x/sys v0.48.0
+	golang.org/x/sys v0.49.0
 	golang.org/x/term v0.46.0
 	gopkg.in/yaml.v3 v3.0.1
 )
