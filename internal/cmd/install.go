@@ -1,50 +1,45 @@
 package cmd
 
 import (
-	"errors"
-	"log/slog"
 	"os"
 	"path/filepath"
-	"strings"
+
+	"github.com/Alia5/VIIPER/internal/install"
+	"golang.org/x/term"
 )
 
-// Install sets up VIIPER to run automatically.
-type Install struct{}
+type Install struct {
+	Quiet      bool   `short:"q" help:"No TUI, defaults for every choice"`
+	InstallDir string `help:"Install directory"`
+}
 
-// Uninstall removes VIIPER startup configuration.
-type Uninstall struct{}
+type Uninstall struct {
+	Quiet bool `short:"q" help:"No TUI"`
+}
 
-func (c *Install) Run(logger *slog.Logger) error {
-	exe, err := os.Executable()
+func (c *Install) Run(t install.Target, banner string) error {
+	exe, err := install.DefaultExe()
 	if err != nil {
 		return err
 	}
-
-	if strings.Contains(exe, "go-build") {
-		return errors.New("cannot install from 'go run'")
+	if c.InstallDir != "" {
+		exe = filepath.Join(c.InstallDir, filepath.Base(exe))
 	}
+	t.Exe = exe
 
-	return install(logger)
+	return run(c.Quiet, t, false, banner)
 }
 
-func (c *Uninstall) Run(logger *slog.Logger) error {
-	exe, err := os.Executable()
-	if err != nil {
-		return err
-	}
+func (c *Uninstall) Run(t install.Target, banner string) error {
+	t.Exe = t.Source
 
-	if strings.Contains(exe, "go-build") {
-		return errors.New("cannot uninstall from 'go run'")
-	}
-
-	return uninstall(logger)
+	return run(c.Quiet, t, true, banner)
 }
 
-func currentExecutable() (string, error) {
-	exe, err := os.Executable()
-	if err != nil {
-		return "", err
+func run(quiet bool, t install.Target, uninstall bool, banner string) error {
+	if quiet || !term.IsTerminal(int(os.Stdout.Fd())) {
+		return install.Run(t, uninstall)
 	}
 
-	return filepath.Abs(exe)
+	return install.TUI(t, uninstall, banner)
 }

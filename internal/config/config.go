@@ -27,7 +27,8 @@ type CLI struct {
 	Log          `embed:"" prefix:"log."`
 	codegenCommand
 
-	Server cmd.Server `cmd:"" help:"Start the VIIPER USB-IP server" default:""`
+	TUI    cmd.TUI    `cmd:"" help:"Run an interactive TUI"`
+	Server cmd.Server `cmd:"" help:"Start the VIIPER USB-IP server"`
 	Proxy  cmd.Proxy  `cmd:"" help:"Start the VIIPER USB-IP proxy"`
 
 	Config    cmd.ConfigCommand `cmd:"" help:"Manage configuration files"`

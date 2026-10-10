@@ -26,7 +26,7 @@ licenses_template := "scripts/licenses.tpl"
 licenses_template_work := if os_family() == "windows" { join(env_var_or_default("TEMP", "."), "viiper-licenses.rendered.tpl") } else { "/tmp/viiper-licenses.rendered.tpl" }
 licenses_ignore := "github.com/Alia5/VIIPER,github.com/alecthomas/kong-yaml"
 licenses_dir := join(dist_dir, "libVIIPER")
-licenses_out := join(dist_dir, "licenses.txt")
+licenses_out := "internal/install/bundle/licenses.txt"
 lib_licenses_out := join(licenses_dir, "licenses.txt")
 
 ldflags_common := "-X main.Version=" + version + " -X main.Commit=" + commit + " -X main.Date=" + build_time + " -X github.com/Alia5/VIIPER/internal/codegen/common.Version=" + version
@@ -41,10 +41,10 @@ help:
 tidy:
 	go mod tidy
 
-test:
+test: licenses
 	go test -count=1 -v ./...
 
-test-coverage:
+test-coverage: licenses
 	go test -count=1 -v -coverpkg="./..." -coverprofile="coverage.txt" ./...
 
 [windows]
@@ -73,17 +73,15 @@ clean-versioninfo:
 
 [arg("type", pattern="Debug|Release")]
 [windows]
-build type=build_type: generate-versioninfo
+build type=build_type: generate-versioninfo licenses
 	{{ mkdir_p }} {{ dist_dir }}
 	$env:CGO_ENABLED='0'; go build {{ if type == "Release" { "-tags release" } else { "" } }} -trimpath -ldflags "{{ if type == "Release" { ldflags_release } else { ldflags_common } }}" -o {{ build_path }} {{ main_pkg }}
-	just licenses
 
 [arg("type", pattern="Debug|Release")]
 [unix]
-build type=build_type:
+build type=build_type: licenses
 	{{ mkdir_p }} {{ dist_dir }}
 	CGO_ENABLED=0 go build {{ if type == "Release" { "-tags release" } else { "" } }} -trimpath -ldflags "{{ if type == "Release" { ldflags_release } else { ldflags_common } }}" -o {{ build_path }} {{ main_pkg }}
-	just licenses
 
 [arg("type", pattern="Debug|Release")]
 [windows]
@@ -120,8 +118,9 @@ lint:
 
 [windows]
 licenses:
-	go install github.com/google/go-licenses/v2@latest  
-	{{ mkdir_p }} {{ dist_dir }}; $template = (Get-Content {{ licenses_template }} -Raw).Replace('VERSION_PLACEHOLDER', '{{ version }}'); [System.IO.File]::WriteAllText("{{ licenses_template_work }}", $template, [System.Text.UTF8Encoding]::new($false)); $env:GOOS = ''; $env:GOARCH = ''; {{ go_licenses_cmd }} report {{ main_pkg }} --ignore {{ licenses_ignore }} --template {{ licenses_template_work }} | Set-Content -Encoding utf8 {{ licenses_out }}; Remove-Item -Force {{ licenses_template_work }} -ErrorAction SilentlyContinue
+	if (-not (Test-Path {{ licenses_out }})) { New-Item -ItemType File -Force {{ licenses_out }} | Out-Null }
+	go install github.com/google/go-licenses/v2@latest
+	$template = (Get-Content {{ licenses_template }} -Raw).Replace('VERSION_PLACEHOLDER', '{{ version }}'); [System.IO.File]::WriteAllText("{{ licenses_template_work }}", $template, [System.Text.UTF8Encoding]::new($false)); $env:GOOS = ''; $env:GOARCH = ''; $report = ({{ go_licenses_cmd }} report {{ main_pkg }} --ignore {{ licenses_ignore }} --template {{ licenses_template_work }}) -join "`n"; [System.IO.File]::WriteAllText("{{ licenses_out }}", $report + "`n", [System.Text.UTF8Encoding]::new($false)); Remove-Item -Force {{ licenses_template_work }} -ErrorAction SilentlyContinue
 
 [windows]
 licenses-libVIIPER:
@@ -130,8 +129,9 @@ licenses-libVIIPER:
 
 [unix]
 licenses:
-	go install github.com/google/go-licenses/v2@latest  
-	{{ mkdir_p }} {{ dist_dir }} && sed "s/VERSION_PLACEHOLDER/{{ version }}/g" {{ licenses_template }} > {{ licenses_template_work }} && GOOS= GOARCH= {{ go_licenses_cmd }} report {{ main_pkg }} --ignore {{ licenses_ignore }} --template {{ licenses_template_work }} > {{ licenses_out }} && rm -f {{ licenses_template_work }}
+	mkdir -p {{ parent_directory(licenses_out) }} && touch {{ licenses_out }}
+	go install github.com/google/go-licenses/v2@latest
+	sed "s/VERSION_PLACEHOLDER/{{ version }}/g" {{ licenses_template }} > {{ licenses_template_work }} && GOOS= GOARCH= {{ go_licenses_cmd }} report {{ main_pkg }} --ignore {{ licenses_ignore }} --template {{ licenses_template_work }} > {{ licenses_out }} && rm -f {{ licenses_template_work }}
 
 [unix]
 licenses-libVIIPER:

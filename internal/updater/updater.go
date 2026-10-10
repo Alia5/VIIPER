@@ -26,13 +26,18 @@ const (
 )
 
 var (
-	client             = &http.Client{Timeout: 10 * time.Second}
+	client = &http.Client{
+		Timeout: 10 * time.Second,
+	}
 	remindLaterVersion string
 	versionRe          = regexp.MustCompile(`v(\d+)\.(\d+)\.(\d+)(?:-(\d+)-g[0-9a-f]+)?`)
 )
 
 type version struct {
-	Major, Minor, Patch, Commits int
+	Major   int
+	Minor   int
+	Patch   int
+	Commits int
 }
 
 func parseVersion(s string) (version, bool) {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/Alia5/VIIPER/internal/config"
 	"github.com/Alia5/VIIPER/internal/configpaths"
+	"github.com/Alia5/VIIPER/internal/install"
 	"github.com/Alia5/VIIPER/internal/log"
 	"github.com/Alia5/VIIPER/internal/updater"
 
@@ -55,6 +56,13 @@ func main() {
 
 	ctx.Bind(logger)
 	ctx.BindTo(rawLogger, (*log.RawLogger)(nil))
+	exe, err := os.Executable()
+	ctx.FatalIfErrorf(err)
+	ctx.Bind(install.Target{
+		Source:  exe,
+		Version: Version,
+	})
+	ctx.Bind(normalizeLineEndings(asciiBrailleColoredSmall))
 
 	if cli.UpdateNotify != config.UpdateNotifyNone {
 		go func() {

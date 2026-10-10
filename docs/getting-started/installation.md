@@ -2,7 +2,7 @@
 
 VIIPER comes in two distinct flavors:
 
-- **VIIPER Server** 
+- **VIIPER Server**
 A self-contained, portable, standalone executable providing a lightweight TCP-based API for feeder application development. All client libraries are MIT licensed.
 - **libVIIPER**  
  a single shared library that lets you emulate devices using USBIP directly from within your application. Requires your application to be GPL-3.0 licensed.
@@ -112,25 +112,116 @@ You must have a USBIP-Client implementation available on your system to use VIIP
     - Windows (x64, ARM64)
     - Linux (x64, ARM64)
 
-    ### Automated Install Script
+    ### Installer
 
-    The following scripts will download a VIIPER release, install it to a system location and configure it to start automatically on boot.
+    The VIIPER executable is its own installer.  
+    Run the release binary and you will be prompted to install VIIPER or run the sever portably. 
 
-    !!! info "For Application Developers"
-        The installation scripts are intended for **end-users** setting up a permanent VIIPER service on their system.
+    === "Windows"
 
-        If you are developing an application that uses VIIPER, I **strongly** encourage you to **not** install a permanent VIIPER service on your users' machines.
+        Double-click `viiper-windows-x64.exe` (or run it without arguments from a terminal) and choose **Install/Update VIIPER**, or run:
 
-        Instead, bundle the (no dependencies, portable) VIIPER binary with your application and start/stop the server directly from your application as needed.
-        You may need to check for existing VIIPER instances or use a custom port via `--api.addr` to avoid conflicts.
+        ```powershell
+        .\viiper-windows-x64.exe install
+        ```
 
-    !!! info "USBIP installed by scripts"
-        The install scripts install and configure USBIP for you:
+        - **Update to the latest release**: checks GitHub and installs the newest release instead of the binary you ran
+        - **Autostart**: starts the server when you log in
+        - **Start menu shortcut** / **Desktop shortcut**
+        - **Install USBIP**: downloads and runs the [usbip-win2](https://github.com/vadimgrn/usbip-win2) installer when it is missing or outdated (needs an elevated terminal; usbip-win2 asks for a reboot)
+        - **Start the server now**
 
-        - **Windows:** installs the usbip-win2 driver (admin prompt) and prompts for a reboot when drivers were added.
-        - **Linux:** installs USBIP via the distro package manager (when available), loads `vhci_hcd` and configures it to autoload.
+        Installs to `%LOCALAPPDATA%\VIIPER\viiper.exe` by default and registers VIIPER in **Apps & Features**, where it can be modified or uninstalled.
 
-        If the automated USBIP setup fails, follow the [USBIP guide](usbip.md) to finish manually.
+        Unattended install, for scripts and package managers (defaults for every choice, no output):
+
+        ```powershell
+        .\viiper-windows-x64.exe install --quiet
+        ```
+
+        Installs to: `%LOCALAPPDATA%\VIIPER\viiper.exe`
+
+        Uninstall from **Apps & Features** or with:
+
+        ```powershell
+        viiper.exe uninstall
+        ```
+
+    === "Linux"
+
+        ```bash
+        chmod +x viiper-linux-amd64
+        sudo ./viiper-linux-amd64 install
+        ```
+
+        - **Update to the latest release**: checks GitHub and installs the newest release instead of the binary you ran
+        - **Add systemd service** / **Enable service**
+        - **Install USBIP**: installs the distribution package (pacman, apt or dnf), loads `vhci_hcd` and configures it to autoload
+        - **Start the server now**
+
+        Installs to `/usr/local/bin/viiper` by default.
+
+        Unattended install (defaults for every choice, no output):
+
+        ```bash
+        sudo ./viiper-linux-amd64 install --quiet
+        ```
+
+        Uninstall with:
+
+        ```bash
+        sudo viiper uninstall
+        ```
+
+        #### Manual installation
+
+        For package maintainers, or if you prefer not to use the built-in installer.  
+        This is what the installer does:
+
+        1. Copy the binary and the bundled licenses:
+
+            ```bash
+            sudo install -m 755 viiper-linux-amd64 /usr/local/bin/viiper
+            sudo install -m 644 licenses.txt /usr/local/bin/licenses.txt
+            ```
+
+        2. Install USBIP and load `vhci_hcd` on boot (see [USBIP](#usbip) above):
+
+            ```bash
+            echo "vhci_hcd" | sudo tee /etc/modules-load.d/viiper.conf
+            sudo modprobe vhci_hcd
+            ```
+
+        3. Create `/etc/systemd/system/viiper.service`:
+
+            ```ini
+            [Unit]
+            Description=VIIPER server
+            After=network-online.target
+            Wants=network-online.target
+
+            [Service]
+            Type=simple
+            ExecStart="/usr/local/bin/viiper" server
+            WorkingDirectory=/usr/local/bin
+            Restart=on-failure
+
+            [Install]
+            WantedBy=multi-user.target
+            ```
+
+        4. Enable and start it:
+
+            ```bash
+            sudo systemctl daemon-reload
+            sudo systemctl enable --now viiper.service
+            ```
+
+        To remove: stop and disable the service, delete the unit file, `/etc/modules-load.d/viiper.conf`, the binary and `licenses.txt`.
+
+    ### One-line install
+
+    Downloads the release binary and runs `install --quiet`.
 
     === "Windows"
 
@@ -138,31 +229,11 @@ You must have a USBIP-Client implementation available on your system to use VIIP
         irm https://alia5.github.io/VIIPER/stable/install.ps1 | iex
         ```
 
-        Installs to: `%LOCALAPPDATA%\VIIPER\viiper.exe`
-
-        The scripts will:
-
-        1. Download the specified VIIPER binary version
-        2. Install it to the system location
-        3. Install and configure USBIP (driver on Windows; packages/modules on Linux)
-        4. Configure automatic startup (Registry RunKey on Windows, systemd service on Linux)
-        5. Start/restart the VIIPER service
-
     === "Linux"
 
         ```bash
         curl -fsSL https://alia5.github.io/VIIPER/stable/install.sh | sh
         ```
-
-        Installs to: `/usr/local/bin/viiper`
-
-        The scripts will:
-
-        1. Download the specified VIIPER binary version
-        2. Install it to the system location
-        3. Attempt to install and configure USBIP
-        4. Load the `vhci_hcd` kernel module and configure it to autoload on boot
-        5. Configure and run a systemd service
 
 === "libVIIPER"
 
@@ -193,6 +264,6 @@ You must have a USBIP-Client implementation available on your system to use VIIP
 
     !!! info "CGO Required"
         Building libVIIPER requires CGO (`CGO_ENABLED=1`) and a C compiler (GCC / MSVC / Clang) in `PATH`.
-        On Windows, [mingw-w64](https://www.mingw-w64.org/) or MSVC is required.
+        On Windows, [llvm-mingw](https://github.com/mstorsjo/llvm-mingw) is recommended.
 
     See [libVIIPER documentation](../libviiper/overview.md) for integration guides and examples.

@@ -4,10 +4,14 @@ VIIPER provides a command-line interface for running the USBIP server and proxy.
 
 ## Commands
 
+- `tui` - Open the interactive launcher (also opens when VIIPER is started without arguments from a terminal on Linux, or by double-click on Windows)
 - [`server`](server.md) - Start the VIIPER USBIP server
 - [`proxy`](proxy.md) - Start the VIIPER USBIP proxy
-- `install` - Configure VIIPER to start automatically on system boot (see [Installation](../getting-started/installation.md#system-startup-configuration))
-- `uninstall` - Remove VIIPER from system startup configuration
+- `config init` - Generate a configuration template for `server` or `proxy`
+- `install` - Install VIIPER: copies the binary, sets up autostart, shortcuts and USBIP  
+  `--quiet` for unattended use  
+  `--install-dir` to pick the directory (see [Installation](../getting-started/installation.md#installer))
+- `uninstall` - Remove everything `install` set up; `--quiet` for unattended use
 - [`codegen`](codegen.md) - Generate client libraries from source code annotations
 
 ## Global Options

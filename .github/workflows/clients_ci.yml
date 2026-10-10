@@ -43,6 +43,7 @@ jobs:
               shell: bash
               run: |
                   set -euo pipefail
+                  touch internal/install/bundle/licenses.txt
                   if [ -n "${{ inputs.version }}" ]; then
                     echo "Running codegen with injected version: ${{ inputs.version }}"
                     go run -ldflags "-X github.com/Alia5/VIIPER/internal/codegen/common.Version=${{ inputs.version }}" ./cmd/viiper codegen
