@@ -239,7 +239,7 @@ jobs:
                       <summary><b>Windows (PowerShell)</b></summary>
 
                       ```powershell
-                      irm https://alia5.github.io/VIIPER/stable/install.ps1 | iex
+                      winget install Alia5.VIIPER
                       ```
                       Installs / updates to `%LOCALAPPDATA%\VIIPER\viiper.exe`
                       </details>

@@ -3,7 +3,8 @@
 VIIPER comes in two distinct flavors:
 
 - **VIIPER Server**
-A self-contained, portable, standalone executable providing a lightweight TCP-based API for feeder application development. All client libraries are MIT licensed.
+A self-contained, portable, standalone executable providing a lightweight TCP-based API for feeder application development.  
+    All client libraries are MIT licensed.
 - **libVIIPER**  
  a single shared library that lets you emulate devices using USBIP directly from within your application. Requires your application to be GPL-3.0 licensed.
 
@@ -119,9 +120,16 @@ It is only listed here for informational purposes.
     The VIIPER executable is its own installer.  
     Run the release binary and you will be prompted to install VIIPER or run the sever portably. 
 
+
+    !!! tip "Windows: VIIPER is on winget"
+
+        ```powershell
+        winget install Alia5.VIIPER
+        ```
+
     === "Windows"
 
-        Double-click `viiper-windows-x64.exe` (or run it without arguments from a terminal) and choose **Install/Update VIIPER**, or run:
+        Double-click `viiper-windows-x64.exe` and choose **Install/Update VIIPER**, **or** run:
 
         ```powershell
         .\viiper-windows-x64.exe install
@@ -235,7 +243,7 @@ It is only listed here for informational purposes.
     === "Windows"
 
         ```powershell
-        irm https://alia5.github.io/VIIPER/stable/install.ps1 | iex
+        winget install Alia5.VIIPER
         ```
 
     === "Linux"

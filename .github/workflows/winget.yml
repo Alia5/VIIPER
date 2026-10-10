@@ -1,0 +1,46 @@
+name: Winget
+
+on:
+    release:
+        types: [published]
+
+permissions:
+    contents: read
+
+jobs:
+    submit:
+        name: Submit to winget
+        if: ${{ !github.event.release.prerelease }}
+        runs-on: windows-latest
+        environment: ReleaseEnv
+        defaults:
+            run:
+                shell: pwsh
+        env:
+            TAG: ${{ github.event.release.tag_name }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
+
+            - name: Fill in manifest templates
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
+              run: |
+                  $assets = (Invoke-RestMethod "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/$env:TAG" -Headers @{ Authorization = "Bearer $env:GITHUB_TOKEN" }).assets
+                  $version = $env:TAG.TrimStart("v")
+                  $amd64 = ($assets | Where-Object name -eq "viiper-windows-amd64.exe").digest.Replace("sha256:", "").ToUpper()
+                  $arm64 = ($assets | Where-Object name -eq "viiper-windows-arm64.exe").digest.Replace("sha256:", "").ToUpper()
+                  foreach ($manifest in Get-ChildItem .github/winget) {
+                    $filled = (Get-Content $manifest -Raw).Replace("{VERSION}", $version).Replace("{SHA256_AMD64}", $amd64).Replace("{SHA256_ARM64}", $arm64)
+                    Set-Content $manifest $filled -NoNewline
+                  }
+
+            - name: Submit manifest
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  WINGET_CREATE_GITHUB_TOKEN: ${{ secrets.WINGET_CREATE_GITHUB_TOKEN }}
+              run: |
+                  gh api repos/microsoft/winget-pkgs/contents/manifests/a/Alia5/VIIPER --silent
+                  $kind = $LASTEXITCODE -eq 0 ? "version" : "package"
+                  Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+                  .\wingetcreate.exe submit --no-open --prtitle "New ${kind}: Alia5.VIIPER version $($env:TAG.TrimStart('v'))" .github/winget
