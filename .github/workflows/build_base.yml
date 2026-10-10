@@ -25,7 +25,7 @@ jobs:
                   fetch-depth: 0
 
             - name: Set up Go
-              uses: actions/setup-go@v6.4.0
+              uses: actions/setup-go@v6
               with:
                   go-version: stable
                   cache: true
@@ -33,7 +33,7 @@ jobs:
                       go.sum
 
             - name: Setup just
-              uses: extractions/setup-just@v3
+              uses: extractions/setup-just@v4
 
             - name: Install goversioninfo (Windows)
               if: ${{ matrix.target.goos == 'windows' }}
@@ -48,7 +48,7 @@ jobs:
               run: just licenses
 
             - name: Lint
-              uses: golangci/golangci-lint-action@v9.2.0
+              uses: golangci/golangci-lint-action@v9
               with:
                   version: latest
                   install-mode: goinstall
@@ -102,7 +102,7 @@ jobs:
                   fetch-depth: 0
 
             - name: Set up Go
-              uses: actions/setup-go@v6.4.0
+              uses: actions/setup-go@v6
               with:
                   go-version: stable
                   cache: true
@@ -110,7 +110,7 @@ jobs:
                       go.sum
 
             - name: Setup just
-              uses: extractions/setup-just@v3
+              uses: extractions/setup-just@v4
 
             - name: Install goversioninfo
               shell: pwsh
@@ -179,7 +179,7 @@ jobs:
                   fetch-depth: 0
 
             - name: Set up Go
-              uses: actions/setup-go@v6.4.0
+              uses: actions/setup-go@v6
               with:
                   go-version: stable
                   cache: true
@@ -187,7 +187,7 @@ jobs:
                       go.sum
 
             - name: Setup just
-              uses: extractions/setup-just@v3
+              uses: extractions/setup-just@v4
 
             - name: Build
               run: |
@@ -215,7 +215,7 @@ jobs:
                   fetch-depth: 0
 
             - name: Set up Go
-              uses: actions/setup-go@v6.4.0
+              uses: actions/setup-go@v6
               with:
                   go-version: stable
                   cache: true
@@ -223,7 +223,7 @@ jobs:
                       go.sum
 
             - name: Setup just
-              uses: extractions/setup-just@v3
+              uses: extractions/setup-just@v4
 
             - name: Install build tools
               shell: pwsh
