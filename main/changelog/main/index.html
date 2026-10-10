@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#fixes" class="md-skip">
+        <a href="#new-features" class="md-skip">
           Skip to content
         </a>
       
@@ -1588,10 +1588,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#fixes" class="md-nav__link">
+  <a href="#new-features" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🐛 Fixes
+        ✨ New Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#miscellaneous" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Miscellaneous
       
     </span>
   </a>
@@ -1620,10 +1631,21 @@
 
   <h1>Main</h1>
 
-<p>Changes since v0.8.1:</p>
-<h3 id="fixes">🐛 Fixes</h3>
+<p>Changes since v0.8.2:</p>
+<h3 id="new-features">✨ New Features</h3>
 <ul>
-<li>Fix CPU spin on no-data IN URBs</li>
+<li>Overhaul install process
+      The installer is now an in-process TUI as opposed to an external script
+      To ease usage further, running VIIPER (without arguments) from any non interactive shell now presents a TUI with options to select commands by default.
+      For installation, simply run <code>./viiper install</code> from a cli for installation
+      <code>--quiet</code> can be supplied to <code>install</code> to run an unattended install.<ul>
+<li>(Windows) Fixes detection of installed USBIP-Drivers</li>
+</ul>
+</li>
+</ul>
+<h3 id="miscellaneous">🔧 Miscellaneous</h3>
+<ul>
+<li>Move package viipertypes -&gt; viiperclient</li>
 </ul>
 
 
