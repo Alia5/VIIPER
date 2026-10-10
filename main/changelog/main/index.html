@@ -1634,6 +1634,21 @@
 <p>Changes since v0.8.2:</p>
 <h3 id="new-features">✨ New Features</h3>
 <ul>
+<li>All binaries are now signed<ul>
+<li>Windows binaries use Authenticode<ul>
+<li><code>viiper-windows-amd64.exe</code>, <code>viiper-windows-arm64.exe</code>, <code>libVIIPER.dll</code></li>
+<li>To validate use the "Digital Signatures" tab in the Windows file properties</li>
+</ul>
+</li>
+<li>Linux binaries are signed headless<ul>
+<li>Detached CMS signature (<code>.p7</code>) over the SHA256 checksum file</li>
+<li><code>viiper-linux-&lt;arch&gt;.SHA256SUMS</code> + <code>viiper-linux-&lt;arch&gt;.SHA256SUMS.p7</code> as separate release assets</li>
+<li><code>SHA256SUMS</code> + <code>SHA256SUMS.p7</code> inside <code>libVIIPER-linux-amd64.zip</code></li>
+<li>To validate use <code>sha256sum -c</code> on the checksum file and <code>openssl cms -verify</code> on the <code>.p7</code></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>Overhaul install process
       The installer is now an in-process TUI as opposed to an external script
       To ease usage further, running VIIPER (without arguments) from any non interactive shell now presents a TUI with options to select commands by default.
@@ -1645,6 +1660,9 @@
 </ul>
 <h3 id="miscellaneous">🔧 Miscellaneous</h3>
 <ul>
+<li>Overhaul auto updater</li>
+<li>Remove main zip/tar packages from GitHub release page
+      See: c8df5716be739e6bcf4cdffd44f6f506275ea990</li>
 <li>Move package viipertypes -&gt; viiperclient</li>
 </ul>
 

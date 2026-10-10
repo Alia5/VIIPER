@@ -2128,6 +2128,12 @@ The <code>viiper</code> executable is completely self-contained (fully portable,
 - Connect to the existing VIIPER instance (if accessible)
 - Use a custom port via <code>--api.addr</code> flag to run a separate instance</p>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Disabling Auto-Update Notifications</p>
+<p>VIIPER comes with an inbuilt auto updater.<br />
+If you decide to ship VIIPER portably, as opposed to installing it system-wide, you might want to disable auto-update notifications to avoid unexpected prompts.  </p>
+<p>To disable auto-update notifications, use the <code>--update-notify=none</code> flag, set the <code>VIIPER_UPDATE_NOTIFY</code> environment variable to <code>none</code>, or configure this option in VIIPER's configuration file.</p>
+</div>
 <div class="admonition info">
 <p class="admonition-title">Linux Permissions</p>
 <p>On Linux, attaching devices via USBIP requires root permissions.
@@ -2222,6 +2228,9 @@ This is what the installer does:</p>
 </li>
 </ol>
 <p>To remove: stop and disable the service, delete the unit file, <code>/etc/modules-load.d/viiper.conf</code>, the binary and <code>licenses.txt</code>.</p>
+<p>To disable VIIPERs auto-update notifications, you can use the <code>--update-notify=none</code> flag 
+or set the <code>VIIPER_UPDATE_NOTIFY</code> environment variable to <code>none</code>
+or place this option in VIIPERs configuration file.</p>
 </div>
 </div>
 </div>
