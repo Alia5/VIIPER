@@ -1655,7 +1655,11 @@
 <li>Detached CMS signature (<code>.p7</code>) over the SHA256 checksum file</li>
 <li><code>viiper-linux-&lt;arch&gt;.SHA256SUMS</code> + <code>viiper-linux-&lt;arch&gt;.SHA256SUMS.p7</code> as separate release assets</li>
 <li><code>SHA256SUMS</code> + <code>SHA256SUMS.p7</code> inside <code>libVIIPER-linux-amd64.zip</code></li>
-<li>To validate use <code>sha256sum -c</code> on the checksum file and <code>openssl cms -verify</code> on the <code>.p7</code></li>
+<li>To validate:<ul>
+<li><code>sha256sum -c viiper-linux-&lt;arch&gt;.SHA256SUMS</code></li>
+<li><code>openssl cms -verify -binary -purpose any -inform DER -in viiper-linux-&lt;arch&gt;.SHA256SUMS.p7 -content viiper-linux-&lt;arch&gt;.SHA256SUMS</code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
