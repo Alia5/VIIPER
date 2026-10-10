@@ -127,45 +127,12 @@ jobs:
               run: |
                   just build Release
 
-            - name: Package (Linux)
-              if: ${{ matrix.target.goos == 'linux' }}
-              shell: bash
-              run: |
-                  set -euo pipefail
-                  rm -rf dist/package
-                  mkdir -p dist/package
-                  cp dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }} dist/package/viiper
-                  cp internal/install/bundle/licenses.txt dist/package/licenses.txt
-                  tar -czf dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}.tar.gz -C dist/package viiper licenses.txt
-
-            - name: Package (Windows)
-              if: ${{ matrix.target.goos == 'windows' }}
-              shell: pwsh
-              run: |
-                  Remove-Item -Recurse -Force dist/package -ErrorAction SilentlyContinue
-                  New-Item -ItemType Directory -Force -Path dist/package | Out-Null
-                  Copy-Item dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}${{ matrix.target.ext }} dist/package/viiper.exe -Force
-                  Copy-Item internal/install/bundle/licenses.txt dist/package/licenses.txt -Force
-                  Compress-Archive -Path dist/package/viiper.exe, dist/package/licenses.txt -DestinationPath dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}.zip -Force
-
-            - name: Upload artifact (Linux)
-              if: ${{ inputs.upload_artifacts && matrix.target.goos == 'linux' }}
+            - name: Upload artifact
+              if: ${{ inputs.upload_artifacts }}
               uses: actions/upload-artifact@v7
               with:
                   name: VIIPER-${{ matrix.target.goos }}-${{ matrix.target.goarch }}${{ inputs.artifact_suffix }}
-                  path: |
-                      dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}.tar.gz
-                      dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}
-                  if-no-files-found: error
-
-            - name: Upload artifact (Windows)
-              if: ${{ inputs.upload_artifacts && matrix.target.goos == 'windows' }}
-              uses: actions/upload-artifact@v7
-              with:
-                  name: VIIPER-${{ matrix.target.goos }}-${{ matrix.target.goarch }}${{ inputs.artifact_suffix }}
-                  path: |
-                      dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}.zip
-                      dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}${{ matrix.target.ext }}
+                  path: dist/viiper-${{ matrix.target.goos }}-${{ matrix.target.goarch }}${{ matrix.target.ext }}
                   if-no-files-found: error
 
     libviiper-linux:
