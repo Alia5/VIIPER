@@ -2306,7 +2306,7 @@ to avoid float serialization differences across client languages.</p>
 <p>Constants (see <code>/device/dualshock4/const.go</code>):</p>
 <ul>
 <li><code>GyroCountsPerDps = 16</code></li>
-<li><code>AccelCountsPerMS2 = 512</code></li>
+<li><code>AccelCountsPerMS2 = 835.07</code></li>
 </ul>
 <p>Gyro (degrees/second):</p>
 <div class="highlight"><pre><span></span><code>raw_gyro = round(gyro_dps * GyroCountsPerDps)
@@ -2319,10 +2319,10 @@ accel_ms2 = raw_accel / AccelCountsPerMS2
 <p>With the default scales:</p>
 <ul>
 <li>Gyro: resolution <code>0.0625 deg/s</code>, max approx <code>2048 deg/s</code></li>
-<li>Accelerometer: resolution approx <code>0.00195 m/s2</code>, max approx <code>64 m/s2</code></li>
+<li>Accelerometer: resolution approx <code>0.0012 m/s2</code>, max approx <code>39 m/s2</code></li>
 </ul>
 <p>On device creation, VIIPER initializes the accelerometer to a controller lying
-flat with gravity downwards (<code>AccelZ = -5023</code>, i.e. <code>round(-9.81 * 512)</code>).</p>
+flat with gravity downwards (<code>AccelZ = -8192</code>, i.e. <code>-1 g</code> at <code>8192 counts/g</code>).</p>
 <p>Helpers are in <code>/device/dualshock4/helpers.go</code>.</p>
 </div>
 <div class="tabbed-block">
