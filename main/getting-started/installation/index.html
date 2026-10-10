@@ -2068,19 +2068,13 @@ A self-contained, portable, standalone executable providing a lightweight TCP-ba
 <h3 id="usbip">USBIP</h3>
 <p>VIIPER relies on USBIP.
 You must have a USBIP-Client implementation available on your system to use VIIPER's virtual devices.</p>
+<p>VIIPERs installation will install the necessary USBIP components/driver for you.<br />
+It is only listed here for informational purposes.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Linux</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><a href="https://github.com/vadimgrn/usbip-win2">usbip-win2</a> is by far the most complete implementation of USBIP for Windows (comes with a <strong>SIGNED</strong> kernel mode driver).</p>
 <p><strong>Install and done 😉</strong></p>
-<div class="admonition warning">
-<p class="admonition-title">USBIP-Win2 security issue</p>
-<p>The releases of usbip-win2 <strong>currently</strong> (at the time of writing) install the publicly available test signing CA as a <em>trusted root CA</em> on your system.
-You can safely remove this CA after installation using <code>certmgr.msc</code> (run as admin) and removing the "USBIP" from the "Trusted Root Certification Authorities" -&gt; "Certificates" list.</p>
-<p><strong>Alternatively</strong>, you can download and install the <strong>latest pre-release</strong> driver manually from the
-<a href="https://github.com/OSSign/vadimgrn--usbip-win2/releases">OSSign repository</a>, which has this issue fixed already.
-<em>Note</em> that the installer does not work, only the driver <code>.cat,.inf,.sys</code> files.</p>
-</div>
 </div>
 <div class="tabbed-block">
 <h4 id="ubuntudebian">Ubuntu/Debian</h4>
