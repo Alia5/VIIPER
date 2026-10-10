@@ -26,6 +26,7 @@ All command-line flags have corresponding environment variables for easier deplo
 | `VIIPER_API_AUTO_ATTACH_LOCAL_CLIENT` | `--api.auto-attach-local-client` | `true` | Auto-attach exported devices to local usbip client |
 | `VIIPER_API_REQUIRE_LOCALHOST_AUTH` | `--api.require-localhost-auth` | `false` | Require authentication even for localhost connections |
 | `VIIPER_CONNECTION_TIMEOUT` | `--connection-timeout` | `30s` | Connection operation timeout |
+| `VIIPER_NO_TRAY` | `--no-tray` | `false` | Disable the tray icon (Windows) |
 
 ### Proxy Configuration
 

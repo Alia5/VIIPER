@@ -27,6 +27,7 @@ type Server struct {
 	USBServerConfig   usb.ServerConfig `embed:"" prefix:"usb."`
 	APIServerConfig   api.ServerConfig `embed:"" prefix:"api."`
 	ConnectionTimeout time.Duration    `help:"ConnectionTimeout operation timeout" default:"30s" env:"VIIPER_CONNECTION_TIMEOUT"`
+	NoTray            bool             `help:"Disable the tray icon" env:"VIIPER_NO_TRAY"`
 }
 
 // Run is called by Kong when the server command is executed.
@@ -39,7 +40,9 @@ func (s *Server) Run(logger *slog.Logger, rawLogger log.RawLogger, update tray.U
 func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger log.RawLogger, update tray.Update) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	tray.Run(ctx, cancel, update)
+	if !s.NoTray {
+		tray.Run(ctx, cancel, update)
+	}
 
 	s.USBServerConfig.ConnectionTimeout = s.ConnectionTimeout
 	s.APIServerConfig.ConnectionTimeout = s.ConnectionTimeout

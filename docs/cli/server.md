@@ -99,6 +99,13 @@ Connection operation timeout for both USBIP and API servers.
 **Default:** `30s`  
 **Environment Variable:** `VIIPER_CONNECTION_TIMEOUT`
 
+### `--no-tray`
+
+Disable the tray icon (Windows).
+
+**Default:** `false`  
+**Environment Variable:** `VIIPER_NO_TRAY`
+
 ## Examples
 
 ### Basic Server
