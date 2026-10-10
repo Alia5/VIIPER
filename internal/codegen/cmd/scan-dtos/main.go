@@ -16,8 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	viipertypesPkg := filepath.Join(projectRoot, "viipertypes")
-	schemas, err := scanner.ScanDTOsInPackage(viipertypesPkg)
+	schemas, err := scanner.ScanDTOs(filepath.Join(projectRoot, "viiperclient", "structs.go"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to scan DTOs: %v\n", err)
 		os.Exit(1)

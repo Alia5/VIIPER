@@ -6,10 +6,9 @@ import (
 )
 
 func TestScanDTOs(t *testing.T) {
-	// Scan the viipertypes package
-	schemas, err := ScanDTOsInPackage("../../..//viipertypes")
+	schemas, err := ScanDTOs("../../../viiperclient/structs.go")
 	if err != nil {
-		t.Fatalf("ScanDTOsInPackage failed: %v", err)
+		t.Fatalf("ScanDTOs failed: %v", err)
 	}
 
 	if len(schemas) == 0 {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"log/slog"
 	"net"
+	"strings"
 	"sync"
 	"time"
 
@@ -54,6 +55,9 @@ func (c *Client) OpenStream(ctx context.Context, busID uint32, devID string) (*D
 		r := bufio.NewReader(conn)
 		clientNonce, serverNonce, err := auth.HandleAuthHandshake(r, conn, key, true)
 		if err != nil {
+			if strings.Contains(err.Error(), "read handshake response: EOF") {
+				return nil, ErrUnauthorized("invalid password")
+			}
 			return nil, err
 		}
 		sessionKey := auth.DeriveSessionKey(key, serverNonce, clientNonce)

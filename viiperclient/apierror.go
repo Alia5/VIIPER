@@ -16,7 +16,7 @@ func ErrUnauthorized(detail string) APIError {
 	return APIError{Status: 401, Title: "Unauthorized", Detail: detail}
 }
 
-// WrapError normalizes any error into viipertypes.ApiError.
+// WrapError normalizes any error into APIError.
 func WrapError(err error) APIError {
 	if ae, ok := err.(*APIError); ok {
 		return *ae

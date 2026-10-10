@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// ScanHandlerReturnDTOs scans handler implementations to find the viipertypes.* struct
+// ScanHandlerReturnDTOs scans handler implementations to find the viiperclient.* struct
 // passed to json.Marshal, and returns a mapping of handler factory name (e.g., "BusList")
 // to DTO type name (e.g., "BusListResponse"). If no DTO is found, the handler is omitted.
 func ScanHandlerReturnDTOs(pkgPath string) (map[string]string, error) {
@@ -124,5 +124,5 @@ func detectDTOType(expr ast.Expr) string {
 }
 
 func isDTOPackageName(name string) bool {
-	return name == "viipertypes" || name == "apitypes"
+	return name == "viiperclient" || name == "viipertypes" || name == "apitypes"
 }

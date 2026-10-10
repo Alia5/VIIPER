@@ -14,7 +14,6 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/internal/server/usb"
 	"github.com/Alia5/VIIPER/viiperclient"
-	"github.com/Alia5/VIIPER/viipertypes"
 
 	_ "github.com/Alia5/VIIPER/internal/registry" // Register all device handlers
 
@@ -190,7 +189,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 	var c *viiperclient.Client
 
 	c = viiperclient.New("localhost:3245")
-	var busResp *viipertypes.BusCreateResponse
+	var busResp *viiperclient.BusCreateResponse
 	var err error
 	for range 10 {
 		busResp, err = c.BusCreate(1)

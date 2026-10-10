@@ -262,7 +262,7 @@ func blockReturnsError(block *ast.BlockStmt) bool {
 			if call, ok := res.(*ast.CallExpr); ok {
 				if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
 					if ident, ok := sel.X.(*ast.Ident); ok {
-						if (ident.Name == "api" || ident.Name == "apierror") && strings.HasPrefix(sel.Sel.Name, "Err") {
+						if (ident.Name == "api" || ident.Name == "apierror" || ident.Name == "viiperclient") && strings.HasPrefix(sel.Sel.Name, "Err") {
 							return true
 						}
 					}
@@ -399,7 +399,7 @@ func usesPayloadDirect(expr ast.Expr) bool {
 func extractTypeName(expr ast.Expr) string {
 	switch v := expr.(type) {
 	case *ast.SelectorExpr:
-		// e.g., viipertypes.DeviceCreateRequest
+		// e.g., viiperclient.DeviceCreateRequest
 		left := extractTypeName(v.X)
 		if left == "" {
 			return v.Sel.Name
