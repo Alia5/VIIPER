@@ -96,6 +96,13 @@ It is only listed here for informational purposes.
         - Connect to the existing VIIPER instance (if accessible)
         - Use a custom port via `--api.addr` flag to run a separate instance
 
+    !!! tip "Disabling Auto-Update Notifications"
+
+        VIIPER comes with an inbuilt auto updater.  
+        If you decide to ship VIIPER portably, as opposed to installing it system-wide, you might want to disable auto-update notifications to avoid unexpected prompts.  
+        
+        To disable auto-update notifications, use the `--update-notify=none` flag, set the `VIIPER_UPDATE_NOTIFY` environment variable to `none`, or configure this option in VIIPER's configuration file.
+
     !!! info "Linux Permissions"
         On Linux, attaching devices via USBIP requires root permissions.
         You can run VIIPER with `sudo`, or configure appropriate udev rules to allow non-root users to attach devices.
@@ -213,6 +220,10 @@ It is only listed here for informational purposes.
             ```
 
         To remove: stop and disable the service, delete the unit file, `/etc/modules-load.d/viiper.conf`, the binary and `licenses.txt`.
+
+        To disable VIIPERs auto-update notifications, you can use the `--update-notify=none` flag 
+        or set the `VIIPER_UPDATE_NOTIFY` environment variable to `none`
+        or place this option in VIIPERs configuration file.
 
     ### One-line install
 
