@@ -1,0 +1,116 @@
+name: Sign
+
+on:
+    workflow_call:
+        inputs:
+            artifact_suffix:
+                required: false
+                type: string
+                default: ""
+                description: "Suffix of the artifact names"
+        secrets:
+            SIGNSERVER_TOKEN:
+                required: true
+
+jobs:
+    sign:
+        name: Sign (${{ matrix.target.artifact }})
+        runs-on: ubuntu-latest
+        environment: ReleaseEnv
+        strategy:
+            matrix:
+                target:
+                    - {
+                          artifact: VIIPER-linux-amd64,
+                          goos: linux,
+                          binary: viiper-linux-amd64,
+                          archive: "",
+                      }
+                    - {
+                          artifact: VIIPER-linux-arm64,
+                          goos: linux,
+                          binary: viiper-linux-arm64,
+                          archive: "",
+                      }
+                    - {
+                          artifact: libVIIPER-linux-amd64,
+                          goos: linux,
+                          binary: libVIIPER.so,
+                          archive: libVIIPER-linux-amd64.zip,
+                      }
+                    - {
+                          artifact: VIIPER-windows-amd64,
+                          goos: windows,
+                          binary: viiper-windows-amd64.exe,
+                          archive: "",
+                      }
+                    - {
+                          artifact: VIIPER-windows-arm64,
+                          goos: windows,
+                          binary: viiper-windows-arm64.exe,
+                          archive: "",
+                      }
+                    - {
+                          artifact: libVIIPER-windows-amd64,
+                          goos: windows,
+                          binary: libVIIPER.dll,
+                          archive: libVIIPER-windows-amd64.zip,
+                      }
+        defaults:
+            run:
+                working-directory: artifact
+        env:
+            SIGNSERVER: https://signproxy.1-3-3-7.dev/api/v1/sign
+            BINARY: ${{ matrix.target.binary }}
+            ARCHIVE: ${{ matrix.target.archive }}
+        steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v8
+              with:
+                  name: ${{ matrix.target.artifact }}${{ inputs.artifact_suffix }}
+                  path: artifact
+
+            - name: Extract binary from archive
+              if: ${{ matrix.target.archive != '' }}
+              run: unzip "$ARCHIVE" "$BINARY"
+
+            - name: Sign Windows PE
+              if: ${{ matrix.target.goos == 'windows' }}
+              env:
+                  SIGNSERVER_TOKEN: ${{ secrets.SIGNSERVER_TOKEN }}
+              run: |
+                  curl --fail -H "Authorization: Bearer $SIGNSERVER_TOKEN" -F "files=@$BINARY" -o signed.zip "$SIGNSERVER/binary"
+                  unzip -o signed.zip "$BINARY"
+                  rm signed.zip
+
+            - name: Sign SHA256SUMS
+              if: ${{ matrix.target.goos == 'linux' }}
+              env:
+                  SIGNSERVER_TOKEN: ${{ secrets.SIGNSERVER_TOKEN }}
+              run: |
+                  sha256sum "$BINARY" > SHA256SUMS
+                  curl --fail -H "Authorization: Bearer $SIGNSERVER_TOKEN" -F "sha256sums=@SHA256SUMS" -o SHA256SUMS.p7 "$SIGNSERVER/sha256sums"
+
+            - name: Prefix SHA256SUMS with binary name
+              if: ${{ matrix.target.goos == 'linux' && matrix.target.archive == '' }}
+              run: |
+                  mv SHA256SUMS "$BINARY.SHA256SUMS"
+                  mv SHA256SUMS.p7 "$BINARY.SHA256SUMS.p7"
+
+            - name: Move signed binary into archive
+              if: ${{ matrix.target.goos == 'windows' && matrix.target.archive != '' }}
+              run: zip --move "$ARCHIVE" "$BINARY"
+
+            - name: Move SHA256SUMS into archive
+              if: ${{ matrix.target.goos == 'linux' && matrix.target.archive != '' }}
+              run: |
+                  zip --move "$ARCHIVE" SHA256SUMS SHA256SUMS.p7
+                  rm "$BINARY"
+
+            - name: Upload signed artifact
+              uses: actions/upload-artifact@v7
+              with:
+                  name: ${{ matrix.target.artifact }}${{ inputs.artifact_suffix }}
+                  path: artifact
+                  overwrite: true
+                  if-no-files-found: error
