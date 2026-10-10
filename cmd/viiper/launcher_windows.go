@@ -28,6 +28,7 @@ func commands() ([]command, error) {
 				return install.Kill(exe)
 			},
 		},
+		showHelp,
 		configInit,
 		proxy,
 		{

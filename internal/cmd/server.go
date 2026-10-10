@@ -30,16 +30,16 @@ type Server struct {
 }
 
 // Run is called by Kong when the server command is executed.
-func (s *Server) Run(logger *slog.Logger, rawLogger log.RawLogger) error {
+func (s *Server) Run(logger *slog.Logger, rawLogger log.RawLogger, update tray.Update) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	return s.StartServer(ctx, logger, rawLogger)
+	return s.StartServer(ctx, logger, rawLogger, update)
 }
 
-func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger log.RawLogger) error {
+func (s *Server) StartServer(ctx context.Context, logger *slog.Logger, rawLogger log.RawLogger, update tray.Update) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	tray.Run(ctx, cancel)
+	tray.Run(ctx, cancel, update)
 
 	s.USBServerConfig.ConnectionTimeout = s.ConnectionTimeout
 	s.APIServerConfig.ConnectionTimeout = s.ConnectionTimeout

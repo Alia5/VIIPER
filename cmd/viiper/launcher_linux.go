@@ -6,6 +6,7 @@ func commands() ([]command, error) {
 			label: "Run VIIPER",
 			args:  []string{"server"},
 		},
+		showHelp,
 		configInit,
 		proxy,
 		{

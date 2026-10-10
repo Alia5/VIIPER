@@ -13,6 +13,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/cmd"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/internal/server/usb"
+	"github.com/Alia5/VIIPER/internal/tray"
 	"github.com/Alia5/VIIPER/viiperclient"
 
 	_ "github.com/Alia5/VIIPER/internal/registry" // Register all device handlers
@@ -181,7 +182,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	go func() {
-		if err := s.StartServer(ctx, logger, nil); err != nil {
+		if err := s.StartServer(ctx, logger, nil, tray.Update{}); err != nil {
 			panic(err)
 		}
 	}()

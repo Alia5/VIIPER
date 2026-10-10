@@ -9,22 +9,31 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
-	latestReleaseURL = "https://api.github.com/repos/Alia5/VIIPER/releases/latest"
-	releaseAssetURL  = "https://github.com/Alia5/VIIPER/releases/download/%s/viiper-%s-%s%s"
+	GitHubAPI    = "https://api.github.com/repos/Alia5/VIIPER"
+	GitHubAssets = "https://github.com/Alia5/VIIPER/releases/download"
+	apiTimeout   = 10 * time.Second
 )
 
 type Target struct {
-	Source  string
-	Exe     string
-	Version string
-	Latest  string
+	Source    string
+	Exe       string
+	Version   string
+	Latest    string
+	API       string
+	Assets    string
+	TempDir   string
+	ConfigDir string
+	Launch    func(*exec.Cmd) error
 }
 
 type step struct {
@@ -35,10 +44,32 @@ type step struct {
 	err      error
 }
 
+type release struct {
+	TagName    string `json:"tag_name"`
+	Name       string `json:"name"`
+	Prerelease bool   `json:"prerelease"`
+}
+
 //go:embed bundle
 var bundle embed.FS
 
-var ErrGoRun = errors.New("cannot install from 'go run'")
+var (
+	ErrGoRun     = errors.New("cannot install from 'go run'")
+	ErrNoRelease = errors.New("no release found")
+
+	client = &http.Client{
+		Timeout: apiTimeout,
+	}
+	versionRe = regexp.MustCompile(`v?(\d+(?:\.\d+)*)(?:-(\d+)-g[0-9a-f]+)?`)
+)
+
+func (r release) version() string {
+	if r.Prerelease {
+		return r.Name
+	}
+
+	return r.TagName
+}
 
 func Run(t Target, uninstall bool) error {
 	if strings.Contains(t.Source, "go-build") {
@@ -67,52 +98,104 @@ func Run(t Target, uninstall bool) error {
 }
 
 func checkLatest(t *Target) error {
-	resp, err := http.Get(latestReleaseURL)
+	r, err := latest(*t, false)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close() //nolint:errcheck
-	var release struct {
-		TagName string `json:"tag_name"`
-	}
-	err = json.NewDecoder(resp.Body).Decode(&release)
-	if err != nil {
-		return err
-	}
-	t.Latest = release.TagName
+	t.Latest = r.TagName
 
 	return nil
 }
 
 func downloadLatest(t *Target) error {
-	if !isOlder(t.Version, t.Latest) {
+	if !ShouldUpdate(t.Version, t.Latest) {
 		return nil
 	}
-	download := filepath.Join(os.TempDir(), exeName)
-	err := downloadFile(fmt.Sprintf(releaseAssetURL, t.Latest, runtime.GOOS, runtime.GOARCH, filepath.Ext(exeName)), download)
+	exe, err := download(*t, t.Latest)
 	if err != nil {
 		return err
 	}
-	t.Source = download
+	t.Source = exe
 	t.Version = t.Latest
 
 	return nil
 }
 
-func isOlder(version, than string) bool {
+func latest(t Target, prerelease bool) (release, error) {
+	url := t.API + "/releases/latest"
+	if prerelease {
+		url = t.API + "/releases?per_page=1"
+	}
+	resp, err := client.Get(url)
+	if err != nil {
+		return release{}, err
+	}
+	defer resp.Body.Close() //nolint:errcheck
+	if resp.StatusCode != http.StatusOK {
+		return release{}, fmt.Errorf("%s: status %d", url, resp.StatusCode)
+	}
+	if !prerelease {
+		var r release
+		err = json.NewDecoder(resp.Body).Decode(&r)
+
+		return r, err
+	}
+	var releases []release
+	err = json.NewDecoder(resp.Body).Decode(&releases)
+	if err != nil {
+		return release{}, err
+	}
+	if len(releases) == 0 {
+		return release{}, ErrNoRelease
+	}
+
+	return releases[0], nil
+}
+
+func download(t Target, tag string) (string, error) {
+	exe := filepath.Join(t.TempDir, exeName)
+
+	return exe, downloadFile(fmt.Sprintf("%s/%s/viiper-%s-%s%s", t.Assets, tag, runtime.GOOS, runtime.GOARCH, filepath.Ext(exeName)), exe)
+}
+
+func parseVersion(s string) []int {
+	m := versionRe.FindStringSubmatch(s)
+	if m == nil {
+		return nil
+	}
+	var parts []int
+	for p := range strings.SplitSeq(m[1], ".") {
+		n, _ := strconv.Atoi(p)
+		parts = append(parts, n)
+	}
+	if m[2] != "" {
+		n, _ := strconv.Atoi(m[2])
+		parts = append(parts, n)
+	}
+
+	return parts
+}
+
+func ShouldUpdate(version, latest string) bool {
 	if version == "" {
 		return true
 	}
-	have := strings.Split(strings.TrimPrefix(version, "v"), ".")
-	need := strings.Split(strings.TrimPrefix(than, "v"), ".")
-	for i := range need {
-		h := 0
-		if i < len(have) {
-			h, _ = strconv.Atoi(have[i])
+	current := parseVersion(version)
+	if current == nil {
+		return false
+	}
+	available := parseVersion(latest)
+	for i := range max(len(current), len(available)) {
+		currentPart := 0
+		if i < len(current) {
+			currentPart = current[i]
 		}
-		n, _ := strconv.Atoi(need[i])
-		if h != n {
-			return h < n
+		availablePart := 0
+		if i < len(available) {
+			availablePart = available[i]
+		}
+		if currentPart != availablePart {
+			return currentPart < availablePart
 		}
 	}
 

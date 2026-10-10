@@ -24,7 +24,7 @@ const (
 	runValueKey = "VIIPER"
 )
 
-func Run(ctx context.Context, shutdown func()) {
+func Run(ctx context.Context, shutdown func(), update Update) {
 	go systray.Run(func() {
 		runtime.LockOSThread()
 
@@ -35,6 +35,9 @@ func Run(ctx context.Context, shutdown func()) {
 		infoStr := fmt.Sprintf("VIIPER - %s", version)
 		versionItem := systray.AddMenuItem(infoStr, infoStr)
 		versionItem.Disable()
+
+		updateAvailableItem := systray.AddMenuItem("", "")
+		updateAvailableItem.Hide()
 
 		systray.AddSeparator()
 
@@ -49,6 +52,16 @@ func Run(ctx context.Context, shutdown func()) {
 				select {
 				case <-ctx.Done():
 					return
+				case availableVersion := <-update.AvailableVersion:
+					title := fmt.Sprintf("⬆️ Update available: %s", availableVersion)
+					updateAvailableItem.SetTitle(title)
+					updateAvailableItem.SetTooltip(title)
+					updateAvailableItem.Show()
+				case <-updateAvailableItem.ClickedCh:
+					select {
+					case update.ShowDialog <- struct{}{}:
+					default:
+					}
 				case <-autoStartItem.ClickedCh:
 					if toggleAutoStart() {
 						autoStartItem.Check()

@@ -1,14 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"slices"
 
+	"github.com/Alia5/VIIPER/internal/config"
 	"github.com/Alia5/VIIPER/internal/tui"
 
 	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
+	"github.com/alecthomas/kong"
 )
 
 type field struct {
@@ -26,6 +29,10 @@ type command struct {
 }
 
 var (
+	showHelp = command{
+		label:  "Show help information",
+		before: printHelp,
+	}
 	configInit = command{
 		label: "Generate a config template",
 		args:  []string{"config", "init"},
@@ -44,6 +51,30 @@ var (
 		},
 	}
 )
+
+func printHelp() error {
+	parser, err := kong.New(
+		&config.CLI{},
+		kong.Name("VIIPER"),
+		kong.Description(Description()),
+		kong.Help(helpWithASCIIArt),
+	)
+	if err != nil {
+		return err
+	}
+	ctx, err := kong.Trace(parser, nil)
+	if err != nil {
+		return err
+	}
+	err = ctx.PrintUsage(false)
+	if err != nil {
+		return err
+	}
+	fmt.Print("\nPress Enter to return")
+	_, err = bufio.NewReader(os.Stdin).ReadString('\n')
+
+	return err
+}
 
 func textField(label, flag, value string) field {
 	input := textinput.New()
@@ -151,19 +182,22 @@ func launch() {
 
 		return tea.Batch(cmds...)
 	}
-	_, err = tea.NewProgram(ui).Run()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	if chosen == nil {
-		os.Exit(0)
-	}
-	if chosen.before != nil {
-		err = chosen.before()
+	for chosen == nil || len(chosen.args) == 0 {
+		chosen = nil
+		_, err = tea.NewProgram(ui).Run()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
+		}
+		if chosen == nil {
+			os.Exit(0)
+		}
+		if chosen.before != nil {
+			err = chosen.before()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
 		}
 	}
 	args := slices.Clone(chosen.args)

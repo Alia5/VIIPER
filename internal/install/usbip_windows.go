@@ -30,7 +30,7 @@ func installUsbip(*Target) error {
 	if err != nil && !errors.Is(err, registry.ErrNotExist) {
 		return err
 	}
-	if !isOlder(installed, usbipWin2Version) {
+	if !ShouldUpdate(installed, usbipWin2Version) {
 		return nil
 	}
 	if !windows.GetCurrentProcessToken().IsElevated() {

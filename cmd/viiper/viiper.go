@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/configpaths"
 	"github.com/Alia5/VIIPER/internal/install"
 	"github.com/Alia5/VIIPER/internal/log"
-	"github.com/Alia5/VIIPER/internal/updater"
+	"github.com/Alia5/VIIPER/internal/tray"
 
 	_ "github.com/Alia5/VIIPER/internal/registry" // Register all device handlers
 
@@ -58,18 +59,52 @@ func main() {
 	ctx.BindTo(rawLogger, (*log.RawLogger)(nil))
 	exe, err := os.Executable()
 	ctx.FatalIfErrorf(err)
-	ctx.Bind(install.Target{
-		Source:  exe,
-		Version: Version,
-	})
+	configDir, err := configpaths.DefaultConfigDir()
+	if err != nil {
+		logger.Warn("no config dir, skipped update versions are not remembered", "error", err)
+	}
+	target := install.Target{
+		Source:    exe,
+		Version:   Version,
+		API:       install.GitHubAPI,
+		Assets:    install.GitHubAssets,
+		TempDir:   os.TempDir(),
+		ConfigDir: configDir,
+		Launch:    (*exec.Cmd).Start,
+	}
+	ctx.Bind(target)
 	ctx.Bind(normalizeLineEndings(asciiBrailleColoredSmall))
+
+	update := tray.Update{
+		AvailableVersion: make(chan string, 1),
+		ShowDialog:       make(chan struct{}, 1),
+	}
+	ctx.Bind(update)
 
 	if cli.UpdateNotify != config.UpdateNotifyNone {
 		go func() {
-			time.Sleep(10 * time.Second)
-			updater.CheckUpdate(Version, cli.UpdateNotify)
-			for range time.NewTicker(1 * time.Hour).C {
-				updater.CheckUpdate(Version, cli.UpdateNotify)
+			nextCheck := time.After(10 * time.Second)
+			for {
+				select {
+				case <-nextCheck:
+				case <-update.ShowDialog:
+					install.ForgetUpdateChoice(&target)
+				}
+				availableVersion, err := install.CheckUpdate(
+					&target,
+					cli.UpdateNotify == config.UpdateNotifyPrerelease,
+					install.ShowUpdateMessage,
+				)
+				if err != nil {
+					logger.Error("update check failed", "error", err)
+				}
+				if availableVersion != "" {
+					select {
+					case update.AvailableVersion <- availableVersion:
+					default:
+					}
+				}
+				nextCheck = time.After(1 * time.Hour)
 			}
 		}()
 	}
