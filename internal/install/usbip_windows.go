@@ -20,7 +20,11 @@ const (
 
 var ErrNeedsAdmin = errors.New("installing the USBIP driver needs elevated (administrator) privileges")
 
-func installUsbip(*Target) error {
+func (rebootRequired) ExitCode() int {
+	return int(windows.ERROR_SUCCESS_REBOOT_REQUIRED)
+}
+
+func installUsbip(t *Target) error {
 	installed := ""
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE, usbipUninstallKey, registry.QUERY_VALUE|registry.WOW64_64KEY)
 	if err == nil {
@@ -33,9 +37,6 @@ func installUsbip(*Target) error {
 	if !ShouldUpdate(installed, usbipWin2Version) {
 		return nil
 	}
-	if !windows.GetCurrentProcessToken().IsElevated() {
-		return ErrNeedsAdmin
-	}
 	arch := runtime.GOARCH
 	if arch == "amd64" {
 		arch = "x64"
@@ -46,7 +47,23 @@ func installUsbip(*Target) error {
 		return err
 	}
 	defer os.Remove(installer) //nolint:errcheck
-	err = exec.Command(installer).Run()
+	var switches []string
+	if t.Quiet {
+		switches = []string{
+			"/VERYSILENT",
+			"/SUPPRESSMSGBOXES",
+			"/NORESTART",
+			fmt.Sprintf("/RESTARTEXITCODE=%d", windows.ERROR_SUCCESS_REBOOT_REQUIRED),
+		}
+	}
+	err = exec.Command(installer, switches...).Run()
+	var exit *exec.ExitError
+	if errors.As(err, &exit) && exit.ExitCode() == int(windows.ERROR_SUCCESS_REBOOT_REQUIRED) {
+		return ErrRebootRequired
+	}
+	if err != nil && !windows.GetCurrentProcessToken().IsElevated() {
+		return fmt.Errorf("%w: %w", ErrNeedsAdmin, err)
+	}
 	if err != nil {
 		return fmt.Errorf("usbip-win2 installer: %w", err)
 	}

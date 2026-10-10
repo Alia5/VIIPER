@@ -33,6 +33,8 @@ type Target struct {
 	Assets    string
 	TempDir   string
 	ConfigDir string
+	Quiet     bool
+	NoUpdate  bool
 	Launch    func(*exec.Cmd) error
 }
 
@@ -50,12 +52,15 @@ type release struct {
 	Prerelease bool   `json:"prerelease"`
 }
 
+type rebootRequired struct{}
+
 //go:embed bundle
 var bundle embed.FS
 
 var (
-	ErrGoRun     = errors.New("cannot install from 'go run'")
-	ErrNoRelease = errors.New("no release found")
+	ErrGoRun          = errors.New("cannot install from 'go run'")
+	ErrNoRelease      = errors.New("no release found")
+	ErrRebootRequired = rebootRequired{}
 
 	client = &http.Client{
 		Timeout: apiTimeout,
@@ -71,19 +76,35 @@ func (r release) version() string {
 	return r.TagName
 }
 
+func (rebootRequired) Error() string {
+	return "restart the system to finish installing USBIP"
+}
+
 func Run(t Target, uninstall bool) error {
 	if strings.Contains(t.Source, "go-build") {
 		return ErrGoRun
+	}
+	t.Quiet = true
+	if t.NoUpdate && runtime.GOOS == "linux" {
+		installSteps = append(installSteps[:1], installSteps[3:]...)
+	} else if t.NoUpdate {
+		installSteps = installSteps[2:]
 	}
 	steps := installSteps
 	if uninstall {
 		steps = uninstallSteps
 	}
+	var pendingReboot error
 	for _, step := range steps {
 		if step.optional && !step.enabled {
 			continue
 		}
 		err := step.run(&t)
+		if errors.Is(err, ErrRebootRequired) {
+			pendingReboot = err
+
+			continue
+		}
 		if err != nil && step.optional {
 			slog.Warn(step.label, "error", err)
 
@@ -94,7 +115,7 @@ func Run(t Target, uninstall bool) error {
 		}
 	}
 
-	return nil
+	return pendingReboot
 }
 
 func checkLatest(t *Target) error {

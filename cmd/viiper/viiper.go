@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -110,6 +111,11 @@ func main() {
 	}
 
 	err = ctx.Run()
+	var exitCoder kong.ExitCoder
+	if errors.As(err, &exitCoder) {
+		logger.Info(err.Error())
+		ctx.Exit(exitCoder.ExitCode())
+	}
 	ctx.FatalIfErrorf(err)
 }
 

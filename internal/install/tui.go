@@ -2,6 +2,7 @@ package install
 
 import (
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/Alia5/VIIPER/internal/tui"
@@ -25,6 +26,11 @@ type wizard struct {
 }
 
 func TUI(t Target, uninstall bool, banner string) error {
+	if t.NoUpdate && runtime.GOOS == "linux" {
+		installSteps = append(installSteps[:1], installSteps[3:]...)
+	} else if t.NoUpdate {
+		installSteps = installSteps[2:]
+	}
 	w := &wizard{
 		target:    t,
 		uninstall: uninstall,

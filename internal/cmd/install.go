@@ -11,6 +11,7 @@ import (
 type Install struct {
 	Quiet      bool   `short:"q" help:"No TUI, defaults for every choice"`
 	InstallDir string `help:"Install directory"`
+	NoUpdate   bool   `help:"Disable auto-update upon install"`
 }
 
 type Uninstall struct {
@@ -26,6 +27,7 @@ func (c *Install) Run(t install.Target, banner string) error {
 		exe = filepath.Join(c.InstallDir, filepath.Base(exe))
 	}
 	t.Exe = exe
+	t.NoUpdate = c.NoUpdate
 
 	return run(c.Quiet, t, false, banner)
 }

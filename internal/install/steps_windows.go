@@ -299,9 +299,17 @@ func Kill(exe string) error {
 		return err
 	}
 	for _, pid := range pids {
+		process, err := os.FindProcess(pid)
+		if err != nil {
+			return err
+		}
 		output, err := exec.Command("taskkill", "/PID", strconv.Itoa(pid), "/T", "/F").CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("taskkill pid %d failed: %w: %s", pid, err, strings.TrimSpace(string(output)))
+		}
+		_, err = process.Wait()
+		if err != nil {
+			return err
 		}
 		slog.Info("terminated running instance", "pid", pid)
 	}

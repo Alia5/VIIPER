@@ -130,7 +130,7 @@ It is only listed here for informational purposes.
         - **Update to the latest release**: checks GitHub and installs the newest release instead of the binary you ran
         - **Autostart**: starts the server when you log in
         - **Start menu shortcut** / **Desktop shortcut**
-        - **Install USBIP**: downloads and runs the [usbip-win2](https://github.com/vadimgrn/usbip-win2) installer when it is missing or outdated (needs an elevated terminal; usbip-win2 asks for a reboot)
+        - **Install USBIP**: downloads and runs the [usbip-win2](https://github.com/vadimgrn/usbip-win2) installer when it is missing or outdated (asks for administrator rights; usbip-win2 asks for a reboot)
         - **Start the server now**
 
         Installs to `%LOCALAPPDATA%\VIIPER\viiper.exe` by default and registers VIIPER in **Apps & Features**, where it can be modified or uninstalled.
@@ -142,6 +142,9 @@ It is only listed here for informational purposes.
         ```
 
         Installs to: `%LOCALAPPDATA%\VIIPER\viiper.exe`
+
+        - `--no-update` disables the auto-update upon install
+        - USBIP is installed without its wizard; a reboot may be required
 
         Uninstall from **Apps & Features** or with:
 
