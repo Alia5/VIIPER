@@ -104,7 +104,7 @@ touchpad click, IMU (gyro + accelerometer), and touchpad finger coordinates.
     Constants (see `/device/dualshock4/const.go`):
 
     - `GyroCountsPerDps = 16`
-    - `AccelCountsPerMS2 = 512`
+    - `AccelCountsPerMS2 = 835.07`
 
     Gyro (degrees/second):
 
@@ -119,10 +119,10 @@ touchpad click, IMU (gyro + accelerometer), and touchpad finger coordinates.
     With the default scales:
 
     - Gyro: resolution `0.0625 deg/s`, max approx `2048 deg/s`
-    - Accelerometer: resolution approx `0.00195 m/s2`, max approx `64 m/s2`
+    - Accelerometer: resolution approx `0.0012 m/s2`, max approx `39 m/s2`
 
     On device creation, VIIPER initializes the accelerometer to a controller lying
-    flat with gravity downwards (`AccelZ = -5023`, i.e. `round(-9.81 * 512)`).
+    flat with gravity downwards (`AccelZ = -8192`, i.e. `-1 g` at `8192 counts/g`).
 
     Helpers are in `/device/dualshock4/helpers.go`.
 
