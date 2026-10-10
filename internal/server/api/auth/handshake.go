@@ -9,9 +9,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-
-	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
-	"github.com/Alia5/VIIPER/viipertypes"
 )
 
 const (
@@ -96,7 +93,7 @@ func HandleAuthHandshake(r *bufio.Reader, w io.Writer, key []byte, isClient bool
 			raw := append(respPrefix, rest...)
 			line := strings.TrimSuffix(string(raw), "\n")
 
-			var apiErr viipertypes.APIError
+			var apiErr apierr
 			if err := json.Unmarshal([]byte(line), &apiErr); err == nil && (apiErr.Status != 0 || apiErr.Title != "") {
 				return nil, nil, &apiErr
 			}
@@ -130,7 +127,11 @@ func HandleAuthHandshake(r *bufio.Reader, w io.Writer, key []byte, isClient bool
 	_, _ = mac.Write(clientNonce)
 	expectedAuth := mac.Sum(nil)
 	if !hmac.Equal(clientAuth, expectedAuth) {
-		return nil, nil, apierror.ErrUnauthorized("invalid password")
+		return nil, nil, apierr{
+			Status: 401,
+			Title:  "Unauthorized",
+			Detail: "invalid password",
+		}
 	}
 
 	serverNonce, err = WriteServerHandshake(w)
@@ -139,4 +140,20 @@ func HandleAuthHandshake(r *bufio.Reader, w io.Writer, key []byte, isClient bool
 	}
 
 	return clientNonce, serverNonce, nil
+}
+
+type apierr struct {
+	Status int    `json:"status"`
+	Title  string `json:"title"`
+	Detail string `json:"detail"`
+}
+
+func (e apierr) Error() string {
+	if e.Status == 0 && e.Title == "" {
+		return "unknown error"
+	}
+	if e.Status == 0 {
+		return fmt.Sprintf("%s: %s", e.Title, e.Detail)
+	}
+	return fmt.Sprintf("%d %s: %s", e.Status, e.Title, e.Detail)
 }

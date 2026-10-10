@@ -21,7 +21,6 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/usb"
 	pusb "github.com/Alia5/VIIPER/usb"
 	"github.com/Alia5/VIIPER/viiperclient"
-	"github.com/Alia5/VIIPER/viipertypes"
 	"github.com/Alia5/VIIPER/virtualbus"
 
 	"github.com/stretchr/testify/assert"
@@ -39,7 +38,7 @@ func TestAddDeviceAndConnect(t *testing.T) {
 	tests := []struct {
 		name          string
 		setup         func(responses map[string]string) error
-		wantDevice    *viipertypes.Device
+		wantDevice    *viiperclient.Device
 		wantErrSubstr string
 	}{
 		{
@@ -48,7 +47,7 @@ func TestAddDeviceAndConnect(t *testing.T) {
 				responses["bus/{id}/add"] = `{"busId":42,"devId":"7","vid":"0x1234","pid":"0xabcd","type":"test"}`
 				return nil
 			},
-			wantDevice:    &viipertypes.Device{BusID: 42, DevID: "7", Vid: "0x1234", Pid: "0xabcd", Type: "test"},
+			wantDevice:    &viiperclient.Device{BusID: 42, DevID: "7", Vid: "0x1234", Pid: "0xabcd", Type: "test"},
 			wantErrSubstr: "not supported with mock transport",
 		},
 		{
@@ -201,7 +200,7 @@ func TestEncryptedStream(t *testing.T) {
 
 		clientNonce, serverNonce, err := auth.HandleAuthHandshake(r, conn, key, false)
 		if err != nil {
-			var apiErr viipertypes.APIError
+			var apiErr viiperclient.APIError
 			if errors.As(err, &apiErr) {
 				b, err := json.Marshal(apiErr)
 				if err != nil {

@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/Alia5/VIIPER/internal/server/api/auth"
-	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
+	"github.com/Alia5/VIIPER/viiperclient"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -245,7 +245,7 @@ func TestFullHandshake(t *testing.T) {
 			writer:      bytes.NewBuffer(nil),
 			key:         wrongKey,
 			isClient:    false,
-			expectedErr: apierror.ErrUnauthorized("invalid password"),
+			expectedErr: viiperclient.ErrUnauthorized("invalid password"),
 		},
 	}
 	for _, tc := range testCases {

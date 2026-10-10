@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/Alia5/VIIPER/viiperclient"
-	"github.com/Alia5/VIIPER/viipertypes"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -39,8 +38,8 @@ func TestHighLevelClient(t *testing.T) {
 			setup: func(responses map[string]string) error { responses["bus/create"] = `{"busId":42}`; return nil },
 			call:  func(c *viiperclient.Client) (any, error) { return c.BusCreate(42) },
 			assertFunc: func(t *testing.T, got any) {
-				_, ok := got.(*viipertypes.BusCreateResponse)
-				assert.True(t, ok, "expected *viipertypes.BusCreateResponse type")
+				_, ok := got.(*viiperclient.BusCreateResponse)
+				assert.True(t, ok, "expected *viiperclient.BusCreateResponse type")
 			},
 		},
 		{
@@ -78,7 +77,7 @@ func TestHighLevelClient(t *testing.T) {
 			setup: func(responses map[string]string) error { responses["bus/{id}/list"] = `{"devices":[]}`; return nil },
 			call:  func(c *viiperclient.Client) (any, error) { return c.DevicesList(1) },
 			assertFunc: func(t *testing.T, got any) {
-				resp := got.(*viipertypes.DevicesListResponse)
+				resp := got.(*viiperclient.DevicesListResponse)
 				assert.Len(t, resp.Devices, 0)
 			},
 		},

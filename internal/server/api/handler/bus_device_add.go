@@ -9,9 +9,8 @@ import (
 
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/internal/server/api"
-	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
 	usbs "github.com/Alia5/VIIPER/internal/server/usb"
-	"github.com/Alia5/VIIPER/viipertypes"
+	"github.com/Alia5/VIIPER/viiperclient"
 )
 
 // BusDeviceAdd returns a handler to add devices to a bus.
@@ -19,33 +18,33 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 	return func(req *api.Request, res *api.Response, logger *slog.Logger) error {
 		idStr, ok := req.Params["id"]
 		if !ok {
-			return apierror.ErrBadRequest("missing id parameter")
+			return viiperclient.ErrBadRequest("missing id parameter")
 		}
 		busID, err := strconv.ParseUint(idStr, 10, 32)
 		if err != nil {
-			return apierror.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
+			return viiperclient.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
 		}
 		b := s.GetBus(uint32(busID))
 		if b == nil {
-			return apierror.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
+			return viiperclient.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
 		}
 		if req.Payload == "" {
-			return apierror.ErrBadRequest("missing payload")
+			return viiperclient.ErrBadRequest("missing payload")
 		}
-		var deviceCreateReq viipertypes.DeviceCreateRequest
+		var deviceCreateReq viiperclient.DeviceCreateRequest
 		err = json.Unmarshal([]byte(req.Payload), &deviceCreateReq)
 		if err != nil {
-			return apierror.ErrBadRequest(fmt.Sprintf("invalid JSON payload: %v", err))
+			return viiperclient.ErrBadRequest(fmt.Sprintf("invalid JSON payload: %v", err))
 		}
 		if deviceCreateReq.Type == nil {
-			return apierror.ErrBadRequest("missing device type")
+			return viiperclient.ErrBadRequest("missing device type")
 		}
 
 		name := strings.ToLower(*deviceCreateReq.Type)
 
 		reg := api.GetRegistration(name)
 		if reg == nil {
-			return apierror.ErrBadRequest(fmt.Sprintf("unknown device type: %s", name))
+			return viiperclient.ErrBadRequest(fmt.Sprintf("unknown device type: %s", name))
 		}
 
 		opts := device.CreateOptions{
@@ -55,23 +54,23 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 		if deviceCreateReq.DeviceSpecific != nil {
 			b, err := json.Marshal(deviceCreateReq.DeviceSpecific)
 			if err != nil {
-				return apierror.ErrBadRequest(fmt.Sprintf("invalid deviceSpecific JSON: %v", err))
+				return viiperclient.ErrBadRequest(fmt.Sprintf("invalid deviceSpecific JSON: %v", err))
 			}
 			opts.DeviceSpecific = string(b)
 		}
 
 		dev, err := reg.CreateDevice(&opts)
 		if err != nil {
-			return apierror.ErrBadRequest(fmt.Sprintf("failed to create device: %v", err))
+			return viiperclient.ErrBadRequest(fmt.Sprintf("failed to create device: %v", err))
 		}
 		devCtx, err := b.Add(dev)
 		if err != nil {
-			return apierror.ErrInternal(fmt.Sprintf("failed to add device to bus: %v", err))
+			return viiperclient.ErrInternal(fmt.Sprintf("failed to add device to bus: %v", err))
 		}
 
 		exportMeta := device.GetDeviceMeta(devCtx)
 		if exportMeta == nil {
-			return apierror.ErrInternal("failed to get device metadata from context")
+			return viiperclient.ErrInternal("failed to get device metadata from context")
 		}
 
 		connTimer := device.GetConnTimer(devCtx)
@@ -103,13 +102,13 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 			)
 			if err != nil {
 				logger.Error("failed to auto-attach localhost client", "error", err)
-				return apierror.ErrConflict(fmt.Sprintf(
+				return viiperclient.ErrConflict(fmt.Sprintf(
 					"Failed to auto-attach device: %v", err,
 				))
 			}
 		}
 
-		payload, err := json.Marshal(viipertypes.Device{
+		payload, err := json.Marshal(viiperclient.Device{
 			BusID:          uint32(busID),
 			DevID:          fmt.Sprintf("%d", exportMeta.DevID),
 			Vid:            fmt.Sprintf("0x%04x", dev.GetDescriptor().Device.IDVendor),
@@ -118,7 +117,7 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 			DeviceSpecific: dev.GetDeviceSpecificArgs(),
 		})
 		if err != nil {
-			return apierror.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))
+			return viiperclient.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))
 		}
 
 		res.JSON = string(payload)

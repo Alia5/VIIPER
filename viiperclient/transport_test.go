@@ -12,7 +12,6 @@ import (
 
 	"github.com/Alia5/VIIPER/internal/server/api/auth"
 	"github.com/Alia5/VIIPER/viiperclient"
-	"github.com/Alia5/VIIPER/viipertypes"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -183,7 +182,7 @@ func TestEncryptedTransport(t *testing.T) {
 
 		clientNonce, serverNonce, err := auth.HandleAuthHandshake(r, conn, key, false)
 		if err != nil {
-			var apiErr viipertypes.APIError
+			var apiErr viiperclient.APIError
 			if errors.As(err, &apiErr) {
 				b, err := json.Marshal(apiErr)
 				if err != nil {

@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/Alia5/VIIPER/internal/server/api/auth"
-	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
 )
 
 // Config controls low-level transport behavior such as timeouts.
@@ -124,7 +123,7 @@ func (t *Transport) DoCtx(ctx context.Context, path string, payload any, pathPar
 		if err != nil {
 
 			if strings.Contains(err.Error(), "read handshake response: EOF") {
-				return "", apierror.ErrUnauthorized("invalid password")
+				return "", ErrUnauthorized("invalid password")
 			}
 			return "", err
 		}

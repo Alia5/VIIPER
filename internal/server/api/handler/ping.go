@@ -6,7 +6,7 @@ import (
 
 	"github.com/Alia5/VIIPER/internal/codegen/common"
 	"github.com/Alia5/VIIPER/internal/server/api"
-	"github.com/Alia5/VIIPER/viipertypes"
+	"github.com/Alia5/VIIPER/viiperclient"
 )
 
 // Ping returns a handler for the "ping" endpoint.
@@ -22,7 +22,7 @@ func Ping() api.HandlerFunc {
 			logger.Error("ping: invalid version format", "error", err, "version", ver)
 		}
 
-		payload := viipertypes.PingResponse{Server: "VIIPER", Version: ver}
+		payload := viiperclient.PingResponse{Server: "VIIPER", Version: ver}
 		b, err := json.Marshal(payload)
 		if err != nil {
 			return err

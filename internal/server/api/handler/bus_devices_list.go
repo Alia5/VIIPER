@@ -10,9 +10,8 @@ import (
 	"strings"
 
 	"github.com/Alia5/VIIPER/internal/server/api"
-	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
 	"github.com/Alia5/VIIPER/internal/server/usb"
-	"github.com/Alia5/VIIPER/viipertypes"
+	"github.com/Alia5/VIIPER/viiperclient"
 )
 
 // BusDevicesList returns a handler that lists devices on a bus.
@@ -20,21 +19,21 @@ func BusDevicesList(s *usb.Server) api.HandlerFunc {
 	return func(req *api.Request, res *api.Response, logger *slog.Logger) error {
 		idStr, ok := req.Params["id"]
 		if !ok {
-			return apierror.ErrBadRequest("missing id parameter")
+			return viiperclient.ErrBadRequest("missing id parameter")
 		}
 		busID, err := strconv.ParseUint(idStr, 10, 32)
 		if err != nil {
-			return apierror.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
+			return viiperclient.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err))
 		}
 		b := s.GetBus(uint32(busID))
 		if b == nil {
-			return apierror.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
+			return viiperclient.ErrNotFound(fmt.Sprintf("bus %d not found", busID))
 		}
 		metas := b.GetAllDeviceMetas()
-		out := make([]viipertypes.Device, 0, len(metas))
+		out := make([]viiperclient.Device, 0, len(metas))
 		for _, m := range metas {
 			dtype := inferDeviceType(m.Dev)
-			out = append(out, viipertypes.Device{
+			out = append(out, viiperclient.Device{
 				BusID:          m.Meta.BusID,
 				DevID:          fmt.Sprintf("%d", m.Meta.DevID),
 				Vid:            fmt.Sprintf("0x%04x", m.Dev.GetDescriptor().Device.IDVendor),
@@ -43,9 +42,9 @@ func BusDevicesList(s *usb.Server) api.HandlerFunc {
 				DeviceSpecific: m.Dev.GetDeviceSpecificArgs(),
 			})
 		}
-		payload, err := json.Marshal(viipertypes.DevicesListResponse{Devices: out})
+		payload, err := json.Marshal(viiperclient.DevicesListResponse{Devices: out})
 		if err != nil {
-			return apierror.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))
+			return viiperclient.ErrInternal(fmt.Sprintf("failed to marshal response: %v", err))
 		}
 		res.JSON = string(payload)
 		return nil

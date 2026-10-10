@@ -19,7 +19,6 @@ import (
 	"github.com/Alia5/VIIPER/internal/log"
 	_ "github.com/Alia5/VIIPER/internal/registry" // Register devices
 	"github.com/Alia5/VIIPER/internal/server/api"
-	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
 	"github.com/Alia5/VIIPER/internal/server/api/handler"
 	srvusb "github.com/Alia5/VIIPER/internal/server/usb"
 	pusb "github.com/Alia5/VIIPER/usb"
@@ -148,14 +147,14 @@ func TestAPIServer_WrappedConn(t *testing.T) {
 			requireLocalAuth: false,
 			serverPass:       "test123",
 			clientPass:       "wrongpass",
-			expectedErr:      apierror.ErrUnauthorized("invalid password"),
+			expectedErr:      viiperclient.ErrUnauthorized("invalid password"),
 		},
 		{
 			name:             "Auth Required",
 			requireLocalAuth: true,
 			serverPass:       "test123",
 			clientPass:       "",
-			expectedErr:      apierror.ErrUnauthorized("authentication required"),
+			expectedErr:      viiperclient.ErrUnauthorized("authentication required"),
 		},
 	}
 

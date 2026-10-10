@@ -1,4 +1,4 @@
-package viipertypes
+package viiperclient
 
 import (
 	"encoding/json"

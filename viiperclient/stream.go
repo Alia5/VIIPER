@@ -13,7 +13,6 @@ import (
 
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/internal/server/api/auth"
-	"github.com/Alia5/VIIPER/viipertypes"
 )
 
 // DeviceStream represents a bidirectional connection to a device stream.
@@ -81,7 +80,7 @@ func (c *Client) OpenStream(ctx context.Context, busID uint32, devID string) (*D
 
 // AddDeviceAndConnect creates a device on the specified bus and immediately connects to its stream.
 // This is a convenience wrapper that combines DeviceAdd + OpenStream in one call.
-func (c *Client) AddDeviceAndConnect(ctx context.Context, busID uint32, deviceType string, o *device.CreateOptions) (*DeviceStream, *viipertypes.Device, error) {
+func (c *Client) AddDeviceAndConnect(ctx context.Context, busID uint32, deviceType string, o *device.CreateOptions) (*DeviceStream, *Device, error) {
 	resp, err := c.DeviceAddCtx(ctx, busID, deviceType, o)
 	if err != nil {
 		return nil, nil, err

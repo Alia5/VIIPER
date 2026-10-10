@@ -15,10 +15,9 @@ import (
 
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/internal/server/api/auth"
-	apierror "github.com/Alia5/VIIPER/internal/server/api/error"
 	"github.com/Alia5/VIIPER/internal/server/usb"
 	pusb "github.com/Alia5/VIIPER/usb"
-	"github.com/Alia5/VIIPER/viipertypes"
+	"github.com/Alia5/VIIPER/viiperclient"
 )
 
 // Server implements a small TCP API for managing virtual bus topology.
@@ -105,7 +104,7 @@ func (s *Server) serve() {
 }
 
 func (s *Server) writeError(w io.Writer, err error) {
-	apiErr := apierror.WrapError(err)
+	apiErr := viiperclient.WrapError(err)
 	problemJSON, _ := json.Marshal(apiErr)
 	_, err = fmt.Fprintf(w, "%s\n", string(problemJSON))
 	if err != nil {
@@ -145,7 +144,7 @@ func (s *Server) handleConn(conn net.Conn) {
 
 	if !isAuth && s.requiresAuth(conn.RemoteAddr()) {
 		connLogger.Error("authentication required")
-		s.writeError(w, apierror.ErrUnauthorized("authentication required"))
+		s.writeError(w, viiperclient.ErrUnauthorized("authentication required"))
 		return
 	}
 
@@ -159,7 +158,7 @@ func (s *Server) handleConn(conn net.Conn) {
 
 		clientNonce, serverNonce, err := auth.HandleAuthHandshake(r, w, key, false)
 		if err != nil {
-			if apiErr, ok := errors.AsType[viipertypes.APIError](err); ok {
+			if apiErr, ok := errors.AsType[viiperclient.APIError](err); ok {
 				connLogger.Error("auth handshake failed", "error", apiErr)
 				s.writeError(w, apiErr)
 				return
@@ -198,7 +197,7 @@ func (s *Server) handleConn(conn net.Conn) {
 
 	if reqData == "" {
 		connLogger.Error("api empty command")
-		s.writeError(w, apierror.ErrBadRequest("empty request"))
+		s.writeError(w, viiperclient.ErrBadRequest("empty request"))
 		return
 	}
 
@@ -217,7 +216,7 @@ func (s *Server) handleConn(conn net.Conn) {
 
 	if path == "" {
 		connLogger.Error("api empty path")
-		s.writeError(w, apierror.ErrBadRequest("empty path"))
+		s.writeError(w, viiperclient.ErrBadRequest("empty path"))
 		return
 	}
 
@@ -239,23 +238,23 @@ func (s *Server) handleConn(conn net.Conn) {
 		connLogger.Info("api stream begin", "path", path)
 		busIDStr, ok := params["busId"]
 		if !ok {
-			s.writeError(w, apierror.ErrBadRequest("missing busId parameter"))
+			s.writeError(w, viiperclient.ErrBadRequest("missing busId parameter"))
 			return
 		}
 		devIDStr, ok := params["deviceid"]
 		if !ok {
-			s.writeError(w, apierror.ErrBadRequest("missing deviceid parameter"))
+			s.writeError(w, viiperclient.ErrBadRequest("missing deviceid parameter"))
 			return
 		}
 
 		busID, err := strconv.ParseUint(busIDStr, 10, 32)
 		if err != nil {
-			s.writeError(w, apierror.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err)))
+			s.writeError(w, viiperclient.ErrBadRequest(fmt.Sprintf("invalid busId: %v", err)))
 			return
 		}
 		bus := s.usbs.GetBus(uint32(busID))
 		if bus == nil {
-			s.writeError(w, apierror.ErrNotFound(fmt.Sprintf("bus %d not found", busID)))
+			s.writeError(w, viiperclient.ErrNotFound(fmt.Sprintf("bus %d not found", busID)))
 			return
 		}
 		var dev pusb.Device
@@ -269,7 +268,7 @@ func (s *Server) handleConn(conn net.Conn) {
 			}
 		}
 		if dev == nil || devCtx == nil {
-			s.writeError(w, apierror.ErrNotFound(fmt.Sprintf("device %s not found on bus %d", devIDStr, busID)))
+			s.writeError(w, viiperclient.ErrNotFound(fmt.Sprintf("device %s not found on bus %d", devIDStr, busID)))
 			return
 		}
 
@@ -311,7 +310,7 @@ func (s *Server) handleConn(conn net.Conn) {
 		return
 	}
 	connLogger.Error("api unknown path", "path", path)
-	s.writeError(w, apierror.ErrNotFound(fmt.Sprintf("unknown path: %s", path)))
+	s.writeError(w, viiperclient.ErrNotFound(fmt.Sprintf("unknown path: %s", path)))
 }
 
 func (s *Server) isLocalHostClient(addr net.Addr) bool {

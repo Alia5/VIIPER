@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/Alia5/VIIPER/device"
-	"github.com/Alia5/VIIPER/viipertypes"
 )
 
 // Client provides a high-level interface to the VIIPER API, handling request
@@ -34,73 +33,73 @@ func NewWithConfig(addr string, cfg *Config) *Client {
 func WithTransport(t *Transport) *Client { return &Client{transport: t} }
 
 // Ping returns the version and identity of the VIIPER server.
-func (c *Client) Ping() (*viipertypes.PingResponse, error) {
+func (c *Client) Ping() (*PingResponse, error) {
 	return c.PingCtx(context.Background())
 }
 
 // PingCtx is the context-aware version of Ping.
-func (c *Client) PingCtx(ctx context.Context) (*viipertypes.PingResponse, error) {
+func (c *Client) PingCtx(ctx context.Context) (*PingResponse, error) {
 	const path = "ping"
 	raw, err := c.transport.DoCtx(ctx, path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	return parse[viipertypes.PingResponse](raw)
+	return parse[PingResponse](raw)
 }
 
 // BusCreate creates a new virtual USB bus with the specified bus number.
 // Returns the created bus ID or an error if the bus number is already allocated.
-func (c *Client) BusCreate(busID uint32) (*viipertypes.BusCreateResponse, error) {
+func (c *Client) BusCreate(busID uint32) (*BusCreateResponse, error) {
 	return c.BusCreateCtx(context.Background(), busID)
 }
 
-func (c *Client) BusCreateCtx(ctx context.Context, busID uint32) (*viipertypes.BusCreateResponse, error) {
+func (c *Client) BusCreateCtx(ctx context.Context, busID uint32) (*BusCreateResponse, error) {
 	const path = "bus/create"
 	raw, err := c.transport.DoCtx(ctx, path, fmt.Sprintf("%d", busID), nil)
 	if err != nil {
 		return nil, err
 	}
-	return parse[viipertypes.BusCreateResponse](raw)
+	return parse[BusCreateResponse](raw)
 }
 
 // BusRemove removes an existing virtual USB bus and all devices attached to it.
 // Returns the removed bus ID or an error if the bus does not exist.
-func (c *Client) BusRemove(busID uint32) (*viipertypes.BusRemoveResponse, error) {
+func (c *Client) BusRemove(busID uint32) (*BusRemoveResponse, error) {
 	return c.BusRemoveCtx(context.Background(), busID)
 }
 
-func (c *Client) BusRemoveCtx(ctx context.Context, busID uint32) (*viipertypes.BusRemoveResponse, error) {
+func (c *Client) BusRemoveCtx(ctx context.Context, busID uint32) (*BusRemoveResponse, error) {
 	const path = "bus/remove"
 	raw, err := c.transport.DoCtx(ctx, path, fmt.Sprintf("%d", busID), nil)
 	if err != nil {
 		return nil, err
 	}
-	return parse[viipertypes.BusRemoveResponse](raw)
+	return parse[BusRemoveResponse](raw)
 }
 
 // BusList retrieves a list of all active virtual USB bus numbers.
-func (c *Client) BusList() (*viipertypes.BusListResponse, error) {
+func (c *Client) BusList() (*BusListResponse, error) {
 	return c.BusListCtx(context.Background())
 }
 
-func (c *Client) BusListCtx(ctx context.Context) (*viipertypes.BusListResponse, error) {
+func (c *Client) BusListCtx(ctx context.Context) (*BusListResponse, error) {
 	const path = "bus/list"
 	raw, err := c.transport.DoCtx(ctx, path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	return parse[viipertypes.BusListResponse](raw)
+	return parse[BusListResponse](raw)
 }
 
 // DeviceAdd adds a new device of the specified type to the given bus.
 // The devType parameter specifies the device type (e.g., "xbox360").
 // Returns the assigned bus ID (e.g., "1-1") or an error if the bus does not exist
 // or the device type is unknown.
-func (c *Client) DeviceAdd(busID uint32, devType string, o *device.CreateOptions) (*viipertypes.Device, error) {
+func (c *Client) DeviceAdd(busID uint32, devType string, o *device.CreateOptions) (*Device, error) {
 	return c.DeviceAddCtx(context.Background(), busID, devType, o)
 }
 
-func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string, o *device.CreateOptions) (*viipertypes.Device, error) {
+func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string, o *device.CreateOptions) (*Device, error) {
 	pathParams := map[string]string{"id": fmt.Sprintf("%d", busID)}
 	const path = "bus/{id}/add"
 
@@ -114,7 +113,7 @@ func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string,
 			return nil, fmt.Errorf("invalid CreateOptions.DeviceSpecific JSON: %w", err)
 		}
 	}
-	req := viipertypes.DeviceCreateRequest{
+	req := DeviceCreateRequest{
 		Type:           &devType,
 		IDVendor:       o.IDVendor,
 		IDProduct:      o.IDProduct,
@@ -128,48 +127,48 @@ func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string,
 	if err != nil {
 		return nil, err
 	}
-	return parse[viipertypes.Device](raw)
+	return parse[Device](raw)
 }
 
 // DeviceRemove removes a device from the specified bus by its device ID.
 // The devID parameter is the device number (e.g., "1") on the given bus.
 // Active USB-IP connections to the device will be closed.
 // Returns the removed device's bus and device ID or an error if not found.
-func (c *Client) DeviceRemove(busID uint32, devID string) (*viipertypes.DeviceRemoveResponse, error) {
+func (c *Client) DeviceRemove(busID uint32, devID string) (*DeviceRemoveResponse, error) {
 	return c.DeviceRemoveCtx(context.Background(), busID, devID)
 }
 
-func (c *Client) DeviceRemoveCtx(ctx context.Context, busID uint32, devID string) (*viipertypes.DeviceRemoveResponse, error) {
+func (c *Client) DeviceRemoveCtx(ctx context.Context, busID uint32, devID string) (*DeviceRemoveResponse, error) {
 	pathParams := map[string]string{"id": fmt.Sprintf("%d", busID)}
 	const path = "bus/{id}/remove"
 	raw, err := c.transport.DoCtx(ctx, path, devID, pathParams)
 	if err != nil {
 		return nil, err
 	}
-	return parse[viipertypes.DeviceRemoveResponse](raw)
+	return parse[DeviceRemoveResponse](raw)
 }
 
 // DevicesList retrieves a list of all devices attached to the specified bus.
 // Each device entry includes bus ID, device ID, VID, PID, and device type.
-func (c *Client) DevicesList(busID uint32) (*viipertypes.DevicesListResponse, error) {
+func (c *Client) DevicesList(busID uint32) (*DevicesListResponse, error) {
 	return c.DevicesListCtx(context.Background(), busID)
 }
 
-func (c *Client) DevicesListCtx(ctx context.Context, busID uint32) (*viipertypes.DevicesListResponse, error) {
+func (c *Client) DevicesListCtx(ctx context.Context, busID uint32) (*DevicesListResponse, error) {
 	pathParams := map[string]string{"id": fmt.Sprintf("%d", busID)}
 	const path = "bus/{id}/list"
 	raw, err := c.transport.DoCtx(ctx, path, nil, pathParams)
 	if err != nil {
 		return nil, err
 	}
-	return parse[viipertypes.DevicesListResponse](raw)
+	return parse[DevicesListResponse](raw)
 }
 
 func parse[T any](data string) (*T, error) {
 	if data == "" {
 		return nil, errors.New("empty response")
 	}
-	var problem viipertypes.APIError
+	var problem APIError
 	if err := json.Unmarshal([]byte(data), &problem); err == nil && (problem.Status != 0 || problem.Title != "") {
 		return nil, &problem
 	}
