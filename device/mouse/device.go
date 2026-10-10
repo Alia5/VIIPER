@@ -3,6 +3,7 @@ package mouse
 
 import (
 	"context"
+	"errors"
 	"sync/atomic"
 
 	"github.com/Alia5/VIIPER/device"
@@ -16,6 +17,7 @@ import (
 type Mouse struct {
 	tick       uint64
 	inputCh    chan InputState
+	buttons    atomic.Uint32
 	descriptor usb.Descriptor
 }
 
@@ -38,6 +40,7 @@ func New(o *device.CreateOptions) (*Mouse, error) {
 }
 
 func (m *Mouse) UpdateInputState(state InputState) {
+	m.buttons.Store(uint32(state.Buttons))
 	select {
 	case <-m.inputCh:
 	default:
@@ -52,6 +55,10 @@ func (m *Mouse) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out [
 			atomic.AddUint64(&m.tick, 1)
 			select {
 			case <-ctx.Done():
+				if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+					st := InputState{Buttons: uint8(m.buttons.Load())}
+					return st.BuildReport()
+				}
 				return nil
 			case st := <-m.inputCh:
 				if st.DX != 0 || st.DY != 0 || st.Wheel != 0 || st.Pan != 0 {
@@ -162,7 +169,7 @@ var defaultDescriptor = usb.Descriptor{
 					BEndpointAddress: 0x81,
 					BMAttributes:     0x03,   // Interrupt
 					WMaxPacketSize:   0x0010, // 16 bytes (9 needed)
-					BInterval:        0x05,   // 5 ms
+					BInterval:        0x02,
 				},
 			},
 		},

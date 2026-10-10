@@ -3,6 +3,7 @@ package keyboard
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"sync/atomic"
 
@@ -17,6 +18,7 @@ type Keyboard struct {
 	tick        uint64
 	inputCh     chan InputState
 	stateMu     sync.Mutex
+	inputState  InputState
 	ledState    uint8
 	ledCallback func(LEDState)
 	descriptor  usb.Descriptor
@@ -60,6 +62,9 @@ func (k *Keyboard) GetLEDState() LEDState {
 
 // UpdateInputState updates the device's current input state (thread-safe).
 func (k *Keyboard) UpdateInputState(state InputState) {
+	k.stateMu.Lock()
+	k.inputState = state
+	k.stateMu.Unlock()
 	select {
 	case <-k.inputCh:
 	default:
@@ -75,6 +80,12 @@ func (k *Keyboard) HandleTransfer(ctx context.Context, ep uint32, dir uint32, ou
 			atomic.AddUint64(&k.tick, 1)
 			select {
 			case <-ctx.Done():
+				if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+					k.stateMu.Lock()
+					st := k.inputState
+					k.stateMu.Unlock()
+					return st.BuildReport()
+				}
 				return nil
 			case st := <-k.inputCh:
 				return st.BuildReport()
@@ -197,13 +208,13 @@ var defaultDescriptor = usb.Descriptor{
 					BEndpointAddress: 0x81,
 					BMAttributes:     0x03, // Interrupt
 					WMaxPacketSize:   0x0040,
-					BInterval:        0x05, // 5 ms
+					BInterval:        0x02,
 				},
 				{
 					BEndpointAddress: 0x01,
 					BMAttributes:     0x03, // Interrupt
 					WMaxPacketSize:   0x0008,
-					BInterval:        0x05, // 5 ms
+					BInterval:        0x02,
 				},
 			},
 		},
