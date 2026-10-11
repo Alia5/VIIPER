@@ -75,11 +75,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#new-features" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -1581,47 +1576,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#new-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ✨ New Features
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fixes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🐛 Fixes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#miscellaneous" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🔧 Miscellaneous
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1642,51 +1596,8 @@
 
   <h1>Main</h1>
 
-<p>Changes since v0.8.2:</p>
-<h3 id="new-features">✨ New Features</h3>
-<ul>
-<li>Add <code>--no-tray</code> flag</li>
-<li>All binaries are now signed<ul>
-<li>Windows binaries use Authenticode<ul>
-<li><code>viiper-windows-amd64.exe</code>, <code>viiper-windows-arm64.exe</code>, <code>libVIIPER.dll</code></li>
-<li>To validate use the "Digital Signatures" tab in the Windows file properties</li>
-</ul>
-</li>
-<li>Linux binaries are signed headless<ul>
-<li>Detached CMS signature (<code>.p7</code>) over the SHA256 checksum file</li>
-<li><code>viiper-linux-&lt;arch&gt;.SHA256SUMS</code> + <code>viiper-linux-&lt;arch&gt;.SHA256SUMS.p7</code> as separate release assets</li>
-<li><code>SHA256SUMS</code> + <code>SHA256SUMS.p7</code> inside <code>libVIIPER-linux-amd64.zip</code></li>
-<li>To validate:<ul>
-<li><code>sha256sum -c viiper-linux-&lt;arch&gt;.SHA256SUMS</code></li>
-<li><code>openssl cms -verify -binary -purpose any -inform DER -in viiper-linux-&lt;arch&gt;.SHA256SUMS.p7 -content viiper-linux-&lt;arch&gt;.SHA256SUMS</code></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Overhaul install process
-      The installer is now an in-process TUI as opposed to an external script
-      To ease usage further, running VIIPER (without arguments) from any non interactive shell now presents a TUI with options to select commands by default.
-      For installation, simply run <code>./viiper install</code> from a cli for installation
-      <code>--quiet</code> can be supplied to <code>install</code> to run an unattended install.<ul>
-<li>(Windows) Fixes detection of installed USBIP-Drivers</li>
-</ul>
-</li>
-</ul>
-<h3 id="fixes">🐛 Fixes</h3>
-<ul>
-<li>Keyboard/Mouse: Fix occasionally stuck keys</li>
-<li>Fix DS4 Gyro consts</li>
-</ul>
-<h3 id="miscellaneous">🔧 Miscellaneous</h3>
-<ul>
-<li>Publish to WinGet</li>
-<li>Overhaul auto updater</li>
-<li>Remove main zip/tar packages from GitHub release page
-      See: c8df5716be739e6bcf4cdffd44f6f506275ea990</li>
-<li>Move package viipertypes -&gt; viiperclient</li>
-</ul>
+<p>Changes since v0.9.0:</p>
+<p>No changes yet.</p>
 
 
 
