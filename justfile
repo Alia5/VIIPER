@@ -29,7 +29,7 @@ licenses_dir := join(dist_dir, "libVIIPER")
 licenses_out := "internal/install/bundle/licenses.txt"
 lib_licenses_out := join(licenses_dir, "licenses.txt")
 
-ldflags_common := "-X main.Version=" + version + " -X main.Commit=" + commit + " -X main.Date=" + build_time + " -X github.com/Alia5/VIIPER/internal/codegen/common.Version=" + version
+ldflags_common := "-X github.com/Alia5/VIIPER/meta.Version=" + version + " -X github.com/Alia5/VIIPER/meta.Commit=" + commit + " -X github.com/Alia5/VIIPER/meta.Date=" + build_time + " -X github.com/Alia5/VIIPER/internal/codegen/common.Version=" + version
 ldflags_release := "-s -w " + ldflags_common
 
 default:
