@@ -1,53 +1,50 @@
 package install
 
 import (
-	"github.com/Alia5/VIIPER/internal/tui"
+	"github.com/Alia5/VIIPER/tui"
 
-	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
-	"charm.land/lipgloss/v2"
 )
 
-func (w *wizard) options() tui.Page {
-	rows := []tui.Row{
-		tui.Text("Directory", &w.dir),
+func (w *wizard) options() tea.Cmd {
+	elements := []tui.Element{
+		tui.NewText("Directory", w.flags["install-dir"].Help, &w.dir),
 	}
 	for i := range w.steps {
 		s := &w.steps[i]
-		if !s.optional {
-			continue
+		switch {
+		case s.option != "" && s.optional:
+			flag := w.flags[s.option]
+			elements = append(elements, tui.Checkbox{
+				Label:    s.label,
+				Checked:  flag.Target.Addr().Interface().(*bool),
+				HelpText: tui.HelpText(flag.Help),
+			})
+		case s.optional:
+			elements = append(elements, tui.Checkbox{
+				Label:    s.label,
+				Checked:  &s.enabled,
+				HelpText: tui.HelpText(s.help),
+			})
 		}
-		rows = append(rows, tui.Row{
-			Items: 1,
-			View: func(focus int) string {
-				mark := "[ ] "
-				if s.enabled {
-					mark = "[x] "
-				}
-
-				return lipgloss.NewStyle().Reverse(focus >= 0).Render(mark + s.label)
-			},
-			Key: func(msg tea.KeyPressMsg, _ int) (tea.Cmd, bool) {
-				if !key.Matches(msg, tui.KeyConfirm) {
-					return nil, false
-				}
-				s.enabled = !s.enabled
-
-				return nil, true
-			},
-		})
 	}
 
-	return tui.Page{
-		Title: "Select Destination Location and Additional Tasks",
-		Text:  "Where should VIIPER be installed, and which additional tasks should be performed?",
-		Hint:  "↑/↓ Tab: move   Space: toggle   ←/→: switch   Enter: confirm   Esc: quit",
-		Rows: append(rows, tui.Buttons(tui.Button{
-			Label: "Install",
-			Press: w.start,
-		}, tui.Button{
-			Label: "Cancel",
-			Press: tui.Quit,
-		})),
-	}
+	return tui.Show(tui.Page{
+		Title:    "Select Destination Location and Additional Tasks",
+		Text:     "Where should VIIPER be installed, and which additional tasks should be performed?",
+		Hint:     "↑/↓ Tab: move   Space: toggle   ←/→: switch   Enter: confirm   Esc: quit",
+		Elements: elements,
+		Buttons: []tui.Button{
+			{
+				Label:     "Install",
+				OnPressed: w.start,
+			},
+			{
+				Label: "Cancel",
+				OnPressed: func() tea.Cmd {
+					return tea.Quit
+				},
+			},
+		},
+	})
 }

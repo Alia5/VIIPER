@@ -2,6 +2,8 @@
 package config
 
 import (
+	"github.com/Alia5/VIIPER/cmd/install"
+	"github.com/Alia5/VIIPER/cmd/uninstall"
 	"github.com/Alia5/VIIPER/internal/cmd"
 )
 
@@ -31,7 +33,7 @@ type CLI struct {
 	Server cmd.Server `cmd:"" help:"Start the VIIPER USB-IP server"`
 	Proxy  cmd.Proxy  `cmd:"" help:"Start the VIIPER USB-IP proxy"`
 
-	Config    cmd.ConfigCommand `cmd:"" help:"Manage configuration files"`
-	Install   cmd.Install       `cmd:"" help:"Add the current VIIPER executable to system startup and runs it (creates a Systemd service on Linux)"`
-	Uninstall cmd.Uninstall     `cmd:"" help:"Remove any VIIPER system startup configuration / Systemd service"`
+	Config    cmd.ConfigCommand   `cmd:"" help:"Manage configuration files"`
+	Install   install.Installer   `cmd:"" help:"Add the current VIIPER executable to system startup and runs it (creates a Systemd service on Linux)"`
+	Uninstall uninstall.Uninstall `cmd:"" help:"Remove any VIIPER system startup configuration / Systemd service"`
 }

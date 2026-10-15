@@ -20,10 +20,6 @@ const (
 
 var ErrNeedsAdmin = errors.New("installing the USBIP driver needs elevated (administrator) privileges")
 
-func (rebootRequired) ExitCode() int {
-	return int(windows.ERROR_SUCCESS_REBOOT_REQUIRED)
-}
-
 func installUsbip(t *Target) error {
 	installed := ""
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE, usbipUninstallKey, registry.QUERY_VALUE|registry.WOW64_64KEY)

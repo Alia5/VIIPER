@@ -16,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/alecthomas/kong"
 )
 
 const (
@@ -23,6 +25,9 @@ const (
 	GitHubAssets = "https://github.com/Alia5/VIIPER/releases/download"
 	apiTimeout   = 10 * time.Second
 )
+
+//go:embed bundle
+var bundle embed.FS
 
 type Target struct {
 	Source    string
@@ -34,12 +39,13 @@ type Target struct {
 	TempDir   string
 	ConfigDir string
 	Quiet     bool
-	NoUpdate  bool
 	Launch    func(*exec.Cmd) error
 }
 
 type step struct {
 	label    string
+	help     string
+	option   string
 	optional bool
 	enabled  bool
 	run      func(*Target) error
@@ -52,15 +58,11 @@ type release struct {
 	Prerelease bool   `json:"prerelease"`
 }
 
-type rebootRequired struct{}
-
-//go:embed bundle
-var bundle embed.FS
-
 var (
 	ErrGoRun          = errors.New("cannot install from 'go run'")
 	ErrNoRelease      = errors.New("no release found")
-	ErrRebootRequired = rebootRequired{}
+	ErrRebootRequired = errors.New("restart the system to finish installing USBIP")
+	ErrCanceled       = errors.New("VIIPER setup canceled")
 
 	client = &http.Client{
 		Timeout: apiTimeout,
@@ -76,27 +78,26 @@ func (r release) version() string {
 	return r.TagName
 }
 
-func (rebootRequired) Error() string {
-	return "restart the system to finish installing USBIP"
+func (s step) shouldRun(flags map[string]*kong.Flag) bool {
+	if s.option != "" {
+		return flags[s.option].Target.Bool()
+	}
+
+	return !s.optional || s.enabled
 }
 
-func Run(t Target, uninstall bool) error {
+func Run(t Target, uninstall bool, flags map[string]*kong.Flag) error {
 	if strings.Contains(t.Source, "go-build") {
 		return ErrGoRun
 	}
 	t.Quiet = true
-	if t.NoUpdate && runtime.GOOS == "linux" {
-		installSteps = append(installSteps[:1], installSteps[3:]...)
-	} else if t.NoUpdate {
-		installSteps = installSteps[2:]
-	}
 	steps := installSteps
 	if uninstall {
 		steps = uninstallSteps
 	}
 	var pendingReboot error
 	for _, step := range steps {
-		if step.optional && !step.enabled {
+		if !step.shouldRun(flags) {
 			continue
 		}
 		err := step.run(&t)

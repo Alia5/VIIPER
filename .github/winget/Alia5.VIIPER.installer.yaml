@@ -10,6 +10,8 @@ InstallerSwitches:
 ExpectedReturnCodes:
 - InstallerReturnCode: 3010
   ReturnResponse: rebootRequiredToFinish
+- InstallerReturnCode: 1602
+  ReturnResponse: cancelledByUser
 Installers:
 - Architecture: x64
   InstallerUrl: https://github.com/Alia5/VIIPER/releases/download/v{VERSION}/viiper-windows-amd64.exe

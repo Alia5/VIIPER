@@ -16,6 +16,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/install"
 	"github.com/Alia5/VIIPER/internal/log"
 	"github.com/Alia5/VIIPER/internal/tray"
+	"github.com/Alia5/VIIPER/meta"
 
 	_ "github.com/Alia5/VIIPER/internal/registry" // Register all device handlers
 
@@ -34,7 +35,7 @@ func main() {
 	var cli config.CLI
 	ctx := kong.Parse(&cli,
 		kong.Name("VIIPER"),
-		kong.Description(Description()),
+		kong.Description(meta.Description()),
 		kong.UsageOnError(),
 		kong.Help(helpWithASCIIArt),
 		// Load configuration from JSON/YAML/TOML in priority order; flags/env override config values.
@@ -66,7 +67,7 @@ func main() {
 	}
 	target := install.Target{
 		Source:    exe,
-		Version:   Version,
+		Version:   meta.Version,
 		API:       install.GitHubAPI,
 		Assets:    install.GitHubAssets,
 		TempDir:   os.TempDir(),
@@ -74,7 +75,6 @@ func main() {
 		Launch:    (*exec.Cmd).Start,
 	}
 	ctx.Bind(target)
-	ctx.Bind(normalizeLineEndings(asciiBrailleColoredSmall))
 
 	update := tray.Update{
 		AvailableVersion: make(chan string, 1),
@@ -111,10 +111,13 @@ func main() {
 	}
 
 	err = ctx.Run()
-	var exitCoder kong.ExitCoder
-	if errors.As(err, &exitCoder) {
+	switch {
+	case errors.Is(err, install.ErrRebootRequired):
 		logger.Info(err.Error())
-		ctx.Exit(exitCoder.ExitCode())
+		ctx.Exit(install.ExitRebootRequired)
+	case errors.Is(err, install.ErrCanceled):
+		logger.Info(err.Error())
+		ctx.Exit(install.ExitCanceled)
 	}
 	ctx.FatalIfErrorf(err)
 }
@@ -169,9 +172,9 @@ func helpWithASCIIArt(options kong.HelpOptions, ctx *kong.Context) error {
 
 	helpText := captureHelpOutput(options, ctx)
 
-	art := asciiBrailleColoredSmall
+	art := meta.ASCIIBrailleColoredSmall
 	if helpStyle == "big" {
-		art = asciiBrailleColoredBig
+		art = meta.ASCIIBrailleColoredBig
 	}
 
 	output := mergeArtWithHelp(normalizeLineEndings(art), normalizeLineEndings(helpText))

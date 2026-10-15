@@ -14,6 +14,10 @@ const (
 	serviceName     = "viiper.service"
 	servicePath     = "/etc/systemd/system/viiper.service"
 	modulesConfPath = "/etc/modules-load.d/viiper.conf"
+	exitFailure     = 1
+	// No convention on Linux; both exit like any other failure.
+	ExitRebootRequired = exitFailure
+	ExitCanceled       = exitFailure
 )
 
 var (
@@ -25,13 +29,14 @@ var (
 			run:   requireRoot,
 		},
 		{
-			label: "Check for the latest release",
-			run:   checkLatest,
+			label:  "Check for the latest release",
+			option: "update",
+			run:    checkLatest,
 		},
 		{
 			label:    "Update to the latest release",
+			option:   "update",
 			optional: true,
-			enabled:  true,
 			run:      downloadLatest,
 		},
 		{
@@ -57,24 +62,28 @@ var (
 		},
 		{
 			label:    "Add systemd service",
+			help:     "Write " + servicePath,
 			optional: true,
 			enabled:  true,
 			run:      addService,
 		},
 		{
 			label:    "Enable service",
+			help:     "Start " + serviceName + " on boot",
 			optional: true,
 			enabled:  true,
 			run:      enableService,
 		},
 		{
 			label:    "Install USBIP",
+			help:     "Install usbip with pacman, apt or dnf and load " + vhciModule + " on boot",
 			optional: true,
 			enabled:  true,
 			run:      installUsbip,
 		},
 		{
 			label:    "Start the server now",
+			help:     "Start the VIIPER server once setup finishes",
 			optional: true,
 			enabled:  true,
 			run:      startServer,

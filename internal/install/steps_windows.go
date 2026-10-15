@@ -25,18 +25,21 @@ const (
 	appsAndFeaturesKey = `Software\Microsoft\Windows\CurrentVersion\Uninstall\VIIPER`
 	createShortcut     = `$s = (New-Object -ComObject WScript.Shell).CreateShortcut("%s"); $s.TargetPath = "%s"; $s.Save()`
 	removeAfterExit    = `Wait-Process -Id %d -ErrorAction SilentlyContinue; Remove-Item -LiteralPath "%s"; Remove-Item -LiteralPath "%s" -ErrorAction SilentlyContinue`
+	ExitRebootRequired = int(windows.ERROR_SUCCESS_REBOOT_REQUIRED)
+	ExitCanceled       = int(windows.ERROR_INSTALL_USEREXIT)
 )
 
 var (
 	installSteps = []step{
 		{
-			label: "Check for the latest release",
-			run:   checkLatest,
+			label:  "Check for the latest release",
+			option: "update",
+			run:    checkLatest,
 		},
 		{
 			label:    "Update to the latest release",
+			option:   "update",
 			optional: true,
-			enabled:  true,
 			run:      downloadLatest,
 		},
 		{
@@ -85,12 +88,14 @@ var (
 		},
 		{
 			label:    "Autostart",
+			help:     "Start the VIIPER server on system startup",
 			optional: true,
 			enabled:  true,
 			run:      enableAutostart,
 		},
 		{
 			label:    "Start menu shortcut",
+			help:     "Add VIIPER to the start menu",
 			optional: true,
 			enabled:  true,
 			run: func(t *Target) error {
@@ -99,6 +104,7 @@ var (
 		},
 		{
 			label:    "Desktop shortcut",
+			help:     "Add a VIIPER shortcut to the desktop",
 			optional: true,
 			run: func(t *Target) error {
 				return writeShortcut(windows.FOLDERID_Desktop, t.Exe)
@@ -106,12 +112,14 @@ var (
 		},
 		{
 			label:    "Install USBIP",
+			help:     "Install the usbip-win2 driver " + usbipWin2Version + " (if not already, needs administrator privileges, may need a restart)",
 			optional: true,
 			enabled:  true,
 			run:      installUsbip,
 		},
 		{
 			label:    "Start the server now",
+			help:     "Start the VIIPER server once setup finishes",
 			optional: true,
 			enabled:  true,
 			run:      startServer,
@@ -202,7 +210,13 @@ func startServer(t *Target) error {
 		return err
 	}
 
-	return exec.Command(t.Exe, "server", "--log.file", filepath.Join(cfgDir, "viiper.log")).Start()
+	server := exec.Command(t.Exe, "server", "--log.file", filepath.Join(cfgDir, "viiper.log"))
+	server.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow:    true,
+		CreationFlags: windows.DETACHED_PROCESS,
+	}
+
+	return server.Start()
 }
 
 func stopServer(t *Target) error {
