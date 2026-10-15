@@ -10,7 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"runtime/debug"
+
+	"github.com/Alia5/VIIPER/meta"
 
 	"fyne.io/systray"
 	"golang.org/x/sys/windows/registry"
@@ -31,8 +32,7 @@ func Run(ctx context.Context, shutdown func(), update Update) {
 		systray.SetIcon(trayIcon)
 		systray.SetTooltip("VIIPER")
 
-		version := readVersion()
-		infoStr := fmt.Sprintf("VIIPER - %s", version)
+		infoStr := fmt.Sprintf("VIIPER - %s", meta.Version)
 		versionItem := systray.AddMenuItem(infoStr, infoStr)
 		versionItem.Disable()
 
@@ -77,16 +77,6 @@ func Run(ctx context.Context, shutdown func(), update Update) {
 		}()
 
 	}, func() {})
-}
-
-func readVersion() string {
-	if info, ok := debug.ReadBuildInfo(); ok {
-		v := info.Main.Version
-		if v != "" && v != "(devel)" {
-			return v
-		}
-	}
-	return "dev"
 }
 
 func autoStartEnabled() bool {
