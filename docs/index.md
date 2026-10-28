@@ -55,6 +55,7 @@ Beyond device emulation, VIIPER can proxy real USB devices for traffic inspectio
 - PS4 controller emulation; see [Devices › DualShock 4 Controller](devices/dualshock4.md)
 - PS5 DualSense controller emulation (including Edge variant); see [Devices › DualSense Controller](devices/dualsense.md)
 - Nintendo Switch 2 Pro Controller emulation; see [Devices › Switch 2 Pro Controller](devices/ns2pro.md)
+- HID proxy: a copy of a real USB HID device whose descriptors and reports come from the client; see [Devices › HID proxy](devices/hidproxy.md)
 
 ---
 

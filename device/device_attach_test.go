@@ -2,6 +2,7 @@ package device_test
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	viiperTesting "github.com/Alia5/VIIPER/_testing"
+	"github.com/Alia5/VIIPER/device"
 
 	_ "github.com/Alia5/VIIPER/internal/registry" // Register devices
 )
@@ -56,7 +58,7 @@ func TestDeviceAttach(t *testing.T) {
 
 			c := viiperclient.New(s.ApiServer.Addr())
 
-			stream, addResp, err := c.AddDeviceAndConnect(context.Background(), b.BusID(), tc.deviceType, nil)
+			stream, addResp, err := c.AddDeviceAndConnect(context.Background(), b.BusID(), tc.deviceType, createOptions(t, tc.deviceType))
 			if !assert.NoError(t, err) {
 				t.Fatal()
 			}
@@ -102,4 +104,18 @@ func TestDeviceAttach(t *testing.T) {
 		})
 	}
 
+}
+
+// createOptions gives the device types that can't be made without them their create options: a hidproxy copies
+// the descriptors it is given (here those of the Steam Controller puck).
+func createOptions(t *testing.T, deviceType string) *device.CreateOptions {
+	t.Helper()
+	if deviceType != "hidproxy" {
+		return nil
+	}
+	descriptors, err := os.ReadFile("hidproxy/testdata/puck.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return &device.CreateOptions{DeviceSpecific: string(descriptors)}
 }

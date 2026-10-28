@@ -89,5 +89,6 @@ nav:
   - Switch 2 Pro Controller: devices/ns2pro.md
   - Keyboard: devices/keyboard.md
   - Mouse: devices/mouse.md
+  - HID proxy: devices/hidproxy.md
 - Community & Support: misc/support.md
 - Changelog: changelog/

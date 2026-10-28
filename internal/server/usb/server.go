@@ -744,6 +744,10 @@ func (s *Server) handleUrbStream(conn net.Conn, dev usb.Device) error {
 			pending[seq] = urbCancel
 			pendingMu.Unlock()
 			interval := endpointInterval(dev.GetDescriptor(), ep)
+			if nr, ok := dev.(usb.NoInRepeatDevice); ok && nr.NoInRepeat() {
+				// The device passes another device's reports: repeating the last one would invent input.
+				interval = 0
+			}
 
 			go func(seq, ep, dir uint32) {
 				defer urbCancel()

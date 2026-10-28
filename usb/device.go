@@ -31,3 +31,10 @@ type ControlDevice interface {
 	// If handled is true, the returned bytes (if any) will be used as the IN data stage.
 	HandleControl(bmRequestType, bRequest uint8, wValue, wIndex, wLength uint16, data []byte) (resp []byte, handled bool)
 }
+
+// NoInRepeatDevice is an optional interface for devices whose IN endpoints must not have their last report
+// repeated when no new one came within bInterval (the server's default for interrupt endpoints). A device that
+// passes another device's reports on needs this: some of those reports are events, not state.
+type NoInRepeatDevice interface {
+	NoInRepeat() bool
+}
