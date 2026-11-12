@@ -1,6 +1,7 @@
 package dualsense
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -24,7 +25,7 @@ func init() {
 
 type dshandler struct{}
 
-func (h *dshandler) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
+func (h *Handler) CreateDevice(ctx context.Context, o *device.CreateOptions) (usb.Device, error) {
 	if o == nil {
 		o = &device.CreateOptions{}
 	}
@@ -83,7 +84,7 @@ func (h *dshandler) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
 	}
 	o.DeviceSpecific = string(b)
 
-	return new(o, false)
+	return new(ctx, o, false)
 }
 
 func (h *dshandler) StreamHandler() api.StreamHandlerFunc {

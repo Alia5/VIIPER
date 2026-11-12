@@ -15,6 +15,8 @@ import (
 )
 
 type NS2Pro struct {
+	ctx context.Context
+
 	inputCh        chan struct{}
 	bulkCh         chan struct{}
 	stateMu        sync.Mutex
@@ -37,7 +39,7 @@ type NS2Pro struct {
 	bulkInQueue       [][]byte
 }
 
-func New(o *device.CreateOptions) (*NS2Pro, error) {
+func New(ctx context.Context, o *device.CreateOptions) (*NS2Pro, error) {
 	metaState := defaultMetaState()
 	if o != nil && o.DeviceSpecific != "" {
 		var newMeta MetaState
@@ -64,6 +66,7 @@ func New(o *device.CreateOptions) (*NS2Pro, error) {
 	inputCh := make(chan struct{}, 1)
 	inputCh <- struct{}{}
 	d := &NS2Pro{
+		ctx:            ctx,
 		inputCh:        inputCh,
 		bulkCh:         make(chan struct{}, 1),
 		inputState:     defaultInputState(),

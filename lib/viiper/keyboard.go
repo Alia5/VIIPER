@@ -182,12 +182,15 @@ func CreateKeyboardDevice(
 		opts.IDProduct = &idProduct
 	}
 
-	d, err := keyboard.New(opts)
+	ctx, cancel := context.WithCancel(context.Background())
+	d, err := keyboard.New(ctx, opts)
 	if err != nil {
+		cancel()
 		return false
 	}
-	devCtx, err := bus.Add(d)
+	devCtx, err := bus.Add(d, cancel)
 	if err != nil {
+		cancel()
 		return false
 	}
 	exportMeta := device.GetDeviceMeta(devCtx)

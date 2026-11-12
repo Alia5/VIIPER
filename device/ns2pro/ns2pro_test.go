@@ -23,7 +23,7 @@ import (
 )
 
 func TestBuildReport05(t *testing.T) {
-	dev, err := New(nil)
+	dev, err := New(t.Context(), nil)
 	require.NoError(t, err)
 
 	state := InputState{
@@ -136,9 +136,9 @@ func TestCreateDeviceDeduplicatesSerial(t *testing.T) {
 	})
 
 	h := &handler{}
-	dev1, err := h.CreateDevice(nil)
+	dev1, err := h.CreateDevice(t.Context(), nil)
 	require.NoError(t, err)
-	dev2, err := h.CreateDevice(nil)
+	dev2, err := h.CreateDevice(t.Context(), nil)
 	require.NoError(t, err)
 
 	ns1, ok := dev1.(*NS2Pro)
@@ -155,7 +155,7 @@ func TestCreateDeviceDeduplicatesSerial(t *testing.T) {
 }
 
 func TestBuildReport09(t *testing.T) {
-	dev, err := New(nil)
+	dev, err := New(t.Context(), nil)
 	require.NoError(t, err)
 
 	state := InputState{
@@ -194,7 +194,7 @@ func TestBuildReport09(t *testing.T) {
 }
 
 func TestBulkCommands(t *testing.T) {
-	dev, err := New(nil)
+	dev, err := New(t.Context(), nil)
 	require.NoError(t, err)
 
 	dev.HandleTransfer(context.Background(), 2, usbip.DirOut, featureCommand(0x02, FeatureButtons|FeatureSticks|FeatureIMU|FeatureRumble))
@@ -222,7 +222,7 @@ func TestBulkCommands(t *testing.T) {
 }
 
 func TestFlashSerialUsesMetaStateSerial(t *testing.T) {
-	dev, err := New(nil)
+	dev, err := New(t.Context(), nil)
 	require.NoError(t, err)
 
 	dev.SetMetaState(MetaState{
@@ -242,7 +242,7 @@ func TestFlashSerialUsesMetaStateSerial(t *testing.T) {
 }
 
 func TestSDLUSBInitializationSequence(t *testing.T) {
-	dev, err := New(nil)
+	dev, err := New(t.Context(), nil)
 	require.NoError(t, err)
 
 	for _, address := range []uint32{0x13000, 0x13040, 0x13080, 0x130C0, 0x13100, 0x1FC040, 0x1FC080} {
@@ -287,7 +287,7 @@ func TestSDLUSBInitializationSequence(t *testing.T) {
 }
 
 func TestRumbleOutput(t *testing.T) {
-	dev, err := New(nil)
+	dev, err := New(t.Context(), nil)
 	require.NoError(t, err)
 
 	var got OutputState
@@ -327,7 +327,7 @@ func TestRumbleOutput(t *testing.T) {
 }
 
 func TestPlayerLEDOutput(t *testing.T) {
-	dev, err := New(nil)
+	dev, err := New(t.Context(), nil)
 	require.NoError(t, err)
 
 	var got OutputState

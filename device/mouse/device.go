@@ -15,6 +15,8 @@ import (
 // Mouse implements the minimal Device interface for a 5-button HID mouse
 // with vertical and horizontal wheels.
 type Mouse struct {
+	ctx context.Context
+
 	tick       uint64
 	inputCh    chan InputState
 	buttons    atomic.Uint32
@@ -22,8 +24,9 @@ type Mouse struct {
 }
 
 // New returns a new Mouse device.
-func New(o *device.CreateOptions) (*Mouse, error) {
+func New(ctx context.Context, o *device.CreateOptions) (*Mouse, error) {
 	d := &Mouse{
+		ctx:        ctx,
 		descriptor: defaultDescriptor,
 	}
 	if o != nil {

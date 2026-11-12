@@ -13,6 +13,8 @@ import (
 )
 
 type Xbox360 struct {
+	ctx context.Context
+
 	tick       uint64
 	inputCh    chan InputState
 	rumbleFunc func(XRumbleState)
@@ -24,8 +26,9 @@ type Xbox360CreateOptions struct {
 }
 
 // New returns a new Xbox360 device.
-func New(o *device.CreateOptions) (*Xbox360, error) {
+func New(ctx context.Context, o *device.CreateOptions) (*Xbox360, error) {
 	d := &Xbox360{
+		ctx:        ctx,
 		descriptor: MakeDescriptor(),
 	}
 	if o != nil {

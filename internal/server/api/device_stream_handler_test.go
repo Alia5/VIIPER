@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net"
@@ -29,9 +30,9 @@ func TestDeviceStreamHandler_Dispatch(t *testing.T) {
 	bus, err := virtualbus.NewWithBusID(90001)
 	require.NoError(t, err)
 	require.NoError(t, srv.AddBus(bus))
-	dev, err := keyboard.New(nil)
+	dev, err := keyboard.New(t.Context(), nil)
 	require.NoError(t, err)
-	devCtx, err := bus.Add(dev)
+	devCtx, err := bus.Add(dev, func() {})
 	require.NoError(t, err)
 
 	meta := device.GetDeviceMeta(devCtx)
@@ -56,7 +57,7 @@ func TestDeviceStreamHandler_Dispatch(t *testing.T) {
 
 	handlerCalled := make(chan bool, 1)
 	testReg := th.CreateMockRegistration(t, "keyboard",
-		func(o *device.CreateOptions) (pusb.Device, error) { return keyboard.New(o) },
+		func(ctx context.Context, o *device.CreateOptions) (pusb.Device, error) { return keyboard.New(ctx, o) },
 		func(conn net.Conn, d *pusb.Device, l *slog.Logger) error {
 			handlerCalled <- true
 			return nil
@@ -92,9 +93,9 @@ func TestAPIServer_StreamRoute_DispatchE2E(t *testing.T) {
 	bus, err := virtualbus.NewWithBusID(70001)
 	require.NoError(t, err)
 	require.NoError(t, srv.AddBus(bus))
-	dev, err := keyboard.New(nil)
+	dev, err := keyboard.New(t.Context(), nil)
 	require.NoError(t, err)
-	devCtx, err := bus.Add(dev)
+	devCtx, err := bus.Add(dev, func() {})
 	require.NoError(t, err)
 	meta := device.GetDeviceMeta(devCtx)
 	require.NotNil(t, meta)
@@ -112,7 +113,7 @@ func TestAPIServer_StreamRoute_DispatchE2E(t *testing.T) {
 
 	handlerCalled := make(chan struct{}, 1)
 	testReg := th.CreateMockRegistration(t, "keyboard",
-		func(o *device.CreateOptions) (pusb.Device, error) { return keyboard.New(o) },
+		func(ctx context.Context, o *device.CreateOptions) (pusb.Device, error) { return keyboard.New(ctx, o) },
 		func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error {
 			handlerCalled <- struct{}{}
 			return nil

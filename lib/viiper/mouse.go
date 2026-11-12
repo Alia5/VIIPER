@@ -71,12 +71,15 @@ func CreateMouseDevice(
 		opts.IDProduct = &idProduct
 	}
 
-	d, err := mouse.New(opts)
+	ctx, cancel := context.WithCancel(context.Background())
+	d, err := mouse.New(ctx, opts)
 	if err != nil {
+		cancel()
 		return false
 	}
-	devCtx, err := bus.Add(d)
+	devCtx, err := bus.Add(d, cancel)
 	if err != nil {
+		cancel()
 		return false
 	}
 	exportMeta := device.GetDeviceMeta(devCtx)

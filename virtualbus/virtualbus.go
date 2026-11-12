@@ -76,7 +76,7 @@ func NewWithBusID(busID uint32) (*VirtualBus, error) {
 //
 // which returns a static descriptor that will be used for bus registration.
 // Returns a context containing the device's lifecycle and metadata (use GetDeviceMeta to extract).
-func (vb *VirtualBus) Add(dev usb.Device) (context.Context, error) {
+func (vb *VirtualBus) Add(dev usb.Device, cancelDev context.CancelFunc) (context.Context, error) {
 	vb.mtx.Lock()
 	defer vb.mtx.Unlock()
 
@@ -111,9 +111,13 @@ func (vb *VirtualBus) Add(dev usb.Device) (context.Context, error) {
 	meta.DevID = devID
 	connTimer := time.NewTimer(0)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancelBus := context.WithCancel(context.Background())
 	ctx = context.WithValue(ctx, device.ExportMetaKey, &meta)
 	ctx = context.WithValue(ctx, device.ConnTimerKey, connTimer)
+	cancel := func() {
+		cancelBus()
+		cancelDev()
+	}
 
 	vb.devices = append(vb.devices, busDevice{dev: dev, meta: meta, ctx: ctx, cancel: cancel})
 	return ctx, nil

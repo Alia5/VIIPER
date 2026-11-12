@@ -81,7 +81,9 @@ func TestDeviceRegistry(t *testing.T) {
 			reg := th.CreateMockRegistration(
 				t,
 				tt.expectedDevice,
-				func(o *device.CreateOptions) (usb.Device, error) { return &mockDevice{name: tt.expectedDevice}, nil },
+				func(ctx context.Context, o *device.CreateOptions) (usb.Device, error) {
+					return &mockDevice{name: tt.expectedDevice}, nil
+				},
 				mockHandler,
 			)
 
@@ -93,7 +95,7 @@ func TestDeviceRegistry(t *testing.T) {
 			if tt.shouldFind {
 				assert.NotNil(t, retrieved, "expected to find registered device")
 				if retrieved != nil {
-					dev, err := retrieved.CreateDevice(nil)
+					dev, err := retrieved.CreateDevice(t.Context(), nil)
 					assert.NoError(t, err)
 					mockDev, ok := dev.(*mockDevice)
 					assert.True(t, ok, "expected mockDevice type")
@@ -157,7 +159,9 @@ func TestGetStreamHandler(t *testing.T) {
 			reg := th.CreateMockRegistration(
 				t,
 				tt.registerName,
-				func(o *device.CreateOptions) (usb.Device, error) { return &mockDevice{name: tt.registerName}, nil },
+				func(ctx context.Context, o *device.CreateOptions) (usb.Device, error) {
+					return &mockDevice{name: tt.registerName}, nil
+				},
 				mockHandler,
 			)
 

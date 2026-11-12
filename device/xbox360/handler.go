@@ -1,6 +1,7 @@
 package xbox360
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -22,7 +23,9 @@ func init() {
 
 type handler struct{}
 
-func (h *handler) CreateDevice(o *device.CreateOptions) (usb.Device, error) { return New(o) }
+func (h *handler) CreateDevice(ctx context.Context, o *device.CreateOptions) (usb.Device, error) {
+	return New(ctx, o)
+}
 
 func (h *handler) StreamHandler() api.StreamHandlerFunc {
 	return func(conn net.Conn, devPtr *usb.Device, logger *slog.Logger) error {

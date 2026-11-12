@@ -1,6 +1,7 @@
 package dualshock4
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -25,7 +26,7 @@ type handler struct{}
 
 var serials = map[string]struct{}{}
 
-func (h *handler) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
+func (h *handler) CreateDevice(ctx context.Context, o *device.CreateOptions) (usb.Device, error) {
 	if o == nil {
 		o = &device.CreateOptions{}
 	}
@@ -57,7 +58,7 @@ func (h *handler) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
 		return nil, fmt.Errorf("marshal meta state: %w", err)
 	}
 	o.DeviceSpecific = string(b)
-	return New(o)
+	return New(ctx, o)
 }
 
 func (h *handler) StreamHandler() api.StreamHandlerFunc {

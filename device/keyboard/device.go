@@ -15,6 +15,8 @@ import (
 
 // Keyboard implements the Device interface for a full HID keyboard with LED support.
 type Keyboard struct {
+	ctx context.Context
+
 	tick        uint64
 	inputCh     chan InputState
 	stateMu     sync.Mutex
@@ -25,8 +27,9 @@ type Keyboard struct {
 }
 
 // New returns a new Keyboard device.
-func New(o *device.CreateOptions) (*Keyboard, error) {
+func New(ctx context.Context, o *device.CreateOptions) (*Keyboard, error) {
 	d := &Keyboard{
+		ctx:        ctx,
 		descriptor: defaultDescriptor,
 	}
 	if o != nil {

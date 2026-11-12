@@ -140,12 +140,15 @@ func CreateDS4Device(
 		opts.DeviceSpecific = string(b)
 	}
 
-	d, err := dualshock4.New(opts)
+	ctx, cancel := context.WithCancel(context.Background())
+	d, err := dualshock4.New(ctx, opts)
 	if err != nil {
+		cancel()
 		return false
 	}
-	devCtx, err := bus.Add(d)
+	devCtx, err := bus.Add(d, cancel)
 	if err != nil {
+		cancel()
 		return false
 	}
 	exportMeta := device.GetDeviceMeta(devCtx)

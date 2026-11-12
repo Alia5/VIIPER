@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"context"
 	"encoding/json"
 	"log/slog"
 	"net"
@@ -130,11 +131,11 @@ func TestBusDeviceAdd(t *testing.T) {
 				if err := s.AddBus(b); err != nil {
 					t.Fatalf("add bus failed: %v", err)
 				}
-				dev, err := xbox360.New(nil)
+				dev, err := xbox360.New(t.Context(), nil)
 				if err != nil {
 					t.Fatalf("create device failed: %v", err)
 				}
-				if _, err := b.Add(dev); err != nil {
+				if _, err := b.Add(dev, func() {}); err != nil {
 					t.Fatalf("add device failed: %v", err)
 				}
 				if err := b.RemoveDeviceByID("1"); err != nil {
@@ -225,7 +226,7 @@ func TestBusDeviceAdd_NoConnection_TimeoutCleanup(t *testing.T) {
 	defer apiSrv.Close() //nolint:errcheck
 
 	testReg := th.CreateMockRegistration(t, "xbox360",
-		func(o *device.CreateOptions) (pusb.Device, error) { return xbox360.New(o) },
+		func(ctx context.Context, o *device.CreateOptions) (pusb.Device, error) { return xbox360.New(ctx, o) },
 		func(conn net.Conn, devPtr *pusb.Device, l *slog.Logger) error { return nil },
 	)
 

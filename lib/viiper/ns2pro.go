@@ -142,12 +142,15 @@ func CreateNS2ProDevice(
 		opts.DeviceSpecific = string(b)
 	}
 
-	d, err := ns2pro.New(opts)
+	ctx, cancel := context.WithCancel(context.Background())
+	d, err := ns2pro.New(ctx, opts)
 	if err != nil {
+		cancel()
 		return false
 	}
-	devCtx, err := bus.Add(d)
+	devCtx, err := bus.Add(d, cancel)
 	if err != nil {
+		cancel()
 		return false
 	}
 	exportMeta := device.GetDeviceMeta(devCtx)

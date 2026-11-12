@@ -1,6 +1,7 @@
 package testing
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Alia5/VIIPER/device"
@@ -12,11 +13,11 @@ type mockRegistration struct {
 	deviceName  string
 	handlerFunc api.StreamHandlerFunc
 
-	createFunc func(o *device.CreateOptions) (usb.Device, error)
+	createFunc func(ctx context.Context, o *device.CreateOptions) (usb.Device, error)
 }
 
-func (m *mockRegistration) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
-	return m.createFunc(o)
+func (m *mockRegistration) CreateDevice(ctx context.Context, o *device.CreateOptions) (usb.Device, error) {
+	return m.createFunc(ctx, o)
 }
 
 func (m *mockRegistration) StreamHandler() api.StreamHandlerFunc {
@@ -30,7 +31,7 @@ func (m *mockRegistration) UpdateMetaState(meta string, dev *usb.Device) error {
 func CreateMockRegistration(
 	t *testing.T,
 	name string,
-	cf func(o *device.CreateOptions) (usb.Device, error),
+	cf func(ctx context.Context, o *device.CreateOptions) (usb.Device, error),
 	h api.StreamHandlerFunc,
 ) api.DeviceHandler {
 	return &mockRegistration{

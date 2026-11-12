@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"sync"
 
 	"github.com/Alia5/VIIPER/device"
@@ -11,7 +12,7 @@ import (
 // and stream handler registration.
 type DeviceHandler interface {
 	// CreateDevice returns a new device instance of this type.
-	CreateDevice(o *device.CreateOptions) (usb.Device, error)
+	CreateDevice(ctx context.Context, o *device.CreateOptions) (usb.Device, error)
 	// StreamHandler returns the handler function for long-lived connections.
 	StreamHandler() StreamHandlerFunc
 	UpdateMetaState(meta string, dev *usb.Device) error

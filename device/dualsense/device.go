@@ -21,6 +21,8 @@ import (
 )
 
 type DualSense struct {
+	ctx context.Context
+
 	inputCh    chan *InputState
 	inputState *InputState
 	metaState  *MetaState
@@ -44,14 +46,14 @@ type DualSense struct {
 	mtx sync.Mutex
 }
 
-func New(o *device.CreateOptions) (*DualSense, error) {
-	return new(o, false)
+func New(ctx context.Context, o *device.CreateOptions) (*DualSense, error) {
+	return new(ctx, o, false)
 }
-func NewEdge(o *device.CreateOptions) (*DualSense, error) {
-	return new(o, true)
+func NewEdge(ctx context.Context, o *device.CreateOptions) (*DualSense, error) {
+	return new(ctx, o, true)
 }
 
-func new(o *device.CreateOptions, edge bool) (*DualSense, error) {
+func new(ctx context.Context, o *device.CreateOptions, edge bool) (*DualSense, error) {
 	metaState := &MetaState{
 		SerialNumber:       DefaultSerialNumberDS,
 		MACAddress:         DefaultMACAddressDS,
@@ -98,6 +100,7 @@ func new(o *device.CreateOptions, edge bool) (*DualSense, error) {
 	}
 
 	d := &DualSense{
+		ctx:        ctx,
 		descriptor: defaultDescriptor,
 		metaState:  metaState,
 		edge:       edge,
@@ -118,16 +121,16 @@ func new(o *device.CreateOptions, edge bool) (*DualSense, error) {
 			}
 			switch reportID.ID {
 			case ReportIDOutput:
-				gamepadCollection.Items[i+reportCountOffsetFromReportID] = hid.ReportCount{
-					Count: outputReportCountEdge,
+				gamepadCollection.Items[i+ReportCountOffsetFromReportID] = hid.ReportCount{
+					Count: OutputReportCountEdge,
 				}
 			case 0xF2:
-				gamepadCollection.Items[i+reportCountOffsetFromReportID] = hid.ReportCount{
-					Count: featureF2CountEdge,
+				gamepadCollection.Items[i+ReportCountOffsetFromReportID] = hid.ReportCount{
+					Count: FeatureF2CountEdge,
 				}
 			}
 		}
-		gamepadCollection.Items = append(gamepadCollection.Items, edgeOnlyFeatureReports...)
+		gamepadCollection.Items = append(gamepadCollection.Items, EdgeOnlyFeatureReports...)
 		hidFunction.ReportDescriptor.Items = slices.Clone(hidFunction.ReportDescriptor.Items)
 		hidFunction.ReportDescriptor.Items[2] = gamepadCollection
 		d.descriptor.Interfaces = slices.Clone(d.descriptor.Interfaces)
@@ -298,9 +301,9 @@ func (d *DualSense) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex,
 }
 
 var featureGetHandlers = map[byte]func(*DualSense) []byte{
-	featureIDCalibration:     (*DualSense).featureReportCalibration,
-	featureIDPairing:         (*DualSense).featureReportPairing,
-	featureIDFirmware:        (*DualSense).featureReportFirmware,
+	FeatureIDCalibration:     (*DualSense).featureReportCalibration,
+	FeatureIDPairing:         (*DualSense).featureReportPairing,
+	FeatureIDFirmware:        (*DualSense).featureReportFirmware,
 	featureIDCommandResponse: (*DualSense).featureReportCommandResponse,
 }
 
@@ -320,7 +323,7 @@ func parseOutputReport(out []byte) OutputState {
 
 func (d *DualSense) featureReportCalibration() []byte {
 	report := make([]byte, 41)
-	report[0] = featureIDCalibration
+	report[0] = FeatureIDCalibration
 
 	for i, v := range [17]int16{
 		0, 0, 0,
@@ -337,7 +340,7 @@ func (d *DualSense) featureReportCalibration() []byte {
 
 func (d *DualSense) featureReportPairing() []byte {
 	report := make([]byte, 20)
-	report[0] = featureIDPairing
+	report[0] = FeatureIDPairing
 
 	d.mtx.Lock()
 	mac := d.metaState.MACAddress
@@ -362,7 +365,7 @@ func (d *DualSense) featureReportPairing() []byte {
 
 func (d *DualSense) featureReportFirmware() []byte {
 	report := make([]byte, 64)
-	report[0] = featureIDFirmware
+	report[0] = FeatureIDFirmware
 
 	d.mtx.Lock()
 	bt := d.metaState.BuildTime

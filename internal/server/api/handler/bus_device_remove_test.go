@@ -32,11 +32,11 @@ func TestBusDeviceRemove(t *testing.T) {
 				if err := s.AddBus(b); err != nil {
 					t.Fatalf("add bus failed: %v", err)
 				}
-				dev, err := xbox360.New(nil)
+				dev, err := xbox360.New(t.Context(), nil)
 				if err != nil {
 					t.Fatalf("create device failed: %v", err)
 				}
-				if _, err := b.Add(dev); err != nil {
+				if _, err := b.Add(dev, func() {}); err != nil {
 					t.Fatalf("add device failed: %v", err)
 				}
 			},

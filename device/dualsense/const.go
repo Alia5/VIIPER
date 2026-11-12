@@ -159,9 +159,9 @@ const (
 )
 
 const (
-	featureIDCalibration     uint8 = 0x05
-	featureIDPairing         uint8 = 0x09
-	featureIDFirmware        uint8 = 0x20
+	FeatureIDCalibration     uint8 = 0x05
+	FeatureIDPairing         uint8 = 0x09
+	FeatureIDFirmware        uint8 = 0x20
 	featureIDCommand         uint8 = 0x80
 	featureIDCommandResponse uint8 = 0x81
 )

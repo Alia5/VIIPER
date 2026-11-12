@@ -17,6 +17,8 @@ import (
 )
 
 type DualShock4 struct {
+	ctx context.Context
+
 	inputCh    chan *InputState
 	inputState *InputState
 	metaState  *MetaState
@@ -33,7 +35,7 @@ type DualShock4 struct {
 	mtx sync.Mutex
 }
 
-func New(o *device.CreateOptions) (*DualShock4, error) {
+func New(ctx context.Context, o *device.CreateOptions) (*DualShock4, error) {
 	metaState := &MetaState{
 		SerialNumber:       DefaultSerialString,
 		Board:              DefaultBoardString,
@@ -69,6 +71,7 @@ func New(o *device.CreateOptions) (*DualShock4, error) {
 	}
 
 	d := &DualShock4{
+		ctx:        ctx,
 		descriptor: defaultDescriptor,
 		metaState:  metaState,
 	}

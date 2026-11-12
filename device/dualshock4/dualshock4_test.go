@@ -354,7 +354,7 @@ func TestInputReports(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			dev, err := dualshock4.New(nil)
+			dev, err := dualshock4.New(t.Context(), nil)
 			if !assert.NoError(t, err) {
 				return
 			}

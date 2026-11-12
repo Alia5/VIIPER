@@ -29,6 +29,8 @@ const (
 	InterfaceDescLen = 9
 	EndpointDescLen  = 7
 	HIDDescLen       = 9
+
+	AudioEndpointDescLen = 9
 )
 
 type Data []uint8
@@ -337,19 +339,33 @@ type EndpointDescriptor struct {
 	WMaxPacketSize   uint16 // LE
 	BInterval        uint8
 
+	Audio *AudioEndpointDescriptor
+
 	// ClassDescriptors are optional endpoint-level class-specific descriptors
 	// emitted immediately after this endpoint descriptor.
 	ClassDescriptors []ClassSpecificDescriptor
 }
 
+type AudioEndpointDescriptor struct {
+	BRefresh      uint8
+	BSynchAddress uint8
+}
+
 func (e EndpointDescriptor) Write(b *bytes.Buffer) {
-	b.WriteByte(EndpointDescLen)
+	if e.Audio != nil {
+		b.WriteByte(AudioEndpointDescLen)
+	} else {
+		b.WriteByte(EndpointDescLen)
+	}
 	b.WriteByte(EndpointDescType)
 	b.WriteByte(e.BEndpointAddress)
 	b.WriteByte(e.BMAttributes)
 	_ = binary.Write(b, binary.LittleEndian, e.WMaxPacketSize)
 	b.WriteByte(e.BInterval)
-
+	if e.Audio != nil {
+		b.WriteByte(e.Audio.BRefresh)
+		b.WriteByte(e.Audio.BSynchAddress)
+	}
 }
 
 // HIDSubDescriptor is one subordinate descriptor entry in the HID class descriptor.

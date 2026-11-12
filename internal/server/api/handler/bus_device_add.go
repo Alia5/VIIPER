@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -59,12 +60,15 @@ func BusDeviceAdd(s *usbs.Server, apiSrv *api.Server) api.HandlerFunc {
 			opts.DeviceSpecific = string(b)
 		}
 
-		dev, err := reg.CreateDevice(&opts)
+		ctx, cancel := context.WithCancel(context.Background())
+		dev, err := reg.CreateDevice(ctx, &opts)
 		if err != nil {
+			cancel()
 			return viiperclient.ErrBadRequest(fmt.Sprintf("failed to create device: %v", err))
 		}
-		devCtx, err := b.Add(dev)
+		devCtx, err := b.Add(dev, cancel)
 		if err != nil {
+			cancel()
 			return viiperclient.ErrInternal(fmt.Sprintf("failed to add device to bus: %v", err))
 		}
 

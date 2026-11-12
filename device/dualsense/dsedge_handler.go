@@ -1,6 +1,7 @@
 package dualsense
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,12 +17,12 @@ import (
 )
 
 const (
-	outputReportCountEdge         = 63
-	featureF2CountEdge            = 52
-	reportCountOffsetFromReportID = 2
+	OutputReportCountEdge         = 63
+	FeatureF2CountEdge            = 52
+	ReportCountOffsetFromReportID = 2
 )
 
-var edgeOnlyFeatureReports = []hid.Item{
+var EdgeOnlyFeatureReports = []hid.Item{
 	hid.ReportID{ID: 0x60}, hid.Usage{Usage: 0x41}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
 	hid.ReportID{ID: 0x61}, hid.Usage{Usage: 0x42}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
 	hid.ReportID{ID: 0x62}, hid.Usage{Usage: 0x43}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
@@ -53,7 +54,7 @@ func init() {
 
 type dsedgehandler struct{}
 
-func (h *dsedgehandler) CreateDevice(o *device.CreateOptions) (usb.Device, error) {
+func (h *EdgeHandler) CreateDevice(ctx context.Context, o *device.CreateOptions) (usb.Device, error) {
 	if o == nil {
 		o = &device.CreateOptions{}
 	}
@@ -112,7 +113,7 @@ func (h *dsedgehandler) CreateDevice(o *device.CreateOptions) (usb.Device, error
 	}
 	o.DeviceSpecific = string(b)
 
-	return new(o, true)
+	return new(ctx, o, true)
 }
 
 func (h *dsedgehandler) StreamHandler() api.StreamHandlerFunc {
