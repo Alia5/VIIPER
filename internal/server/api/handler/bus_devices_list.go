@@ -58,6 +58,10 @@ func inferDeviceType(dev any) string {
 	if dev == nil {
 		return ""
 	}
+	named, ok := dev.(interface{ DeviceTypeName() string })
+	if ok {
+		return strings.ToLower(named.DeviceTypeName())
+	}
 	t := reflect.TypeOf(dev)
 	if t.Kind() == reflect.Pointer {
 		t = t.Elem()

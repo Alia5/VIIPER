@@ -30,6 +30,10 @@ type DualSense struct {
 	outputFunc func(OutputState)
 	descriptor usb.Descriptor
 
+	triggerR2  triggerState
+	triggerL2  triggerState
+	triggerMtx sync.Mutex
+
 	subcommand [2]byte
 
 	edge bool
@@ -97,6 +101,8 @@ func new(ctx context.Context, o *device.CreateOptions, edge bool) (*DualSense, e
 			metaState.BatteryVoltage = newMeta.BatteryVoltage
 		}
 		metaState.ShellColor = newMeta.ShellColor
+		metaState.HeadphonesConnected = newMeta.HeadphonesConnected
+		metaState.MicrophoneConnected = newMeta.MicrophoneConnected
 	}
 
 	d := &DualSense{
@@ -158,6 +164,13 @@ func new(ctx context.Context, o *device.CreateOptions, edge bool) (*DualSense, e
 	d.timestampBase = time.Now()
 
 	return d, nil
+}
+
+func (d *DualSense) DeviceTypeName() string {
+	if d.edge {
+		return TypeNameEdge.Name
+	}
+	return TypeName.Name
 }
 
 func (d *DualSense) SetMetaState(meta MetaState) {
@@ -228,9 +241,7 @@ func (d *DualSense) HandleTransfer(ctx context.Context, ep uint32, dir uint32, o
 
 	if dir == usbip.DirOut && ep == 3 {
 		if len(out) >= 48 && out[0] == ReportIDOutput {
-			if d.outputFunc != nil {
-				d.outputFunc(parseOutputReport(out))
-			}
+			d.handleOutputReport(out)
 		}
 	}
 
@@ -270,8 +281,8 @@ func (d *DualSense) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex,
 		case hidGetProtocol:
 			return []byte{0x01}, true
 		}
-	case hidClassOUT:
-		if bRequest == hidSetReport {
+	case HIDClassOUT:
+		if bRequest == HIDSetReport {
 			switch {
 			case reportType == reportTypeFeature && reportID == featureIDCommand && len(data) >= 3:
 				d.subcommand[0] = data[1]
@@ -279,10 +290,8 @@ func (d *DualSense) HandleControl(bmRequestType, bRequest uint8, wValue, wIndex,
 				return nil, true
 			case reportType == reportTypeFeature:
 				return nil, true
-			case reportType == reportTypeOutput && reportID == ReportIDOutput && len(data) >= 48:
-				if d.outputFunc != nil {
-					d.outputFunc(parseOutputReport(data))
-				}
+			case reportType == ReportTypeOutput && reportID == ReportIDOutput && len(data) >= 48:
+				d.handleOutputReport(data)
 				return nil, true
 			}
 		}
@@ -307,17 +316,43 @@ var featureGetHandlers = map[byte]func(*DualSense) []byte{
 	featureIDCommandResponse: (*DualSense).featureReportCommandResponse,
 }
 
-func parseOutputReport(out []byte) OutputState {
+func (d *DualSense) handleOutputReport(out []byte) {
+	state := ParseOutputReport(out)
+
+	d.triggerMtx.Lock()
+	if state.UpdateFlags1&UpdateFlag1TriggerR2 != 0 {
+		d.triggerR2 = triggerState{
+			effect: state.TriggerR2(),
+		}
+	}
+	if state.UpdateFlags1&UpdateFlag1TriggerL2 != 0 {
+		d.triggerL2 = triggerState{
+			effect: state.TriggerL2(),
+		}
+	}
+	d.triggerMtx.Unlock()
+
+	if d.outputFunc != nil {
+		d.outputFunc(state)
+	}
+}
+
+func ParseOutputReport(out []byte) OutputState {
 	return OutputState{
-		UpdateFlags1: out[1],
-		UpdateFlags2: out[2],
-		UpdateFlags3: out[39],
-		RumbleSmall:  out[3],
-		RumbleLarge:  out[4],
-		LedRed:       out[45],
-		LedGreen:     out[46],
-		LedBlue:      out[47],
-		PlayerLeds:   out[44],
+		UpdateFlags1: out[OutputReportOffsetUpdateFlags1],
+		UpdateFlags2: out[OutputReportOffsetUpdateFlags2],
+		UpdateFlags3: out[OutputReportOffsetUpdateFlags3],
+		RumbleSmall:  out[OutputReportOffsetRumbleSmall],
+		RumbleLarge:  out[OutputReportOffsetRumbleLarge],
+		LedRed:       out[OutputReportOffsetLedRed],
+		LedGreen:     out[OutputReportOffsetLedGreen],
+		LedBlue:      out[OutputReportOffsetLedBlue],
+		PlayerLeds:   out[OutputReportOffsetPlayerLeds],
+
+		TriggerR2Mode:   out[OutputReportOffsetTriggerR2Mode],
+		TriggerR2Params: [TriggerParamsSize]uint8(out[OutputReportOffsetTriggerR2Params:]),
+		TriggerL2Mode:   out[OutputReportOffsetTriggerL2Mode],
+		TriggerL2Params: [TriggerParamsSize]uint8(out[OutputReportOffsetTriggerL2Params:]),
 	}
 }
 
@@ -496,8 +531,14 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 	}
 	b[41] = d.touchTimestamp
 
-	b[42] = TriggerStatusNeutral
-	b[43] = TriggerStatusNeutral
+	d.triggerMtx.Lock()
+	effectR2, statusR2 := d.triggerR2.decode(s.R2)
+	effectL2, statusL2 := d.triggerL2.decode(s.L2)
+	d.triggerMtx.Unlock()
+
+	b[42] = TriggerStatusNeutral | statusR2<<4
+	b[43] = TriggerStatusNeutral | statusL2<<4
+	b[48] = effectR2 | effectL2<<4
 
 	if d.edge {
 		b[49] = EdgeActiveProfile
@@ -505,7 +546,13 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 		binary.LittleEndian.PutUint32(b[49:53], ts)
 	}
 	b[53] = m.BatteryStatus
-	b[54] = ConnectStateUSB
+	b[InputReportOffsetConnectState] = ConnectStateUSB
+	if m.HeadphonesConnected {
+		b[InputReportOffsetConnectState] |= ConnectStateHeadphones
+	}
+	if m.MicrophoneConnected {
+		b[InputReportOffsetConnectState] |= ConnectStateMicrophone
+	}
 
 	return b
 }

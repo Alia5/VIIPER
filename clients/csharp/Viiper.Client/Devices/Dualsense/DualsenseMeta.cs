@@ -35,6 +35,12 @@ public class MetaState
     [JsonPropertyName("shell_color")]
     public string ShellColor { get; set; } = string.Empty;
 
+    [JsonPropertyName("headphones_connected")]
+    public bool HeadphonesConnected { get; set; }
+
+    [JsonPropertyName("microphone_connected")]
+    public bool MicrophoneConnected { get; set; }
+
 
     public Dictionary<string, object?> ToMap()
     {

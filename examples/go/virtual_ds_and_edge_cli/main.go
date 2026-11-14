@@ -127,6 +127,12 @@ func main() {
 				f := feedback.(*dualsense.OutputState)
 				fmt.Printf("[Output] Flags: %02x/%02x/%02x, Rumble: S=%d L=%d, LED: R=%d G=%d B=%d, Player LEDs: %d\n",
 					f.UpdateFlags1, f.UpdateFlags2, f.UpdateFlags3, f.RumbleSmall, f.RumbleLarge, f.LedRed, f.LedGreen, f.LedBlue, f.PlayerLeds)
+				if f.UpdateFlags1&dualsense.UpdateFlag1TriggerR2 != 0 {
+					fmt.Printf("[Output] Trigger R2: %+v\n", f.TriggerR2())
+				}
+				if f.UpdateFlags1&dualsense.UpdateFlag1TriggerL2 != 0 {
+					fmt.Printf("[Output] Trigger L2: %+v\n", f.TriggerL2())
+				}
 			case err := <-errCh:
 				if err != nil {
 					fmt.Printf("[Output read error] %v\n", err)
@@ -287,7 +293,6 @@ func printHelp() {
 	fmt.Println("    Touch2=123,456                       (sets Touch2X/Touch2Y + Touch2Active=true)")
 	fmt.Println("  DPad (bool): DPadUp, DPadDown, DPadLeft, DPadRight")
 	fmt.Println("Other commands: print | reset | help | quit")
-	fmt.Println("NOTE: This is a temporary hacky tool; it only supports what the current wire protocol exposes.")
 }
 
 func parseAssignment(line string) (key string, val string, dur time.Duration, ok bool, err error) {

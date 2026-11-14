@@ -20,10 +20,10 @@ var TypeName = viiperclient.DeviceType[MetaState]{
 }
 
 func init() {
-	api.RegisterDevice(TypeName.Name, &dshandler{})
+	api.RegisterDevice(TypeName.Name, &Handler{})
 }
 
-type dshandler struct{}
+type Handler struct{}
 
 func (h *Handler) CreateDevice(ctx context.Context, o *device.CreateOptions) (usb.Device, error) {
 	if o == nil {
@@ -87,7 +87,7 @@ func (h *Handler) CreateDevice(ctx context.Context, o *device.CreateOptions) (us
 	return new(ctx, o, false)
 }
 
-func (h *dshandler) StreamHandler() api.StreamHandlerFunc {
+func (h *Handler) StreamHandler() api.StreamHandlerFunc {
 	return func(conn net.Conn, devPtr *usb.Device, logger *slog.Logger) error {
 		defer func() {
 			if devPtr == nil || *devPtr == nil {
@@ -98,13 +98,7 @@ func (h *dshandler) StreamHandler() api.StreamHandlerFunc {
 				slog.Warn("device is not DualSenseEdge on disconnect")
 				return
 			}
-			dse.mtx.Lock()
-			serial := dse.metaState.SerialNumber
-			mac := dse.metaState.MACAddress
-			dse.mtx.Unlock()
-			delete(serials, serial)
-			delete(macs, mac)
-			slog.Debug("DualSenseEdge disconnected, serial/mac released", "serial", serial, "mac", mac)
+			dse.ReleaseSerialAndMAC()
 		}()
 
 		if devPtr == nil || *devPtr == nil {
@@ -145,7 +139,7 @@ func (h *dshandler) StreamHandler() api.StreamHandlerFunc {
 	}
 }
 
-func (h *dshandler) UpdateMetaState(meta string, dev *usb.Device) error {
+func (h *Handler) UpdateMetaState(meta string, dev *usb.Device) error {
 	dse, ok := (*dev).(*DualSense)
 	if !ok {
 		return fmt.Errorf("%w: expected DualSenseEdge", device.ErrWrongDeviceType)

@@ -35,9 +35,16 @@ func DeviceStreamHandler(srv *usb.Server) StreamHandlerFunc {
 	}
 }
 
+type namedDevice interface {
+	DeviceTypeName() string
+}
+
 func inferDeviceType(dev any) string {
 	if dev == nil {
 		return ""
+	}
+	if named, ok := dev.(namedDevice); ok {
+		return strings.ToLower(named.DeviceTypeName())
 	}
 	t := reflect.TypeOf(dev)
 	if t.Kind() == reflect.Pointer {

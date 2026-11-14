@@ -4,6 +4,8 @@
 
 #include "../error.hpp"
 #include "../detail/json.hpp"
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 #include <string_view>
@@ -14,12 +16,25 @@ namespace viiper
 {
     namespace dualsense
     {
+        constexpr std::size_t OUTPUT_SIZE = 31;
+        constexpr std::size_t TriggerParamsSize = 10;
+        constexpr std::size_t TriggerZoneCount = 10;
 
-        // ============================================================================
-        // Constants
-        // ============================================================================
-
-        constexpr std::size_t OUTPUT_SIZE = 9;
+        constexpr std::uint8_t TriggerModeSimpleFeedback = 0x01;
+        constexpr std::uint8_t TriggerModeSimpleWeapon = 0x02;
+        constexpr std::uint8_t TriggerModeOff = 0x05;
+        constexpr std::uint8_t TriggerModeSimpleVibration = 0x06;
+        constexpr std::uint8_t TriggerModeLimitedFeedback = 0x11;
+        constexpr std::uint8_t TriggerModeLimitedWeapon = 0x12;
+        constexpr std::uint8_t TriggerModeFeedback = 0x21;
+        constexpr std::uint8_t TriggerModeBow = 0x22;
+        constexpr std::uint8_t TriggerModeGalloping = 0x23;
+        constexpr std::uint8_t TriggerModeWeapon = 0x25;
+        constexpr std::uint8_t TriggerModeVibration = 0x26;
+        constexpr std::uint8_t TriggerModeMachine = 0x27;
+        constexpr std::uint8_t TriggerModeCalibration = 0xFC;
+        constexpr std::uint8_t TriggerModeDebugFD = 0xFD;
+        constexpr std::uint8_t TriggerModeDebugFE = 0xFE;
 
         constexpr std::uint64_t DefaultVID = 1356;
         constexpr std::uint64_t DefaultPIDDSEdge = 3570;
@@ -31,11 +46,11 @@ namespace viiper
         constexpr std::uint64_t InputReportSize = 64;
         constexpr std::uint64_t OutputReportSize = 64;
         constexpr std::uint64_t InputStateSize = 33;
-        constexpr std::uint64_t OutputStateSize = 9;
+        constexpr std::uint64_t OutputStateSize = 31;
         constexpr std::uint64_t UpdateFlag1Rumble = 1;
         constexpr std::uint64_t UpdateFlag1HapticsSelect = 2;
-constexpr std::uint64_t UpdateFlag1TriggerR2 = 4;
-constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
+        constexpr std::uint64_t UpdateFlag1TriggerR2 = 4;
+        constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
         constexpr std::uint64_t UpdateFlag2Led = 4;
         constexpr std::uint64_t UpdateFlag2PlayerLeds = 16;
         constexpr std::uint64_t UpdateFlag3ImprovedRumble = 4;
@@ -89,10 +104,6 @@ constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
         constexpr std::uint64_t HwInfo = 16777736;
         constexpr std::uint64_t FirmwareVersion = 1584;
 
-        // ============================================================================
-        // Device-specific typed helpers
-        // ============================================================================
-
         struct MetaState
         {
             std::string SerialNumber{};
@@ -103,6 +114,8 @@ constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
             double TemperatureCelsius{};
             double BatteryVoltage{};
             std::string ShellColor{};
+            bool HeadphonesConnected{};
+            bool MicrophoneConnected{};
 
             static MetaState from_map(const json_type &j)
             {
@@ -115,6 +128,8 @@ constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
                 result.TemperatureCelsius = j.value("temperature_celsius", double{});
                 result.BatteryVoltage = j.value("battery_voltage", double{});
                 result.ShellColor = j.value("shell_color", std::string{});
+                result.HeadphonesConnected = j.value("headphones_connected", bool{});
+                result.MicrophoneConnected = j.value("microphone_connected", bool{});
                 return result;
             }
 
@@ -129,14 +144,11 @@ constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
                 j["temperature_celsius"] = TemperatureCelsius;
                 j["battery_voltage"] = BatteryVoltage;
                 j["shell_color"] = ShellColor;
+                j["headphones_connected"] = HeadphonesConnected;
+                j["microphone_connected"] = MicrophoneConnected;
                 return j;
             }
         };
-
-        // ============================================================================
-        // Input: Client -> Device
-        // ============================================================================
-
         struct Input
         {
             std::int8_t sticklx = 0;
@@ -198,9 +210,125 @@ constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
             }
         };
 
-        // ============================================================================
-        // Output: Device -> Client
-        // ============================================================================
+        struct TriggerEffect
+        {
+            std::uint8_t mode = 0;
+            std::array<std::uint8_t, TriggerParamsSize> params{};
+            std::array<std::uint8_t, TriggerZoneCount> zone_strengths{};
+            std::uint8_t start_zone = 0;
+            std::uint8_t end_zone = 0;
+            std::uint8_t start_position = 0;
+            std::uint8_t end_position = 0;
+            std::uint8_t strength = 0;
+            std::uint8_t snap_force = 0;
+            std::uint8_t amplitude_a = 0;
+            std::uint8_t amplitude_b = 0;
+            std::uint8_t first_foot = 0;
+            std::uint8_t second_foot = 0;
+            std::uint8_t frequency = 0;
+            std::uint8_t period = 0;
+
+            [[nodiscard]] static TriggerEffect decode(std::uint8_t mode, const std::array<std::uint8_t, TriggerParamsSize> &params)
+            {
+                constexpr std::size_t bits_per_strength = 3;
+                constexpr std::uint8_t strength_mask = 0x07;
+                constexpr std::size_t frequency_param = 8;
+
+                TriggerEffect effect;
+                effect.mode = mode;
+                effect.params = params;
+                const auto zones = static_cast<std::uint16_t>(params[0] | params[1] << 8);
+
+                switch (mode)
+                {
+                case TriggerModeFeedback:
+                case TriggerModeVibration:
+                {
+                    const std::uint32_t packed_strengths =
+                        static_cast<std::uint32_t>(params[2]) |
+                        static_cast<std::uint32_t>(params[3]) << 8 |
+                        static_cast<std::uint32_t>(params[4]) << 16 |
+                        static_cast<std::uint32_t>(params[5]) << 24;
+                    for (std::size_t zone = 0; zone < TriggerZoneCount; zone++)
+                    {
+                        if (zones & (1u << zone))
+                        {
+                            effect.zone_strengths[zone] = static_cast<std::uint8_t>(((packed_strengths >> (bits_per_strength * zone)) & strength_mask) + 1);
+                        }
+                    }
+                    if (mode == TriggerModeVibration)
+                    {
+                        effect.frequency = params[frequency_param];
+                    }
+                    break;
+                }
+                case TriggerModeWeapon:
+                case TriggerModeBow:
+                case TriggerModeGalloping:
+                case TriggerModeMachine:
+                {
+                    for (std::size_t zone = TriggerZoneCount; zone-- > 0;)
+                    {
+                        if (zones & (1u << zone))
+                        {
+                            effect.start_zone = static_cast<std::uint8_t>(zone);
+                        }
+                    }
+                    for (std::size_t zone = 0; zone < TriggerZoneCount; zone++)
+                    {
+                        if (zones & (1u << zone))
+                        {
+                            effect.end_zone = static_cast<std::uint8_t>(zone);
+                        }
+                    }
+                    const auto first = static_cast<std::uint8_t>(params[2] & strength_mask);
+                    const auto second = static_cast<std::uint8_t>((params[2] >> bits_per_strength) & strength_mask);
+                    if (mode == TriggerModeWeapon)
+                    {
+                        effect.strength = static_cast<std::uint8_t>(first + 1);
+                    }
+                    if (mode == TriggerModeBow)
+                    {
+                        effect.strength = static_cast<std::uint8_t>(first + 1);
+                        effect.snap_force = static_cast<std::uint8_t>(second + 1);
+                    }
+                    if (mode == TriggerModeGalloping)
+                    {
+                        effect.second_foot = first;
+                        effect.first_foot = second;
+                        effect.frequency = params[3];
+                    }
+                    if (mode == TriggerModeMachine)
+                    {
+                        effect.amplitude_a = first;
+                        effect.amplitude_b = second;
+                        effect.frequency = params[3];
+                        effect.period = params[4];
+                    }
+                    break;
+                }
+                case TriggerModeSimpleFeedback:
+                case TriggerModeLimitedFeedback:
+                    effect.start_position = params[0];
+                    effect.strength = params[1];
+                    break;
+                case TriggerModeSimpleWeapon:
+                case TriggerModeLimitedWeapon:
+                    effect.start_position = params[0];
+                    effect.end_position = params[1];
+                    effect.strength = params[2];
+                    break;
+                case TriggerModeSimpleVibration:
+                    effect.frequency = params[0];
+                    effect.strength = params[1];
+                    effect.start_position = params[2];
+                    break;
+                default:
+                    break;
+                }
+                return effect;
+            }
+        };
 
         struct Output
         {
@@ -213,39 +341,48 @@ constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
             std::uint8_t ledgreen = 0;
             std::uint8_t ledblue = 0;
             std::uint8_t playerleds = 0;
+            std::uint8_t trigger_r2_mode = 0;
+            std::array<std::uint8_t, TriggerParamsSize> trigger_r2_params{};
+            std::uint8_t trigger_l2_mode = 0;
+            std::array<std::uint8_t, TriggerParamsSize> trigger_l2_params{};
+
+            [[nodiscard]] TriggerEffect trigger_r2() const
+            {
+                return TriggerEffect::decode(trigger_r2_mode, trigger_r2_params);
+            }
+
+            [[nodiscard]] TriggerEffect trigger_l2() const
+            {
+                return TriggerEffect::decode(trigger_l2_mode, trigger_l2_params);
+            }
 
             static Result<Output> from_bytes(const std::uint8_t *data, std::size_t len)
             {
+                if (len < OUTPUT_SIZE)
+                {
+                    return Error("buffer too short");
+                }
                 Output result;
                 std::size_t offset = 0;
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.updateflags1 = data[offset++];
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.updateflags2 = data[offset++];
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.updateflags3 = data[offset++];
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.rumblesmall = data[offset++];
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.rumblelarge = data[offset++];
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.ledred = data[offset++];
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.ledgreen = data[offset++];
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.ledblue = data[offset++];
-                if (offset >= len)
-                    return Error("buffer too short");
                 result.playerleds = data[offset++];
-                (void)offset; // suppress unused warning
+                result.trigger_r2_mode = data[offset++];
+                for (std::size_t i = 0; i < TriggerParamsSize; i++)
+                {
+                    result.trigger_r2_params[i] = data[offset++];
+                }
+                result.trigger_l2_mode = data[offset++];
+                for (std::size_t i = 0; i < TriggerParamsSize; i++)
+                {
+                    result.trigger_l2_params[i] = data[offset++];
+                }
                 return result;
             }
         };

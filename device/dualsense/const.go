@@ -42,14 +42,95 @@ const (
 	InputReportSize  = 64
 	OutputReportSize = 64
 	InputStateSize   = 33
-	OutputStateSize  = 9
+
+	TriggerParamsSize = 10
+	OutputStateSize   = 9 + 2*(TriggerParamsSize+1)
 )
 
 const (
-	UpdateFlag1Rumble         uint8 = 0x01
-	UpdateFlag1HapticsSelect  uint8 = 0x02
-	UpdateFlag2Led            uint8 = 0x04
-	UpdateFlag2PlayerLeds     uint8 = 0x10
+	OutputReportOffsetUpdateFlags1    = 1
+	OutputReportOffsetUpdateFlags2    = 2
+	OutputReportOffsetRumbleSmall     = 3
+	OutputReportOffsetRumbleLarge     = 4
+	OutputReportOffsetTriggerR2Mode   = 11
+	OutputReportOffsetTriggerR2Params = 12
+	OutputReportOffsetTriggerL2Mode   = 22
+	OutputReportOffsetTriggerL2Params = 23
+	OutputReportOffsetUpdateFlags3    = 39
+	OutputReportOffsetPlayerLeds      = 44
+	OutputReportOffsetLedRed          = 45
+	OutputReportOffsetLedGreen        = 46
+	OutputReportOffsetLedBlue         = 47
+)
+
+const InputReportOffsetConnectState = 54
+
+// Trigger effects stolen from https://gist.github.com/Nielk1/6d54cc2c00d2201ccb8c2720ad7538db
+/* MIT License
+ *
+ * Copyright (c) 2021-2022 John "Nielk1" Klein
+ */
+const (
+	TriggerModeSimpleFeedback  uint8 = 0x01
+	TriggerModeSimpleWeapon    uint8 = 0x02
+	TriggerModeOff             uint8 = 0x05
+	TriggerModeSimpleVibration uint8 = 0x06
+	TriggerModeLimitedFeedback uint8 = 0x11
+	TriggerModeLimitedWeapon   uint8 = 0x12
+	TriggerModeFeedback        uint8 = 0x21
+	TriggerModeBow             uint8 = 0x22
+	TriggerModeGalloping       uint8 = 0x23
+	TriggerModeWeapon          uint8 = 0x25
+	TriggerModeVibration       uint8 = 0x26
+	TriggerModeMachine         uint8 = 0x27
+	TriggerModeCalibration     uint8 = 0xFC
+	TriggerModeDebugFD         uint8 = 0xFD
+	TriggerModeDebugFE         uint8 = 0xFE
+)
+
+const (
+	TriggerEffectNone      uint8 = 0x00
+	TriggerEffectFeedback  uint8 = 0x01
+	TriggerEffectWeapon    uint8 = 0x02
+	TriggerEffectVibration uint8 = 0x03
+)
+
+const (
+	TriggerStatusFeedbackNoLoad      uint8 = 0x00
+	TriggerStatusFeedbackLoadApplied uint8 = 0x01
+)
+const (
+	TriggerStatusWeaponReady  uint8 = 0x00
+	TriggerStatusWeaponFiring uint8 = 0x01
+	TriggerStatusWeaponFired  uint8 = 0x02
+)
+
+const (
+	TriggerStatusVibrationOff uint8 = 0x00
+	TriggerStatusVibrationOn  uint8 = 0x01
+)
+
+const (
+	TriggerZoneCount = 10
+
+	triggerBitsPerStrength = 3
+	triggerStrengthMask    = 0x07
+	triggerFrequencyParam  = 8
+)
+
+const (
+	UpdateFlag1Rumble        uint8 = 0x01
+	UpdateFlag1HapticsSelect uint8 = 0x02
+	UpdateFlag1TriggerR2     uint8 = 0x04
+	UpdateFlag1TriggerL2     uint8 = 0x08
+)
+
+const (
+	UpdateFlag2Led        uint8 = 0x04
+	UpdateFlag2PlayerLeds uint8 = 0x10
+)
+
+const (
 	UpdateFlag3ImprovedRumble uint8 = 0x04
 )
 
@@ -135,26 +216,31 @@ const (
 )
 
 const (
-	ConnectStateUSB      uint8 = 0x08
+	ConnectStateHeadphones uint8 = 0x01
+	ConnectStateMicrophone uint8 = 0x02
+	ConnectStateUSB        uint8 = 0x08
+)
+
+const (
 	TriggerStatusNeutral uint8 = 0x09
 	EdgeActiveProfile    uint8 = 0x10
 )
 
 const (
 	hidClassIN  uint8 = 0xA1
-	hidClassOUT uint8 = 0x21
+	HIDClassOUT uint8 = 0x21
 )
 
 const (
 	hidGetReport   uint8 = 0x01
 	hidGetIdle     uint8 = 0x02
 	hidGetProtocol uint8 = 0x03
-	hidSetReport   uint8 = 0x09
+	HIDSetReport   uint8 = 0x09
 )
 
 const (
 	reportTypeInput   uint8 = 0x01
-	reportTypeOutput  uint8 = 0x02
+	ReportTypeOutput  uint8 = 0x02
 	reportTypeFeature uint8 = 0x03
 )
 

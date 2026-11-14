@@ -17,6 +17,14 @@ public class DualsenseOutput : IBinarySerializable
     public required byte Ledgreen { get; set; }
     public required byte Ledblue { get; set; }
     public required byte Playerleds { get; set; }
+    public required byte TriggerR2Mode { get; set; }
+    public required byte[] TriggerR2Params { get; set; }
+    public required byte TriggerL2Mode { get; set; }
+    public required byte[] TriggerL2Params { get; set; }
+
+    public TriggerEffect TriggerR2() => TriggerEffect.Decode(TriggerR2Mode, TriggerR2Params);
+
+    public TriggerEffect TriggerL2() => TriggerEffect.Decode(TriggerL2Mode, TriggerL2Params);
 
     public void Write(BinaryWriter writer)
     {
@@ -29,6 +37,10 @@ public class DualsenseOutput : IBinarySerializable
         writer.Write(Ledgreen);
         writer.Write(Ledblue);
         writer.Write(Playerleds);
+        writer.Write(TriggerR2Mode);
+        writer.Write(TriggerR2Params, 0, Dualsense.TriggerParamsSize);
+        writer.Write(TriggerL2Mode);
+        writer.Write(TriggerL2Params, 0, Dualsense.TriggerParamsSize);
     }
 
     /// <summary>
@@ -36,28 +48,21 @@ public class DualsenseOutput : IBinarySerializable
     /// </summary>
     public static DualsenseOutput Read(BinaryReader reader)
     {
-	        var updateflags1 = reader.ReadByte();
-	        var updateflags2 = reader.ReadByte();
-	        var updateflags3 = reader.ReadByte();
-	        var rumblesmall = reader.ReadByte();
-	        var rumblelarge = reader.ReadByte();
-	        var ledred = reader.ReadByte();
-	        var ledgreen = reader.ReadByte();
-	        var ledblue = reader.ReadByte();
-	        var playerleds = reader.ReadByte();
-	
-
-		return new DualsenseOutput
-		{
-	            Updateflags1 = updateflags1,
-	            Updateflags2 = updateflags2,
-	            Updateflags3 = updateflags3,
-	            Rumblesmall = rumblesmall,
-	            Rumblelarge = rumblelarge,
-	            Ledred = ledred,
-	            Ledgreen = ledgreen,
-	            Ledblue = ledblue,
-	            Playerleds = playerleds,
-	        };
-	    }
+        return new DualsenseOutput
+        {
+            Updateflags1 = reader.ReadByte(),
+            Updateflags2 = reader.ReadByte(),
+            Updateflags3 = reader.ReadByte(),
+            Rumblesmall = reader.ReadByte(),
+            Rumblelarge = reader.ReadByte(),
+            Ledred = reader.ReadByte(),
+            Ledgreen = reader.ReadByte(),
+            Ledblue = reader.ReadByte(),
+            Playerleds = reader.ReadByte(),
+            TriggerR2Mode = reader.ReadByte(),
+            TriggerR2Params = reader.ReadBytes(Dualsense.TriggerParamsSize),
+            TriggerL2Mode = reader.ReadByte(),
+            TriggerL2Params = reader.ReadBytes(Dualsense.TriggerParamsSize),
+        };
+    }
 }

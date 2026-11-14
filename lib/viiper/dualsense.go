@@ -35,9 +35,32 @@ typedef uintptr_t DSDeviceHandle;
 
 #define DS_OUTPUT_UPDATE1_RUMBLE         0x01u
 #define DS_OUTPUT_UPDATE1_HAPTICS_SELECT 0x02u
+#define DS_OUTPUT_UPDATE1_TRIGGER_R2     0x04u
+#define DS_OUTPUT_UPDATE1_TRIGGER_L2     0x08u
+
 #define DS_OUTPUT_UPDATE2_LED            0x04u
 #define DS_OUTPUT_UPDATE2_PLAYER_LEDS    0x10u
+
 #define DS_OUTPUT_UPDATE3_IMPROVED_RUMBLE 0x04u
+
+#define DS_TRIGGER_PARAMS_SIZE 10
+#define DS_TRIGGER_ZONE_COUNT  10
+
+#define DS_TRIGGER_MODE_SIMPLE_FEEDBACK  0x01u
+#define DS_TRIGGER_MODE_SIMPLE_WEAPON    0x02u
+#define DS_TRIGGER_MODE_OFF              0x05u
+#define DS_TRIGGER_MODE_SIMPLE_VIBRATION 0x06u
+#define DS_TRIGGER_MODE_LIMITED_FEEDBACK 0x11u
+#define DS_TRIGGER_MODE_LIMITED_WEAPON   0x12u
+#define DS_TRIGGER_MODE_FEEDBACK         0x21u
+#define DS_TRIGGER_MODE_BOW              0x22u
+#define DS_TRIGGER_MODE_GALLOPING        0x23u
+#define DS_TRIGGER_MODE_WEAPON           0x25u
+#define DS_TRIGGER_MODE_VIBRATION        0x26u
+#define DS_TRIGGER_MODE_MACHINE          0x27u
+#define DS_TRIGGER_MODE_CALIBRATION      0xFCu
+#define DS_TRIGGER_MODE_DEBUG_FD         0xFDu
+#define DS_TRIGGER_MODE_DEBUG_FE         0xFEu
 
 #define DS_SHELL_COLOR_WHITE                    "00"
 #define DS_SHELL_COLOR_BLACK                    "01"
@@ -95,12 +118,46 @@ typedef struct {
 	double      TemperatureCelsius; // 0 = use default
 	double      BatteryVoltage;     // 0 = use default
 	const char* ShellColor;     // NULL = use default (2-char code, e.g. "00", "Z1")
+	uint8_t     HeadphonesConnected; // 0 = no headphones in the audio jack
+	uint8_t     MicrophoneConnected; // 0 = no headset microphone in the audio jack
 } DSMetaState;
 
-typedef void (*DSOutputCallback)(DSDeviceHandle handle, uint8_t updateFlags1, uint8_t updateFlags2, uint8_t updateFlags3, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t playerLeds);
+typedef struct {
+	uint8_t Mode;                                 // DS_TRIGGER_MODE_*
+	uint8_t Params[DS_TRIGGER_PARAMS_SIZE];       // raw effect parameters
+	uint8_t ZoneStrengths[DS_TRIGGER_ZONE_COUNT]; // feedback, vibration: 0 = zone not active, 1-8
+	uint8_t StartZone;                            // weapon, bow, galloping, machine: 0-9
+	uint8_t EndZone;                              // weapon, bow, galloping, machine: 0-9
+	uint8_t StartPosition;                        // simple and limited modes: raw position
+	uint8_t EndPosition;                          // simple and limited weapon: raw position
+	uint8_t Strength;                             // weapon, bow: 1-8; simple and limited modes: raw strength
+	uint8_t SnapForce;                            // bow: 1-8
+	uint8_t AmplitudeA;                           // machine: 0-7
+	uint8_t AmplitudeB;                           // machine: 0-7
+	uint8_t FirstFoot;                            // galloping: 0-6
+	uint8_t SecondFoot;                           // galloping: 1-7
+	uint8_t Frequency;                            // vibration, galloping, machine, simple vibration: Hz
+	uint8_t Period;                               // machine: tenths of a second
+} DSTriggerEffect;
 
-static void viiper_call_ds_output(DSOutputCallback fn, DSDeviceHandle handle, uint8_t updateFlags1, uint8_t updateFlags2, uint8_t updateFlags3, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t playerLeds) {
-	fn(handle, updateFlags1, updateFlags2, updateFlags3, rumbleSmall, rumbleLarge, ledRed, ledGreen, ledBlue, playerLeds);
+typedef struct {
+	uint8_t         UpdateFlags1;     // DS_OUTPUT_UPDATE1_*
+	uint8_t         UpdateFlags2;     // DS_OUTPUT_UPDATE2_*
+	uint8_t         UpdateFlags3;     // DS_OUTPUT_UPDATE3_*
+	uint8_t         RumbleSmall;
+	uint8_t         RumbleLarge;
+	uint8_t         LedRed;
+	uint8_t         LedGreen;
+	uint8_t         LedBlue;
+	uint8_t         PlayerLeds;
+	DSTriggerEffect TriggerR2;
+	DSTriggerEffect TriggerL2;
+} DSOutputState;
+
+typedef void (*DSOutputCallback)(DSDeviceHandle handle, DSOutputState state);
+
+static void viiper_call_ds_output(DSOutputCallback fn, DSDeviceHandle handle, DSOutputState state) {
+	fn(handle, state);
 }
 
 */
@@ -116,6 +173,11 @@ import (
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/device/dualsense"
 	"github.com/Alia5/VIIPER/internal/server/api"
+)
+
+type (
+	dsDeviceState = C.DSDeviceState
+	dsMetaState   = C.DSMetaState
 )
 
 // CreateDualSenseDevice creates a new DualSense (non-edge) device on the bus with the given ID on the server associated with the given handle.
@@ -191,13 +253,15 @@ func createDualSenseDevice(
 	}
 	if meta != nil {
 		goMeta := dualsense.MetaState{
-			SerialNumber:       goStringOrEmpty(meta.SerialNumber),
-			MACAddress:         goStringOrEmpty(meta.MACAddress),
-			Board:              goStringOrEmpty(meta.Board),
-			BatteryStatus:      uint8(meta.BatteryStatus),
-			TemperatureCelsius: float64(meta.TemperatureCelsius),
-			BatteryVoltage:     float64(meta.BatteryVoltage),
-			ShellColor:         goStringOrEmpty(meta.ShellColor),
+			SerialNumber:        goStringOrEmpty(meta.SerialNumber),
+			MACAddress:          goStringOrEmpty(meta.MACAddress),
+			Board:               goStringOrEmpty(meta.Board),
+			BatteryStatus:       uint8(meta.BatteryStatus),
+			TemperatureCelsius:  float64(meta.TemperatureCelsius),
+			BatteryVoltage:      float64(meta.BatteryVoltage),
+			ShellColor:          goStringOrEmpty(meta.ShellColor),
+			HeadphonesConnected: meta.HeadphonesConnected != 0,
+			MicrophoneConnected: meta.MicrophoneConnected != 0,
 		}
 		b, err := json.Marshal(goMeta)
 		if err != nil {
@@ -294,9 +358,9 @@ func SetDualSenseDeviceState(handle C.DSDeviceHandle, state C.DSDeviceState) boo
 	return true
 }
 
-// SetDualSenseOutputCallback sets a callback to be invoked when the host sends output (rumble/LED) commands to the device.
+// SetDualSenseOutputCallback sets a callback to be invoked when the host sends output (rumble/LED/adaptive trigger) commands to the device.
 // @param handle Handle to the DualSense device.
-// @param callback Callback receiving rumbleSmall, rumbleLarge, ledRed, ledGreen, ledBlue, playerLeds. Pass NULL to clear.
+// @param callback Callback receiving the output state. Pass NULL to clear.
 //
 //export SetDualSenseOutputCallback
 func SetDualSenseOutputCallback(handle C.DSDeviceHandle, cb C.DSOutputCallback) bool {
@@ -314,19 +378,46 @@ func SetDualSenseOutputCallback(handle C.DSDeviceHandle, cb C.DSOutputCallback) 
 		return true
 	}
 	dsDevice.SetOutputCallback(func(out dualsense.OutputState) {
-		C.viiper_call_ds_output(cb, handle,
-			C.uint8_t(out.UpdateFlags1),
-			C.uint8_t(out.UpdateFlags2),
-			C.uint8_t(out.UpdateFlags3),
-			C.uint8_t(out.RumbleSmall),
-			C.uint8_t(out.RumbleLarge),
-			C.uint8_t(out.LedRed),
-			C.uint8_t(out.LedGreen),
-			C.uint8_t(out.LedBlue),
-			C.uint8_t(out.PlayerLeds),
-		)
+		C.viiper_call_ds_output(cb, handle, C.DSOutputState{
+			UpdateFlags1: C.uint8_t(out.UpdateFlags1),
+			UpdateFlags2: C.uint8_t(out.UpdateFlags2),
+			UpdateFlags3: C.uint8_t(out.UpdateFlags3),
+			RumbleSmall:  C.uint8_t(out.RumbleSmall),
+			RumbleLarge:  C.uint8_t(out.RumbleLarge),
+			LedRed:       C.uint8_t(out.LedRed),
+			LedGreen:     C.uint8_t(out.LedGreen),
+			LedBlue:      C.uint8_t(out.LedBlue),
+			PlayerLeds:   C.uint8_t(out.PlayerLeds),
+			TriggerR2:    dsTriggerEffect(out.TriggerR2()),
+			TriggerL2:    dsTriggerEffect(out.TriggerL2()),
+		})
 	})
 	return true
+}
+
+func dsTriggerEffect(effect dualsense.TriggerEffect) C.DSTriggerEffect {
+	out := C.DSTriggerEffect{
+		Mode:          C.uint8_t(effect.Mode),
+		StartZone:     C.uint8_t(effect.StartZone),
+		EndZone:       C.uint8_t(effect.EndZone),
+		StartPosition: C.uint8_t(effect.StartPosition),
+		EndPosition:   C.uint8_t(effect.EndPosition),
+		Strength:      C.uint8_t(effect.Strength),
+		SnapForce:     C.uint8_t(effect.SnapForce),
+		AmplitudeA:    C.uint8_t(effect.AmplitudeA),
+		AmplitudeB:    C.uint8_t(effect.AmplitudeB),
+		FirstFoot:     C.uint8_t(effect.FirstFoot),
+		SecondFoot:    C.uint8_t(effect.SecondFoot),
+		Frequency:     C.uint8_t(effect.Frequency),
+		Period:        C.uint8_t(effect.Period),
+	}
+	for i, param := range effect.Params {
+		out.Params[i] = C.uint8_t(param)
+	}
+	for i, strength := range effect.ZoneStrengths {
+		out.ZoneStrengths[i] = C.uint8_t(strength)
+	}
+	return out
 }
 
 // RemoveDualSenseDevice removes the DualSense device associated with the given handle from the server.

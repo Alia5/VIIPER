@@ -93,21 +93,52 @@ func (s *InputState) UnmarshalBinary(data []byte) error {
 }
 
 // nolint
-// viiper:wire dualsense s2c updateFlags1:u8 updateFlags2:u8 updateFlags3:u8 rumbleSmall:u8 rumbleLarge:u8 ledRed:u8 ledGreen:u8 ledBlue:u8 playerLeds:u8
+// viiper:wire dualsense s2c updateFlags1:u8 updateFlags2:u8 updateFlags3:u8 rumbleSmall:u8 rumbleLarge:u8 ledRed:u8 ledGreen:u8 ledBlue:u8 playerLeds:u8 triggerR2Mode:u8 triggerR2Params:u8*10 triggerL2Mode:u8 triggerL2Params:u8*10
 type OutputState struct {
-	UpdateFlags1 uint8
-	UpdateFlags2 uint8
-	UpdateFlags3 uint8
-	RumbleSmall  uint8
-	RumbleLarge  uint8
-	LedRed       uint8
-	LedGreen     uint8
-	LedBlue      uint8
-	PlayerLeds   uint8
+	UpdateFlags1    uint8
+	UpdateFlags2    uint8
+	UpdateFlags3    uint8
+	RumbleSmall     uint8
+	RumbleLarge     uint8
+	LedRed          uint8
+	LedGreen        uint8
+	LedBlue         uint8
+	PlayerLeds      uint8
+	TriggerR2Mode   uint8
+	TriggerR2Params [TriggerParamsSize]uint8
+	TriggerL2Mode   uint8
+	TriggerL2Params [TriggerParamsSize]uint8
+}
+
+func (f *OutputState) TriggerR2() TriggerEffect {
+	return newTriggerEffect(f.TriggerR2Mode, f.TriggerR2Params)
+}
+
+func (f *OutputState) TriggerL2() TriggerEffect {
+	return newTriggerEffect(f.TriggerL2Mode, f.TriggerL2Params)
+}
+
+func (f *OutputState) OutputReport() [OutputReportSize]byte {
+	var report [OutputReportSize]byte
+	report[0] = ReportIDOutput
+	report[OutputReportOffsetUpdateFlags1] = f.UpdateFlags1
+	report[OutputReportOffsetUpdateFlags2] = f.UpdateFlags2
+	report[OutputReportOffsetUpdateFlags3] = f.UpdateFlags3
+	report[OutputReportOffsetRumbleSmall] = f.RumbleSmall
+	report[OutputReportOffsetRumbleLarge] = f.RumbleLarge
+	report[OutputReportOffsetLedRed] = f.LedRed
+	report[OutputReportOffsetLedGreen] = f.LedGreen
+	report[OutputReportOffsetLedBlue] = f.LedBlue
+	report[OutputReportOffsetPlayerLeds] = f.PlayerLeds
+	report[OutputReportOffsetTriggerR2Mode] = f.TriggerR2Mode
+	copy(report[OutputReportOffsetTriggerR2Params:], f.TriggerR2Params[:])
+	report[OutputReportOffsetTriggerL2Mode] = f.TriggerL2Mode
+	copy(report[OutputReportOffsetTriggerL2Params:], f.TriggerL2Params[:])
+	return report
 }
 
 func (f *OutputState) MarshalBinary() ([]byte, error) {
-	return []byte{
+	b := []byte{
 		f.UpdateFlags1,
 		f.UpdateFlags2,
 		f.UpdateFlags3,
@@ -117,7 +148,12 @@ func (f *OutputState) MarshalBinary() ([]byte, error) {
 		f.LedGreen,
 		f.LedBlue,
 		f.PlayerLeds,
-	}, nil
+	}
+	b = append(b, f.TriggerR2Mode)
+	b = append(b, f.TriggerR2Params[:]...)
+	b = append(b, f.TriggerL2Mode)
+	b = append(b, f.TriggerL2Params[:]...)
+	return b, nil
 }
 
 func (f *OutputState) UnmarshalBinary(data []byte) error {
@@ -133,6 +169,11 @@ func (f *OutputState) UnmarshalBinary(data []byte) error {
 	f.LedGreen = data[6]
 	f.LedBlue = data[7]
 	f.PlayerLeds = data[8]
+	triggers := data[9:OutputStateSize]
+	f.TriggerR2Mode = triggers[0]
+	copy(f.TriggerR2Params[:], triggers[1:1+TriggerParamsSize])
+	f.TriggerL2Mode = triggers[1+TriggerParamsSize]
+	copy(f.TriggerL2Params[:], triggers[2+TriggerParamsSize:])
 	return nil
 }
 
@@ -147,6 +188,9 @@ type MetaState struct {
 	BatteryVoltage     float64 `json:"battery_voltage"`
 
 	ShellColor string `json:"shell_color"` // hardware variant / controller color code, e.g. "00", "Z1"
+
+	HeadphonesConnected bool `json:"headphones_connected"`
+	MicrophoneConnected bool `json:"microphone_connected"`
 }
 
 func (m *MetaState) ToMap() map[string]any {
@@ -198,4 +242,6 @@ func (m *MetaState) UpdateFromMap(data map[string]any) {
 		m.BatteryVoltage = newMeta.BatteryVoltage
 	}
 	m.ShellColor = newMeta.ShellColor
+	m.HeadphonesConnected = newMeta.HeadphonesConnected
+	m.MicrophoneConnected = newMeta.MicrophoneConnected
 }

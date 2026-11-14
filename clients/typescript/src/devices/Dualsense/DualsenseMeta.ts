@@ -14,6 +14,8 @@ export interface MetaState {
   temperatureCelsius: number;
   batteryVoltage: number;
   shellColor: string;
+  headphonesConnected: boolean;
+  microphoneConnected: boolean;
 }
 
 export const metaStateToMap = (value: MetaState): Record<string, unknown> => ({
@@ -25,6 +27,8 @@ export const metaStateToMap = (value: MetaState): Record<string, unknown> => ({
   temperature_celsius: value.temperatureCelsius,
   battery_voltage: value.batteryVoltage,
   shell_color: value.shellColor,
+  headphones_connected: value.headphonesConnected,
+  microphone_connected: value.microphoneConnected,
 });
 
 export const metaStateFromMap = (data: Record<string, unknown> | undefined | null): MetaState => {
@@ -38,6 +42,8 @@ export const metaStateFromMap = (data: Record<string, unknown> | undefined | nul
     temperatureCelsius: map['temperature_celsius'] as number,
     batteryVoltage: map['battery_voltage'] as number,
     shellColor: map['shell_color'] as string,
+    headphonesConnected: map['headphones_connected'] as boolean,
+    microphoneConnected: map['microphone_connected'] as boolean,
   };
 };
 

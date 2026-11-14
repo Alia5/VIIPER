@@ -21,6 +21,10 @@ pub struct MetaState {
 	pub battery_voltage: f64,
     #[serde(rename = "shell_color")]
 	pub shell_color: String,
+    #[serde(rename = "headphones_connected", default)]
+	pub headphones_connected: bool,
+    #[serde(rename = "microphone_connected", default)]
+	pub microphone_connected: bool,
 }
 
 impl MetaState {

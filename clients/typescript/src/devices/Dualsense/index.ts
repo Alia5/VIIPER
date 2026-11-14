@@ -4,6 +4,7 @@
 
 export * from './DualsenseInput';
 export * from './DualsenseOutput';
+export * from './DualsenseTriggerEffect';
 export * from './DualsenseConstants';
 export * from './DualsenseMeta';
 
