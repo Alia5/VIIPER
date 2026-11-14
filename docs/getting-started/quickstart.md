@@ -193,7 +193,7 @@ Now that you have a working setup:
 
 1. **Explore Examples**: Check the `examples/` directory for complete working programs in C#, Go, Rust, TypeScript, and C++
 2. **Read API Documentation**: Learn about all available [API commands](../api/overview.md)
-3. **Choose a Client Library**: Pick a [client library](../clients/generator.md) for your preferred language
+3. **Choose a Client Library**: Pick a [client library](../api/overview.md) for your preferred language
 4. **Review Device Specs**: Understand device-specific protocols in [Devices](../devices/keyboard.md)
 
 ## 🆘 Troubleshooting
@@ -283,5 +283,5 @@ sudo usbip attach --remote=localhost --tcp-port=3241 --busid=1-1
 
 - [CLI Reference](../cli/overview.md) - Complete command documentation
 - [API Reference](../api/overview.md) - Management API protocol
-- [Client Libraries](../clients/generator.md) - Language-specific client libraries
+- [Client Libraries](../api/overview.md) - Language-specific client libraries
 - [Configuration](../cli/configuration.md) - Environment variables and config files

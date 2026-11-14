@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/alia5/VIIPER/actions/workflows/snapshots.yml/badge.svg)](https://github.com/alia5/VIIPER/actions/workflows/snapshots.yml)
 [![codecov](https://codecov.io/github/Alia5/VIIPER/graph/badge.svg?token=5WTEELM3X3)](https://codecov.io/github/Alia5/VIIPER)
 [![License: GPL-3.0](https://img.shields.io/github/license/alia5/VIIPER)](https://github.com/alia5/VIIPER/blob/main/LICENSE.txt)
-[![Client Libraries: MIT](https://img.shields.io/badge/Client_Libraries-MIT-green)](https://github.com/alia5/VIIPER/blob/main/internal/codegen/common/license.go)
+[![Client Libraries: MIT](https://img.shields.io/badge/Client_Libraries-MIT-green)](https://github.com/alia5/VIIPER/blob/main/clients/typescript/LICENSE.txt)
 [![Release](https://img.shields.io/github/v/release/alia5/VIIPER?include_prereleases&sort=semver)](https://github.com/alia5/VIIPER/releases)
 [![Downloads](https://img.shields.io/github/downloads/alia5/VIIPER/total?logo=github)](https://github.com/alia5/VIIPER/releases)
 [![Issues](https://img.shields.io/github/issues/alia5/VIIPER)](https://github.com/alia5/VIIPER/issues)

@@ -13,7 +13,6 @@ VIIPER provides a command-line interface for running the USBIP server and proxy.
   `--install-dir` to pick the directory (see [Installation](../getting-started/installation.md#installer))  
   `--no-update` to disable the auto-update upon install
 - `uninstall` - Remove everything `install` set up; `--quiet` for unattended use
-- [`codegen`](codegen.md) - Generate client libraries from source code annotations
 
 ## Global Options
 

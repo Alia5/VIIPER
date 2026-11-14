@@ -61,11 +61,10 @@ It's designed to be trivial to drive from any language that can open a TCP socke
     For most use cases, you should use one of the provided client libraries rather than implementing the raw protocol yourself:
 
     - [Go Client](../clients/go.md): Reference implementation included in the repository
-    - [Generator Documentation](../clients/generator.md): Information about code generation
     - [C++ Client Library](../clients/cpp.md): Header-only C++20 library (requires external JSON parser)
-    - [C# Client Library](../clients/csharp.md): Generated .NET library with async/await support
-    - [TypeScript Client Library](../clients/typescript.md): Generated Node.js library with EventEmitter streams
-    - [Rust Client Library](../clients/rust.md): Generated Rust library with sync/async support
+    - [C# Client Library](../clients/csharp.md): .NET library with async/await support
+    - [TypeScript Client Library](../clients/typescript.md): Node.js library with EventEmitter streams
+    - [Rust Client Library](../clients/rust.md): Rust library with sync/async support
 
     
     The documentation below is provided for reference and for implementing clients in languages not supported officially.

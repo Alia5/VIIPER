@@ -49,16 +49,6 @@ Or add directly in your `.csproj` (stable only):
 </ItemGroup>
 ```
 
-### 2. Project Reference (For Local Development Against Source)
-
-Use this when modifying the generator or contributing new device types:
-
-```xml
-<ItemGroup>
-    <ProjectReference Include="..\..\clients\csharp\Viiper.Client\Viiper.Client.csproj" />
-</ItemGroup>
-```
-
 ## Example
 
 ```csharp
@@ -353,7 +343,6 @@ The generated code uses nullable annotations. You may see warnings like CS8601/C
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated client libraries work
 - [Go Client Documentation](go.md): Reference implementation patterns
 - [Rust Client Library Documentation](rust.md): Rust client library with sync/async support
 - [TypeScript Client Library Documentation](typescript.md): Node.js client library

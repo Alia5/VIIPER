@@ -209,7 +209,6 @@ Full working examples are available in the repository:
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated client libraries work
 - [C++ Client Library Documentation](cpp.md): Header-only C++ client library
 - [C# Client Library Documentation](csharp.md): .NET client library
 - [Rust Client Library Documentation](rust.md): Rust client library

@@ -57,8 +57,6 @@ find_package(nlohmann_json REQUIRED)
 target_link_libraries(your_target PRIVATE nlohmann_json::nlohmann_json)
 ```
 
-The client library will be generated in `clients/cpp/include/viiper/`.
-
 ## JSON Parser Configuration
 
 Before including the VIIPER client library, you must configure a JSON parser. The client library is designed to work with any JSON library that provides a compatible interface.
@@ -440,7 +438,6 @@ viiper server --api-addr localhost:3242
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated client libraries work
 - [Rust Client Library Documentation](rust.md): Rust client library with sync/async support
 - [C# Client Library Documentation](csharp.md): .NET client library
 - [TypeScript Client Library Documentation](typescript.md): Node.js client library

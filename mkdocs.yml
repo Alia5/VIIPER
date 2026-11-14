@@ -64,7 +64,6 @@ nav:
   - Overview: cli/overview.md
   - Server Command: cli/server.md
   - Proxy Command: cli/proxy.md
-  - Code Generation: cli/codegen.md
   - Configuration: cli/configuration.md
 - API & Clients:
   - API Overview: api/overview.md
@@ -73,7 +72,6 @@ nav:
   - C# Client Library: clients/csharp.md
   - Rust Client Library: clients/rust.md
   - TypeScript Client Library: clients/typescript.md
-  - Generator Documentation: clients/generator.md
 - libVIIPER:
   - Overview: libviiper/overview.md
   - Xbox 360 Controller: devices/xbox360.md

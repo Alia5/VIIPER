@@ -25,62 +25,30 @@ permissions:
     contents: read
 
 jobs:
-    codegen:
-        name: Code generation
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v6
-
-            - name: Set up Go
-              uses: actions/setup-go@v6
-              with:
-                  go-version: stable
-                  cache: true
-                  cache-dependency-path: go.sum
-
-            - name: Run code generation
-              shell: bash
-              run: |
-                  set -euo pipefail
-                  touch internal/install/bundle/licenses.txt
-                  if [ -n "${{ inputs.version }}" ]; then
-                    echo "Running codegen with injected version: ${{ inputs.version }}"
-                    go run -ldflags "-X github.com/Alia5/VIIPER/internal/codegen/common.Version=${{ inputs.version }}" ./cmd/viiper codegen
-                  else
-                    echo "Running codegen with default dev version"
-                    go run ./cmd/viiper codegen
-                  fi
-
-            - name: Upload generated clients
-              uses: actions/upload-artifact@v7
-              with:
-                  name: generated-clients
-                  path: clients/
-                  retention-days: 1
-
     typescript:
         name: TypeScript Client Library
-        needs: codegen
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v6
-
-            - name: Download generated clients
-              uses: actions/download-artifact@v8
-              with:
-                  name: generated-clients
-                  path: clients/
 
             - name: Set up Node.js
               uses: actions/setup-node@v6
               with:
-                  node-version: "24"
+                  node-version: "26"
                   cache: "npm"
                   cache-dependency-path: |
                       clients/typescript/package-lock.json
                       examples/typescript/package-lock.json
+
+            - name: Set TypeScript Client Library version
+              if: ${{ inputs.version != '' }}
+              working-directory: clients/typescript
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  VERSION="${{ inputs.version }}"
+                  npm version "${VERSION#v}" --no-git-tag-version --allow-same-version
 
             - name: Build TypeScript Client Library
               working-directory: clients/typescript
@@ -115,25 +83,26 @@ jobs:
 
     csharp:
         name: C# Client Library
-        needs: codegen
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v6
 
-            - name: Download generated clients
-              uses: actions/download-artifact@v8
-              with:
-                  name: generated-clients
-                  path: clients/
-
             - name: Set up .NET SDK
               uses: actions/setup-dotnet@v5
               with:
-                  dotnet-version: "8.0.x"
+                  dotnet-version: "10.0.x"
 
             - name: Pack C# Client Library
-              run: dotnet pack clients/csharp/Viiper.Client/Viiper.Client.csproj -c Release -o artifacts/nuget
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  VERSION="${{ inputs.version }}"
+                  VERSION_ARGS=()
+                  if [ -n "$VERSION" ]; then
+                    VERSION_ARGS=("-p:Version=${VERSION#v}")
+                  fi
+                  dotnet pack clients/csharp/Viiper.Client/Viiper.Client.csproj -c Release -o artifacts/nuget "${VERSION_ARGS[@]}"
 
             - name: Build C# examples (smoke)
               run: |
@@ -151,17 +120,27 @@ jobs:
 
     cpp-sdk:
         name: C++ Client Library
-        needs: codegen
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v6
 
-            - name: Download generated clients
-              uses: actions/download-artifact@v8
-              with:
-                  name: generated-clients
-                  path: clients/
+            - name: Set C++ Client Library version
+              if: ${{ inputs.version != '' }}
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  VERSION="${{ inputs.version }}"
+                  VERSION="${VERSION#v}"
+                  BASE="${VERSION%%-*}"
+                  IFS=. read -r MAJOR MINOR PATCH <<< "$BASE"
+                  HEADER=clients/cpp/include/viiper/viiper.hpp
+                  sed -i -E \
+                    -e "s|(//[[:space:]]*Version:[[:space:]]*).*|\1${BASE}|" \
+                    -e "s|(VERSION_MAJOR[[:space:]]*=[[:space:]]*)[0-9]+|\1${MAJOR}|" \
+                    -e "s|(VERSION_MINOR[[:space:]]*=[[:space:]]*)[0-9]+|\1${MINOR}|" \
+                    -e "s|(VERSION_PATCH[[:space:]]*=[[:space:]]*)[0-9]+|\1${PATCH}|" \
+                    "$HEADER"
 
             - name: Set up CMake
               uses: jwlawson/actions-setup-cmake@v2
@@ -194,17 +173,19 @@ jobs:
 
     rust:
         name: Rust Client Library
-        needs: codegen
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v6
 
-            - name: Download generated clients
-              uses: actions/download-artifact@v8
-              with:
-                  name: generated-clients
-                  path: clients/
+            - name: Set Rust Client Library version
+              if: ${{ inputs.version != '' }}
+              working-directory: clients/rust
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  VERSION="${{ inputs.version }}"
+                  sed -i -E "0,/^[[:space:]]*version[[:space:]]*=[[:space:]]*\"[^\"]*\"/s//version = \"${VERSION#v}\"/" Cargo.toml
 
             - name: Set up Rust
               uses: dtolnay/rust-toolchain@stable

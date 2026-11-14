@@ -35,15 +35,6 @@ Package page: [viiper-client on crates.io](https://crates.io/crates/viiper-clien
 
 > Pre-release / snapshot builds are **not** published to crates.io. They are only available as GitHub Release artifacts (e.g. `dev-latest`) or by building from source.
 
-### 2. Path Dependency (For Local Development Against Source)
-
-Use this when modifying the generator or contributing new device types:
-
-```toml
-[dependencies]
-viiper-client = { path = "../../clients/rust" }
-```
-
 ## Example
 
 === "Sync"
@@ -411,7 +402,6 @@ Full working examples are available in the repository:
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated client libraries work
 - [Go Client Documentation](go.md): Reference implementation patterns
 - [C# Client Library Documentation](csharp.md): Alternative managed language client library
 - [TypeScript Client Library Documentation](typescript.md): Node.js client library

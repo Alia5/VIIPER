@@ -27,7 +27,6 @@ type CLI struct {
 	ConfigPath   string       `help:"Path to configuration file (json|yaml|toml)" name:"config" env:"VIIPER_CONFIG"`
 	UpdateNotify UpdateNotify `help:"Update notification level: none, stable, prerelease" default:"stable" env:"VIIPER_UPDATE_NOTIFY"`
 	Log          `embed:"" prefix:"log."`
-	codegenCommand
 
 	TUI    cmd.TUI    `cmd:"" help:"Run an interactive TUI"`
 	Server cmd.Server `cmd:"" help:"Start the VIIPER USB-IP server"`

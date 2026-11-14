@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Viiper.Client</RootNamespace>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    
+    <PackageId>Viiper.Client</PackageId>
+    <Version>0.9.0-6-g9d23005</Version>
+    <Authors>Peter Repukat</Authors>
+    <Description>VIIPER Client Library for C#</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Alia5/VIIPER</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Alia5/VIIPER</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>viiper;usbip;virtual-device;input-emulation;hid</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/"/>
+  </ItemGroup>
+
+</Project>

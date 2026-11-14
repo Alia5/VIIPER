@@ -1,0 +1,35 @@
+{
+  "name": "viiperclient",
+  "version": "0.9.0-6-g9d23005",
+  "description": "VIIPER Client Library for TypeScript/Node.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alia5/VIIPER.git"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./devices/*": {
+      "types": "./dist/devices/*/index.d.ts",
+      "default": "./dist/devices/*/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "clean": "rimraf dist"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "rimraf": "6.1.0",
+    "typescript": "5.9.3"
+  }
+}

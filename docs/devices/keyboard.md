@@ -11,7 +11,7 @@ plus LED status feedback (NumLock, CapsLock, ScrollLock).
 
     The wire protocol is abstracted by client libraries.  
     The **Go client** includes built-in types (`/device/keyboard`),
-    and **generated client libraries** provide equivalent structures
+    and the other **client libraries** provide equivalent structures
     with proper packing.
 
     You don't need to manually construct packets, just use the provided types

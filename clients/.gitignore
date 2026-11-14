@@ -1,3 +1,6 @@
-*
-*/
-!.gitignore
+node_modules/
+dist/
+.tgz
+target/
+bin/
+obj/

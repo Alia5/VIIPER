@@ -38,26 +38,6 @@ npm install ./viiperclient-typescript-sdk-Snapshot.tgz
 
 Package page: [npm: viiperclient](https://www.npmjs.com/package/viiperclient)
 
-### 2. Local Project Reference (For Development Against Source)
-
-If you are actively modifying VIIPER or the code generator, link directly:
-
-```json
-{
-  "dependencies": {
-    "viiperclient": "file:../../clients/typescript"
-  }
-}
-```
-
-Then build locally after regeneration:
-
-```bash
-cd clients/typescript
-npm install
-npm run build
-```
-
 ## Example
 
 ```typescript
@@ -363,7 +343,6 @@ node dist/virtual_keyboard.js localhost:3242
 
 ## See Also
 
-- [Generator Documentation](generator.md): How generated client libraries work
 - [Go Client Documentation](go.md): Reference implementation patterns
 - [C# Client Library Documentation](csharp.md): Alternative managed language client library
 - [Rust Client Library Documentation](rust.md): Rust client library with sync/async support

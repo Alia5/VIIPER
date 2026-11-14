@@ -11,8 +11,6 @@ gyro/accelerometer data, and HD rumble output.
     ## Client Library Support
 
     The Go client can use the built-in types from `/device/ns2pro`.
-    Generated client libraries will pick up the `viiper:wire` tags from this package
-    the next time codegen is run.
 
     ## Raw Streaming Protocol
 

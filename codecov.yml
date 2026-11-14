@@ -4,7 +4,6 @@ ignore:
   - "cmd/viiper/**/*"
   - "docs/**/*"
   - "tests/e2e/**/*"
-  - "internal/codegen/**/*"
 
 coverage:
   status:

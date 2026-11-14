@@ -5,8 +5,4 @@
     },
     "cmake.sourceDirectory": "${workspaceFolder}/VIIPER/examples/cpp",
     "python.useEnvironmentsExtension": false,
-    "files.exclude": {
-        "clients/**": true,
-        "examples/**": true,
-    }
 }
