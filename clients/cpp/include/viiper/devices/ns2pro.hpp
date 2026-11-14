@@ -22,8 +22,8 @@ namespace viiper
 
         constexpr std::size_t OUTPUT_SIZE = 34;
 
-        constexpr std::uint64_t DefaultVID = 1406;
-        constexpr std::uint64_t DefaultPID = 8297;
+        constexpr std::uint64_t DefaultVID = 0x057E;
+        constexpr std::uint64_t DefaultPID = 0x2069;
         constexpr std::uint64_t DefaultBatteryVolts = 3800;
         constexpr std::uint64_t ButtonB = 1;
         constexpr std::uint64_t ButtonA = 2;

@@ -21,8 +21,8 @@ namespace viiper
 
         constexpr std::size_t OUTPUT_SIZE = 8;
 
-        constexpr std::uint64_t DefaultVID = 1356;
-        constexpr std::uint64_t DefaultPID = 2508;
+        constexpr std::uint64_t DefaultVID = 0x054C;
+        constexpr std::uint64_t DefaultPID = 0x09CC;
         constexpr std::uint64_t EndpointIn = 132;
         constexpr std::uint64_t EndpointOut = 3;
         constexpr std::uint64_t ReportIDInput = 1;

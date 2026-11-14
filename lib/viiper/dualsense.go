@@ -8,6 +8,32 @@ typedef uintptr_t USBServerHandle;
 
 typedef uintptr_t DSDeviceHandle;
 
+#define DS_VENDOR_ID       0x054Cu
+#define DS_PRODUCT_ID      0x0CE6u
+#define DS_PRODUCT_ID_EDGE 0x0DF2u
+
+#define DS_TOUCHPAD_MAX_X 1920
+#define DS_TOUCHPAD_MAX_Y 1080
+
+#define DS_GYRO_COUNTS_PER_DPS  16.384
+#define DS_ACCEL_COUNTS_PER_MS2 835.07
+
+#define DS_OUTPUT_REPORT_SIZE 64
+
+#define DS_OUTPUT_REPORT_OFFSET_UPDATE_FLAGS1     1
+#define DS_OUTPUT_REPORT_OFFSET_UPDATE_FLAGS2     2
+#define DS_OUTPUT_REPORT_OFFSET_RUMBLE_SMALL      3
+#define DS_OUTPUT_REPORT_OFFSET_RUMBLE_LARGE      4
+#define DS_OUTPUT_REPORT_OFFSET_TRIGGER_R2_MODE   11
+#define DS_OUTPUT_REPORT_OFFSET_TRIGGER_R2_PARAMS 12
+#define DS_OUTPUT_REPORT_OFFSET_TRIGGER_L2_MODE   22
+#define DS_OUTPUT_REPORT_OFFSET_TRIGGER_L2_PARAMS 23
+#define DS_OUTPUT_REPORT_OFFSET_UPDATE_FLAGS3     39
+#define DS_OUTPUT_REPORT_OFFSET_PLAYER_LEDS       44
+#define DS_OUTPUT_REPORT_OFFSET_LED_RED           45
+#define DS_OUTPUT_REPORT_OFFSET_LED_GREEN         46
+#define DS_OUTPUT_REPORT_OFFSET_LED_BLUE          47
+
 #define DS_BUTTON_SQUARE    0x00000010u
 #define DS_BUTTON_CROSS     0x00000020u
 #define DS_BUTTON_CIRCLE    0x00000040u
@@ -37,9 +63,15 @@ typedef uintptr_t DSDeviceHandle;
 #define DS_OUTPUT_UPDATE1_HAPTICS_SELECT 0x02u
 #define DS_OUTPUT_UPDATE1_TRIGGER_R2     0x04u
 #define DS_OUTPUT_UPDATE1_TRIGGER_L2     0x08u
+#define DS_OUTPUT_UPDATE1_SPEAKER_VOLUME    0x20u
+#define DS_OUTPUT_UPDATE1_MICROPHONE_VOLUME 0x40u
+#define DS_OUTPUT_UPDATE1_AUDIO_CONTROL     0x80u
 
+#define DS_OUTPUT_UPDATE2_MIC_MUTE_LED       0x01u
+#define DS_OUTPUT_UPDATE2_POWER_SAVE_CONTROL 0x02u
 #define DS_OUTPUT_UPDATE2_LED            0x04u
 #define DS_OUTPUT_UPDATE2_PLAYER_LEDS    0x10u
+#define DS_OUTPUT_UPDATE2_AUDIO_CONTROL2 0x80u
 
 #define DS_OUTPUT_UPDATE3_IMPROVED_RUMBLE 0x04u
 
@@ -169,6 +201,7 @@ import (
 	"log/slog"
 	"runtime/cgo"
 	"slices"
+	"unsafe"
 
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/device/dualsense"
@@ -178,6 +211,7 @@ import (
 type (
 	dsDeviceState = C.DSDeviceState
 	dsMetaState   = C.DSMetaState
+	dsOutputState = C.DSOutputState
 )
 
 // CreateDualSenseDevice creates a new DualSense (non-edge) device on the bus with the given ID on the server associated with the given handle.
@@ -393,6 +427,52 @@ func SetDualSenseOutputCallback(handle C.DSDeviceHandle, cb C.DSOutputCallback) 
 		})
 	})
 	return true
+}
+
+// DualSenseOutputReport builds the USB output report (report ID 0x02) of a DualSense from an output state.
+// @param state Output state, as received by the output callback.
+// @param report Output buffer of DS_OUTPUT_REPORT_SIZE bytes.
+//
+//export DualSenseOutputReport
+func DualSenseOutputReport(state C.DSOutputState, report *C.uint8_t) {
+	goState := goDSOutputState(state)
+	out := goState.OutputReport()
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(report)), len(out)), out[:])
+}
+
+// DualSenseGyroDpsToRaw converts an angular velocity in degrees per second to the raw gyroscope value of the device state.
+//
+//export DualSenseGyroDpsToRaw
+func DualSenseGyroDpsToRaw(dps float64) int16 {
+	return dualsense.GyroDpsToRaw(dps)
+}
+
+// DualSenseAccelMS2ToRaw converts an acceleration in m/s² to the raw accelerometer value of the device state.
+//
+//export DualSenseAccelMS2ToRaw
+func DualSenseAccelMS2ToRaw(ms2 float64) int16 {
+	return dualsense.AccelMS2ToRaw(ms2)
+}
+
+func goDSOutputState(state dsOutputState) dualsense.OutputState {
+	out := dualsense.OutputState{
+		UpdateFlags1:  uint8(state.UpdateFlags1),
+		UpdateFlags2:  uint8(state.UpdateFlags2),
+		UpdateFlags3:  uint8(state.UpdateFlags3),
+		RumbleSmall:   uint8(state.RumbleSmall),
+		RumbleLarge:   uint8(state.RumbleLarge),
+		LedRed:        uint8(state.LedRed),
+		LedGreen:      uint8(state.LedGreen),
+		LedBlue:       uint8(state.LedBlue),
+		PlayerLeds:    uint8(state.PlayerLeds),
+		TriggerR2Mode: uint8(state.TriggerR2.Mode),
+		TriggerL2Mode: uint8(state.TriggerL2.Mode),
+	}
+	for i := range out.TriggerR2Params {
+		out.TriggerR2Params[i] = uint8(state.TriggerR2.Params[i])
+		out.TriggerL2Params[i] = uint8(state.TriggerL2.Params[i])
+	}
+	return out
 }
 
 func dsTriggerEffect(effect dualsense.TriggerEffect) C.DSTriggerEffect {

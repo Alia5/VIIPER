@@ -26,6 +26,26 @@ public class DualsenseOutput : IBinarySerializable
 
     public TriggerEffect TriggerL2() => TriggerEffect.Decode(TriggerL2Mode, TriggerL2Params);
 
+    public byte[] OutputReport()
+    {
+        var report = new byte[Dualsense.OutputReportSize];
+        report[0] = Dualsense.ReportIDOutput;
+        report[Dualsense.OutputReportOffsetUpdateFlags1] = Updateflags1;
+        report[Dualsense.OutputReportOffsetUpdateFlags2] = Updateflags2;
+        report[Dualsense.OutputReportOffsetUpdateFlags3] = Updateflags3;
+        report[Dualsense.OutputReportOffsetRumbleSmall] = Rumblesmall;
+        report[Dualsense.OutputReportOffsetRumbleLarge] = Rumblelarge;
+        report[Dualsense.OutputReportOffsetLedRed] = Ledred;
+        report[Dualsense.OutputReportOffsetLedGreen] = Ledgreen;
+        report[Dualsense.OutputReportOffsetLedBlue] = Ledblue;
+        report[Dualsense.OutputReportOffsetPlayerLeds] = Playerleds;
+        report[Dualsense.OutputReportOffsetTriggerR2Mode] = TriggerR2Mode;
+        Array.Copy(TriggerR2Params, 0, report, Dualsense.OutputReportOffsetTriggerR2Params, Dualsense.TriggerParamsSize);
+        report[Dualsense.OutputReportOffsetTriggerL2Mode] = TriggerL2Mode;
+        Array.Copy(TriggerL2Params, 0, report, Dualsense.OutputReportOffsetTriggerL2Params, Dualsense.TriggerParamsSize);
+        return report;
+    }
+
     public void Write(BinaryWriter writer)
     {
         writer.Write(Updateflags1);

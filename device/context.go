@@ -3,17 +3,27 @@ package device
 
 import (
 	"context"
+	"net"
 	"time"
 
 	"github.com/Alia5/VIIPER/usbip"
 )
 
-type contextKey int
+type contextKey string
 
 const (
-	ExportMetaKey contextKey = iota
-	ConnTimerKey
+	ExportMetaKey contextKey = "exportMeta"
+	ConnTimerKey  contextKey = "connTimer"
+	ConnKey       contextKey = "conn"
 )
+
+func GetConn(ctx context.Context) net.Conn {
+	conn, ok := ctx.Value(ConnKey).(net.Conn)
+	if ok {
+		return conn
+	}
+	return nil
+}
 
 // GetDeviceMeta extracts the device metadata from a device context.
 // Returns nil if the context doesn't contain device metadata.

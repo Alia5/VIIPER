@@ -65,8 +65,14 @@ export enum Update {
   Flag1HapticsSelect = 0x2,
   Flag1TriggerR2 = 0x4,
   Flag1TriggerL2 = 0x8,
+  Flag1SpeakerVolume = 0x20,
+  Flag1MicrophoneVolume = 0x40,
+  Flag1AudioControl = 0x80,
+  Flag2MicMuteLed = 0x1,
+  Flag2PowerSaveControl = 0x2,
   Flag2Led = 0x4,
   Flag2PlayerLeds = 0x10,
+  Flag2AudioControl2 = 0x80,
   Flag3ImprovedRumble = 0x4,
 }
 
@@ -90,6 +96,31 @@ export enum TriggerMode {
 
 export const TriggerParamsSize = 10;
 export const TriggerZoneCount = 10;
+
+export const ReportIDOutput = 0x02;
+export const OutputReportSize = 64;
+export const OutputReportOffsetUpdateFlags1 = 1;
+export const OutputReportOffsetUpdateFlags2 = 2;
+export const OutputReportOffsetRumbleSmall = 3;
+export const OutputReportOffsetRumbleLarge = 4;
+export const OutputReportOffsetTriggerR2Mode = 11;
+export const OutputReportOffsetTriggerR2Params = 12;
+export const OutputReportOffsetTriggerL2Mode = 22;
+export const OutputReportOffsetTriggerL2Params = 23;
+export const OutputReportOffsetUpdateFlags3 = 39;
+export const OutputReportOffsetPlayerLeds = 44;
+export const OutputReportOffsetLedRed = 45;
+export const OutputReportOffsetLedGreen = 46;
+export const OutputReportOffsetLedBlue = 47;
+
+const int16Min = -32768;
+const int16Max = 32767;
+
+export const gyroDpsToRaw = (dps: number): number =>
+  Math.min(Math.max(Math.round(dps * GyroCountsPerDps), int16Min), int16Max);
+
+export const accelMS2ToRaw = (ms2: number): number =>
+  Math.min(Math.max(Math.round(ms2 * AccelCountsPerMS2), int16Min), int16Max);
 export const OutputStateSize = 31;
 
 

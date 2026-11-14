@@ -29,6 +29,35 @@ impl DualsenseOutput {
     pub fn trigger_l2(&self) -> TriggerEffect {
         TriggerEffect::decode(self.trigger_l2_mode, self.trigger_l2_params)
     }
+
+    pub fn output_report(&self) -> [u8; OUTPUT_REPORT_SIZE as usize] {
+        let mut report = [0u8; OUTPUT_REPORT_SIZE as usize];
+        report[0] = REPORT_ID_OUTPUT;
+        report[OUTPUT_REPORT_OFFSET_UPDATE_FLAGS1] = self.update_flags1;
+        report[OUTPUT_REPORT_OFFSET_UPDATE_FLAGS2] = self.update_flags2;
+        report[OUTPUT_REPORT_OFFSET_UPDATE_FLAGS3] = self.update_flags3;
+        report[OUTPUT_REPORT_OFFSET_RUMBLE_SMALL] = self.rumble_small;
+        report[OUTPUT_REPORT_OFFSET_RUMBLE_LARGE] = self.rumble_large;
+        report[OUTPUT_REPORT_OFFSET_LED_RED] = self.led_red;
+        report[OUTPUT_REPORT_OFFSET_LED_GREEN] = self.led_green;
+        report[OUTPUT_REPORT_OFFSET_LED_BLUE] = self.led_blue;
+        report[OUTPUT_REPORT_OFFSET_PLAYER_LEDS] = self.player_leds;
+        report[OUTPUT_REPORT_OFFSET_TRIGGER_R2_MODE] = self.trigger_r2_mode;
+        report[OUTPUT_REPORT_OFFSET_TRIGGER_R2_PARAMS..OUTPUT_REPORT_OFFSET_TRIGGER_R2_PARAMS + TRIGGER_PARAMS_SIZE]
+            .copy_from_slice(&self.trigger_r2_params);
+        report[OUTPUT_REPORT_OFFSET_TRIGGER_L2_MODE] = self.trigger_l2_mode;
+        report[OUTPUT_REPORT_OFFSET_TRIGGER_L2_PARAMS..OUTPUT_REPORT_OFFSET_TRIGGER_L2_PARAMS + TRIGGER_PARAMS_SIZE]
+            .copy_from_slice(&self.trigger_l2_params);
+        report
+    }
+}
+
+pub fn gyro_dps_to_raw(dps: f64) -> i16 {
+    (dps * GYRO_COUNTS_PER_DPS).round().clamp(i16::MIN as f64, i16::MAX as f64) as i16
+}
+
+pub fn accel_ms2_to_raw(ms2: f64) -> i16 {
+    (ms2 * ACCEL_COUNTS_PER_MS2).round().clamp(i16::MIN as f64, i16::MAX as f64) as i16
 }
 
 impl DeviceOutput for DualsenseOutput {

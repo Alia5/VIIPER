@@ -1,0 +1,313 @@
+package dualsensefull
+
+import (
+	"github.com/Alia5/VIIPER/device/dualsense"
+	"github.com/Alia5/VIIPER/usb"
+	"github.com/Alia5/VIIPER/usb/hid"
+)
+
+var defaultDescriptor = usb.Descriptor{
+	Device: usb.DeviceDescriptor{
+		BcdUSB:             0x0200,
+		BDeviceClass:       0x00,
+		BDeviceSubClass:    0x00,
+		BDeviceProtocol:    0x00,
+		BMaxPacketSize0:    0x40,
+		IDVendor:           dualsense.DefaultVID,
+		IDProduct:          dualsense.DefaultPIDDS,
+		BcdDevice:          0x0100,
+		IManufacturer:      0x01,
+		IProduct:           0x02,
+		ISerialNumber:      0x00,
+		BNumConfigurations: 0x01,
+		Speed:              3,
+	},
+	Interfaces: []usb.InterfaceConfig{
+		{
+			Descriptor: usb.InterfaceDescriptor{
+				BInterfaceNumber:   0x00,
+				BAlternateSetting:  0x00,
+				BNumEndpoints:      0x00,
+				BInterfaceClass:    0x01,
+				BInterfaceSubClass: 0x01,
+				BInterfaceProtocol: 0x00,
+				IInterface:         0x00,
+			},
+			ClassDescriptors: []usb.ClassSpecificDescriptor{
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x01, 0x00, 0x01, 0x49, 0x00, 0x02, 0x01, 0x02,
+					},
+				},
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x02, 0x01, 0x01, 0x01, 0x06, 0x04, 0x33, 0x00, 0x00, 0x00,
+					},
+				},
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x06, 0x02, 0x01, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00,
+					},
+				},
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x03, 0x03, 0x01, 0x03, 0x04, 0x02, 0x00,
+					},
+				},
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x02, 0x04, 0x02, 0x04, 0x03, 0x02, 0x03, 0x00, 0x00, 0x00,
+					},
+				},
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x06, 0x05, 0x04, 0x01, 0x03, 0x00, 0x00,
+					},
+				},
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x03, 0x06, 0x01, 0x01, 0x01, 0x05, 0x00,
+					},
+				},
+			},
+		},
+		{
+			Descriptor: usb.InterfaceDescriptor{
+				BInterfaceNumber:   0x01,
+				BAlternateSetting:  0x00,
+				BNumEndpoints:      0x00,
+				BInterfaceClass:    0x01,
+				BInterfaceSubClass: 0x02,
+				BInterfaceProtocol: 0x00,
+				IInterface:         0x00,
+			},
+		},
+		{
+			Descriptor: usb.InterfaceDescriptor{
+				BInterfaceNumber:   0x01,
+				BAlternateSetting:  0x01,
+				BNumEndpoints:      0x01,
+				BInterfaceClass:    0x01,
+				BInterfaceSubClass: 0x02,
+				BInterfaceProtocol: 0x00,
+				IInterface:         0x00,
+			},
+			ClassDescriptors: []usb.ClassSpecificDescriptor{
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x01, 0x01, 0x01, 0x01, 0x00,
+					},
+				},
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x02, 0x01, 0x04, 0x02, 0x10, 0x01, 0x80, 0xBB, 0x00,
+					},
+				},
+			},
+			Endpoints: []usb.EndpointDescriptor{
+				{
+					BEndpointAddress: 0x01,
+					BMAttributes:     0x09,
+					WMaxPacketSize:   392,
+					BInterval:        4,
+					Audio:            &usb.AudioEndpointDescriptor{},
+					ClassDescriptors: []usb.ClassSpecificDescriptor{
+						{
+							DescriptorType: 0x25,
+							Payload: usb.Data{
+								0x01, 0x00, 0x00, 0x00, 0x00,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Descriptor: usb.InterfaceDescriptor{
+				BInterfaceNumber:   0x02,
+				BAlternateSetting:  0x00,
+				BNumEndpoints:      0x00,
+				BInterfaceClass:    0x01,
+				BInterfaceSubClass: 0x02,
+				BInterfaceProtocol: 0x00,
+				IInterface:         0x00,
+			},
+		},
+		{
+			Descriptor: usb.InterfaceDescriptor{
+				BInterfaceNumber:   0x02,
+				BAlternateSetting:  0x01,
+				BNumEndpoints:      0x01,
+				BInterfaceClass:    0x01,
+				BInterfaceSubClass: 0x02,
+				BInterfaceProtocol: 0x00,
+				IInterface:         0x00,
+			},
+			ClassDescriptors: []usb.ClassSpecificDescriptor{
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x01, 0x06, 0x01, 0x01, 0x00,
+					},
+				},
+				{
+					DescriptorType: 0x24,
+					Payload: usb.Data{
+						0x02, 0x01, 0x02, 0x02, 0x10, 0x01, 0x80, 0xBB, 0x00,
+					},
+				},
+			},
+			Endpoints: []usb.EndpointDescriptor{
+				{
+					BEndpointAddress: 0x82,
+					BMAttributes:     0x05,
+					WMaxPacketSize:   196,
+					BInterval:        4,
+					Audio:            &usb.AudioEndpointDescriptor{},
+					ClassDescriptors: []usb.ClassSpecificDescriptor{
+						{
+							DescriptorType: 0x25,
+							Payload: usb.Data{
+								0x01, 0x00, 0x00, 0x00, 0x00,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Descriptor: usb.InterfaceDescriptor{
+				BInterfaceNumber:   0x03,
+				BAlternateSetting:  0x00,
+				BNumEndpoints:      0x02,
+				BInterfaceClass:    0x03, // HID
+				BInterfaceSubClass: 0x00,
+				BInterfaceProtocol: 0x00,
+				IInterface:         0x00,
+			},
+			HID: &usb.HIDFunction{
+				Descriptor: usb.HIDDescriptor{
+					BcdHID:       0x0111,
+					BCountryCode: 0x00,
+					Descriptors: []usb.HIDSubDescriptor{
+						{Type: usb.ReportDescType},
+					},
+				},
+				ReportDescriptor: hid.ReportDescriptor{
+					Items: []hid.Item{
+						hid.UsagePage{Page: hid.UsagePageGenericDesktop},
+						hid.Usage{Usage: hid.UsageGamePad},
+						hid.Collection{
+							Kind: hid.CollectionApplication,
+							Items: []hid.Item{
+								hid.ReportID{ID: dualsense.ReportIDInput},
+								hid.UsagePage{Page: hid.UsagePageGenericDesktop},
+								hid.Usage{Usage: hid.UsageX},
+								hid.Usage{Usage: hid.UsageY},
+								hid.Usage{Usage: hid.UsageZ},
+								hid.Usage{Usage: hid.UsageRz},
+								hid.Usage{Usage: hid.UsageRx},
+								hid.Usage{Usage: hid.UsageRy},
+								hid.LogicalMinimum{Min: 0},
+								hid.LogicalMaximum{Max: 255},
+								hid.ReportSize{Bits: 8},
+								hid.ReportCount{Count: 6},
+								hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+
+								hid.UsagePage{Page: 0xFF00},
+								hid.Usage{Usage: 0x20},
+								hid.ReportCount{Count: 1},
+								hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+
+								hid.UsagePage{Page: hid.UsagePageGenericDesktop},
+								hid.Usage{Usage: 0x39},
+								hid.LogicalMinimum{Min: 0},
+								hid.LogicalMaximum{Max: 7},
+								hid.PhysicalMinimum{Min: 0},
+								hid.PhysicalMaximum{Max: 315},
+								hid.Unit{Value: 0x14},
+								hid.ReportSize{Bits: 4},
+								hid.ReportCount{Count: 1},
+								hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainNullState},
+								hid.Unit{Value: 0},
+
+								hid.UsagePage{Page: hid.UsagePageButton},
+								hid.UsageMinimum{Min: 0x01},
+								hid.UsageMaximum{Max: 0x0F},
+								hid.LogicalMinimum{Min: 0},
+								hid.LogicalMaximum{Max: 1},
+								hid.ReportSize{Bits: 1},
+								hid.ReportCount{Count: 15},
+								hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+
+								hid.UsagePage{Page: 0xFF00},
+								hid.Usage{Usage: 0x21},
+								hid.ReportCount{Count: 13},
+								hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+
+								hid.UsagePage{Page: 0xFF00},
+								hid.Usage{Usage: 0x22},
+								hid.LogicalMinimum{Min: 0},
+								hid.LogicalMaximum{Max: 255},
+								hid.ReportSize{Bits: 8},
+								hid.ReportCount{Count: 52},
+								hid.Input{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+
+								hid.ReportID{ID: dualsense.ReportIDOutput},
+								hid.Usage{Usage: 0x23},
+								hid.ReportCount{Count: 47},
+								hid.Output{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+
+								hid.ReportID{ID: dualsense.FeatureIDCalibration}, hid.Usage{Usage: 0x33}, hid.ReportCount{Count: 40}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x08}, hid.Usage{Usage: 0x34}, hid.ReportCount{Count: 47}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: dualsense.FeatureIDPairing}, hid.Usage{Usage: 0x24}, hid.ReportCount{Count: 19}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x0A}, hid.Usage{Usage: 0x25}, hid.ReportCount{Count: 26}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: dualsense.FeatureIDFirmware}, hid.Usage{Usage: 0x26}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x21}, hid.Usage{Usage: 0x27}, hid.ReportCount{Count: 4}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x22}, hid.Usage{Usage: 0x40}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x80}, hid.Usage{Usage: 0x28}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x81}, hid.Usage{Usage: 0x29}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x82}, hid.Usage{Usage: 0x2A}, hid.ReportCount{Count: 9}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x83}, hid.Usage{Usage: 0x2B}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x84}, hid.Usage{Usage: 0x2C}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0x85}, hid.Usage{Usage: 0x2D}, hid.ReportCount{Count: 2}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0xA0}, hid.Usage{Usage: 0x2E}, hid.ReportCount{Count: 1}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0xE0}, hid.Usage{Usage: 0x2F}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0xF0}, hid.Usage{Usage: 0x30}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0xF1}, hid.Usage{Usage: 0x31}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0xF2}, hid.Usage{Usage: 0x32}, hid.ReportCount{Count: 15}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0xF4}, hid.Usage{Usage: 0x35}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+								hid.ReportID{ID: 0xF5}, hid.Usage{Usage: 0x36}, hid.ReportCount{Count: 3}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs}}},
+					}},
+			},
+			Endpoints: []usb.EndpointDescriptor{
+				{
+					BEndpointAddress: dualsense.EndpointIn,
+					BMAttributes:     0x03, // Interrupt
+					WMaxPacketSize:   64,
+					BInterval:        4,
+				},
+				{
+					BEndpointAddress: dualsense.EndpointOut,
+					BMAttributes:     0x03, // Interrupt
+					WMaxPacketSize:   64,
+					BInterval:        4,
+				},
+			},
+		},
+	},
+	Strings: map[uint8]string{
+		0: "\u0409", // LangID: en-US (0x0409)
+		1: "Sony Interactive Entertainment",
+		2: "DualSense Wireless Controller",
+	},
+}

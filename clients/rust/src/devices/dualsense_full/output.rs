@@ -1,5 +1,4 @@
 use super::constants::*;
-use super::trigger_effect::TriggerEffect;
 use crate::devices::dualsense::DualsenseOutput;
 use crate::wire::DeviceOutput;
 
@@ -8,19 +7,24 @@ const BASE_OUTPUT_SIZE: usize = crate::devices::dualsense::OUTPUT_SIZE;
 #[derive(Debug, Clone, Default)]
 pub struct DualsenseFullOutput {
     pub base: DualsenseOutput,
-    pub trigger_r2_mode: u8,
-    pub trigger_r2_params: [u8; TRIGGER_PARAMS_SIZE],
-    pub trigger_l2_mode: u8,
-    pub trigger_l2_params: [u8; TRIGGER_PARAMS_SIZE],
+    pub speaker_volume: u8,
+    pub microphone_volume: u8,
+    pub audio_control: u8,
+    pub mic_mute_led: u8,
+    pub power_save_control: u8,
+    pub audio_control2: u8,
 }
 
 impl DualsenseFullOutput {
-    pub fn trigger_r2(&self) -> TriggerEffect {
-        TriggerEffect::decode(self.trigger_r2_mode, self.trigger_r2_params)
-    }
-
-    pub fn trigger_l2(&self) -> TriggerEffect {
-        TriggerEffect::decode(self.trigger_l2_mode, self.trigger_l2_params)
+    pub fn output_report(&self) -> [u8; crate::devices::dualsense::OUTPUT_REPORT_SIZE as usize] {
+        let mut report = self.base.output_report();
+        report[OUTPUT_REPORT_OFFSET_SPEAKER_VOLUME] = self.speaker_volume;
+        report[OUTPUT_REPORT_OFFSET_MICROPHONE_VOLUME] = self.microphone_volume;
+        report[OUTPUT_REPORT_OFFSET_AUDIO_CONTROL] = self.audio_control;
+        report[OUTPUT_REPORT_OFFSET_MIC_MUTE_LED] = self.mic_mute_led;
+        report[OUTPUT_REPORT_OFFSET_POWER_SAVE_CONTROL] = self.power_save_control;
+        report[OUTPUT_REPORT_OFFSET_AUDIO_CONTROL2] = self.audio_control2;
+        report
     }
 }
 
@@ -32,18 +36,16 @@ impl DeviceOutput for DualsenseFullOutput {
             ));
         }
         let base = DualsenseOutput::from_bytes(buf)?;
-        let triggers = &buf[BASE_OUTPUT_SIZE..OUTPUT_SIZE];
-        let mut trigger_r2_params = [0u8; TRIGGER_PARAMS_SIZE];
-        trigger_r2_params.copy_from_slice(&triggers[1..1 + TRIGGER_PARAMS_SIZE]);
-        let mut trigger_l2_params = [0u8; TRIGGER_PARAMS_SIZE];
-        trigger_l2_params.copy_from_slice(&triggers[2 + TRIGGER_PARAMS_SIZE..]);
+        let audio = &buf[BASE_OUTPUT_SIZE..OUTPUT_SIZE];
 
         Ok(Self {
             base,
-            trigger_r2_mode: triggers[0],
-            trigger_r2_params,
-            trigger_l2_mode: triggers[1 + TRIGGER_PARAMS_SIZE],
-            trigger_l2_params,
+            speaker_volume: audio[0],
+            microphone_volume: audio[1],
+            audio_control: audio[2],
+            mic_mute_led: audio[3],
+            power_save_control: audio[4],
+            audio_control2: audio[5],
         })
     }
 }

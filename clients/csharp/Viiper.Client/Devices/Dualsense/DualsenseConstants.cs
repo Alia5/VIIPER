@@ -15,6 +15,32 @@ public static class Dualsense
     public const int TriggerParamsSize = 10;
     public const int TriggerZoneCount = 10;
 
+    public const byte ReportIDOutput = 0x02;
+    public const int OutputReportSize = 64;
+    public const int OutputReportOffsetUpdateFlags1 = 1;
+    public const int OutputReportOffsetUpdateFlags2 = 2;
+    public const int OutputReportOffsetRumbleSmall = 3;
+    public const int OutputReportOffsetRumbleLarge = 4;
+    public const int OutputReportOffsetTriggerR2Mode = 11;
+    public const int OutputReportOffsetTriggerR2Params = 12;
+    public const int OutputReportOffsetTriggerL2Mode = 22;
+    public const int OutputReportOffsetTriggerL2Params = 23;
+    public const int OutputReportOffsetUpdateFlags3 = 39;
+    public const int OutputReportOffsetPlayerLeds = 44;
+    public const int OutputReportOffsetLedRed = 45;
+    public const int OutputReportOffsetLedGreen = 46;
+    public const int OutputReportOffsetLedBlue = 47;
+
+    public static short GyroDpsToRaw(double dps)
+    {
+        return (short)Math.Clamp(Math.Round(dps * GyroCountsPerDps), short.MinValue, short.MaxValue);
+    }
+
+    public static short AccelMS2ToRaw(double ms2)
+    {
+        return (short)Math.Clamp(Math.Round(ms2 * AccelCountsPerMS2), short.MinValue, short.MaxValue);
+    }
+
     public const double AccelCountsPerMS2 = 835.070000;
     public const string DefaultBatteryStatus = "BatteryFullyCharged";
     public const string DefaultBoardStringDS = "BDM-050";
@@ -145,8 +171,14 @@ public enum Update : byte
     Flag1HapticsSelect = 0x2,
     Flag1TriggerR2 = 0x4,
     Flag1TriggerL2 = 0x8,
+    Flag1SpeakerVolume = 0x20,
+    Flag1MicrophoneVolume = 0x40,
+    Flag1AudioControl = 0x80,
+    Flag2MicMuteLed = 0x1,
+    Flag2PowerSaveControl = 0x2,
     Flag2Led = 0x4,
     Flag2PlayerLeds = 0x10,
+    Flag2AudioControl2 = 0x80,
     Flag3ImprovedRumble = 0x4,
 }
 

@@ -5,6 +5,7 @@
 #include "../error.hpp"
 #include "../detail/json.hpp"
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -36,9 +37,9 @@ namespace viiper
         constexpr std::uint8_t TriggerModeDebugFD = 0xFD;
         constexpr std::uint8_t TriggerModeDebugFE = 0xFE;
 
-        constexpr std::uint64_t DefaultVID = 1356;
-        constexpr std::uint64_t DefaultPIDDSEdge = 3570;
-        constexpr std::uint64_t DefaultPIDDS = 3302;
+        constexpr std::uint64_t DefaultVID = 0x054C;
+        constexpr std::uint64_t DefaultPIDDSEdge = 0x0DF2;
+        constexpr std::uint64_t DefaultPIDDS = 0x0CE6;
         constexpr std::uint64_t EndpointIn = 132;
         constexpr std::uint64_t EndpointOut = 3;
         constexpr std::uint64_t ReportIDInput = 1;
@@ -47,53 +48,59 @@ namespace viiper
         constexpr std::uint64_t OutputReportSize = 64;
         constexpr std::uint64_t InputStateSize = 33;
         constexpr std::uint64_t OutputStateSize = 31;
-        constexpr std::uint64_t UpdateFlag1Rumble = 1;
-        constexpr std::uint64_t UpdateFlag1HapticsSelect = 2;
-        constexpr std::uint64_t UpdateFlag1TriggerR2 = 4;
-        constexpr std::uint64_t UpdateFlag1TriggerL2 = 8;
-        constexpr std::uint64_t UpdateFlag2Led = 4;
-        constexpr std::uint64_t UpdateFlag2PlayerLeds = 16;
-        constexpr std::uint64_t UpdateFlag3ImprovedRumble = 4;
-        constexpr std::uint64_t ButtonSquare = 16;
-        constexpr std::uint64_t ButtonCross = 32;
-        constexpr std::uint64_t ButtonCircle = 64;
-        constexpr std::uint64_t ButtonTriangle = 128;
-        constexpr std::uint64_t ButtonL1 = 256;
-        constexpr std::uint64_t ButtonR1 = 512;
-        constexpr std::uint64_t ButtonL2 = 1024;
-        constexpr std::uint64_t ButtonR2 = 2048;
-        constexpr std::uint64_t ButtonCreate = 4096;
-        constexpr std::uint64_t ButtonOptions = 8192;
-        constexpr std::uint64_t ButtonL3 = 16384;
-        constexpr std::uint64_t ButtonR3 = 32768;
-        constexpr std::uint64_t ButtonPS = 65536;
-        constexpr std::uint64_t ButtonTouchpad = 131072;
-        constexpr std::uint64_t ButtonMicMute = 262144;
-        constexpr std::uint64_t ButtonEdgeLFn = 1048576;
-        constexpr std::uint64_t ButtonEdgeRFn = 2097152;
-        constexpr std::uint64_t ButtonEdgeL4 = 4194304;
-        constexpr std::uint64_t ButtonEdgeR4 = 8388608;
-        constexpr std::uint64_t DPadUp = 1;
-        constexpr std::uint64_t DPadDown = 2;
-        constexpr std::uint64_t DPadLeft = 4;
-        constexpr std::uint64_t DPadRight = 8;
-        constexpr std::uint64_t DPadUSBUp = 0;
-        constexpr std::uint64_t DPadUSBUpRight = 1;
-        constexpr std::uint64_t DPadUSBRight = 2;
-        constexpr std::uint64_t DPadUSBDownRight = 3;
-        constexpr std::uint64_t DPadUSBDown = 4;
-        constexpr std::uint64_t DPadUSBDownLeft = 5;
-        constexpr std::uint64_t DPadUSBLeft = 6;
-        constexpr std::uint64_t DPadUSBUpLeft = 7;
-        constexpr std::uint64_t DPadUSBNeutral = 8;
-        constexpr std::uint64_t DPadMask = 15;
-        constexpr std::uint64_t DefaultAccelXRaw = 0;
-        constexpr std::uint64_t DefaultAccelYRaw = 0;
-        constexpr std::uint64_t DefaultAccelZRaw = -8192;
-        constexpr std::uint64_t TouchpadMinX = 0;
-        constexpr std::uint64_t TouchpadMinY = 0;
-        constexpr std::uint64_t TouchpadMaxX = 1920;
-        constexpr std::uint64_t TouchpadMaxY = 1080;
+        constexpr std::uint8_t UpdateFlag1Rumble = 1;
+        constexpr std::uint8_t UpdateFlag1HapticsSelect = 2;
+        constexpr std::uint8_t UpdateFlag1TriggerR2 = 4;
+        constexpr std::uint8_t UpdateFlag1TriggerL2 = 8;
+        constexpr std::uint8_t UpdateFlag1SpeakerVolume = 32;
+        constexpr std::uint8_t UpdateFlag1MicrophoneVolume = 64;
+        constexpr std::uint8_t UpdateFlag1AudioControl = 128;
+        constexpr std::uint8_t UpdateFlag2MicMuteLed = 1;
+        constexpr std::uint8_t UpdateFlag2PowerSaveControl = 2;
+        constexpr std::uint8_t UpdateFlag2Led = 4;
+        constexpr std::uint8_t UpdateFlag2PlayerLeds = 16;
+        constexpr std::uint8_t UpdateFlag2AudioControl2 = 128;
+        constexpr std::uint8_t UpdateFlag3ImprovedRumble = 4;
+        constexpr std::uint32_t ButtonSquare = 16;
+        constexpr std::uint32_t ButtonCross = 32;
+        constexpr std::uint32_t ButtonCircle = 64;
+        constexpr std::uint32_t ButtonTriangle = 128;
+        constexpr std::uint32_t ButtonL1 = 256;
+        constexpr std::uint32_t ButtonR1 = 512;
+        constexpr std::uint32_t ButtonL2 = 1024;
+        constexpr std::uint32_t ButtonR2 = 2048;
+        constexpr std::uint32_t ButtonCreate = 4096;
+        constexpr std::uint32_t ButtonOptions = 8192;
+        constexpr std::uint32_t ButtonL3 = 16384;
+        constexpr std::uint32_t ButtonR3 = 32768;
+        constexpr std::uint32_t ButtonPS = 65536;
+        constexpr std::uint32_t ButtonTouchpad = 131072;
+        constexpr std::uint32_t ButtonMicMute = 262144;
+        constexpr std::uint32_t ButtonEdgeLFn = 1048576;
+        constexpr std::uint32_t ButtonEdgeRFn = 2097152;
+        constexpr std::uint32_t ButtonEdgeL4 = 4194304;
+        constexpr std::uint32_t ButtonEdgeR4 = 8388608;
+        constexpr std::uint8_t DPadUp = 1;
+        constexpr std::uint8_t DPadDown = 2;
+        constexpr std::uint8_t DPadLeft = 4;
+        constexpr std::uint8_t DPadRight = 8;
+        constexpr std::uint8_t DPadUSBUp = 0;
+        constexpr std::uint8_t DPadUSBUpRight = 1;
+        constexpr std::uint8_t DPadUSBRight = 2;
+        constexpr std::uint8_t DPadUSBDownRight = 3;
+        constexpr std::uint8_t DPadUSBDown = 4;
+        constexpr std::uint8_t DPadUSBDownLeft = 5;
+        constexpr std::uint8_t DPadUSBLeft = 6;
+        constexpr std::uint8_t DPadUSBUpLeft = 7;
+        constexpr std::uint8_t DPadUSBNeutral = 8;
+        constexpr std::uint8_t DPadMask = 15;
+        constexpr std::int16_t DefaultAccelXRaw = 0;
+        constexpr std::int16_t DefaultAccelYRaw = 0;
+        constexpr std::int16_t DefaultAccelZRaw = -8192;
+        constexpr std::uint16_t TouchpadMinX = 0;
+        constexpr std::uint16_t TouchpadMinY = 0;
+        constexpr std::uint16_t TouchpadMaxX = 1920;
+        constexpr std::uint16_t TouchpadMaxY = 1080;
         constexpr std::uint64_t TouchInactiveMask = 128;
         constexpr std::uint64_t DeltaTimeNS = 333;
         constexpr std::uint64_t BatteryFullyCharged = 42;
@@ -103,6 +110,33 @@ namespace viiper
         constexpr std::uint64_t HardwareType = 3;
         constexpr std::uint64_t HwInfo = 16777736;
         constexpr std::uint64_t FirmwareVersion = 1584;
+
+        constexpr double GyroCountsPerDps = 16.384;
+        constexpr double AccelCountsPerMS2 = 835.07;
+
+        constexpr std::size_t OutputReportOffsetUpdateFlags1 = 1;
+        constexpr std::size_t OutputReportOffsetUpdateFlags2 = 2;
+        constexpr std::size_t OutputReportOffsetRumbleSmall = 3;
+        constexpr std::size_t OutputReportOffsetRumbleLarge = 4;
+        constexpr std::size_t OutputReportOffsetTriggerR2Mode = 11;
+        constexpr std::size_t OutputReportOffsetTriggerR2Params = 12;
+        constexpr std::size_t OutputReportOffsetTriggerL2Mode = 22;
+        constexpr std::size_t OutputReportOffsetTriggerL2Params = 23;
+        constexpr std::size_t OutputReportOffsetUpdateFlags3 = 39;
+        constexpr std::size_t OutputReportOffsetPlayerLeds = 44;
+        constexpr std::size_t OutputReportOffsetLedRed = 45;
+        constexpr std::size_t OutputReportOffsetLedGreen = 46;
+        constexpr std::size_t OutputReportOffsetLedBlue = 47;
+
+        [[nodiscard]] inline std::int16_t gyro_dps_to_raw(double dps)
+        {
+            return static_cast<std::int16_t>(std::clamp(std::round(dps * GyroCountsPerDps), -32768.0, 32767.0));
+        }
+
+        [[nodiscard]] inline std::int16_t accel_ms2_to_raw(double ms2)
+        {
+            return static_cast<std::int16_t>(std::clamp(std::round(ms2 * AccelCountsPerMS2), -32768.0, 32767.0));
+        }
 
         struct MetaState
         {
@@ -190,10 +224,12 @@ namespace viiper
                 buf.push_back(static_cast<std::uint8_t>((touch1x >> 8) & 0xFF));
                 buf.push_back(static_cast<std::uint8_t>(touch1y & 0xFF));
                 buf.push_back(static_cast<std::uint8_t>((touch1y >> 8) & 0xFF));
+                buf.push_back(touch1active ? 1 : 0);
                 buf.push_back(static_cast<std::uint8_t>(touch2x & 0xFF));
                 buf.push_back(static_cast<std::uint8_t>((touch2x >> 8) & 0xFF));
                 buf.push_back(static_cast<std::uint8_t>(touch2y & 0xFF));
                 buf.push_back(static_cast<std::uint8_t>((touch2y >> 8) & 0xFF));
+                buf.push_back(touch2active ? 1 : 0);
                 buf.push_back(static_cast<std::uint8_t>(gyrox & 0xFF));
                 buf.push_back(static_cast<std::uint8_t>((gyrox >> 8) & 0xFF));
                 buf.push_back(static_cast<std::uint8_t>(gyroy & 0xFF));
@@ -354,6 +390,26 @@ namespace viiper
             [[nodiscard]] TriggerEffect trigger_l2() const
             {
                 return TriggerEffect::decode(trigger_l2_mode, trigger_l2_params);
+            }
+
+            [[nodiscard]] std::array<std::uint8_t, OutputReportSize> output_report() const
+            {
+                std::array<std::uint8_t, OutputReportSize> report{};
+                report[0] = static_cast<std::uint8_t>(ReportIDOutput);
+                report[OutputReportOffsetUpdateFlags1] = updateflags1;
+                report[OutputReportOffsetUpdateFlags2] = updateflags2;
+                report[OutputReportOffsetUpdateFlags3] = updateflags3;
+                report[OutputReportOffsetRumbleSmall] = rumblesmall;
+                report[OutputReportOffsetRumbleLarge] = rumblelarge;
+                report[OutputReportOffsetLedRed] = ledred;
+                report[OutputReportOffsetLedGreen] = ledgreen;
+                report[OutputReportOffsetLedBlue] = ledblue;
+                report[OutputReportOffsetPlayerLeds] = playerleds;
+                report[OutputReportOffsetTriggerR2Mode] = trigger_r2_mode;
+                std::copy(trigger_r2_params.begin(), trigger_r2_params.end(), report.begin() + OutputReportOffsetTriggerR2Params);
+                report[OutputReportOffsetTriggerL2Mode] = trigger_l2_mode;
+                std::copy(trigger_l2_params.begin(), trigger_l2_params.end(), report.begin() + OutputReportOffsetTriggerL2Params);
+                return report;
             }
 
             static Result<Output> from_bytes(const std::uint8_t *data, std::size_t len)

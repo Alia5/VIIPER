@@ -2,6 +2,7 @@ package registry
 
 import (
 	_ "github.com/Alia5/VIIPER/device/dualsense"
+	_ "github.com/Alia5/VIIPER/device/dualsense/full"
 	_ "github.com/Alia5/VIIPER/device/dualshock4"
 	_ "github.com/Alia5/VIIPER/device/keyboard"
 	_ "github.com/Alia5/VIIPER/device/mouse"

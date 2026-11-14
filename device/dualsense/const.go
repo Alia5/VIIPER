@@ -119,15 +119,21 @@ const (
 )
 
 const (
-	UpdateFlag1Rumble        uint8 = 0x01
-	UpdateFlag1HapticsSelect uint8 = 0x02
-	UpdateFlag1TriggerR2     uint8 = 0x04
-	UpdateFlag1TriggerL2     uint8 = 0x08
+	UpdateFlag1Rumble           uint8 = 0x01
+	UpdateFlag1HapticsSelect    uint8 = 0x02
+	UpdateFlag1TriggerR2        uint8 = 0x04
+	UpdateFlag1TriggerL2        uint8 = 0x08
+	UpdateFlag1SpeakerVolume    uint8 = 0x20
+	UpdateFlag1MicrophoneVolume uint8 = 0x40
+	UpdateFlag1AudioControl     uint8 = 0x80
 )
 
 const (
-	UpdateFlag2Led        uint8 = 0x04
-	UpdateFlag2PlayerLeds uint8 = 0x10
+	UpdateFlag2MicMuteLed       uint8 = 0x01
+	UpdateFlag2PowerSaveControl uint8 = 0x02
+	UpdateFlag2Led              uint8 = 0x04
+	UpdateFlag2PlayerLeds       uint8 = 0x10
+	UpdateFlag2AudioControl2    uint8 = 0x80
 )
 
 const (

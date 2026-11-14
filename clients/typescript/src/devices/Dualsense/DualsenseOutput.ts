@@ -1,6 +1,23 @@
 import { BinaryWriter, BinaryReader } from '../../utils/binary';
 import type { IBinarySerializable } from '../../ViiperDevice';
-import { TriggerParamsSize } from './DualsenseConstants';
+import {
+  OutputReportOffsetLedBlue,
+  OutputReportOffsetLedGreen,
+  OutputReportOffsetLedRed,
+  OutputReportOffsetPlayerLeds,
+  OutputReportOffsetRumbleLarge,
+  OutputReportOffsetRumbleSmall,
+  OutputReportOffsetTriggerL2Mode,
+  OutputReportOffsetTriggerL2Params,
+  OutputReportOffsetTriggerR2Mode,
+  OutputReportOffsetTriggerR2Params,
+  OutputReportOffsetUpdateFlags1,
+  OutputReportOffsetUpdateFlags2,
+  OutputReportOffsetUpdateFlags3,
+  OutputReportSize,
+  ReportIDOutput,
+  TriggerParamsSize,
+} from './DualsenseConstants';
 import {
   TriggerEffect,
   decodeTriggerEffect,
@@ -31,6 +48,25 @@ export class DualsenseOutput implements IBinarySerializable {
 
   triggerL2(): TriggerEffect {
     return decodeTriggerEffect(this.TriggerL2Mode, this.TriggerL2Params);
+  }
+
+  outputReport(): Uint8Array {
+    const report = new Uint8Array(OutputReportSize);
+    report[0] = ReportIDOutput;
+    report[OutputReportOffsetUpdateFlags1] = this.Updateflags1;
+    report[OutputReportOffsetUpdateFlags2] = this.Updateflags2;
+    report[OutputReportOffsetUpdateFlags3] = this.Updateflags3;
+    report[OutputReportOffsetRumbleSmall] = this.Rumblesmall;
+    report[OutputReportOffsetRumbleLarge] = this.Rumblelarge;
+    report[OutputReportOffsetLedRed] = this.Ledred;
+    report[OutputReportOffsetLedGreen] = this.Ledgreen;
+    report[OutputReportOffsetLedBlue] = this.Ledblue;
+    report[OutputReportOffsetPlayerLeds] = this.Playerleds;
+    report[OutputReportOffsetTriggerR2Mode] = this.TriggerR2Mode;
+    report.set(this.TriggerR2Params.slice(0, TriggerParamsSize), OutputReportOffsetTriggerR2Params);
+    report[OutputReportOffsetTriggerL2Mode] = this.TriggerL2Mode;
+    report.set(this.TriggerL2Params.slice(0, TriggerParamsSize), OutputReportOffsetTriggerL2Params);
+    return report;
   }
 
   write(writer: BinaryWriter): void {
