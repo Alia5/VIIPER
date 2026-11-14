@@ -89,7 +89,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api"
 )
 
-// CreateDS4Device creates a new DualShock 4 device on the bus with the given ID on the server associated with the given handle.
+// CreateDS4 creates a new DualShock 4 device on the bus with the given ID on the server associated with the given handle.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -98,8 +98,8 @@ import (
 // @param idProduct Optional USB product ID (0 = default).
 // @param meta Optional pointer to initial device metadata. Pass NULL to use defaults.
 //
-//export CreateDS4Device
-func CreateDS4Device(
+//export CreateDS4
+func CreateDS4(
 	serverHandle C.USBServerHandle,
 	outDeviceHandle *C.DS4DeviceHandle,
 	busID uint32,
@@ -258,11 +258,11 @@ func SetDS4OutputCallback(handle C.DS4DeviceHandle, cb C.DS4OutputCallback) bool
 	return true
 }
 
-// RemoveDS4Device removes the DualShock 4 device associated with the given handle from the server.
+// RemoveDS4 removes the DualShock 4 device associated with the given handle from the server.
 // @param handle Handle to the DS4 device to remove.
 //
-//export RemoveDS4Device
-func RemoveDS4Device(handle C.DS4DeviceHandle) bool {
+//export RemoveDS4
+func RemoveDS4(handle C.DS4DeviceHandle) bool {
 	dh := cgo.Handle(handle)
 	dhw, ok := dh.Value().(*deviceHandleWrapper)
 	if !ok {

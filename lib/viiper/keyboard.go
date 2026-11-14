@@ -147,7 +147,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api"
 )
 
-// CreateKeyboardDevice creates a new HID keyboard device on the bus with the given ID on the server associated with the given handle.
+// CreateKeyboard creates a new HID keyboard device on the bus with the given ID on the server associated with the given handle.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -155,8 +155,8 @@ import (
 // @param idVendor Optional USB vendor ID (0 = default).
 // @param idProduct Optional USB product ID (0 = default).
 //
-//export CreateKeyboardDevice
-func CreateKeyboardDevice(
+//export CreateKeyboard
+func CreateKeyboard(
 	serverHandle C.USBServerHandle,
 	outDeviceHandle *C.KeyboardDeviceHandle,
 	busID uint32,
@@ -291,11 +291,11 @@ func SetKeyboardLEDCallback(handle C.KeyboardDeviceHandle, cb C.KeyboardLEDCallb
 	return true
 }
 
-// RemoveKeyboardDevice removes the keyboard device associated with the given handle from the server.
+// RemoveKeyboard removes the keyboard device associated with the given handle from the server.
 // @param handle Handle to the keyboard device to remove.
 //
-//export RemoveKeyboardDevice
-func RemoveKeyboardDevice(handle C.KeyboardDeviceHandle) bool {
+//export RemoveKeyboard
+func RemoveKeyboard(handle C.KeyboardDeviceHandle) bool {
 	dh := cgo.Handle(handle)
 	dhw, ok := dh.Value().(*deviceHandleWrapper)
 	if !ok {

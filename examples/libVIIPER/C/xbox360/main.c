@@ -68,7 +68,7 @@ int main() {
 
 
     Xbox360DeviceHandle deviceHandle = 0;
-    success = CreateXbox360Device(serverHandle, &deviceHandle, busID, true, 0,0,0);
+    success = CreateXbox360(serverHandle, &deviceHandle, busID, true, 0,0,0);
     if (!success) {
         printf("Failed to create Xbox 360 device.\n");
         return 1;

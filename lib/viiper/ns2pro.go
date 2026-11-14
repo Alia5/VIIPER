@@ -91,7 +91,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api"
 )
 
-// CreateNS2ProDevice creates a new Nintendo Switch 2 Pro Controller device on the bus with the given ID on the server associated with the given handle.
+// CreateNS2Pro creates a new Nintendo Switch 2 Pro Controller device on the bus with the given ID on the server associated with the given handle.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -100,8 +100,8 @@ import (
 // @param idProduct Optional USB product ID (0 = default).
 // @param meta Optional pointer to initial device metadata. Pass NULL to use defaults.
 //
-//export CreateNS2ProDevice
-func CreateNS2ProDevice(
+//export CreateNS2Pro
+func CreateNS2Pro(
 	serverHandle C.USBServerHandle,
 	outDeviceHandle *C.NS2ProDeviceHandle,
 	busID uint32,
@@ -249,11 +249,11 @@ func SetNS2ProOutputCallback(handle C.NS2ProDeviceHandle, cb C.NS2ProOutputCallb
 	return true
 }
 
-// RemoveNS2ProDevice removes the NS2Pro device associated with the given handle from the server.
+// RemoveNS2Pro removes the NS2Pro device associated with the given handle from the server.
 // @param handle Handle to the NS2Pro device to remove.
 //
-//export RemoveNS2ProDevice
-func RemoveNS2ProDevice(handle C.NS2ProDeviceHandle) bool {
+//export RemoveNS2Pro
+func RemoveNS2Pro(handle C.NS2ProDeviceHandle) bool {
 	dh := cgo.Handle(handle)
 	dhw, ok := dh.Value().(*deviceHandleWrapper)
 	if !ok {

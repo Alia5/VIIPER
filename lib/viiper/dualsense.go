@@ -214,7 +214,7 @@ type (
 	dsOutputState = C.DSOutputState
 )
 
-// CreateDualSenseDevice creates a new DualSense (non-edge) device on the bus with the given ID on the server associated with the given handle.
+// CreateDualSense creates a new DualSense (non-edge) device on the bus with the given ID on the server associated with the given handle.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -223,8 +223,8 @@ type (
 // @param idProduct Optional USB product ID (0 = default).
 // @param meta Optional pointer to initial device metadata. Pass NULL to use defaults.
 //
-//export CreateDualSenseDevice
-func CreateDualSenseDevice(
+//export CreateDualSense
+func CreateDualSense(
 	serverHandle C.USBServerHandle,
 	outDeviceHandle *C.DSDeviceHandle,
 	busID uint32,
@@ -236,7 +236,7 @@ func CreateDualSenseDevice(
 	return createDualSenseDevice(serverHandle, outDeviceHandle, busID, autoAttachLocalhost, idVendor, idProduct, meta, false)
 }
 
-// CreateDualSenseEdgeDevice creates a new DualSense Edge device on the bus with the given ID on the server associated with the given handle.
+// CreateDualSenseEdge creates a new DualSense Edge device on the bus with the given ID on the server associated with the given handle.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -245,8 +245,8 @@ func CreateDualSenseDevice(
 // @param idProduct Optional USB product ID (0 = default).
 // @param meta Optional pointer to initial device metadata. Pass NULL to use defaults.
 //
-//export CreateDualSenseEdgeDevice
-func CreateDualSenseEdgeDevice(
+//export CreateDualSenseEdge
+func CreateDualSenseEdge(
 	serverHandle C.USBServerHandle,
 	outDeviceHandle *C.DSDeviceHandle,
 	busID uint32,
@@ -500,11 +500,11 @@ func dsTriggerEffect(effect dualsense.TriggerEffect) C.DSTriggerEffect {
 	return out
 }
 
-// RemoveDualSenseDevice removes the DualSense device associated with the given handle from the server.
+// RemoveDualSense removes the DualSense device associated with the given handle from the server.
 // @param handle Handle to the DualSense device to remove.
 //
-//export RemoveDualSenseDevice
-func RemoveDualSenseDevice(handle C.DSDeviceHandle) bool {
+//export RemoveDualSense
+func RemoveDualSense(handle C.DSDeviceHandle) bool {
 	dh := cgo.Handle(handle)
 	dhw, ok := dh.Value().(*deviceHandleWrapper)
 	if !ok {

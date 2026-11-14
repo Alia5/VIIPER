@@ -44,7 +44,7 @@ class Program
         }
         Console.WriteLine($"Created USB bus with ID: {busID}");
 
-        success = LibVIIPER.CreateXbox360Device(serverHandle, out nuint deviceHandle, busID, true, 0, 0, 0);
+        success = LibVIIPER.CreateXbox360(serverHandle, out nuint deviceHandle, busID, true, 0, 0, 0);
         if (!success) {
             Console.WriteLine("Failed to create Xbox 360 device.");
             return 1;
@@ -167,7 +167,7 @@ static class LibVIIPER
 
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.I1)]
-    public static extern bool CreateXbox360Device(nuint serverHandle, out nuint outDeviceHandle, uint busID, [MarshalAs(UnmanagedType.I1)] bool autoAttachLocalhost, ushort idVendor, ushort idProduct, byte xinputSubType);
+    public static extern bool CreateXbox360(nuint serverHandle, out nuint outDeviceHandle, uint busID, [MarshalAs(UnmanagedType.I1)] bool autoAttachLocalhost, ushort idVendor, ushort idProduct, byte xinputSubType);
 
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.I1)]

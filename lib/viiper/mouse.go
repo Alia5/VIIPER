@@ -36,7 +36,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api"
 )
 
-// CreateMouseDevice creates a new HID mouse device on the bus with the given ID on the server associated with the given handle.
+// CreateMouse creates a new HID mouse device on the bus with the given ID on the server associated with the given handle.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -44,8 +44,8 @@ import (
 // @param idVendor Optional USB vendor ID (0 = default).
 // @param idProduct Optional USB product ID (0 = default).
 //
-//export CreateMouseDevice
-func CreateMouseDevice(
+//export CreateMouse
+func CreateMouse(
 	serverHandle C.USBServerHandle,
 	outDeviceHandle *C.MouseDeviceHandle,
 	busID uint32,
@@ -139,11 +139,11 @@ func SetMouseDeviceState(handle C.MouseDeviceHandle, state C.MouseDeviceState) b
 	return true
 }
 
-// RemoveMouseDevice removes the mouse device associated with the given handle from the server.
+// RemoveMouse removes the mouse device associated with the given handle from the server.
 // @param handle Handle to the mouse device to remove.
 //
-//export RemoveMouseDevice
-func RemoveMouseDevice(handle C.MouseDeviceHandle) bool {
+//export RemoveMouse
+func RemoveMouse(handle C.MouseDeviceHandle) bool {
 	dh := cgo.Handle(handle)
 	dhw, ok := dh.Value().(*deviceHandleWrapper)
 	if !ok {

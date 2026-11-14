@@ -293,7 +293,7 @@ int main(void)
     NS2ProMetaState meta = {
         .SerialNumber = "OVERRIDE-SN-00"
     };
-    if (!CreateNS2ProDevice(
+    if (!CreateNS2Pro(
             server,
             &device,
             busID, /*autoAttach=*/true,
@@ -363,7 +363,7 @@ int main(void)
     }
 
     printf("\nShutting down...\n");
-    RemoveNS2ProDevice(device);
+    RemoveNS2Pro(device);
     CloseUSBServer(server);
     return 0;
 }

@@ -59,7 +59,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api"
 )
 
-// CreateXbox360Device creates a new Xbox360 device on the bus with the given ID on the server associated with the given handle.
+// CreateXbox360 creates a new Xbox360 device on the bus with the given ID on the server associated with the given handle.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -68,8 +68,8 @@ import (
 // @param xinputSubType Optional XInput subtype to set on the device (e.g. 0x01 for gamepad, 0x02 for wheel, etc.). (Default gamepad)
 // @param autoAttachLocalhost If true, the device will be automatically attached to a USBIP-Client/Driver running on THIS machine. (uses IOCTL on windows, USBIP binary on linux)
 //
-//export CreateXbox360Device
-func CreateXbox360Device(
+//export CreateXbox360
+func CreateXbox360(
 	serverHandle C.USBServerHandle,
 	outDeviceHandle *C.Xbox360DeviceHandle,
 	busID uint32,
@@ -182,11 +182,11 @@ func SetXbox360DeviceState(handle C.Xbox360DeviceHandle, state C.Xbox360DeviceSt
 	return true
 }
 
-// RemoveXbox360Device removes the Xbox360 device associated with the given handle from the server.
+// RemoveXbox360 removes the Xbox360 device associated with the given handle from the server.
 // @param deviceHandle Handle to the Xbox360 device to remove.
 //
-//export RemoveXbox360Device
-func RemoveXbox360Device(handle C.Xbox360DeviceHandle) bool {
+//export RemoveXbox360
+func RemoveXbox360(handle C.Xbox360DeviceHandle) bool {
 	dh := cgo.Handle(handle)
 	dhw, ok := dh.Value().(*deviceHandleWrapper)
 	if !ok {
