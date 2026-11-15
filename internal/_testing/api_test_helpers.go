@@ -105,7 +105,11 @@ func ExecuteLine(t *testing.T, r *api.Router, data string) string {
 	path = strings.ToLower(path)
 
 	if h, params := r.Match(path); h != nil {
-		req := &api.Request{Params: params, Payload: payload}
+		req := &api.Request{
+			Ctx:     t.Context(),
+			Params:  params,
+			Payload: payload,
+		}
 		res := &api.Response{}
 		if err := h(req, res, slog.Default()); err != nil {
 			return jsonError(err.Error())

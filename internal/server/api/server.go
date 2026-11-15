@@ -131,6 +131,7 @@ func (s *Server) handleConn(conn net.Conn) {
 
 	connCtx, connCancel := context.WithCancel(context.Background())
 	defer connCancel()
+	connCtx = context.WithValue(connCtx, device.ConnKey, conn)
 
 	connLogger := s.logger.With("remote", conn.RemoteAddr().String())
 	r := bufio.NewReader(conn)
