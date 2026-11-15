@@ -52,7 +52,7 @@ Full working examples are in [`examples/libVIIPER/`](https://github.com/Alia5/VI
     CreateUSBBus(serverHandle, &busID);
 
     Xbox360DeviceHandle deviceHandle = 0;
-    CreateXbox360Device(serverHandle, &deviceHandle, busID, /*autoAttach=*/true, 0, 0, 0);
+    CreateXbox360(serverHandle, &deviceHandle, busID, /*autoAttach=*/true, 0, 0, 0);
 
     SetXbox360RumbleCallback(deviceHandle, rumbleCallback);
 
@@ -78,7 +78,7 @@ Full working examples are in [`examples/libVIIPER/`](https://github.com/Alia5/VI
     uint busID = 0;
     LibVIIPER.CreateUSBBus(serverHandle, ref busID);
 
-    LibVIIPER.CreateXbox360Device(serverHandle, out nuint deviceHandle, busID, autoAttachLocalhost: true, 0, 0, 0);
+    LibVIIPER.CreateXbox360(serverHandle, out nuint deviceHandle, busID, autoAttachLocalhost: true, 0, 0, 0);
 
     Xbox360RumbleCallbackDelegate rumbleCb = RumbleCallback;
     LibVIIPER.SetXbox360RumbleCallback(deviceHandle, rumbleCb);
@@ -96,7 +96,7 @@ Full working examples are in [`examples/libVIIPER/`](https://github.com/Alia5/VI
     LibVIIPER.CloseUSBServer(serverHandle);
     ```
 
-    See [`examples/libVIIPER/C#/`](https://github.com/Alia5/VIIPER/tree/main/examples/libVIIPER/C%23) for the full project including P/Invoke declarations.
+    See [`examples/libVIIPER/csharp/`](https://github.com/Alia5/VIIPER/tree/main/examples/libVIIPER/csharp) for the full project including P/Invoke declarations.
 
 ## Devices
 
@@ -122,5 +122,3 @@ typedef enum {
 
 typedef void (*VIIPERLogCallback)(VIIPERLogLevel level, const char* message);
 ```
-
-

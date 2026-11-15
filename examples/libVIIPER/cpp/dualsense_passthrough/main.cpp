@@ -7,20 +7,6 @@ You can use [HidHide](https://docs.nefarius.at/projects/HidHide/) to hide the re
 CMake fetches SDL3 from the main branch (needs newer than 7b82a40bbf1aad01d9b0f1f3bc18273a1ef9b6b4).
 */
 
-#ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-constexpr int MSG_NOSIGNAL = 0;
-#else
-#include <netdb.h>
-#include <sys/socket.h>
-#include <unistd.h>
-using SOCKET = int;
-constexpr SOCKET INVALID_SOCKET = -1;
-constexpr int SD_BOTH = SHUT_RDWR;
-constexpr auto closesocket = close;
-#endif
-
 #include "libVIIPER.h"
 #include <SDL3/SDL.h>
 #include <array>
@@ -36,10 +22,8 @@ constexpr auto closesocket = close;
 #include <numbers>
 #include <span>
 #include <stdexcept>
-#include <stop_token>
 #include <string>
 #include <string_view>
-#include <thread>
 
 using Gamepad = std::unique_ptr<SDL_Gamepad, decltype(&SDL_CloseGamepad)>;
 using AudioStream = std::unique_ptr<SDL_AudioStream, decltype(&SDL_DestroyAudioStream)>;
@@ -48,7 +32,8 @@ using AudioDevices = std::unique_ptr<SDL_AudioDeviceID[], decltype(&SDL_free)>;
 constexpr int EVENT_WAIT_TIMEOUT_MS = 16;
 constexpr double DEGREES_PER_RADIAN = 180.0 / std::numbers::pi;
 
-constexpr std::uint16_t AUDIO_PORT = 5000;
+constexpr int RECORDING_BUFFER_MAX_MS = 100;
+constexpr int RECORDING_BUFFER_MAX_SIZE = RECORDING_BUFFER_MAX_MS * DS_AUDIO_MICROPHONE_PACKET_SIZE;
 
 const std::map<std::string, std::string> SDL_HINTS = {
     {SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1"},
@@ -59,29 +44,15 @@ const std::map<std::string, std::string> SDL_HINTS = {
 
 struct AudioPassthrough
 {
-    SOCKET conn = INVALID_SOCKET;
-    std::jthread playback_thread;
-    std::jthread recording_thread;
-
-    ~AudioPassthrough()
-    {
-        shutdown(conn, SD_BOTH);
-        recording_thread.request_stop();
-        if (playback_thread.joinable())
-        {
-            playback_thread.join();
-        }
-        if (recording_thread.joinable())
-        {
-            recording_thread.join();
-        }
-        closesocket(conn);
-    }
+    AudioStream playback = AudioStream(nullptr, SDL_DestroyAudioStream);
+    AudioStream recording = AudioStream(nullptr, SDL_DestroyAudioStream);
 };
 
 std::atomic<bool> running{true};
 SDL_Gamepad *controller = nullptr;
-std::atomic<DSAudioOutputState> audio_output{};
+SDL_AudioStream *controller_playback = nullptr;
+SDL_AudioStream *controller_recording = nullptr;
+std::atomic<DSAudioControlState> audio_control{};
 
 void signal_handler(int)
 {
@@ -243,14 +214,33 @@ std::string to_string(const DSTriggerEffect &effect)
     return text;
 }
 
-void store_audio_output(DSDeviceHandle, DSAudioOutputState state)
+void store_audio_control(DSDeviceHandle, DSAudioControlState state)
 {
-    audio_output = state;
+    audio_control = state;
+}
+
+void forward_audio_output(DSDeviceHandle, const std::uint8_t *pcm, std::uint32_t size)
+{
+    SDL_PutAudioStreamData(controller_playback, pcm, static_cast<int>(size));
+}
+
+void forward_microphone(DSDeviceHandle, std::uint8_t *pcm, std::uint32_t size)
+{
+    SDL_GetAudioStreamData(controller_recording, pcm, static_cast<int>(size));
+}
+
+void limit_recording_buffer(void *, SDL_AudioStream *recording, int, int)
+{
+    std::array<std::uint8_t, DS_AUDIO_MICROPHONE_PACKET_SIZE> old{};
+    while (SDL_GetAudioStreamAvailable(recording) > RECORDING_BUFFER_MAX_SIZE)
+    {
+        SDL_GetAudioStreamData(recording, old.data(), static_cast<int>(old.size()));
+    }
 }
 
 void forward_feedback(DSDeviceHandle, DSOutputState f)
 {
-    const DSAudioOutputState audio = audio_output;
+    const DSAudioControlState audio = audio_control;
     std::string feedback_log = std::format(
         "flags={:02x}/{:02x}/{:02x}",
         f.UpdateFlags1,
@@ -341,8 +331,7 @@ void forward_feedback(DSDeviceHandle, DSOutputState f)
     effects.UpdateFlags1 = static_cast<std::uint8_t>(rumble | triggers | speaker);
     effects.UpdateFlags2 = static_cast<std::uint8_t>(player_leds | microphone | speaker_gain);
     effects.UpdateFlags3 &= DS_OUTPUT_UPDATE3_IMPROVED_RUMBLE;
-    DSAudioOutputState audio_effects = audio;
-    // The other AudioControl bits from PS Remote Play silence the microphone of the controller.
+    DSAudioControlState audio_effects = audio;
     audio_effects.AudioControl &= DS_AUDIO_CONTROL_OUTPUT_PATH;
     std::array<std::uint8_t, DS_OUTPUT_REPORT_SIZE> report{};
     DualSenseFullOutputReport(effects, audio_effects, report.data());
@@ -353,39 +342,7 @@ void forward_feedback(DSDeviceHandle, DSOutputState f)
     }
 }
 
-SOCKET connect_tcp(const std::string &host, std::uint16_t port)
-{
-#ifdef _WIN32
-    WSADATA winsock;
-    WSAStartup(WINSOCK_VERSION, &winsock);
-#endif
-    const addrinfo hints{
-        .ai_family = AF_UNSPEC,
-        .ai_socktype = SOCK_STREAM,
-    };
-    addrinfo *resolved = nullptr;
-    if (getaddrinfo(host.c_str(), std::to_string(port).c_str(), &hints, &resolved) != 0)
-    {
-        return INVALID_SOCKET;
-    }
-    const std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addresses(resolved, freeaddrinfo);
-    for (const addrinfo *address = addresses.get(); address != nullptr; address = address->ai_next)
-    {
-        const SOCKET conn = socket(address->ai_family, address->ai_socktype, address->ai_protocol);
-        if (conn == INVALID_SOCKET)
-        {
-            continue;
-        }
-        if (connect(conn, address->ai_addr, static_cast<int>(address->ai_addrlen)) == 0)
-        {
-            return conn;
-        }
-        closesocket(conn);
-    }
-    return INVALID_SOCKET;
-}
-
-void forward_audio(SDL_Gamepad *gamepad, const std::string &host, AudioPassthrough &audio)
+AudioPassthrough forward_audio(SDL_Gamepad *gamepad, DSDeviceHandle device)
 {
     const std::string container_id = SDL_GetStringProperty(
         SDL_GetGamepadProperties(gamepad),
@@ -443,10 +400,9 @@ void forward_audio(SDL_Gamepad *gamepad, const std::string &host, AudioPassthrou
         .channels = DS_AUDIO_OUTPUT_CHANNELS,
         .freq = DS_AUDIO_SAMPLE_RATE,
     };
-    AudioStream playback(
-        SDL_OpenAudioDeviceStream(playback_id, &playback_spec, nullptr, nullptr),
-        SDL_DestroyAudioStream);
-    if (!playback)
+    AudioPassthrough audio;
+    audio.playback.reset(SDL_OpenAudioDeviceStream(playback_id, &playback_spec, nullptr, nullptr));
+    if (!audio.playback)
     {
         throw std::runtime_error(SDL_GetError());
     }
@@ -455,62 +411,30 @@ void forward_audio(SDL_Gamepad *gamepad, const std::string &host, AudioPassthrou
         .channels = DS_AUDIO_MICROPHONE_CHANNELS,
         .freq = DS_AUDIO_SAMPLE_RATE,
     };
-    AudioStream recording(
-        SDL_OpenAudioDeviceStream(recording_id, &recording_spec, nullptr, nullptr),
-        SDL_DestroyAudioStream);
-    if (!recording)
+    audio.recording.reset(
+        SDL_OpenAudioDeviceStream(recording_id, &recording_spec, limit_recording_buffer, nullptr));
+    if (!audio.recording)
     {
         throw std::runtime_error(SDL_GetError());
     }
-    if (!SDL_ResumeAudioStreamDevice(playback.get()))
+    if (!SDL_ResumeAudioStreamDevice(audio.playback.get()))
     {
         throw std::runtime_error(SDL_GetError());
     }
-    if (!SDL_ResumeAudioStreamDevice(recording.get()))
+    if (!SDL_ResumeAudioStreamDevice(audio.recording.get()))
     {
         throw std::runtime_error(SDL_GetError());
-    }
-    audio.conn = connect_tcp(host, AUDIO_PORT);
-    if (audio.conn == INVALID_SOCKET)
-    {
-        throw std::runtime_error("connecting to the audio port failed");
     }
 
-    audio.playback_thread = std::jthread(
-        [playback = std::move(playback), conn = audio.conn]()
-        {
-            std::array<char, DS_AUDIO_OUTPUT_PACKET_SIZE> packet{};
-            const int size = static_cast<int>(packet.size());
-            while (recv(conn, packet.data(), size, MSG_WAITALL) == size)
-            {
-                SDL_PutAudioStreamData(playback.get(), packet.data(), size);
-            }
-        });
-    audio.recording_thread = std::jthread(
-        [recording = std::move(recording), conn = audio.conn](std::stop_token stop)
-        {
-            std::array<char, DS_AUDIO_MICROPHONE_PACKET_SIZE> packet{};
-            while (!stop.stop_requested())
-            {
-                const int size = SDL_GetAudioStreamData(
-                    recording.get(),
-                    packet.data(),
-                    static_cast<int>(packet.size()));
-                if (size <= 0)
-                {
-                    SDL_Delay(1);
-                    continue;
-                }
-                if (send(conn, packet.data(), size, MSG_NOSIGNAL) != size)
-                {
-                    return;
-                }
-            }
-        });
+    controller_playback = audio.playback.get();
+    controller_recording = audio.recording.get();
+    SetDualSenseFullAudioOutputCallback(device, forward_audio_output);
+    SetDualSenseFullMicrophoneCallback(device, forward_microphone);
     std::cout << std::format(
         "Started the audio passthrough playback=\"{}\" recording=\"{}\"\n",
         playback_name,
         recording_name);
+    return audio;
 }
 
 int main()
@@ -572,7 +496,7 @@ int main()
         return 1;
     }
     DSDeviceHandle device = 0;
-    if (!CreateDualSenseEdgeFull(server, &device, bus_id, true, 0, 0, nullptr, AUDIO_PORT))
+    if (!CreateDualSenseEdgeFull(server, &device, bus_id, true, 0, 0, nullptr))
     {
         std::cerr << "Creating the VIIPER device failed\n";
         CloseUSBServer(server);
@@ -581,13 +505,13 @@ int main()
     std::cout << std::format("Created the VIIPER device bus={}\n", bus_id);
 
     controller = gamepad.get();
-    SetDualSenseFullAudioOutputCallback(device, store_audio_output);
+    SetDualSenseFullAudioControlCallback(device, store_audio_control);
     SetDualSenseOutputCallback(device, forward_feedback);
 
     AudioPassthrough audio;
     try
     {
-        forward_audio(gamepad.get(), "localhost", audio);
+        audio = forward_audio(gamepad.get(), device);
     }
     catch (const std::runtime_error &error)
     {

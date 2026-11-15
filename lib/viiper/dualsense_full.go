@@ -34,12 +34,26 @@ typedef struct {
 	uint8_t MicMuteLed;
 	uint8_t PowerSaveControl; // DS_POWER_SAVE_CONTROL_*
 	uint8_t AudioControl2;    // bits 0-2: gain of the speaker pre-amplifier
-} DSAudioOutputState;
+} DSAudioControlState;
 
-typedef void (*DSAudioOutputCallback)(DSDeviceHandle handle, DSAudioOutputState state);
+typedef void (*DSAudioControlCallback)(DSDeviceHandle handle, DSAudioControlState state);
 
-static void viiper_call_ds_audio_output(DSAudioOutputCallback fn, DSDeviceHandle handle, DSAudioOutputState state) {
+// pcm: DS_AUDIO_OUTPUT_CHANNELS channels, DS_AUDIO_SAMPLE_RATE Hz, S16LE. Only valid during the call.
+typedef void (*DSAudioOutputCallback)(DSDeviceHandle handle, const uint8_t* pcm, uint32_t size);
+
+// pcm: buffer to fill with DS_AUDIO_MICROPHONE_CHANNELS channels, DS_AUDIO_SAMPLE_RATE Hz, S16LE. Only valid during the call.
+typedef void (*DSMicrophoneCallback)(DSDeviceHandle handle, uint8_t* pcm, uint32_t size);
+
+static void viiper_call_ds_audio_control(DSAudioControlCallback fn, DSDeviceHandle handle, DSAudioControlState state) {
 	fn(handle, state);
+}
+
+static void viiper_call_ds_audio_output(DSAudioOutputCallback fn, DSDeviceHandle handle, const uint8_t* pcm, uint32_t size) {
+	fn(handle, pcm, size);
+}
+
+static void viiper_call_ds_microphone(DSMicrophoneCallback fn, DSDeviceHandle handle, uint8_t* pcm, uint32_t size) {
+	fn(handle, pcm, size);
 }
 
 */
@@ -58,7 +72,7 @@ import (
 )
 
 // CreateDualSenseFull creates a new DualSense (non-edge) device with audio on the bus with the given ID on the server associated with the given handle.
-// The returned handle is used with SetDualSenseDeviceState, SetDualSenseOutputCallback, SetDualSenseFullAudioOutputCallback and RemoveDualSense.
+// The returned handle is used with SetDualSenseDeviceState, SetDualSenseOutputCallback, SetDualSenseFullAudioControlCallback, SetDualSenseFullAudioOutputCallback, SetDualSenseFullMicrophoneCallback and RemoveDualSense.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -66,7 +80,6 @@ import (
 // @param idVendor Optional USB vendor ID (0 = default).
 // @param idProduct Optional USB product ID (0 = default).
 // @param meta Optional pointer to initial device metadata. Pass NULL to use defaults.
-// @param audioPort TCP port on localhost for the audio of the device (0 = no audio port). The port sends the audio output as 4 channel 48 kHz S16LE PCM and receives the microphone input as 2 channel 48 kHz S16LE PCM.
 //
 //export CreateDualSenseFull
 func CreateDualSenseFull(
@@ -77,13 +90,12 @@ func CreateDualSenseFull(
 	idVendor uint16,
 	idProduct uint16,
 	meta *dsMetaState,
-	audioPort uint16,
 ) bool {
-	return createDualSenseFullDevice(serverHandle, outDeviceHandle, busID, autoAttachLocalhost, idVendor, idProduct, meta, audioPort, false)
+	return createDualSenseFullDevice(serverHandle, outDeviceHandle, busID, autoAttachLocalhost, idVendor, idProduct, meta, false)
 }
 
 // CreateDualSenseEdgeFull creates a new DualSense Edge device with audio on the bus with the given ID on the server associated with the given handle.
-// The returned handle is used with SetDualSenseDeviceState, SetDualSenseOutputCallback, SetDualSenseFullAudioOutputCallback and RemoveDualSense.
+// The returned handle is used with SetDualSenseDeviceState, SetDualSenseOutputCallback, SetDualSenseFullAudioControlCallback, SetDualSenseFullAudioOutputCallback, SetDualSenseFullMicrophoneCallback and RemoveDualSense.
 // @param serverHandle Handle to the USB server.
 // @param outDeviceHandle Output parameter for the created device handle.
 // @param busID ID of the bus to add the device to.
@@ -91,7 +103,6 @@ func CreateDualSenseFull(
 // @param idVendor Optional USB vendor ID (0 = default).
 // @param idProduct Optional USB product ID (0 = default).
 // @param meta Optional pointer to initial device metadata. Pass NULL to use defaults.
-// @param audioPort TCP port on localhost for the audio of the device (0 = no audio port). The port sends the audio output as 4 channel 48 kHz S16LE PCM and receives the microphone input as 2 channel 48 kHz S16LE PCM.
 //
 //export CreateDualSenseEdgeFull
 func CreateDualSenseEdgeFull(
@@ -102,9 +113,8 @@ func CreateDualSenseEdgeFull(
 	idVendor uint16,
 	idProduct uint16,
 	meta *dsMetaState,
-	audioPort uint16,
 ) bool {
-	return createDualSenseFullDevice(serverHandle, outDeviceHandle, busID, autoAttachLocalhost, idVendor, idProduct, meta, audioPort, true)
+	return createDualSenseFullDevice(serverHandle, outDeviceHandle, busID, autoAttachLocalhost, idVendor, idProduct, meta, true)
 }
 
 func createDualSenseFullDevice(
@@ -115,7 +125,6 @@ func createDualSenseFullDevice(
 	idVendor uint16,
 	idProduct uint16,
 	meta *dsMetaState,
-	audioPort uint16,
 	edge bool,
 ) bool {
 	sh := cgo.Handle(serverHandle)
@@ -152,9 +161,6 @@ func createDualSenseFullDevice(
 			HeadphonesConnected: meta.HeadphonesConnected != 0,
 			MicrophoneConnected: meta.MicrophoneConnected != 0,
 		}
-	}
-	if audioPort != 0 {
-		createOptions.AudioPort = &audioPort
 	}
 	b, err := json.Marshal(createOptions)
 	if err != nil {
@@ -209,13 +215,13 @@ func createDualSenseFullDevice(
 	return true
 }
 
-// DualSenseFullOutputReport builds the USB output report (report ID 0x02) of a DualSense with audio from an output state and an audio output state.
+// DualSenseFullOutputReport builds the USB output report (report ID 0x02) of a DualSense with audio from an output state and an audio control state.
 // @param state Output state, as received by the output callback.
-// @param audio Audio output state, as received by the audio output callback.
+// @param audio Audio control state, as received by the audio control callback.
 // @param report Output buffer of DS_OUTPUT_REPORT_SIZE bytes.
 //
 //export DualSenseFullOutputReport
-func DualSenseFullOutputReport(state dsOutputState, audio C.DSAudioOutputState, report *C.uint8_t) {
+func DualSenseFullOutputReport(state dsOutputState, audio C.DSAudioControlState, report *C.uint8_t) {
 	goState := dualsensefull.OutputState{
 		OutputState:      goDSOutputState(state),
 		SpeakerVolume:    uint8(audio.SpeakerVolume),
@@ -229,28 +235,74 @@ func DualSenseFullOutputReport(state dsOutputState, audio C.DSAudioOutputState, 
 	copy(unsafe.Slice((*byte)(unsafe.Pointer(report)), len(out)), out[:])
 }
 
-// SetDualSenseFullAudioOutputCallback sets a callback to be invoked when the host sends audio output (volume/audio control/microphone mute) commands to the device.
-// @param handle Handle to the DualSense device with audio.
-// @param callback Callback receiving the audio output state. Pass NULL to clear.
-//
-//export SetDualSenseFullAudioOutputCallback
-func SetDualSenseFullAudioOutputCallback(handle C.DSDeviceHandle, cb C.DSAudioOutputCallback) bool {
+func dualSenseFullDevice(handle C.DSDeviceHandle) *dualsensefull.Device {
 	dh := cgo.Handle(handle)
 	dhw, ok := dh.Value().(*deviceHandleWrapper)
 	if !ok {
-		return false
+		return nil
 	}
 	bus := dhw.usbServer.s.GetBus(dhw.exportMeta.BusID)
 	if bus == nil {
-		return false
+		return nil
 	}
-	var dsDevice *dualsensefull.Device
 	for _, dev := range bus.Devices() {
 		full, ok := dev.(*dualsensefull.Device)
 		if ok && full.DualSense == dhw.device {
-			dsDevice = full
+			return full
 		}
 	}
+	return nil
+}
+
+// SetDualSenseFullAudioOutputCallback sets a callback to be invoked with the audio output of the host.
+// The callback receives 4 channel 48 kHz S16LE PCM (channels 0 and 1: speaker/headphones, channels 2 and 3: haptics).
+// @param handle Handle to the DualSense device with audio.
+// @param callback Callback receiving the PCM. Pass NULL to clear.
+//
+//export SetDualSenseFullAudioOutputCallback
+func SetDualSenseFullAudioOutputCallback(handle C.DSDeviceHandle, cb C.DSAudioOutputCallback) bool {
+	dsDevice := dualSenseFullDevice(handle)
+	if dsDevice == nil {
+		return false
+	}
+	if cb == nil {
+		dsDevice.SetAudioOutputCallback(nil)
+		return true
+	}
+	dsDevice.SetAudioOutputCallback(func(pcm []byte) {
+		C.viiper_call_ds_audio_output(cb, handle, (*C.uint8_t)(unsafe.Pointer(&pcm[0])), C.uint32_t(len(pcm)))
+	})
+	return true
+}
+
+// SetDualSenseFullMicrophoneCallback sets a callback to be invoked when the host reads the microphone.
+// The callback fills the buffer with 2 channel 48 kHz S16LE PCM. The buffer is zeroed (silence) before the call.
+// @param handle Handle to the DualSense device with audio.
+// @param callback Callback filling the PCM buffer. Pass NULL to clear.
+//
+//export SetDualSenseFullMicrophoneCallback
+func SetDualSenseFullMicrophoneCallback(handle C.DSDeviceHandle, cb C.DSMicrophoneCallback) bool {
+	dsDevice := dualSenseFullDevice(handle)
+	if dsDevice == nil {
+		return false
+	}
+	if cb == nil {
+		dsDevice.SetMicrophoneCallback(nil)
+		return true
+	}
+	dsDevice.SetMicrophoneCallback(func(pcm []byte) {
+		C.viiper_call_ds_microphone(cb, handle, (*C.uint8_t)(unsafe.Pointer(&pcm[0])), C.uint32_t(len(pcm)))
+	})
+	return true
+}
+
+// SetDualSenseFullAudioControlCallback sets a callback to be invoked when the host sends audio control (volume/audio control/microphone mute) commands to the device.
+// @param handle Handle to the DualSense device with audio.
+// @param callback Callback receiving the audio control state. Pass NULL to clear.
+//
+//export SetDualSenseFullAudioControlCallback
+func SetDualSenseFullAudioControlCallback(handle C.DSDeviceHandle, cb C.DSAudioControlCallback) bool {
+	dsDevice := dualSenseFullDevice(handle)
 	if dsDevice == nil {
 		return false
 	}
@@ -259,7 +311,7 @@ func SetDualSenseFullAudioOutputCallback(handle C.DSDeviceHandle, cb C.DSAudioOu
 		return true
 	}
 	dsDevice.SetOutputCallback(func(out dualsensefull.OutputState) {
-		C.viiper_call_ds_audio_output(cb, handle, C.DSAudioOutputState{
+		C.viiper_call_ds_audio_control(cb, handle, C.DSAudioControlState{
 			UpdateFlags1:     C.uint8_t(out.UpdateFlags1),
 			UpdateFlags2:     C.uint8_t(out.UpdateFlags2),
 			SpeakerVolume:    C.uint8_t(out.SpeakerVolume),

@@ -53,7 +53,6 @@ endif()
 
 if(WIN32)
     add_dependencies(dualsense_passthrough libVIIPER_implib)
-    target_link_libraries(dualsense_passthrough PRIVATE ws2_32)
     add_custom_command(TARGET dualsense_passthrough POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${LIB_DIR}/libVIIPER.dll"

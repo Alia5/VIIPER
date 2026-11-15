@@ -54,6 +54,8 @@ type Device struct {
 	altSettings           [interfaceCount]uint8
 
 	outputFunc      func(OutputState)
+	audioOutputFunc func(pcm []byte)
+	microphoneFunc  func(pcm []byte)
 	microphoneMuted bool
 }
 
@@ -260,6 +262,18 @@ func (d *Device) SetOutputCallback(f func(OutputState)) {
 	d.audioMtx.Unlock()
 }
 
+func (d *Device) SetAudioOutputCallback(f func(pcm []byte)) {
+	d.audioMtx.Lock()
+	d.audioOutputFunc = f
+	d.audioMtx.Unlock()
+}
+
+func (d *Device) SetMicrophoneCallback(f func(pcm []byte)) {
+	d.audioMtx.Lock()
+	d.microphoneFunc = f
+	d.audioMtx.Unlock()
+}
+
 func (d *Device) handleOutputReport(report []byte) {
 	if len(report) <= dualsense.OutputReportOffsetLedBlue || report[0] != dualsense.ReportIDOutput {
 		return
@@ -392,18 +406,27 @@ func (d *Device) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out 
 			default:
 			}
 		}
+		audioOutputFunc := d.audioOutputFunc
 		d.audioMtx.Unlock()
+		if audioOutputFunc != nil && len(pcm) > 0 {
+			audioOutputFunc(pcm)
+		}
 		return nil
 	}
 	if dir == usbip.DirIn && ep == endpointMicrophoneIn {
 		pcm := make([]byte, AudioMicrophonePacketSize)
 		d.audioMtx.Lock()
-		if len(d.microphone) >= AudioMicrophonePacketSize {
+		microphoneFunc := d.microphoneFunc
+		featureUnit := d.microphoneFeatureUnit
+		if microphoneFunc == nil && len(d.microphone) >= AudioMicrophonePacketSize {
 			copy(pcm, d.microphone)
 			d.microphone = d.microphone[AudioMicrophonePacketSize:]
 		}
-		applyVolume(pcm, d.microphoneFeatureUnit, microphoneVolumeMax)
 		d.audioMtx.Unlock()
+		if microphoneFunc != nil {
+			microphoneFunc(pcm)
+		}
+		applyVolume(pcm, featureUnit, microphoneVolumeMax)
 		return pcm
 	}
 
