@@ -52,12 +52,30 @@ IMU (gyro + accelerometer), and touchpad finger coordinates.
 
     ### Feedback (Rumble & LED)
 
-    - 6-byte packets:
+    - 9-byte packets:
+        - UpdateFlags1: uint8 (1 byte, raw flag byte 1 of the output report)
+            - `UpdateFlag1Rumble`: 0x01
+            - `UpdateFlag1HapticsSelect`: 0x02
+        - UpdateFlags2: uint8 (1 byte, raw flag byte 2 of the output report)
+            - `UpdateFlag2Led`: 0x04
+            - `UpdateFlag2PlayerLeds`: 0x10
+        - UpdateFlags3: uint8 (1 byte, raw flag byte 39 of the output report)
+            - `UpdateFlag3ImprovedRumble`: 0x04
         - RumbleSmall: uint8, RumbleLarge: uint8 (2 bytes), 0-255 intensity
           values
         - LED Color: LedRed, LedGreen, LedBlue: uint8 each (3 bytes), 0-255 per
           channel
         - PlayerLeds: uint8 (1 byte), host-controlled player indicator LED mask
+
+    The data fields are always copied from the output report.
+    Use the flags to find which fields the host set:
+
+    - Rumble is active when `UpdateFlags1` has `UpdateFlag1Rumble` or
+      `UpdateFlag1HapticsSelect`. When the two bits are clear, rumble is off.
+    - With `UpdateFlag3ImprovedRumble` the rumble values are full scale.
+      Without it, hosts usually send half-scale values.
+    - The LED color is valid when `UpdateFlags2` has `UpdateFlag2Led`.
+    - `PlayerLeds` is valid when `UpdateFlags2` has `UpdateFlag2PlayerLeds`.
 
     See `/device/dualsense/state.go` for the `OutputState` wire definition.
 
@@ -65,37 +83,37 @@ IMU (gyro + accelerometer), and touchpad finger coordinates.
 
     ### Button Constants
 
-    | Button | Hex Value |
-    | -------- | ----------- |
-    | Square button | 0x00000010 |
-    | Cross (X) button | 0x00000020 |
-    | Circle button | 0x00000040 |
-    | Triangle button | 0x00000080 |
-    | L1 (Left bumper) | 0x00000100 |
-    | R1 (Right bumper) | 0x00000200 |
-    | L2 button | 0x00000400 |
-    | R2 button | 0x00000800 |
-    | Create button | 0x00001000 |
-    | Options button | 0x00002000 |
-    | L3 (Left stick button) | 0x00004000 |
+    | Button                  | Hex Value  |
+    | ----------------------- | ---------- |
+    | Square button           | 0x00000010 |
+    | Cross (X) button        | 0x00000020 |
+    | Circle button           | 0x00000040 |
+    | Triangle button         | 0x00000080 |
+    | L1 (Left bumper)        | 0x00000100 |
+    | R1 (Right bumper)       | 0x00000200 |
+    | L2 button               | 0x00000400 |
+    | R2 button               | 0x00000800 |
+    | Create button           | 0x00001000 |
+    | Options button          | 0x00002000 |
+    | L3 (Left stick button)  | 0x00004000 |
     | R3 (Right stick button) | 0x00008000 |
-    | PS button | 0x00010000 |
-    | Touchpad click | 0x00020000 |
-    | Mic mute button | 0x00040000 |
-    | Edge Variant only | --- |
-    | RFn button | 0x00200000 |
-    | LFn button | 0x00100000 |
-    | R4 back paddle | 0x00800000 |
-    | L4 back paddle | 0x00400000 |
+    | PS button               | 0x00010000 |
+    | Touchpad click          | 0x00020000 |
+    | Mic mute button         | 0x00040000 |
+    | Edge Variant only       | ---        |
+    | RFn button              | 0x00200000 |
+    | LFn button              | 0x00100000 |
+    | R4 back paddle          | 0x00800000 |
+    | L4 back paddle          | 0x00400000 |
 
     ### D-Pad Constants
 
     | D-Pad Direction | Hex Value |
-    | --------------- | ----------- |
-    | Up | 0x01 |
-    | Down | 0x02 |
-    | Left | 0x04 |
-    | Right | 0x08 |
+    | --------------- | --------- |
+    | Up              | 0x01      |
+    | Down            | 0x02      |
+    | Left            | 0x04      |
+    | Right           | 0x08      |
 
     ### Touchpad Coordinates
 
@@ -138,13 +156,13 @@ IMU (gyro + accelerometer), and touchpad finger coordinates.
 
     ## API
 
-    | Function | Description |
-    | --- | --- |
-    | `CreateDualSenseDevice(...)` | Create a virtual DualSense device |
-    | `CreateDualSenseEdgeDevice(...)` | Create a virtual DualSense Edge |
-    | `SetDualSenseDeviceState(handle, state)` | Push input state |
-    | `SetDualSenseOutputCallback(handle, cb)` | Register output callback |
-    | `RemoveDualSenseDevice(handle)` | Remove the device |
+    | Function                                 | Description                       |
+    | ---------------------------------------- | --------------------------------- |
+    | `CreateDualSenseDevice(...)`             | Create a virtual DualSense device |
+    | `CreateDualSenseEdgeDevice(...)`         | Create a virtual DualSense Edge   |
+    | `SetDualSenseDeviceState(handle, state)` | Push input state                  |
+    | `SetDualSenseOutputCallback(handle, cb)` | Register output callback          |
+    | `RemoveDualSenseDevice(handle)`          | Remove the device                 |
 
     ## Input state
 
@@ -197,6 +215,9 @@ IMU (gyro + accelerometer), and touchpad finger coordinates.
     ```c
     typedef void (*DSOutputCallback)(
         DSDeviceHandle handle,
+        uint8_t updateFlags1,
+        uint8_t updateFlags2,
+        uint8_t updateFlags3,
         uint8_t rumbleSmall,
         uint8_t rumbleLarge,
         uint8_t ledRed,

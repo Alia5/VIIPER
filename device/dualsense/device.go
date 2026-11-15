@@ -30,8 +30,11 @@ type DualSense struct {
 
 	subcommand [2]byte
 
-	seqCounter    uint8
-	timestampBase time.Time
+	edge bool
+
+	seqCounter     uint8
+	packetSequence uint32
+	timestampBase  time.Time
 
 	mtx sync.Mutex
 }
@@ -92,6 +95,7 @@ func new(o *device.CreateOptions, edge bool) (*DualSense, error) {
 	d := &DualSense{
 		descriptor: defaultDescriptor,
 		metaState:  metaState,
+		edge:       edge,
 	}
 	d.descriptor.Device.IDProduct = DefaultPIDDS
 	if edge {
@@ -296,22 +300,17 @@ var featureGetHandlers = map[byte]func(*DualSense) []byte{
 }
 
 func parseOutputReport(out []byte) OutputState {
-	feedback := OutputState{
-		RumbleSmall: out[3],
-		RumbleLarge: out[4],
+	return OutputState{
+		UpdateFlags1: out[1],
+		UpdateFlags2: out[2],
+		UpdateFlags3: out[39],
+		RumbleSmall:  out[3],
+		RumbleLarge:  out[4],
+		LedRed:       out[45],
+		LedGreen:     out[46],
+		LedBlue:      out[47],
+		PlayerLeds:   out[44],
 	}
-	if len(out) > 2 {
-		flag1 := out[2]
-		if flag1&0x04 != 0 && len(out) > 47 {
-			feedback.LedRed = out[45]
-			feedback.LedGreen = out[46]
-			feedback.LedBlue = out[47]
-		}
-		if flag1&0x10 != 0 && len(out) > 44 {
-			feedback.PlayerLeds = out[44]
-		}
-	}
-	return feedback
 }
 
 func (d *DualSense) featureReportCalibration() []byte {
@@ -438,6 +437,9 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 	d.seqCounter++
 	b[7] = d.seqCounter
 
+	d.packetSequence++
+	binary.LittleEndian.PutUint32(b[12:16], d.packetSequence)
+
 	usbDPad := uint8(DPadUSBNeutral)
 	switch {
 	case s.DPad&DPadUp != 0 && s.DPad&DPadRight != 0:
@@ -486,7 +488,14 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 	b[37] = touch2
 	encodeTouchCoords(b[38:41], s.Touch2X, s.Touch2Y)
 
-	b[49] = 0x10
+	b[42] = TriggerStatusNeutral
+	b[43] = TriggerStatusNeutral
+
+	if d.edge {
+		b[49] = EdgeActiveProfile
+	} else {
+		binary.LittleEndian.PutUint32(b[49:53], ts)
+	}
 	b[53] = m.BatteryStatus
 	b[54] = ConnectStateUSB
 

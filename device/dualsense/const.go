@@ -42,7 +42,15 @@ const (
 	InputReportSize  = 64
 	OutputReportSize = 64
 	InputStateSize   = 33
-	OutputStateSize  = 6
+	OutputStateSize  = 9
+)
+
+const (
+	UpdateFlag1Rumble         uint8 = 0x01
+	UpdateFlag1HapticsSelect  uint8 = 0x02
+	UpdateFlag2Led            uint8 = 0x04
+	UpdateFlag2PlayerLeds     uint8 = 0x10
+	UpdateFlag3ImprovedRumble uint8 = 0x04
 )
 
 const (
@@ -122,7 +130,11 @@ const (
 	BatteryFullyCharged = 0x2A // Status=0x2 (Full), Level=0xA (100%)
 )
 
-const ConnectStateUSB uint8 = 0x08
+const (
+	ConnectStateUSB      uint8 = 0x08
+	TriggerStatusNeutral uint8 = 0x09
+	EdgeActiveProfile    uint8 = 0x10
+)
 
 const (
 	hidClassIN  uint8 = 0xA1

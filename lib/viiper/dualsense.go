@@ -33,6 +33,12 @@ typedef uintptr_t DSDeviceHandle;
 #define DS_DPAD_LEFT   0x04u
 #define DS_DPAD_RIGHT  0x08u
 
+#define DS_OUTPUT_UPDATE1_RUMBLE         0x01u
+#define DS_OUTPUT_UPDATE1_HAPTICS_SELECT 0x02u
+#define DS_OUTPUT_UPDATE2_LED            0x04u
+#define DS_OUTPUT_UPDATE2_PLAYER_LEDS    0x10u
+#define DS_OUTPUT_UPDATE3_IMPROVED_RUMBLE 0x04u
+
 #define DS_SHELL_COLOR_WHITE                    "00"
 #define DS_SHELL_COLOR_BLACK                    "01"
 #define DS_SHELL_COLOR_COSMIC_RED               "02"
@@ -91,10 +97,10 @@ typedef struct {
 	const char* ShellColor;     // NULL = use default (2-char code, e.g. "00", "Z1")
 } DSMetaState;
 
-typedef void (*DSOutputCallback)(DSDeviceHandle handle, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t playerLeds);
+typedef void (*DSOutputCallback)(DSDeviceHandle handle, uint8_t updateFlags1, uint8_t updateFlags2, uint8_t updateFlags3, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t playerLeds);
 
-static void viiper_call_ds_output(DSOutputCallback fn, DSDeviceHandle handle, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t playerLeds) {
-	fn(handle, rumbleSmall, rumbleLarge, ledRed, ledGreen, ledBlue, playerLeds);
+static void viiper_call_ds_output(DSOutputCallback fn, DSDeviceHandle handle, uint8_t updateFlags1, uint8_t updateFlags2, uint8_t updateFlags3, uint8_t rumbleSmall, uint8_t rumbleLarge, uint8_t ledRed, uint8_t ledGreen, uint8_t ledBlue, uint8_t playerLeds) {
+	fn(handle, updateFlags1, updateFlags2, updateFlags3, rumbleSmall, rumbleLarge, ledRed, ledGreen, ledBlue, playerLeds);
 }
 
 */
@@ -306,6 +312,9 @@ func SetDualSenseOutputCallback(handle C.DSDeviceHandle, cb C.DSOutputCallback) 
 	}
 	dsDevice.SetOutputCallback(func(out dualsense.OutputState) {
 		C.viiper_call_ds_output(cb, handle,
+			C.uint8_t(out.UpdateFlags1),
+			C.uint8_t(out.UpdateFlags2),
+			C.uint8_t(out.UpdateFlags3),
 			C.uint8_t(out.RumbleSmall),
 			C.uint8_t(out.RumbleLarge),
 			C.uint8_t(out.LedRed),

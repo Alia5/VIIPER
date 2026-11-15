@@ -93,18 +93,24 @@ func (s *InputState) UnmarshalBinary(data []byte) error {
 }
 
 // nolint
-// viiper:wire dualsense s2c rumbleSmall:u8 rumbleLarge:u8 ledRed:u8 ledGreen:u8 ledBlue:u8 playerLeds:u8
+// viiper:wire dualsense s2c updateFlags1:u8 updateFlags2:u8 updateFlags3:u8 rumbleSmall:u8 rumbleLarge:u8 ledRed:u8 ledGreen:u8 ledBlue:u8 playerLeds:u8
 type OutputState struct {
-	RumbleSmall uint8
-	RumbleLarge uint8
-	LedRed      uint8
-	LedGreen    uint8
-	LedBlue     uint8
-	PlayerLeds  uint8
+	UpdateFlags1 uint8
+	UpdateFlags2 uint8
+	UpdateFlags3 uint8
+	RumbleSmall  uint8
+	RumbleLarge  uint8
+	LedRed       uint8
+	LedGreen     uint8
+	LedBlue      uint8
+	PlayerLeds   uint8
 }
 
 func (f *OutputState) MarshalBinary() ([]byte, error) {
 	return []byte{
+		f.UpdateFlags1,
+		f.UpdateFlags2,
+		f.UpdateFlags3,
 		f.RumbleSmall,
 		f.RumbleLarge,
 		f.LedRed,
@@ -118,12 +124,15 @@ func (f *OutputState) UnmarshalBinary(data []byte) error {
 	if len(data) < OutputStateSize {
 		return io.ErrUnexpectedEOF
 	}
-	f.RumbleSmall = data[0]
-	f.RumbleLarge = data[1]
-	f.LedRed = data[2]
-	f.LedGreen = data[3]
-	f.LedBlue = data[4]
-	f.PlayerLeds = data[5]
+	f.UpdateFlags1 = data[0]
+	f.UpdateFlags2 = data[1]
+	f.UpdateFlags3 = data[2]
+	f.RumbleSmall = data[3]
+	f.RumbleLarge = data[4]
+	f.LedRed = data[5]
+	f.LedGreen = data[6]
+	f.LedBlue = data[7]
+	f.PlayerLeds = data[8]
 	return nil
 }
 

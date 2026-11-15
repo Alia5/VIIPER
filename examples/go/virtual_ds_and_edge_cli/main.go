@@ -125,8 +125,8 @@ func main() {
 			select {
 			case feedback := <-feedbackCh:
 				f := feedback.(*dualsense.OutputState)
-				fmt.Printf("[Output] Rumble: S=%d L=%d, LED: R=%d G=%d B=%d, Player LEDs: %d\n",
-					f.RumbleSmall, f.RumbleLarge, f.LedRed, f.LedGreen, f.LedBlue, f.PlayerLeds)
+				fmt.Printf("[Output] Flags: %02x/%02x/%02x, Rumble: S=%d L=%d, LED: R=%d G=%d B=%d, Player LEDs: %d\n",
+					f.UpdateFlags1, f.UpdateFlags2, f.UpdateFlags3, f.RumbleSmall, f.RumbleLarge, f.LedRed, f.LedGreen, f.LedBlue, f.PlayerLeds)
 			case err := <-errCh:
 				if err != nil {
 					fmt.Printf("[Output read error] %v\n", err)
