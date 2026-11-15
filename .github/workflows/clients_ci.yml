@@ -30,10 +30,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
 
             - name: Set up Node.js
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@v7
               with:
                   node-version: "26"
                   cache: "npm"
@@ -86,12 +86,12 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
 
             - name: Set up .NET SDK
-              uses: actions/setup-dotnet@v5
+              uses: actions/setup-dotnet@v6
               with:
-                  dotnet-version: "10.0.x"
+                  dotnet-version: "11.0.x"
 
             - name: Pack C# Client Library
               shell: bash
@@ -123,7 +123,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
 
             - name: Set C++ Client Library version
               if: ${{ inputs.version != '' }}
@@ -145,7 +145,7 @@ jobs:
             - name: Set up CMake
               uses: jwlawson/actions-setup-cmake@v2
               with:
-                  cmake-version: "3.26.x"
+                  cmake-version: "4.4.x"
 
             - name: Install OpenSSL (libssl-dev)
               run: |
@@ -176,7 +176,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
 
             - name: Set Rust Client Library version
               if: ${{ inputs.version != '' }}
