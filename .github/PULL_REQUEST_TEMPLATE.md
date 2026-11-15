@@ -24,6 +24,7 @@ Fixes #
 ## Checklist
 <!-- Put an `x` in all the boxes that apply -->
 - [ ] I have updated the documentation accordingly
+- [ ] I have updated **all** client libraries (if applicable)
 - [ ] I have added tests to cover my changes
 - [ ] All new and existing tests passed
 - [ ] I have made sure my commit messages are changelog compatible  
