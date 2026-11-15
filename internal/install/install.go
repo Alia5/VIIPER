@@ -100,6 +100,7 @@ func Run(t Target, uninstall bool, flags map[string]*kong.Flag) error {
 		if !step.shouldRun(flags) {
 			continue
 		}
+		slog.Info(step.label)
 		err := step.run(&t)
 		if errors.Is(err, ErrRebootRequired) {
 			pendingReboot = err
@@ -115,6 +116,11 @@ func Run(t Target, uninstall bool, flags map[string]*kong.Flag) error {
 			return err
 		}
 	}
+	if uninstall {
+		slog.Info("VIIPER uninstalled")
+	} else {
+		slog.Info("VIIPER installed", "exe", t.Exe, "version", t.Version)
+	}
 
 	return pendingReboot
 }
@@ -125,12 +131,15 @@ func checkLatest(t *Target) error {
 		return err
 	}
 	t.Latest = r.TagName
+	slog.Info("latest release", "version", t.Latest)
 
 	return nil
 }
 
 func downloadLatest(t *Target) error {
 	if !ShouldUpdate(t.Version, t.Latest) {
+		slog.Info("no newer release", "version", t.Version)
+
 		return nil
 	}
 	exe, err := download(*t, t.Latest)
@@ -229,12 +238,15 @@ func writeFile(path string, content []byte) error {
 	if err != nil {
 		return err
 	}
+	slog.Info("writing file", "path", path)
 
 	return os.WriteFile(path, content, 0o755)
 }
 
 func copyFile(source, path string) error {
 	if source == path {
+		slog.Info("file already in place", "path", path)
+
 		return nil
 	}
 	content, err := os.ReadFile(source)
@@ -246,6 +258,7 @@ func copyFile(source, path string) error {
 }
 
 func downloadFile(url, path string) error {
+	slog.Info("downloading", "url", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return err

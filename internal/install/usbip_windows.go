@@ -3,6 +3,7 @@ package install
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,6 +32,8 @@ func installUsbip(t *Target) error {
 		return err
 	}
 	if !ShouldUpdate(installed, usbipWin2Version) {
+		slog.Info("usbip-win2 is", "installed", installed)
+
 		return nil
 	}
 	arch := runtime.GOARCH
@@ -52,6 +55,7 @@ func installUsbip(t *Target) error {
 			fmt.Sprintf("/RESTARTEXITCODE=%d", windows.ERROR_SUCCESS_REBOOT_REQUIRED),
 		}
 	}
+	slog.Info("running usbip-win2 installer", "installed", installed, "version", usbipWin2Version)
 	err = exec.Command(installer, switches...).Run()
 	var exit *exec.ExitError
 	if errors.As(err, &exit) && exit.ExitCode() == int(windows.ERROR_SUCCESS_REBOOT_REQUIRED) {

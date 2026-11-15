@@ -216,7 +216,13 @@ func startServer(t *Target) error {
 		CreationFlags: windows.DETACHED_PROCESS,
 	}
 
-	return server.Start()
+	err = server.Start()
+	if err != nil {
+		return err
+	}
+	slog.Info("server started", "pid", server.Process.Pid, "version", t.Version, "command", server.String())
+
+	return nil
 }
 
 func stopServer(t *Target) error {
@@ -240,6 +246,7 @@ func writeShortcut(folder *windows.KNOWNFOLDERID, target string) error {
 		return err
 	}
 	path := filepath.Join(dir, "VIIPER.lnk")
+	slog.Info("writing shortcut", "path", path, "target", target)
 	output, err := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", fmt.Sprintf(createShortcut, path, target)).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("shortcut %s failed: %w: %s", path, err, strings.TrimSpace(string(output)))

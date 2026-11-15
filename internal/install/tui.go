@@ -1,6 +1,7 @@
 package install
 
 import (
+	"log/slog"
 	"path/filepath"
 
 	"github.com/Alia5/VIIPER/tui"
@@ -21,6 +22,7 @@ type wizard struct {
 }
 
 func TUI(t Target, uninstall bool, flags map[string]*kong.Flag) error {
+	slog.SetDefault(slog.New(slog.DiscardHandler))
 	w := &wizard{
 		target:    t,
 		uninstall: uninstall,

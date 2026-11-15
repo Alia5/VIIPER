@@ -113,7 +113,7 @@ func main() {
 	err = ctx.Run()
 	switch {
 	case errors.Is(err, install.ErrRebootRequired):
-		logger.Info(err.Error())
+		logger.Warn(err.Error())
 		ctx.Exit(install.ExitRebootRequired)
 	case errors.Is(err, install.ErrCanceled):
 		logger.Info(err.Error())

@@ -2,11 +2,13 @@ package install
 
 import (
 	"errors"
+	"log/slog"
 
 	"golang.org/x/sys/windows/registry"
 )
 
 func setRegistryValues(path string, values map[string]string) error {
+	slog.Info("writing registry values", "key", path)
 	key, _, err := registry.CreateKey(registry.CURRENT_USER, path, registry.SET_VALUE)
 	if err != nil {
 		return err
@@ -23,6 +25,7 @@ func setRegistryValues(path string, values map[string]string) error {
 }
 
 func deleteRegistryValue(path, name string) error {
+	slog.Info("deleting registry value", "key", path, "name", name)
 	key, _, err := registry.CreateKey(registry.CURRENT_USER, path, registry.SET_VALUE)
 	if err != nil {
 		return err
