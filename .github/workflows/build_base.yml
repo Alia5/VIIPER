@@ -24,6 +24,9 @@ jobs:
               with:
                   fetch-depth: 0
 
+            - name: Fetch SDL headers
+              run: git submodule update --init --depth 1 _testing/e2e/deps/SDL
+
             - name: Set up Go
               uses: actions/setup-go@v7
               with:
