@@ -122,6 +122,8 @@ const (
 	BatteryFullyCharged = 0x2A // Status=0x2 (Full), Level=0xA (100%)
 )
 
+const ConnectStateUSB uint8 = 0x08
+
 const (
 	hidClassIN  uint8 = 0xA1
 	hidClassOUT uint8 = 0x21

@@ -488,6 +488,7 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 
 	b[49] = 0x10
 	b[53] = m.BatteryStatus
+	b[54] = ConnectStateUSB
 
 	return b
 }
