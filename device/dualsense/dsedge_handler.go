@@ -11,7 +11,36 @@ import (
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/usb"
+	"github.com/Alia5/VIIPER/usb/hid"
 )
+
+const (
+	outputReportCountEdge         = 63
+	featureF2CountEdge            = 52
+	reportCountOffsetFromReportID = 2
+)
+
+var edgeOnlyFeatureReports = []hid.Item{
+	hid.ReportID{ID: 0x60}, hid.Usage{Usage: 0x41}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x61}, hid.Usage{Usage: 0x42}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x62}, hid.Usage{Usage: 0x43}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x63}, hid.Usage{Usage: 0x44}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x64}, hid.Usage{Usage: 0x45}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x65}, hid.Usage{Usage: 0x46}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x68}, hid.Usage{Usage: 0x47}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x70}, hid.Usage{Usage: 0x48}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x71}, hid.Usage{Usage: 0x49}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x72}, hid.Usage{Usage: 0x4A}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x73}, hid.Usage{Usage: 0x4B}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x74}, hid.Usage{Usage: 0x4C}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x75}, hid.Usage{Usage: 0x4D}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x76}, hid.Usage{Usage: 0x4E}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x77}, hid.Usage{Usage: 0x4F}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x78}, hid.Usage{Usage: 0x50}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x79}, hid.Usage{Usage: 0x51}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x7A}, hid.Usage{Usage: 0x52}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+	hid.ReportID{ID: 0x7B}, hid.Usage{Usage: 0x53}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
+}
 
 func init() {
 	api.RegisterDevice("dualsenseedge", &dsedgehandler{})

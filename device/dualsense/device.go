@@ -7,13 +7,16 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"maps"
 	"math"
 	"net"
+	"slices"
 	"sync"
 	"time"
 
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/usb"
+	"github.com/Alia5/VIIPER/usb/hid"
 	"github.com/Alia5/VIIPER/usbip"
 )
 
@@ -93,7 +96,33 @@ func new(o *device.CreateOptions, edge bool) (*DualSense, error) {
 	d.descriptor.Device.IDProduct = DefaultPIDDS
 	if edge {
 		d.descriptor.Device.IDProduct = DefaultPIDDSEdge
+		d.descriptor.Strings = maps.Clone(d.descriptor.Strings)
 		d.descriptor.Strings[2] = "DualSense Edge Wireless Controller"
+
+		hidFunction := *d.descriptor.Interfaces[0].HID
+		gamepadCollection := hidFunction.ReportDescriptor.Items[2].(hid.Collection)
+		gamepadCollection.Items = slices.Clone(gamepadCollection.Items)
+		for i, item := range gamepadCollection.Items {
+			reportID, isReportID := item.(hid.ReportID)
+			if !isReportID {
+				continue
+			}
+			switch reportID.ID {
+			case ReportIDOutput:
+				gamepadCollection.Items[i+reportCountOffsetFromReportID] = hid.ReportCount{
+					Count: outputReportCountEdge,
+				}
+			case 0xF2:
+				gamepadCollection.Items[i+reportCountOffsetFromReportID] = hid.ReportCount{
+					Count: featureF2CountEdge,
+				}
+			}
+		}
+		gamepadCollection.Items = append(gamepadCollection.Items, edgeOnlyFeatureReports...)
+		hidFunction.ReportDescriptor.Items = slices.Clone(hidFunction.ReportDescriptor.Items)
+		hidFunction.ReportDescriptor.Items[2] = gamepadCollection
+		d.descriptor.Interfaces = slices.Clone(d.descriptor.Interfaces)
+		d.descriptor.Interfaces[0].HID = &hidFunction
 	}
 
 	if o != nil {
