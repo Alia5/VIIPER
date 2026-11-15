@@ -98,15 +98,17 @@ log.Printf("Connected to device %s", resp.ID)
 Every device package exports a `TypeName` descriptor (`viiperclient.DeviceType[T]`) that carries the device type name and the type of its device-specific options.  
 The compiler rejects options that do not belong to the device type.
 
-| Descriptor               | Device-specific options        |
-| ------------------------ | ------------------------------ |
-| `xbox360.TypeName`       | `xbox360.Xbox360CreateOptions` |
-| `dualshock4.TypeName`    | `dualshock4.MetaState`         |
-| `dualsense.TypeName`     | `dualsense.MetaState`          |
-| `dualsense.TypeNameEdge` | `dualsense.MetaState`          |
-| `ns2pro.TypeName`        | `ns2pro.MetaState`             |
-| `keyboard.TypeName`      | `viiperclient.NoOptions`       |
-| `mouse.TypeName`         | `viiperclient.NoOptions`       |
+| Descriptor                   | Device-specific options        |
+| ---------------------------- | ------------------------------ |
+| `xbox360.TypeName`           | `xbox360.Xbox360CreateOptions` |
+| `dualshock4.TypeName`        | `dualshock4.MetaState`         |
+| `dualsense.TypeName`         | `dualsense.MetaState`          |
+| `dualsense.TypeNameEdge`     | `dualsense.MetaState`          |
+| `dualsensefull.TypeName`     | `dualsensefull.CreateOptions`  |
+| `dualsensefull.TypeNameEdge` | `dualsensefull.CreateOptions`  |
+| `ns2pro.TypeName`            | `ns2pro.MetaState`             |
+| `keyboard.TypeName`          | `viiperclient.NoOptions`       |
+| `mouse.TypeName`             | `viiperclient.NoOptions`       |
 
 ```go
 import (
@@ -245,6 +247,7 @@ Full working examples are available in the repository:
 - **Virtual Keyboard**: `examples/go/virtual_keyboard/main.go`
 - **Virtual Xbox360 Controller**: `examples/go/virtual_x360_pad/main.go`
 - **Virtual DualSense (and Edge) Controller**: `examples/go/virtual_ds_and_edge_cli/main.go`
+- **DualSense (and Edge) Passthrough (full w/ audio)**: `examples/go/dualsense_passthrough/main.go`
 - **Virtual Switch 2 Pro Controller**: `examples/go/virtual_ns2pro/main.go`
 - More examples are always being added!
 

@@ -43,9 +43,9 @@ Reports relative motion deltas.
 
     | Function | Description |
     | --- | --- |
-    | `CreateMouseDevice(serverHandle, &handle, busID, autoAttach, vid, pid)` | Create a virtual HID mouse |
+    | `CreateMouse(serverHandle, &handle, busID, autoAttach, vid, pid)` | Create a virtual HID mouse |
     | `SetMouseDeviceState(handle, state)` | Push an input state to the device |
-    | `RemoveMouseDevice(handle)` | Remove the device |
+    | `RemoveMouse(handle)` | Remove the device |
 
     ## Input state
 

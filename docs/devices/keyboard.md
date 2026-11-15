@@ -67,10 +67,10 @@ plus LED status feedback (NumLock, CapsLock, ScrollLock).
 
     | Function | Description |
     | --- | --- |
-    | `CreateKeyboardDevice(serverHandle, &handle, busID, autoAttach, vid, pid)` | Create a virtual HID keyboard |
+    | `CreateKeyboard(serverHandle, &handle, busID, autoAttach, vid, pid)` | Create a virtual HID keyboard |
     | `SetKeyboardDeviceState(handle, state)` | Push an input state to the device |
     | `SetKeyboardLEDCallback(handle, cb)` | Register a callback for LED state changes |
-    | `RemoveKeyboardDevice(handle)` | Remove the device |
+    | `RemoveKeyboard(handle)` | Remove the device |
 
     ## Input state
 

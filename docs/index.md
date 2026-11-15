@@ -49,12 +49,13 @@ Beyond device emulation, VIIPER can proxy real USB devices for traffic inspectio
 
 ## Emulatable devices
 
-- Xbox 360 controller emulation; see [Devices › Xbox 360 Controller](devices/xbox360.md)
-- HID Keyboard with N-key rollover and LED feedback; see [Devices › Keyboard](devices/keyboard.md)
-- HID Mouse with 5 buttons and horizontal/vertical wheel; see [Devices › Mouse](devices/mouse.md)
-- PS4 controller emulation; see [Devices › DualShock 4 Controller](devices/dualshock4.md)
-- PS5 DualSense controller emulation (including Edge variant); see [Devices › DualSense Controller](devices/dualsense.md)
-- Nintendo Switch 2 Pro Controller emulation; see [Devices › Switch 2 Pro Controller](devices/ns2pro.md)
+- Xbox 360 controller emulation; see [Devices > Xbox 360 Controller](devices/xbox360.md)
+- HID Keyboard with N-key rollover and LED feedback; see [Devices > Keyboard](devices/keyboard.md)
+- HID Mouse with 5 buttons and horizontal/vertical wheel; see [Devices > Mouse](devices/mouse.md)
+- PS4 controller emulation; see [Devices > DualShock 4 Controller](devices/dualshock4.md)
+- PS5 DualSense controller emulation (including Edge variant); see [Devices > DualSense Controller](docs/devices/dualsense.md)
+    - with audio and audio-based haptics see [Devices > DualSense Controller (full w/ audio)](docs/devices/dualsense_full.md)
+- Nintendo Switch 2 Pro Controller emulation; see [Devices > Switch 2 Pro Controller](devices/ns2pro.md)
 
 ---
 

@@ -59,7 +59,8 @@ operating systems and games understand out of the box.
           0-255 (0=not pressed, 255=fully pressed)
         - Sticks: LX, LY, RX, RY: int16 each (8 bytes)  
           0 is center, -32768 is min, 32767 is max
-        - Reserved: there are 6 reserved bytes at the end of the report. For most subtypes, these will be zeroed, but a few subtypes do put data here.
+        - Reserved: there are 6 reserved bytes at the end of the report.  
+          For most subtypes, these will be zeroed, but a few subtypes do put data here.
 
     ### Rumble Feedback
 
@@ -93,12 +94,12 @@ operating systems and games understand out of the box.
 
     ## API
 
-    | Function | Description |
-    | --- | --- |
-    | `CreateXbox360Device(serverHandle, &handle, busID, autoAttach, vid, pid, subType)` | Create a virtual Xbox 360 controller |
-    | `SetXbox360DeviceState(handle, state)` | Push an input state to the device |
-    | `SetXbox360RumbleCallback(handle, cb)` | Register a callback for rumble output |
-    | `RemoveXbox360Device(handle)` | Remove the device |
+    | Function                                                                     | Description                           |
+    | ---------------------------------------------------------------------------- | ------------------------------------- |
+    | `CreateXbox360(serverHandle, &handle, busID, autoAttach, vid, pid, subType)` | Create a virtual Xbox 360 controller  |
+    | `SetXbox360DeviceState(handle, state)`                                       | Push an input state to the device     |
+    | `SetXbox360RumbleCallback(handle, cb)`                                       | Register a callback for rumble output |
+    | `RemoveXbox360(handle)`                                                      | Remove the device                     |
 
     ## Input state
 
@@ -117,23 +118,23 @@ operating systems and games understand out of the box.
 
     ### Button flags
 
-    | Constant | Value |
-    | --- | --- |
-    | `XBOX360_BUTTON_DPAD_UP` | `0x0001` |
-    | `XBOX360_BUTTON_DPAD_DOWN` | `0x0002` |
-    | `XBOX360_BUTTON_DPAD_LEFT` | `0x0004` |
-    | `XBOX360_BUTTON_DPAD_RIGHT` | `0x0008` |
-    | `XBOX360_BUTTON_START` | `0x0010` |
-    | `XBOX360_BUTTON_BACK` | `0x0020` |
-    | `XBOX360_BUTTON_LEFT_THUMB` | `0x0040` |
-    | `XBOX360_BUTTON_RIGHT_THUMB` | `0x0080` |
-    | `XBOX360_BUTTON_LEFT_SHOULDER` | `0x0100` |
+    | Constant                        | Value    |
+    | ------------------------------- | -------- |
+    | `XBOX360_BUTTON_DPAD_UP`        | `0x0001` |
+    | `XBOX360_BUTTON_DPAD_DOWN`      | `0x0002` |
+    | `XBOX360_BUTTON_DPAD_LEFT`      | `0x0004` |
+    | `XBOX360_BUTTON_DPAD_RIGHT`     | `0x0008` |
+    | `XBOX360_BUTTON_START`          | `0x0010` |
+    | `XBOX360_BUTTON_BACK`           | `0x0020` |
+    | `XBOX360_BUTTON_LEFT_THUMB`     | `0x0040` |
+    | `XBOX360_BUTTON_RIGHT_THUMB`    | `0x0080` |
+    | `XBOX360_BUTTON_LEFT_SHOULDER`  | `0x0100` |
     | `XBOX360_BUTTON_RIGHT_SHOULDER` | `0x0200` |
-    | `XBOX360_BUTTON_GUIDE` | `0x0400` |
-    | `XBOX360_BUTTON_A` | `0x1000` |
-    | `XBOX360_BUTTON_B` | `0x2000` |
-    | `XBOX360_BUTTON_X` | `0x4000` |
-    | `XBOX360_BUTTON_Y` | `0x8000` |
+    | `XBOX360_BUTTON_GUIDE`          | `0x0400` |
+    | `XBOX360_BUTTON_A`              | `0x1000` |
+    | `XBOX360_BUTTON_B`              | `0x2000` |
+    | `XBOX360_BUTTON_X`              | `0x4000` |
+    | `XBOX360_BUTTON_Y`              | `0x8000` |
 
     ## Rumble callback
 

@@ -67,10 +67,10 @@ gyro/accelerometer data, and HD rumble output.
 
     | Function | Description |
     | --- | --- |
-    | `CreateNS2ProDevice(...)` | Create a virtual Switch 2 Pro Controller |
+    | `CreateNS2Pro(...)` | Create a virtual Switch 2 Pro Controller |
     | `SetNS2ProDeviceState(handle, state)` | Push input state |
     | `SetNS2ProOutputCallback(handle, cb)` | Register output (rumble/LED) callback |
-    | `RemoveNS2ProDevice(handle)` | Remove the device |
+    | `RemoveNS2Pro(handle)` | Remove the device |
 
     ## Input state
 
@@ -94,7 +94,7 @@ gyro/accelerometer data, and HD rumble output.
 
     ## Meta state
 
-    Optional metadata passed to `CreateNS2ProDevice`. Controls battery reporting and serial number.
+    Optional metadata passed to `CreateNS2Pro`. Controls battery reporting and serial number.
 
     ```c
     typedef struct {
@@ -152,7 +152,7 @@ gyro/accelerometer data, and HD rumble output.
 
     ## Feature flags
 
-    Passed to `CreateNS2ProDevice` to declare which features the device exposes.
+    Passed to `CreateNS2Pro` to declare which features the device exposes.
 
     | Constant | Hex Value | Description |
     | --- | --- | --- |

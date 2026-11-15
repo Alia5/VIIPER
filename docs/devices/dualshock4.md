@@ -132,10 +132,10 @@ touchpad click, IMU (gyro + accelerometer), and touchpad finger coordinates.
 
     | Function | Description |
     | --- | --- |
-    | `CreateDS4Device(serverHandle, &handle, busID, autoAttach, vid, pid)` | Create a virtual DualShock 4 controller |
+    | `CreateDS4(serverHandle, &handle, busID, autoAttach, vid, pid)` | Create a virtual DualShock 4 controller |
     | `SetDS4DeviceState(handle, state)` | Push an input state to the device |
     | `SetDS4OutputCallback(handle, cb)` | Register a callback for rumble and LED output |
-    | `RemoveDS4Device(handle)` | Remove the device |
+    | `RemoveDS4(handle)` | Remove the device |
 
     ## Input state
 
