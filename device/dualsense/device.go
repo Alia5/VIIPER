@@ -34,6 +34,9 @@ type DualSense struct {
 
 	seqCounter     uint8
 	packetSequence uint32
+	nextTouchID    uint8
+	touchIDs       [2]uint8
+	touchWasActive [2]bool
 	timestampBase  time.Time
 
 	mtx sync.Mutex
@@ -474,18 +477,10 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 	ts := uint32(time.Since(d.timestampBase).Microseconds() * 3)
 	binary.LittleEndian.PutUint32(b[28:32], ts)
 
-	touch1 := uint8(0)
-	if !s.Touch1Active {
-		touch1 |= TouchInactiveMask
-	}
-	b[33] = touch1
+	b[33] = d.touchContactByte(0, s.Touch1Active)
 	encodeTouchCoords(b[34:37], s.Touch1X, s.Touch1Y)
 
-	touch2 := uint8(0)
-	if !s.Touch2Active {
-		touch2 |= TouchInactiveMask
-	}
-	b[37] = touch2
+	b[37] = d.touchContactByte(1, s.Touch2Active)
 	encodeTouchCoords(b[38:41], s.Touch2X, s.Touch2Y)
 
 	b[42] = TriggerStatusNeutral
@@ -500,4 +495,16 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 	b[54] = ConnectStateUSB
 
 	return b
+}
+
+func (d *DualSense) touchContactByte(finger int, active bool) uint8 {
+	if active && !d.touchWasActive[finger] {
+		d.touchIDs[finger] = d.nextTouchID
+		d.nextTouchID = (d.nextTouchID + 1) & touchIDMask
+	}
+	d.touchWasActive[finger] = active
+	if active {
+		return d.touchIDs[finger]
+	}
+	return d.touchIDs[finger] | TouchInactiveMask
 }

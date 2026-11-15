@@ -122,6 +122,7 @@ const (
 	TouchpadMaxY uint16 = 1080
 
 	TouchInactiveMask uint8 = 0x80
+	touchIDMask       uint8 = 0x7F
 )
 
 const DeltaTimeNS = 333
