@@ -123,6 +123,9 @@ const (
 
 	TouchInactiveMask uint8 = 0x80
 	touchIDMask       uint8 = 0x7F
+
+	touchTimestampUnit = 683 * time.Microsecond
+	touchScanInterval  = 5 * time.Millisecond
 )
 
 const DeltaTimeNS = 333

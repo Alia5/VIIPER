@@ -37,6 +37,8 @@ type DualSense struct {
 	nextTouchID    uint8
 	touchIDs       [2]uint8
 	touchWasActive [2]bool
+
+	touchTimestamp uint8
 	timestampBase  time.Time
 
 	mtx sync.Mutex
@@ -477,11 +479,19 @@ func (d *DualSense) buildUSBInputReport(s *InputState, m *MetaState) []byte {
 	ts := uint32(time.Since(d.timestampBase).Microseconds() * 3)
 	binary.LittleEndian.PutUint32(b[28:32], ts)
 
+	touchedInLastReport := d.touchWasActive[0] || d.touchWasActive[1]
+
 	b[33] = d.touchContactByte(0, s.Touch1Active)
 	encodeTouchCoords(b[34:37], s.Touch1X, s.Touch1Y)
 
 	b[37] = d.touchContactByte(1, s.Touch2Active)
 	encodeTouchCoords(b[38:41], s.Touch2X, s.Touch2Y)
+
+	if s.Touch1Active || s.Touch2Active || touchedInLastReport {
+		lastTouchScan := time.Since(d.timestampBase).Truncate(touchScanInterval)
+		d.touchTimestamp = uint8(lastTouchScan / touchTimestampUnit)
+	}
+	b[41] = d.touchTimestamp
 
 	b[42] = TriggerStatusNeutral
 	b[43] = TriggerStatusNeutral
