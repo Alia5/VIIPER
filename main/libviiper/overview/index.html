@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../../clients/generator/">
+        <link rel="prev" href="../../clients/typescript/">
       
       
         <link rel="next" href="../../devices/xbox360/">
@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -716,34 +716,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/codegen/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Code Generation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../cli/configuration/" class="md-nav__link">
         
   
@@ -981,34 +953,6 @@
     
   
     TypeScript Client Library
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../clients/generator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Generator Documentation
   
 
     
@@ -1309,7 +1253,35 @@
   <span class="md-ellipsis">
     
   
-    DualSense
+    DualSense (Partial)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/dualsense_full/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DualSense/Edge (Full)
   
 
     
@@ -1538,7 +1510,35 @@
   <span class="md-ellipsis">
     
   
-    DualSense
+    DualSense (Partial)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/dualsense_full/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DualSense/Edge (Full)
   
 
     
@@ -1896,7 +1896,7 @@ Handles (<code>USBServerHandle</code>, <code>Xbox360DeviceHandle</code>, …) ar
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">CreateUSBBus</span><span class="p">(</span><span class="n">serverHandle</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">busID</span><span class="p">);</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">Xbox360DeviceHandle</span><span class="w"> </span><span class="n">deviceHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">CreateXbox360Device</span><span class="p">(</span><span class="n">serverHandle</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">deviceHandle</span><span class="p">,</span><span class="w"> </span><span class="n">busID</span><span class="p">,</span><span class="w"> </span><span class="cm">/*autoAttach=*/</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">CreateXbox360</span><span class="p">(</span><span class="n">serverHandle</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">deviceHandle</span><span class="p">,</span><span class="w"> </span><span class="n">busID</span><span class="p">,</span><span class="w"> </span><span class="cm">/*autoAttach=*/</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">SetXbox360RumbleCallback</span><span class="p">(</span><span class="n">deviceHandle</span><span class="p">,</span><span class="w"> </span><span class="n">rumbleCallback</span><span class="p">);</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
@@ -1920,7 +1920,7 @@ Handles (<code>USBServerHandle</code>, <code>Xbox360DeviceHandle</code>, …) ar
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kt">uint</span><span class="w"> </span><span class="n">busID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">LibVIIPER</span><span class="p">.</span><span class="n">CreateUSBBus</span><span class="p">(</span><span class="n">serverHandle</span><span class="p">,</span><span class="w"> </span><span class="k">ref</span><span class="w"> </span><span class="n">busID</span><span class="p">);</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">LibVIIPER</span><span class="p">.</span><span class="n">CreateXbox360Device</span><span class="p">(</span><span class="n">serverHandle</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="k">nuint</span><span class="w"> </span><span class="n">deviceHandle</span><span class="p">,</span><span class="w"> </span><span class="n">busID</span><span class="p">,</span><span class="w"> </span><span class="n">autoAttachLocalhost</span><span class="p">:</span><span class="w"> </span><span class="k">true</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">LibVIIPER</span><span class="p">.</span><span class="n">CreateXbox360</span><span class="p">(</span><span class="n">serverHandle</span><span class="p">,</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="k">nuint</span><span class="w"> </span><span class="n">deviceHandle</span><span class="p">,</span><span class="w"> </span><span class="n">busID</span><span class="p">,</span><span class="w"> </span><span class="n">autoAttachLocalhost</span><span class="p">:</span><span class="w"> </span><span class="k">true</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">Xbox360RumbleCallbackDelegate</span><span class="w"> </span><span class="n">rumbleCb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RumbleCallback</span><span class="p">;</span>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">LibVIIPER</span><span class="p">.</span><span class="n">SetXbox360RumbleCallback</span><span class="p">(</span><span class="n">deviceHandle</span><span class="p">,</span><span class="w"> </span><span class="n">rumbleCb</span><span class="p">);</span>
@@ -1937,7 +1937,7 @@ Handles (<code>USBServerHandle</code>, <code>Xbox360DeviceHandle</code>, …) ar
 <a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>
 <a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="n">LibVIIPER</span><span class="p">.</span><span class="n">CloseUSBServer</span><span class="p">(</span><span class="n">serverHandle</span><span class="p">);</span>
 </code></pre></div>
-<p>See <a href="https://github.com/Alia5/VIIPER/tree/main/examples/libVIIPER/C%23"><code>examples/libVIIPER/C#/</code></a> for the full project including P/Invoke declarations.</p>
+<p>See <a href="https://github.com/Alia5/VIIPER/tree/main/examples/libVIIPER/csharp"><code>examples/libVIIPER/csharp/</code></a> for the full project including P/Invoke declarations.</p>
 </div>
 </div>
 </div>
@@ -1946,6 +1946,7 @@ Handles (<code>USBServerHandle</code>, <code>Xbox360DeviceHandle</code>, …) ar
 <li><a href="../../devices/xbox360/">Xbox 360 Controller</a></li>
 <li><a href="../../devices/dualshock4/">DualShock 4</a></li>
 <li><a href="../../devices/dualsense/">DualSense (and Edge)</a></li>
+<li><a href="../../devices/dualsense_full/">DualSense (and Edge) (full w/ audio)</a></li>
 <li><a href="../../devices/ns2pro/">Switch 2 Pro Controller</a></li>
 <li><a href="../../devices/keyboard/">Keyboard</a></li>
 <li><a href="../../devices/mouse/">Mouse</a></li>
@@ -2017,10 +2018,10 @@ Pass <code>NULL</code> to discard all log output.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

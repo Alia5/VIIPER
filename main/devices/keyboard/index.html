@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -716,34 +716,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/codegen/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Code Generation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../cli/configuration/" class="md-nav__link">
         
   
@@ -994,34 +966,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../clients/generator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Generator Documentation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1181,7 +1125,35 @@
   <span class="md-ellipsis">
     
   
-    DualSense
+    DualSense (Partial)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dualsense_full/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DualSense/Edge (Full)
   
 
     
@@ -1616,7 +1588,35 @@
   <span class="md-ellipsis">
     
   
-    DualSense
+    DualSense (Partial)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dualsense_full/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DualSense/Edge (Full)
   
 
     
@@ -2190,7 +2190,7 @@ plus LED status feedback (NumLock, CapsLock, ScrollLock).</p>
 <h2 id="client-library-support">Client Library Support</h2>
 <p>The wire protocol is abstracted by client libraries.<br />
 The <strong>Go client</strong> includes built-in types (<code>/device/keyboard</code>),
-and <strong>generated client libraries</strong> provide equivalent structures
+and the other <strong>client libraries</strong> provide equivalent structures
 with proper packing.</p>
 <p>You don't need to manually construct packets, just use the provided types
 and send them via the device stream.</p>
@@ -2276,7 +2276,7 @@ and media keys (Mute, VolumeUp/Down, PlayPause, Stop, Next, Previous).</p>
 </thead>
 <tbody>
 <tr>
-<td><code>CreateKeyboardDevice(serverHandle, &amp;handle, busID, autoAttach, vid, pid)</code></td>
+<td><code>CreateKeyboard(serverHandle, &amp;handle, busID, autoAttach, vid, pid)</code></td>
 <td>Create a virtual HID keyboard</td>
 </tr>
 <tr>
@@ -2288,7 +2288,7 @@ and media keys (Mute, VolumeUp/Down, PlayPause, Stop, Next, Previous).</p>
 <td>Register a callback for LED state changes</td>
 </tr>
 <tr>
-<td><code>RemoveKeyboardDevice(handle)</code></td>
+<td><code>RemoveKeyboard(handle)</code></td>
 <td>Remove the device</td>
 </tr>
 </tbody>
@@ -2446,10 +2446,10 @@ and media keys (Mute, VolumeUp/Down, PlayPause, Stop, Next, Previous).</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
