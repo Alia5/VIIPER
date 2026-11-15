@@ -397,7 +397,7 @@ func TestStreamInputAndRumble(t *testing.T) {
 	require.NoError(t, s.UsbServer.AddBus(b))
 
 	client := viiperclient.New(s.ApiServer.Addr())
-	stream, _, err := client.AddDeviceAndConnect(context.Background(), b.BusID(), "ns2pro", nil)
+	stream, _, err := client.AddDeviceAndConnect(context.Background(), b.BusID(), TypeName, nil)
 	require.NoError(t, err)
 	defer stream.Close()
 

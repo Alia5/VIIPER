@@ -82,9 +82,9 @@ func main() {
 		fmt.Printf("Using existing bus %d\n", busID)
 	}
 
-	deviceType := "dualsense"
+	deviceType := dualsense.TypeName
 	if edge {
-		deviceType = "dualsenseedge"
+		deviceType = dualsense.TypeNameEdge
 	}
 
 	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, deviceType, nil)

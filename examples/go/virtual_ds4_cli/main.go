@@ -80,7 +80,7 @@ func main() {
 		fmt.Printf("Using existing bus %d\n", busID)
 	}
 
-	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, "dualshock4", nil)
+	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, dualshock4.TypeName, nil)
 	if err != nil {
 		fmt.Printf("AddDeviceAndConnect error: %v\n", err)
 		if createdBus {

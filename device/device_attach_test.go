@@ -56,7 +56,10 @@ func TestDeviceAttach(t *testing.T) {
 
 			c := viiperclient.New(s.ApiServer.Addr())
 
-			stream, addResp, err := c.AddDeviceAndConnect(context.Background(), b.BusID(), tc.deviceType, nil)
+			deviceType := viiperclient.DeviceType[viiperclient.NoOptions]{
+				Name: tc.deviceType,
+			}
+			stream, addResp, err := c.AddDeviceAndConnect(context.Background(), b.BusID(), deviceType, nil)
 			if !assert.NoError(t, err) {
 				t.Fatal()
 			}

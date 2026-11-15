@@ -9,10 +9,15 @@ import (
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/usb"
+	"github.com/Alia5/VIIPER/viiperclient"
 )
 
+var TypeName = viiperclient.DeviceType[viiperclient.NoOptions]{
+	Name: "keyboard",
+}
+
 func init() {
-	api.RegisterDevice("keyboard", &handler{})
+	api.RegisterDevice(TypeName.Name, &handler{})
 }
 
 type handler struct{}

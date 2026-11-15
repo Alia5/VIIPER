@@ -54,7 +54,7 @@ func main() {
 	}
 
 	// Add device and connect to stream in one call
-	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, "keyboard", nil)
+	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, keyboard.TypeName, nil)
 	if err != nil {
 		fmt.Printf("AddDeviceAndConnect error: %v\n", err)
 		if createdBus {

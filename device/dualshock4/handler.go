@@ -10,10 +10,15 @@ import (
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/usb"
+	"github.com/Alia5/VIIPER/viiperclient"
 )
 
+var TypeName = viiperclient.DeviceType[MetaState]{
+	Name: "dualshock4",
+}
+
 func init() {
-	api.RegisterDevice("dualshock4", &handler{})
+	api.RegisterDevice(TypeName.Name, &handler{})
 }
 
 type handler struct{}

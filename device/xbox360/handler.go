@@ -9,10 +9,15 @@ import (
 	"github.com/Alia5/VIIPER/device"
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/usb"
+	"github.com/Alia5/VIIPER/viiperclient"
 )
 
+var TypeName = viiperclient.DeviceType[Xbox360CreateOptions]{
+	Name: "xbox360",
+}
+
 func init() {
-	api.RegisterDevice("xbox360", &handler{})
+	api.RegisterDevice(TypeName.Name, &handler{})
 }
 
 type handler struct{}

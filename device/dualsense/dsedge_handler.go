@@ -12,6 +12,7 @@ import (
 	"github.com/Alia5/VIIPER/internal/server/api"
 	"github.com/Alia5/VIIPER/usb"
 	"github.com/Alia5/VIIPER/usb/hid"
+	"github.com/Alia5/VIIPER/viiperclient"
 )
 
 const (
@@ -42,8 +43,12 @@ var edgeOnlyFeatureReports = []hid.Item{
 	hid.ReportID{ID: 0x7B}, hid.Usage{Usage: 0x53}, hid.ReportCount{Count: 63}, hid.Feature{Flags: hid.MainData | hid.MainVar | hid.MainAbs},
 }
 
+var TypeNameEdge = viiperclient.DeviceType[MetaState]{
+	Name: "dualsenseedge",
+}
+
 func init() {
-	api.RegisterDevice("dualsenseedge", &dsedgehandler{})
+	api.RegisterDevice(TypeNameEdge.Name, &dsedgehandler{})
 }
 
 type dsedgehandler struct{}

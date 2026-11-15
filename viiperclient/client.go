@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-
-	"github.com/Alia5/VIIPER/device"
 )
 
 // Client provides a high-level interface to the VIIPER API, handling request
@@ -95,26 +93,30 @@ func (c *Client) BusListCtx(ctx context.Context) (*BusListResponse, error) {
 // The devType parameter specifies the device type (e.g., "xbox360").
 // Returns the assigned bus ID (e.g., "1-1") or an error if the bus does not exist
 // or the device type is unknown.
-func (c *Client) DeviceAdd(busID uint32, devType string, o *device.CreateOptions) (*Device, error) {
+func (c *Client) DeviceAdd[T any](busID uint32, devType DeviceType[T], o *CreateOptions[T]) (*Device, error) {
 	return c.DeviceAddCtx(context.Background(), busID, devType, o)
 }
 
-func (c *Client) DeviceAddCtx(ctx context.Context, busID uint32, devType string, o *device.CreateOptions) (*Device, error) {
+func (c *Client) DeviceAddCtx[T any](ctx context.Context, busID uint32, devType DeviceType[T], o *CreateOptions[T]) (*Device, error) {
 	pathParams := map[string]string{"id": fmt.Sprintf("%d", busID)}
 	const path = "bus/{id}/add"
 
 	if o == nil {
-		o = &device.CreateOptions{}
+		o = &CreateOptions[T]{}
 	}
 	var deviceSpecific map[string]any
-	if o.DeviceSpecific != "" {
-		err := json.Unmarshal([]byte(o.DeviceSpecific), &deviceSpecific)
+	if o.DeviceSpecific != nil {
+		deviceSpecificJSON, err := json.Marshal(o.DeviceSpecific)
+		if err != nil {
+			return nil, fmt.Errorf("marshal CreateOptions.DeviceSpecific: %w", err)
+		}
+		err = json.Unmarshal(deviceSpecificJSON, &deviceSpecific)
 		if err != nil {
 			return nil, fmt.Errorf("invalid CreateOptions.DeviceSpecific JSON: %w", err)
 		}
 	}
 	req := DeviceCreateRequest{
-		Type:           &devType,
+		Type:           &devType.Name,
 		IDVendor:       o.IDVendor,
 		IDProduct:      o.IDProduct,
 		DeviceSpecific: deviceSpecific,

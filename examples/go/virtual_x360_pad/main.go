@@ -54,7 +54,7 @@ func main() {
 	}
 
 	// Add device and connect to stream in one call
-	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, "xbox360", nil)
+	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, xbox360.TypeName, nil)
 	if err != nil {
 		fmt.Printf("AddDeviceAndConnect error: %v\n", err)
 		if createdBus {

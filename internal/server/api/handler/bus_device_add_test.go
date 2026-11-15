@@ -232,7 +232,7 @@ func TestBusDeviceAdd_NoConnection_TimeoutCleanup(t *testing.T) {
 	api.RegisterDevice("xbox360", testReg)
 
 	c := viiperclient.New(addr)
-	_, err = c.DeviceAdd(80100, "xbox360", nil)
+	_, err = c.DeviceAdd(80100, xbox360.TypeName, nil)
 	require.NoError(t, err)
 
 	list, err := c.DevicesList(80100)

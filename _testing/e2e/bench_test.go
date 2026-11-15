@@ -205,7 +205,7 @@ func Benchmark_Xbox360_Delay(b *testing.B) {
 	busID := busResp.BusID
 	defer c.BusRemove(busID)
 
-	devInfo, err := c.DeviceAdd(busID, "xbox360", nil)
+	devInfo, err := c.DeviceAdd(busID, xbox360.TypeName, nil)
 	if err != nil {
 		b.Fatalf("DeviceAdd failed: %v", err)
 	}

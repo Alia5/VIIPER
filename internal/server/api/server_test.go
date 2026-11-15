@@ -190,7 +190,7 @@ func TestAPIServer_WrappedConn(t *testing.T) {
 
 			time.Sleep(50 * time.Millisecond)
 
-			resp, err := client.DeviceAdd(b.BusID(), "xbox360", nil)
+			resp, err := client.DeviceAdd(b.BusID(), xbox360.TypeName, nil)
 			if tc.expectedErr != nil {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectedErr.Error())

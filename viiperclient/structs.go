@@ -67,6 +67,18 @@ type DeviceRemoveResponse struct {
 	DevID string `json:"devId"`
 }
 
+type DeviceType[T any] struct {
+	Name string
+}
+
+type NoOptions struct{}
+
+type CreateOptions[T any] struct {
+	IDVendor       *uint16
+	IDProduct      *uint16
+	DeviceSpecific *T
+}
+
 type DeviceCreateRequest struct {
 	Type           *string        `json:"type"`
 	IDVendor       *uint16        `json:"idVendor,omitempty"`

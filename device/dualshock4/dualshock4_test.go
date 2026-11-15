@@ -265,7 +265,7 @@ func TestInputReports(t *testing.T) {
 	_ = s.UsbServer.AddBus(b)
 
 	client := viiperclient.New(s.ApiServer.Addr())
-	stream, _, err := client.AddDeviceAndConnect(context.Background(), b.BusID(), "dualshock4", nil)
+	stream, _, err := client.AddDeviceAndConnect(context.Background(), b.BusID(), dualshock4.TypeName, nil)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -444,7 +444,7 @@ func TestFeedback(t *testing.T) {
 	_ = s.UsbServer.AddBus(b)
 
 	client := viiperclient.New(s.ApiServer.Addr())
-	stream, _, err := client.AddDeviceAndConnect(context.Background(), b.BusID(), "dualshock4", nil)
+	stream, _, err := client.AddDeviceAndConnect(context.Background(), b.BusID(), dualshock4.TypeName, nil)
 	if !assert.NoError(t, err) {
 		return
 	}

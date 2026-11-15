@@ -78,7 +78,10 @@ func TestAddDeviceAndConnect(t *testing.T) {
 				errInject = e
 			}
 			c := testClient(responses, errInject)
-			stream, resp, err := c.AddDeviceAndConnect(context.Background(), 42, "test", nil)
+			deviceType := viiperclient.DeviceType[viiperclient.NoOptions]{
+				Name: "test",
+			}
+			stream, resp, err := c.AddDeviceAndConnect(context.Background(), 42, deviceType, nil)
 			if tt.wantDevice != nil {
 				assert.Nil(t, stream)
 				require.NotNil(t, resp, "device response should be parsed")
@@ -172,7 +175,7 @@ func TestDeviceStream_Operations(t *testing.T) {
 			require.NoError(t, usbSrv.AddBus(b))
 
 			c := viiperclient.New(addr)
-			stream, devResp, err := c.AddDeviceAndConnect(context.Background(), tt.busID, "xbox360", nil)
+			stream, devResp, err := c.AddDeviceAndConnect(context.Background(), tt.busID, xbox360.TypeName, nil)
 			require.NoError(t, err)
 			require.NotNil(t, devResp)
 			require.NotNil(t, stream)

@@ -33,7 +33,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, "ns2pro", nil)
+	stream, addResp, err := api.AddDeviceAndConnect(ctx, busID, ns2pro.TypeName, nil)
 	if err != nil {
 		fmt.Printf("AddDeviceAndConnect error: %v\n", err)
 		if createdBus {

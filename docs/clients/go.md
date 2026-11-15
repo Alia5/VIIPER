@@ -47,9 +47,9 @@ func main() {
     busID = resp.BusID
   }
   
-  // Add device and connect (optional CreateOptions parameter for VID/PID)
-  // Pass nil to use default VID/PID for the device type.
-  stream, resp, err := client.AddDeviceAndConnect(ctx, busID, "keyboard", nil)
+  // Add device and connect (optional CreateOptions parameter for VID/PID and device-specific options)
+  // Pass nil to use the defaults for the device type.
+  stream, resp, err := client.AddDeviceAndConnect(ctx, busID, keyboard.TypeName, nil)
   if err != nil {
     log.Fatal(err)
   }
@@ -83,13 +83,54 @@ The simplest way to add a device and open its control stream (nil opts):
 
 ```go
 // Use default VID/PID for the device type
-stream, resp, err := client.AddDeviceAndConnect(ctx, busID, "xbox360", nil)
+stream, resp, err := client.AddDeviceAndConnect(ctx, busID, xbox360.TypeName, nil)
 if err != nil {
   log.Fatal(err)
 }
 defer stream.Close()
 
 log.Printf("Connected to device %s", resp.ID)
+```
+
+### Device Types and Create Options
+
+`DeviceAdd`, `DeviceAddCtx` and `AddDeviceAndConnect` are generic.  
+Every device package exports a `TypeName` descriptor (`viiperclient.DeviceType[T]`) that carries the device type name and the type of its device-specific options.  
+The compiler rejects options that do not belong to the device type.
+
+| Descriptor               | Device-specific options        |
+| ------------------------ | ------------------------------ |
+| `xbox360.TypeName`       | `xbox360.Xbox360CreateOptions` |
+| `dualshock4.TypeName`    | `dualshock4.MetaState`         |
+| `dualsense.TypeName`     | `dualsense.MetaState`          |
+| `dualsense.TypeNameEdge` | `dualsense.MetaState`          |
+| `ns2pro.TypeName`        | `ns2pro.MetaState`             |
+| `keyboard.TypeName`      | `viiperclient.NoOptions`       |
+| `mouse.TypeName`         | `viiperclient.NoOptions`       |
+
+```go
+import (
+  "github.com/Alia5/VIIPER/device/dualsense"
+  "github.com/Alia5/VIIPER/viiperclient"
+)
+
+opts := &viiperclient.CreateOptions[dualsense.MetaState]{
+  DeviceSpecific: &dualsense.MetaState{
+    ShellColor: dualsense.ShellColorCosmicRed,
+  },
+}
+stream, resp, err := client.AddDeviceAndConnect(ctx, busID, dualsense.TypeNameEdge, opts)
+```
+
+`IDVendor` and `IDProduct` in `CreateOptions` override the default VID/PID of the device type.
+
+For a device type name that is only known at runtime, build the descriptor in place:
+
+```go
+deviceType := viiperclient.DeviceType[viiperclient.NoOptions]{
+  Name: name,
+}
+resp, err := client.DeviceAdd(busID, deviceType, nil)
 ```
 
 ### Sending Input
