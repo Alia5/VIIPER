@@ -144,11 +144,7 @@ func createDualSenseFullDevice(
 	if idProduct != 0 {
 		opts.IDProduct = &idProduct
 	}
-	createOptions := dualsensefull.CreateOptions{
-		Meta: dualsense.MetaState{
-			ShellColor: dualsense.DefaultShellColor,
-		},
-	}
+	var createOptions dualsensefull.CreateOptions
 	if meta != nil {
 		createOptions.Meta = dualsense.MetaState{
 			SerialNumber:        goStringOrEmpty(meta.SerialNumber),

@@ -30,20 +30,21 @@ func (h *Handler) CreateDevice(ctx context.Context, o *device.CreateOptions) (us
 		o = &device.CreateOptions{}
 	}
 
-	metaState := MetaState{
-		ShellColor: DefaultShellColor,
-	}
+	var metaState MetaState
 	if o.DeviceSpecific != "" {
 		if err := json.Unmarshal([]byte(o.DeviceSpecific), &metaState); err != nil {
 			return nil, fmt.Errorf("invalid device specific JSON: %w", err)
 		}
+	}
+	if metaState.ShellColor == "" {
+		metaState.ShellColor = DefaultShellColor
 	}
 
 	serial := metaState.SerialNumber
 	if serial == "" {
 		serial = DefaultSerialNumberDS
 	}
-	if metaState.ShellColor != "" && len(serial) >= 6 {
+	if len(serial) >= 6 {
 		code := strings.ToUpper(metaState.ShellColor)
 		if len(code) >= 2 {
 			serial = serial[:4] + code[:2] + serial[6:]

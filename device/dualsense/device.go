@@ -100,7 +100,9 @@ func new(ctx context.Context, o *device.CreateOptions, edge bool) (*DualSense, e
 		if newMeta.BatteryVoltage != 0 {
 			metaState.BatteryVoltage = newMeta.BatteryVoltage
 		}
-		metaState.ShellColor = newMeta.ShellColor
+		if newMeta.ShellColor != "" {
+			metaState.ShellColor = newMeta.ShellColor
+		}
 		metaState.HeadphonesConnected = newMeta.HeadphonesConnected
 		metaState.MicrophoneConnected = newMeta.MicrophoneConnected
 	}
