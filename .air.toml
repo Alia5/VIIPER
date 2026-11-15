@@ -40,6 +40,10 @@ rerun_delay = 500
 send_interrupt = false
 stop_on_error = true
 
+[build.windows]
+cmd = "go build -ldflags '-X main.Version=$(VERSION) -X main.Commit=$(COMMIT) -X main.Date=$(BUILD_TIME)' -o ./dist/viiper.exe ./cmd/viiper"
+entrypoint = ["./dist/viiper.exe", "server", "--log.level=debug"]
+
 [color]
 app = ""
 build = "yellow"
