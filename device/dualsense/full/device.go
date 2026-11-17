@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"maps"
-	"math"
 	"net"
 	"slices"
 	"strconv"
@@ -399,7 +398,7 @@ func (d *Device) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out 
 	if dir == usbip.DirOut && ep == endpointAudioOut {
 		pcm := append([]byte(nil), out...)
 		d.audioMtx.Lock()
-		applyVolume(pcm, d.speakerFeatureUnit, speakerVolumeMax)
+		// applyVolume(pcm, d.speakerFeatureUnit, speakerVolumeMax)
 		for _, c := range d.audioConns {
 			select {
 			case c.out <- pcm:
@@ -426,7 +425,8 @@ func (d *Device) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out 
 		if microphoneFunc != nil {
 			microphoneFunc(pcm)
 		}
-		applyVolume(pcm, featureUnit, microphoneVolumeMax)
+		_ = featureUnit
+		// applyVolume(pcm, featureUnit, microphoneVolumeMax)
 		return pcm
 	}
 
@@ -436,20 +436,4 @@ func (d *Device) HandleTransfer(ctx context.Context, ep uint32, dir uint32, out 
 	report := d.DualSense.HandleTransfer(ctx, ep, dir, out)
 	d.setMicrophoneMuteState(report)
 	return report
-}
-
-func applyVolume(pcm []byte, featureUnit audioFeatureUnit, maximum int16) {
-	if featureUnit.mute || featureUnit.volume == audioVolumeSilence {
-		clear(pcm)
-		return
-	}
-	if featureUnit.volume >= maximum {
-		return
-	}
-	decibel := float64(int(featureUnit.volume)-int(maximum)) / float64(audioVolumeDecibel)
-	gain := math.Pow(10, decibel/20)
-	for i := 0; i+AudioBytesPerSample <= len(pcm); i += AudioBytesPerSample {
-		sample := int16(binary.LittleEndian.Uint16(pcm[i:]))
-		binary.LittleEndian.PutUint16(pcm[i:], uint16(int16(float64(sample)*gain)))
-	}
 }
