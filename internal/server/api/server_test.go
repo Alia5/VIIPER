@@ -162,7 +162,7 @@ func TestAPIServer_WrappedConn(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			testSrvConfig := viiperTesting.TestServerConfig(t)
 
-			testSrvConfig.Server.APIServerConfig.RequireLocalHostAuth = tc.requireLocalAuth
+			testSrvConfig.Server.APIServerConfig.RequireLocalhostAuth = tc.requireLocalAuth
 			testSrvConfig.Server.APIServerConfig.Password = tc.serverPass
 
 			s := viiperTesting.NewTestServerWithConfig(t, testSrvConfig)
