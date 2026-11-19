@@ -329,7 +329,7 @@ func (s *Server) isLocalHostClient(addr net.Addr) bool {
 
 func (s *Server) requiresAuth(addr net.Addr) bool {
 	if s.isLocalHostClient(addr) {
-		return s.config.RequireLocalHostAuth
+		return s.config.RequireLocalhostAuth
 	}
 	return true
 }
